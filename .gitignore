@@ -1,0 +1,4 @@
+agv-firmware-manager
+.orig
+*.o
+*.a
