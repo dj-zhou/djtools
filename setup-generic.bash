@@ -326,6 +326,7 @@ function _dj_setup_qt_5_11_2()
     filename="qt-opensource-linux-x64-5.11.2.run"
     wget http://qt.mirror.constant.com/archive/qt/5.11/5.11.2/$filename
     chmod +x $filename
+    
     ./$filename
 
     _ask_to_remove_a_file $filename
@@ -360,9 +361,49 @@ function _dj_setup_qt_5_13_1()
     fi
     if [[ "$md5checksum" = *"21c3b16f851697fa8da8009f73694373"* ]] ; then
         echo "file exists, no need to download again"
+        chmod +x $filename
     else
         wget http://qt.mirror.constant.com/archive/qt/5.13/5.13.1/$filename
         # md5 checksum: 21c3b16f851697fa8da8009f73694373  qt-opensource-linux-x64-5.13.1.run
+        chmod +x $filename
+    fi
+
+    ./$filename
+
+    _ask_to_remove_a_file $filename
+    
+    cd ${cwd_before_running}
+}
+
+# ===========================================================================================
+function _dj_setup_qt_5_14_2()
+{
+    cwd_before_running=$PWD
+
+    echo "  "
+    echo "Install Qt 5.14.2" 
+    echo "  "
+    sleep 2
+    
+    # install serialport module
+    sudo apt-get install libqt5serialport5-dev -y
+
+    cd ~ && mkdir -p soft/ &&  cd soft/
+    http://qt.mirror.constant.com/archive/qt/5.14/5.14.2/qt-opensource-linux-x64-5.14.2.run
+    filename="qt-opensource-linux-x64-5.14.2.run"
+
+    # check if the file exists --------------------
+    unset md5checksum
+    if [[ -f $filename ]] ; then
+        md5checksum=`md5sum $filename`
+        echo "md5checksum="$md5checksum
+    fi
+    if [[ "$md5checksum" = *"dce0588874fd369ce493ea5bc2a21d99"* ]] ; then
+        echo "file exists, no need to download again"
+        chmod +x $filename
+    else
+        wget http://qt.mirror.constant.com/archive/qt/5.14/5.14.2/$filename
+        # md5 checksum: dce0588874fd369ce493ea5bc2a21d99  qt-opensource-linux-x64-5.14.2.run
         chmod +x $filename
     fi
 

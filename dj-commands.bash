@@ -137,12 +137,82 @@ function _dj_setup_dj_gadgets()
 }
 
 # ===========================================================================================
+# https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04
+# this is only tested in Ubuntu 18.04
+function _dj_setup_container_docker()
+{
+    current_folder=${PWD}
+
+    # Install a few prerequisite packages
+    sudo apt-get install -y apt-transport-https ca-certificates curl 
+    sudo apt-get install -y software-properties-common
+
+    # Add the GPG key for the official Docker repository
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+    # Add the Docker repository to APT sources
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+    sudo apt update
+
+    # Install
+    sudo apt install docker-ce
+
+    # check the status -- not sure if the "active status" need a system reboot
+    sudo systemctl status docker
+
+    # ----------------------------------------------
+    # add current user to the docker group, which was created from above scripts
+    # to avoid typing "sudo" whenever run the docker command 
+    # -- comment out, -- do not delete
+    # sudo usermod -aG docker ${USER}
+    # (to remove a user from a group: sudo gpasswd -d user group, need log in/out)
+
+    # to list the users in the docker group
+    # result=$(getent group docker)
+    result=$(id -nG)
+    if [ $result=*'docker'* ] ; then
+        echo 'The user '${USER}' is in the docker group'
+    else
+        echo 'The user '${USER}' is NOT in the docker group'
+    fi
+    # ----------------------------------------------
+    cd $current_folder
+}
+
+# ===========================================================================================
+# https://github.com/wagoodman/dive
+# how to clone the repo and use its Makefile to install? -- don't know
+function _dj_setup_container_dive()
+{
+    current_folder=${PWD}
+
+    # ----------------------------------------------
+    cd ~ && mkdir -p soft/ &&  cd soft/
+    dive_version="0.9.2"
+    wget "https://github.com/wagoodman/dive/releases/download/v"$dive_version"/dive_"$dive_version"_linux_amd64.deb"
+    sudo dpkg -i dive_*.deb
+    _ask_to_remove_a_file dive_*.deb
+
+    echo " "
+    echo "use the following command to check the docker image layouts"
+    echo "  sudo dive <image-tag/hash>"
+    echo " "
+    echo "you can find the image-tag/hash from command: sudo docker images -a"
+    echo " "
+
+    # ----------------------------------------------
+    cd $current_folder
+}
+
+# ===========================================================================================
 function _dj_setup_pangolin()
 {
     current_folder=${PWD}
     # dependency installation
     sudo apt-get install libglew-dev mesa-utils -y
     sudo apt-get install libglm-dev -y # opengl related mathematics lib
+    sudo apt-get install libxkbcommon-x11-dev # if error: No package 'xkbcommon' found
+
     # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
     
     cd ~ && mkdir -p soft/ &&  cd soft/
@@ -313,14 +383,13 @@ function _dj_setup_opencv_2_4_13()
     echo " "
     echo " Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.11.2"
+    echo "     dj setup qt-5.11.2"
     echo " "
     sleep 3
     
-    cd ~
-    if [[ ! -d soft ]] ; then
-        mkdir -p soft
-    fi
-    cd soft/
+    cd ~ && mkdir -p soft && cd soft/
+
+    sudo rm -rf opencv-4.1.1 # otherwise, it will not going to clone into this folder
 
     wget https://codeload.github.com/opencv/opencv/zip/2.4.13.6
     mv 2.4.13.6 opencv-2.4.13.6.zip
@@ -351,7 +420,9 @@ function _dj_setup_opencv_4_1_1()
 
     echo " "
     echo " Have you installed Qt? The openCV installation may need Qt"
-    echo " use the following command to install Qt 5.11.2"
+    echo " use the following command to install Qt 5.14.2"
+    echo "     dj setup qt-5.14.2"
+    echo
     echo " "
     sleep 3
 
@@ -367,15 +438,17 @@ function _dj_setup_opencv_4_1_1()
     sudo apt-get install -y x264 v4l-utils
 
     cd ~ && mkdir -p soft && cd soft/
+    sudo rm -rf opencv-4.1.1 # otherwise, it will not going to clone into this folder
 
-    git clone https://gitee.com/dj-zhou/opencv-4.1.1.git
-    git clone https://gitee.com/dj-zhou/ippicv.git
+    git clone https://github.com/dj-zhou/opencv-4.1.1.git
+    git clone https://github.com/dj-zhou/ippicv.git
 
     if [ $# = 1 ] && [ $1 = 'with-contrib' ] ; then
-        git clone https://gitee.com/dj-zhou/opencv_contrib-4.1.1.git
+        git clone https://github.com/dj-zhou/opencv_contrib-4.1.1.git
     fi
     
     cd opencv-4.1.1
+    git checkout add-eigen3-include
     sudo rm -rf build && mkdir build && cd build
     if [ $# = 1 ] && [ $1 = 'with-contrib' ] ; then
         cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.1.1/modules ..
@@ -445,7 +518,7 @@ function _dj_setup_vtk_8_2_0()
     git clone https://gitee.com/dj-zhou/vtk-8.2.0.git
 
     cd vtk-8.2.0 && sudo rm -rf build/ && mkdir -p build && cd build
-    cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DVTK_RENDERING_BACKEND=OpenGL2 -DQT5_DIR=$HOME/Qt5.11.2/5.11.2/gcc_64/lib/cmake/Qt5 -DVTK_QT_VERSION=5 -DVTK_Group_Qt=ON ..
+    cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DVTK_RENDERING_BACKEND=OpenGL2 -DQT5_DIR=$HOME/Qt5.14.2/5.14.2/gcc_64/lib/cmake/Qt5 -DVTK_QT_VERSION=5 -DVTK_Group_Qt=ON ..
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
     # some warning:
     # CMake Warning:
@@ -507,6 +580,18 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'container' ] ; then
+            if [ $3 = 'docker' ] ; then
+                _dj_setup_container_docker
+                return
+            fi
+            if [ $3 = 'dive' ] ; then
+                _dj_setup_container_dive
+                return
+            fi
+            return
+        fi
+        # --------------------------
         if [ $2 = 'dropbox' ] ; then
             _dj_setup_dropbox
             return
@@ -556,7 +641,11 @@ function dj()
             _dj_setup_qt_5_13_1
             return
         fi
-        
+        # --------------------------
+        if [ $2 = 'qt-5.14.2' ] ; then
+            _dj_setup_qt_5_14_2
+            return
+        fi
         # --------------------------
         if [ $2 = 'pip' ] ; then
             _dj_setup_pip
@@ -673,15 +762,18 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    ACTIONS[setup]+="arm-gcc clang-9.0.0 computer dj-gadgets dropbox eigen foxit gitg-kdiff3 "
-    ACTIONS[setup]+="glfw3-gtest-glog i219-v mathpix opencv-2.4.13 opencv-4.1.1 pangolin pip "
-    ACTIONS[setup]+="qt-5.11.2 qt-5.13.1 ros-melodic slack stm32tools typora sublime vscode "
-    ACTIONS[setup]+="vtk-8.2.0 wubi yaml-cpp "
+    ACTIONS[setup]+="arm-gcc clang-9.0.0 container computer dj-gadgets dropbox eigen foxit "
+    ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog i219-v mathpix opencv-2.4.13 opencv-4.1.1 "
+    ACTIONS[setup]+="pangolin pip qt-5.11.2 qt-5.13.1 qt-5.14.2 ros-melodic slack stm32tools "
+    ACTIONS[setup]+="typora sublime vscode vtk-8.2.0 wubi yaml-cpp "
     ACTIONS[arm-gcc]=" "
     ACTIONS[clang-8.0.0]=" "
     ACTIONS[clang-9.0.0]=" "
     ACTIONS[computer]=" "
     ACTIONS[dj-gadgets]=" "
+    ACTIONS[container]="docker dive "
+    ACTIONS[docker]=" "
+    ACTIONS[dive]=" "
     ACTIONS[dropbox]=" "
     ACTIONS[eigen]=" "
     ACTIONS[foxit]=" "
@@ -698,6 +790,7 @@ function _dj()
     ACTIONS[pip]=" "
     ACTIONS[qt-5.11.2]=" "
     ACTIONS[qt-5.13.1]=" "
+    ACTIONS[qt-5.14.2]=" "
     ACTIONS[ros-melodic]=" "
     ACTIONS[slack]=" "
     ACTIONS[stm32tools]=" "

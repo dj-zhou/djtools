@@ -29,7 +29,7 @@ ubuntu_release_version=$(lsb_release -a)
 
 # ===========================================================================================
 source $djtools_path/coding.bash
-source $djtools_path/commands.bash
+source $djtools_path/dj-commands.bash
 source $djtools_path/funcs.bash
 source $djtools_path/keyremap.bash
 source $djtools_path/repo.bash
@@ -76,15 +76,6 @@ alias cdcv="cd ~/workspace/work/openCV/"
 alias cdml="cd ~/ml/"
 alias cdqt="cd ~/qt/"
 alias cdsoft="cd ~/soft/"
-
-# if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
-#     source /opt/ros/kinetic/setup.bash
-# elif  [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
-#     source /opt/ros/melodic/setup.bash
-# fi
-
-# # should be fixed
-# source ~/$ros_ws/devel/setup.bash
 
 # ===========================================================================================
 export HOSTNAME
