@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-# ===================================================================
+# ===========================================================================================
 function _system_help()
 {
     echo ' '
@@ -50,16 +50,31 @@ function _system_disable_program_problem_detected()
 }
 
 # ===========================================================================================
-# this function has one error not solved:
-#    bash: [: too many arguments
 function _system_check_temperature()
 {
     result=$(sensors)
     # echo $result
-    if [ $result=*'not found'* ] ; then
+    if [[ "$result" = *"not found"* ]] ; then
         sudo apt-get install lm-sensors
     fi
     sensors
+}
+
+# ===========================================================================================
+function _system_check_nvidia_driver()
+{
+    result=$(inxi -G)
+    # echo $result
+    if [[ "$result" = *"not found"* ]] ; then
+        sudo apt-get install inxi
+    fi
+    inxi -G
+}
+
+# ===========================================================================================
+function _system_wallpaper_random()
+{
+    _random_wallpaper # from funcs.bash
 }
 
 # ===========================================================================================
@@ -93,14 +108,28 @@ function system()
             _system_check_temperature
             return
         fi
+        # --------------------------
+        if [ $2 = 'nvidia-driver' ] ; then
+            _system_check_nvidia_driver
+            return
+        fi
         _system_check_help
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'wallpaper' ] ; then
+        # --------------------------
+        if [ $2 = 'random' ] ; then
+            _system_wallpaper_random
+            return
+        fi
         return
     fi
     _dj_help
     # ------------------------------
 }
 
-# ===================================================================
+# ===========================================================================================
 function _system()
 {
     COMPREPLY=()
@@ -110,6 +139,7 @@ function _system()
         enable
         disable
         check
+        wallpaper
     ")
 
     # declare an associative array for options
@@ -119,8 +149,11 @@ function _system()
     ACTIONS[enable]+=" "
     ACTIONS[disable]+="program-problem-detected "
     ACTIONS[program-problem-detected]=" "
-    ACTIONS[check]+="temperature "
+    ACTIONS[check]+="temperature nvidia-driver "
     ACTIONS[temperature]+=" "
+    ACTIONS[nvidia-driver]+=" "
+    ACTIONS[wallpaper]+="random "
+    ACTIONS[random]+=" "
 
     
     # ---------------------------------------------------------------------------------
@@ -132,5 +165,5 @@ function _system()
     fi
 }
 
-# ===================================================================
+# ===========================================================================================
 complete -F _system system

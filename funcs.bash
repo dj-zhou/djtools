@@ -28,11 +28,15 @@ function _wallpaper_setup()
 # ===========================================================================================
 function _random_wallpaper()
 {
+    current_folder=${PWD}
+
     cd $wallpaper_folder
     set -- *
     length=$#
     random_num=$((( $RANDOM % ($length) ) + 1))
     gsettings set org.gnome.desktop.background picture-uri "file://$wallpaper_folder/${!random_num}"
+    
+    cd $current_folder
 }
 
 # ===========================================================================================

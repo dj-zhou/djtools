@@ -84,12 +84,12 @@ function _dj_setup_computer()
     echo " "
     echo "  going to install the following packages: "
     echo "      curl g++ git vim terminator kate scrot wmctrl  "
-    echo "      dconf-editor dconf-tools vlc cutecom xclip "
+    echo "      dconf-editor dconf-tools vlc cutecom xclip tree "
     echo "      ark yasm cmake libgtk2.0-dev htop lsb-core "
     echo " "
     _press_enter_to_continue
     sudo apt-get install curl g++ git vim terminator kate scrot wmctrl -y
-    sudo apt-get install dconf-editor dconf-tools vlc cutecom xclip -y
+    sudo apt-get install dconf-editor dconf-tools vlc cutecom xclip tree -y
     sudo apt-get install ark yasm cmake libgtk2.0-dev htop lsb-core -y
 
     # -----------------------------------

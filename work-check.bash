@@ -48,7 +48,6 @@ function _work_check()
     cd $target_path
     workspace_path=$(pwd)
     echo $workspace_path
-    # return
 
     CURRENT_DATE_TIME=`date +"%Y%m%d-%I%M%S"`
     OUTPUT_FILE="${HOME}/work-check-${HOSTNAME}-${CURRENT_DATE_TIME}.txt"
@@ -156,7 +155,6 @@ function _work_check()
             if [[ $git_source != "----" ]] ; then
                 repo=`basename "$folder"`
                 echo $repo
-                #path=$workspace_path/$repo
                 if [ -x "$path" ] ; then
                     cd $workspace_path/$repo
                     branch_diff=`git diff | awk 'NR==1'`
@@ -190,7 +188,6 @@ function _work_check()
             if [[ $git_source != "----" ]] ; then
                 repo=`basename "$folder"`
                 echo $repo
-                #path=$workspace_path/$repo
                 if [ -x "$path" ]; then
                     cd $workspace_path/$repo
                     branch_diff=`git diff`

@@ -205,6 +205,13 @@ function _dj_setup_container_dive()
 }
 
 # ===========================================================================================
+function _dj_setup_container_lxd_4_0()
+{
+    sudo apt install snapd
+    sudo snap install lxd --channel=4.0/stable
+}
+
+# ===========================================================================================
 function _dj_setup_pangolin()
 {
     current_folder=${PWD}
@@ -589,6 +596,10 @@ function dj()
                 _dj_setup_container_dive
                 return
             fi
+            if [ $3 = 'lxd-4.0' ] ; then
+                _dj_setup_container_lxd_4_0
+                return
+            fi
             return
         fi
         # --------------------------
@@ -771,9 +782,10 @@ function _dj()
     ACTIONS[clang-9.0.0]=" "
     ACTIONS[computer]=" "
     ACTIONS[dj-gadgets]=" "
-    ACTIONS[container]="docker dive "
+    ACTIONS[container]="docker dive lxd-4.0 "
     ACTIONS[docker]=" "
     ACTIONS[dive]=" "
+    ACTIONS[lxd-4.0]=" "
     ACTIONS[dropbox]=" "
     ACTIONS[eigen]=" "
     ACTIONS[foxit]=" "

@@ -88,8 +88,8 @@ export ROS_IP=localhost
 
 # ===========================================================================================
 # Qt
-export PATH=~/Qt5.13.1/5.13.1/gcc_64/bin:$PATH
-export  LD_LIBRARY_PATH=~/Qt5.13.1/5.13.1/gcc_64/lib:$LD_LIBRARY_PATH
+export PATH=~/Qt5.14.2/5.14.2/gcc_64/bin:$PATH
+export  LD_LIBRARY_PATH=~/Qt5.14.2/5.14.2/gcc_64/lib:$LD_LIBRARY_PATH
 
 # ===========================================================================================
 # pangolin
