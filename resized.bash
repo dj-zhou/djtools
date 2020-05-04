@@ -65,10 +65,18 @@ _resize_embedded()
     elif [[ $SCREENSIZE = *"3840x2160"* ]]; then
         echo "resized embedded: Single 3840x2160 screen"
         #                   none, x,     y,   width,   height
-        wmctrl -r "/bin/bash" -e 0,10,0,1600,2030
+        wmctrl -r "/bin/bash" -e 0,10,0,1200,2030
         wmctrl -r "eclipse" -e 0,1830,0,2000,2050
         wmctrl -r "Sublime Text" -e 0,1730,0,2000,2050
         wmctrl -r ${vs_code_window} -e 0,1730,0,2300,2030
+    elif [[ "$SCREENSIZE" = *"1920x1200"*"1920x1200"* ]]; then
+        echo "resized embedded: Double 1920x1200 screen"
+        #                   none, x,     y,   width,   height
+        wmctrl -r "/bin/bash" -e 0,0,10,800,1120
+        wmctrl -r "Terminal" -e 0,1200,0,710,1150
+        wmctrl -r "eclipse" -e 0,2720,0,1200,1150
+        wmctrl -r "Sublime Text" -e 0,2830,0,1500,1100
+        wmctrl -r ${vs_code_window} -e 0,800,0,1120,1150
     elif [[ "$SCREENSIZE" = *"1920x1080"*"1920x1080"* ]]; then
         echo "resized embedded: Double 1920x1080 screen"
         #                   none, x,     y,   width,   height

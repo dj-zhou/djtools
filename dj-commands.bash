@@ -30,25 +30,25 @@ function _dj_help()
 function _clang_vscode_setting_json()
 {
     # echo "hello world"
-    current_folder=${PWD}
+    current_folder_json=${PWD}
     cd $djtools_path # otherwise there will be no copy
     # pwd
     folder="/home/$USER/.config/Code/User"
-    if [ ! -d $folder ] ; then
-        mkdir -p $folder
-    fi
+    mkdir -p $folder
 
     if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
         json_file="clang-setting-ubuntu-16.04.json"
     elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
         json_file="clang-setting-ubuntu-18.04.json"
+    elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
+        echo " TODO"
     fi
-    echo "json_file = "$json_file
+    echo "copy json file: "$json_file" to "$folder
     sudo rm -f $folder/settings.json
     cp $json_file $folder/settings.json
     cp .clang-format $folder/.clang-format
 
-    cd $current_folder
+    cd $current_folder_json
 }
 
 # ===========================================================================================
@@ -61,9 +61,11 @@ function _dj_setup_clang_9_0_0()
         echo "  Install clang for Ubuntu 16.04..."
     elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
         echo "  Install clang for Ubuntu 18.04..."
+    elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
+        echo " TODO"
     fi
     echo " "
-    sleep 2
+    sleep 1
 
     cd ~ && mkdir -p soft/ && cd soft/
     
@@ -89,12 +91,12 @@ function _dj_setup_clang_9_0_0()
     echo "untar the clang file ..."
     tar xf ${clang_file}.tar.xz
     sudo rm -rf /opt/clang+llvm*
+
+    echo "copy the clang file into /opt/ ..."
     sudo mv ${clang_file}/ /opt/
     _ask_to_remove_a_file ${clang_file}.tar.xz
 
-    if [[ ! -d ~/.config/Code/User ]] ; then
-        mkdir -p ~/.config/Code/User
-    fi
+    mkdir -p ~/.config/Code/User
 
     cd $djtools_path
 
@@ -119,6 +121,8 @@ function _dj_setup_clang_9_0_0()
         echo "You can edit ~/.config/Code/User/settings.json manually."
     fi
 
+    echo ' '
+
     cd $current_folder
 }
 
@@ -131,8 +135,14 @@ function _dj_setup_dj_gadgets()
     git clone https://dj-zhou@github.com/dj-zhou/dj-gadgets.git
     cd dj-gadgets
     make && sudo make install
+
+    # dj-file installation
+    cd dj-file/
+    ./install.sh
+
     cd ~/workspace/
     _ask_to_remove_a_folder dj-gadgets
+    
     cd $current_folder
 }
 
@@ -355,6 +365,8 @@ function _dj_setup_glfw3_gtest_glog()
     sleep 2
     cd ~
     
+    cd ~ && mkdir -p soft && cd soft/
+
     # glfw3
     sudo apt-get -y install build-essential cmake git xorg-dev libglu1-mesa-dev -y
     sudo rm -rf glfw3/
@@ -364,7 +376,7 @@ function _dj_setup_glfw3_gtest_glog()
     cmake .. -DBUILD_SHARED_LIBS=ON
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install && sudo ldconfig
-    cd ~
+    cd ~/soft/
     _ask_to_remove_a_folder glfw3
     
     # gtest
@@ -748,7 +760,14 @@ function dj()
         return
     fi
     if [ $1 = 'udev' ] ; then
-        _dj_udev_uvc_video_capture $2 $3 $4 $5
+        if [ $2 = '--dialout' ] ; then
+            _dj_udev_dialout $3 $4 $5
+            return
+        fi
+        if [ $2 = 'uvc-video-capture' ] ; then
+            _dj_udev_uvc_video_capture $3 $4 $5
+            return
+        fi
         return
     fi
     _dj_help
@@ -776,7 +795,7 @@ function _dj()
     ACTIONS[setup]+="arm-gcc clang-9.0.0 container computer dj-gadgets dropbox eigen foxit "
     ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog i219-v mathpix opencv-2.4.13 opencv-4.1.1 "
     ACTIONS[setup]+="pangolin pip qt-5.11.2 qt-5.13.1 qt-5.14.2 ros-melodic slack stm32tools "
-    ACTIONS[setup]+="typora sublime vscode vtk-8.2.0 wubi yaml-cpp "
+    ACTIONS[setup]+="sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
     ACTIONS[arm-gcc]=" "
     ACTIONS[clang-8.0.0]=" "
     ACTIONS[clang-9.0.0]=" "
@@ -806,9 +825,9 @@ function _dj()
     ACTIONS[ros-melodic]=" "
     ACTIONS[slack]=" "
     ACTIONS[stm32tools]=" "
+    ACTIONS[sublime]=" "
     ACTIONS[typora]=" "
     ACTIONS[vscode]=" "
-    ACTIONS[sublime]=" "
     ACTIONS[vtk-8.2.0]=" "
     ACTIONS[wubi]=" "
     ACTIONS[yaml-cpp]=" "
@@ -817,24 +836,37 @@ function _dj()
     #---------------------------------------------------------
     ACTIONS[clone]="bitbucket github gitee "
     #---------------------------------------------------------
-    ACTIONS[bitbucket]+="lib-stm32f4-v2 "
-    ACTIONS[lib-stm32f4-v2]=" "
+    ACTIONS[bitbucket]+=" "
+    # ACTIONS[lib-stm32f4-v2]=" "
     #---------------------------------------------------------
-    ACTIONS[github]="python-demo learn-ml opencv4-demo "
-    ACTIONS[github]="e1000e-3.4.2.1 e1000e-3.4.2.4 vtk-demo libsodium-1.0.18 "
-    ACTIONS[github]="pangolin-demo learn-md dj-lib-cpp glfw3 pangolin yaml-cpp "
-    ACTIONS[python-demo]=" "
-    ACTIONS[learn-ml]=" "
-    ACTIONS[opencv4-demo]=" "
-    ACTIONS[e1000e-3.4.2.1]=" "
-    ACTIONS[e1000e-3.4.2.4]=" "
-    ACTIONS[vtk-demo]=" "
-    ACTIONS[libsodium-1.0.18]=" "
-    ACTIONS[pangolin-demo]=" "
-    ACTIONS[learn-md]=" "
+    ACTIONS[github]+="algorithm-note avr-gcc can-analyzer cpp-practise cv dj-gadgets dj-lib-cpp "
+    ACTIONS[github]+="djtools embedded-debug-gui glfw3 math-for-ml-note matplotlib-cpp "
+    ACTIONS[github]+="mqtt-demo opencv-4.1.1 opencv4-demo pads-clear-up pangolin pangolin-demo "
+    ACTIONS[github]+="robotics-note stl-practise stm32-lib stm32tools vtk-demo yaml-cpp "
+    ACTIONS[algorithm-note]=" "
+    ACTIONS[avr-gcc]=" "
+    ACTIONS[can-analyzer]=" "
+    ACTIONS[cpp-practise]=" "
+    ACTIONS[cv]=" "
+    ACTIONS[dj-gadgets]=" "
     ACTIONS[dj-lib-cpp]=" "
+    ACTIONS[djtools]=" "
+    ACTIONS[embedded-debug-gui]=" "
     ACTIONS[glfw3]=" "
+    ACTIONS[math-for-ml-note]=" "
+    ACTIONS[matplotlib-cpp]=" "
+    ACTIONS[mqtt-demo]=" "
+    ACTIONS[opencv-4.1.1]=" "
+    ACTIONS[opencv4-demo]=" "
+    ACTIONS[pads-clear-up]=" "
     ACTIONS[pangolin]=" "
+    ACTIONS[pangolin-demo]=" "
+    ACTIONS[robotics-note]=" "
+    ACTIONS[stl-practise]=" "
+    ACTIONS[stm32-lib]=" "
+    ACTIONS[stm32-embedded-demo]=" "
+    ACTIONS[stm32tools]=" "
+    ACTIONS[vtk-demo]=" "
     ACTIONS[yaml-cpp]=" "
     #---------------------------------------------------------
     ACTIONS[gitee]="vtk-8.2.0 opencv-4.1.1 "
@@ -844,8 +876,9 @@ function _dj()
     #---------------------------------------------------------
     #---------------------------------------------------------
     ACTIONS[work-check]=" "
-    ACTIONS[udev]="uvc-video-capture "
+    ACTIONS[udev]="uvc-video-capture --dialout "
     ACTIONS[uvc-video-capture]=" "
+    ACTIONS[--dialout]=" "
 
     # --------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

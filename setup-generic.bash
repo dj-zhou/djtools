@@ -6,7 +6,7 @@ function _dj_setup_help()
     _dj_help
     echo "--------------------- dj setup ----------------------"
     echo " Second level commands:"
-    echo "   gcc-arm          - to install arm-gcc-embedded compiler"
+    echo "   arm-gcc          - to install arm-gcc-embedded compiler"
     echo "   clang-8.0.0      - to install clang v8.0.0 for use of vscode"
     echo "   computer         - to pre install lots of necessary"
     echo "                      software package"
@@ -164,8 +164,13 @@ function _dj_setup_dropbox()
     sudo apt-get install libpango1.0-0 -y
     sudo apt-get --fix-broken install
     # how to deal with version?
+
+    cd ~ && mkdir -p soft/ &&  cd soft/
+
     curl -L https://linux.dropbox.com/packages/ubuntu/dropbox_2020.03.04_amd64.deb > dropbox.deb
     sudo dpkg -i dropbox.deb
+    
+    _ask_to_remove_a_file dropbox.deb
     
     echo " "
     echo " You can run the following command to setup the Dropbox"
