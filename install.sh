@@ -10,8 +10,7 @@ echo " "
 echo 'djtools installation...'
 echo " "
 
-echo '# ================================================================' >> ~/.bashrc
-echo '# djtools setup' >> ~/.bashrc
+
 
 echo 'Enter a path for wallpaper'
 read answer
@@ -79,7 +78,7 @@ echo " "
 # source the package in ~/.bashrc
 installed=0
 while IFS='' read -r line || [[ -n "$line" ]] ; do
-    if [[ $line == *"source "$djtools_path$"/djtools.bash"* ]] ; then 
+    if [[ $line == *"source "$djtools_path$"/djtools.bash"* ]] ; then
         echo " "
         echo "djtools has already been installed."
         echo " "
@@ -87,7 +86,9 @@ while IFS='' read -r line || [[ -n "$line" ]] ; do
     fi
 done < ~/.bashrc
 
-if [ $installed = 0 ] ; then 
+if [ $installed = 0 ] ; then
+    echo '# ================================================================' >> ~/.bashrc
+    echo '# djtools setup' >> ~/.bashrc
     echo "source "$djtools_path"/djtools.bash" >> ~/.bashrc
     echo " "
     echo "djtools installation finished."

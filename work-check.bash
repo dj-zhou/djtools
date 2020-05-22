@@ -36,7 +36,7 @@ function _work_check()
     else
         target_path="$1"
     fi
-    echo "target_path: "$target_path
+    # echo "target_path: "$target_path
     
     # check all folders target_path folder --------------------
     if [[ ! -d $target_path ]] ; then
@@ -47,7 +47,7 @@ function _work_check()
     fi
     cd $target_path
     workspace_path=$(pwd)
-    echo $workspace_path
+    # echo $workspace_path
 
     CURRENT_DATE_TIME=`date +"%Y%m%d-%I%M%S"`
     OUTPUT_FILE="${HOME}/work-check-${HOSTNAME}-${CURRENT_DATE_TIME}.txt"
@@ -76,7 +76,7 @@ function _work_check()
     for folder in $workspace_path/*; do
         if [[ -d $folder ]] ; then
             repo=`basename "$folder"`
-            echo $repo
+            printf $repo
             path=$workspace_path/$repo
             if [ -x "$path" ]; then
                 cd $workspace_path/$repo
@@ -103,14 +103,17 @@ function _work_check()
                     git_status=$(git status)
                     if [[ $git_status = *"is ahead"* ]] ; then
                         git_status_str="ahead"
+                        printf " ${BLUE_COLOR}ahead${NO_COLOR}"
                     elif [[ $git_status = *"is behind"* ]] ; then
                         git_status_str="behind"
+                        printf " ${CYAN_COLOR}behind${NO_COLOR}"
                     else
                         git_status_str="    "
                     fi
                     if [[ $t_name = *"dirty"* ]] ; then
                         if [[ $git_status_str = "    " ]] ; then
                             git_status_str="dirty"
+                            printf " ${RED_COLOR}dirty${NO_COLOR}"
                         else
                             git_status_str=$git_status_str" + dirty"
                         fi
@@ -122,6 +125,7 @@ function _work_check()
                     commit_str="----"
                     git_status_str="----"
                 fi
+                printf "\r\n"
                 # --------------------------------------------------------
                 $(_write_to_text_file_with_width "$date_time" 24 $OUTPUT_FILE)
                 $(_write_to_text_file_with_width "$git_source" 15 $OUTPUT_FILE)
@@ -141,9 +145,9 @@ function _work_check()
     echo -ne "\n" >> $OUTPUT_FILE
     echo -ne "\n" >> $OUTPUT_FILE
     echo -ne "\n" >> $OUTPUT_FILE
-    echo " "
-    echo " "
-    echo "----------------- git simple diff -----------------"
+    # echo " "
+    # echo " "
+    # echo "----------------- git simple diff -----------------"
     cd $workspace_path/
     echo -ne "+-----------------------------------------------+\n" >> $OUTPUT_FILE
     echo -ne "|--------------- git simple diff ---------------|\n" >> $OUTPUT_FILE
@@ -154,7 +158,7 @@ function _work_check()
             git_source=$(_work_check_git_source)
             if [[ $git_source != "----" ]] ; then
                 repo=`basename "$folder"`
-                echo $repo
+                # echo $repo
                 if [ -x "$path" ] ; then
                     cd $workspace_path/$repo
                     branch_diff=`git diff | awk 'NR==1'`
@@ -174,9 +178,9 @@ function _work_check()
     echo -ne "\n" >> $OUTPUT_FILE
     echo -ne "\n" >> $OUTPUT_FILE
 
-    echo " "
-    echo " "
-    echo "------------ git detailed local change ------------"
+    # echo " "
+    # echo " "
+    # echo "------------ git detailed local change ------------"
     cd $workspace_path/
     echo -ne "+-----------------------------------------------+\n" >> $OUTPUT_FILE
     echo -ne "|---------- git detailed local change ----------|\n" >> $OUTPUT_FILE
@@ -187,7 +191,7 @@ function _work_check()
             git_source=$(_work_check_git_source)
             if [[ $git_source != "----" ]] ; then
                 repo=`basename "$folder"`
-                echo $repo
+                # echo $repo
                 if [ -x "$path" ]; then
                     cd $workspace_path/$repo
                     branch_diff=`git diff`
@@ -205,5 +209,5 @@ function _work_check()
 
     cd ${cwd_before_running}
     # open the file!
-    gedit $OUTPUT_FILE
+    # gedit $OUTPUT_FILE
 }

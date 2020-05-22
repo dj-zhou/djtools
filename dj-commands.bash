@@ -564,6 +564,57 @@ function _dj_work_check()
 }
 
 # ===========================================================================================
+function _dj_meson_build()
+{
+    current_folder=${PWD}
+    
+    echo ' '
+    folder_name=`basename "$current_folder"`
+    echo "current folder name: "$folder_name
+    echo ' '
+    
+    # if the curent folder is build, then
+    # cd ../ && rm build -r 
+    # meson build && cd build && ninja
+    if [ $folder_name = 'build' ] ; then
+        cd ../
+        rm build/ -rf
+        meson build
+        cd build
+        ninja
+
+    # if the curent folder containes a build/ folder, then
+    # rm build -r 
+    # meson build && cd build && ninja
+    elif [ -d build ] ; then
+        rm build/ -rf
+        meson build
+        cd build
+        ninja
+    else
+        echo ' '
+        echo 'not in the build/ folder'
+        echo 'neither contains a build/ folder'
+        echo ' '
+    fi
+    cd $current_folder
+}
+
+# ===========================================================================================
+function _dj_open_file()
+{
+    # --------------------------
+    if [ $# -eq 0 ] ; then
+        nautilus .
+        return
+    fi
+    # --------------------------
+    if [ $# -eq 1 ] ; then
+        nautilus $1
+        return
+    fi
+}
+# ===========================================================================================
 function dj()
 {
     # ------------------------------
@@ -572,10 +623,28 @@ function dj()
         return
     fi
     # ------------------------------
+    if [ $1 = 'meson' ] ; then
+        if [ $2 = 'build' ] ; then
+            _dj_meson_build $3 $4 $5 $6
+            return
+        fi
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'open' ] ; then
+        _dj_open_file $2 $3 $4
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'setup' ] ; then
         # --------------------------
         if [ $2 = 'arm-gcc' ] ; then
             _dj_setup_arm_gcc
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'baidu-netdisk' ] ; then
+            _dj_setup_baidu_netdisk
             return
         fi
         # --------------------------
@@ -627,6 +696,10 @@ function dj()
         # --------------------------
         if [ $2 = 'i219-v' ] ; then
             _dj_setup_i219_v $3
+            return
+        fi
+        if [ $2 = 'libev-4.33' ] ; then
+            _dj_setup_libev_4_33
             return
         fi
         # --------------------------
@@ -781,10 +854,12 @@ function _dj()
 
     # All possible first values in command line
     local SERVICES=("
-        setup
         clone
-        work-check
+        meson
+        open
+        setup
         udev
+        work-check
     ")
 
     # declare an associative array for options
@@ -792,11 +867,12 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    ACTIONS[setup]+="arm-gcc clang-9.0.0 container computer dj-gadgets dropbox eigen foxit "
-    ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog i219-v mathpix opencv-2.4.13 opencv-4.1.1 "
+    ACTIONS[setup]+="arm-gcc baidu-netdisk clang-9.0.0 container computer dj-gadgets dropbox eigen foxit "
+    ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog i219-v libev-4.33 mathpix opencv-2.4.13 opencv-4.1.1 "
     ACTIONS[setup]+="pangolin pip qt-5.11.2 qt-5.13.1 qt-5.14.2 ros-melodic slack stm32tools "
     ACTIONS[setup]+="sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
     ACTIONS[arm-gcc]=" "
+    ACTIONS[baidu-netdisk]=" "
     ACTIONS[clang-8.0.0]=" "
     ACTIONS[clang-9.0.0]=" "
     ACTIONS[computer]=" "
@@ -810,6 +886,7 @@ function _dj()
     ACTIONS[foxit]=" "
     ACTIONS[glfw3-gtest-glog]=" "
     ACTIONS[i219-v]="e1000e-3.4.2.1 e1000e-3.4.2.4 "
+    ACTIONS[libev-4.33]=" "
     ACTIONS[mathpix]=" "
     ACTIONS[e1000e-3.4.2.1]=" "
     ACTIONS[e1000e-3.4.2.4]=" "
@@ -835,14 +912,15 @@ function _dj()
     #---------------------------------------------------------
     #---------------------------------------------------------
     ACTIONS[clone]="bitbucket github gitee "
+    ACTIONS[open]=" "
     #---------------------------------------------------------
     ACTIONS[bitbucket]+=" "
     # ACTIONS[lib-stm32f4-v2]=" "
     #---------------------------------------------------------
     ACTIONS[github]+="algorithm-note avr-gcc can-analyzer cpp-practise cv dj-gadgets dj-lib-cpp "
-    ACTIONS[github]+="djtools embedded-debug-gui glfw3 math-for-ml-note matplotlib-cpp "
-    ACTIONS[github]+="mqtt-demo opencv-4.1.1 opencv4-demo pads-clear-up pangolin pangolin-demo "
-    ACTIONS[github]+="robotics-note stl-practise stm32-lib stm32tools vtk-demo yaml-cpp "
+    ACTIONS[github]+="djtools embedded-debug-gui glfw3 math-for-ml-note matplotlib-cpp opencv-4.1.1 "
+    ACTIONS[github]+="pads-clear-up pangolin robotics-note stl-practise stm32-lib stm32tools tutorials "
+    ACTIONS[github]+="yaml-cpp "
     ACTIONS[algorithm-note]=" "
     ACTIONS[avr-gcc]=" "
     ACTIONS[can-analyzer]=" "
@@ -855,18 +933,15 @@ function _dj()
     ACTIONS[glfw3]=" "
     ACTIONS[math-for-ml-note]=" "
     ACTIONS[matplotlib-cpp]=" "
-    ACTIONS[mqtt-demo]=" "
     ACTIONS[opencv-4.1.1]=" "
-    ACTIONS[opencv4-demo]=" "
     ACTIONS[pads-clear-up]=" "
     ACTIONS[pangolin]=" "
-    ACTIONS[pangolin-demo]=" "
     ACTIONS[robotics-note]=" "
     ACTIONS[stl-practise]=" "
     ACTIONS[stm32-lib]=" "
     ACTIONS[stm32-embedded-demo]=" "
     ACTIONS[stm32tools]=" "
-    ACTIONS[vtk-demo]=" "
+    ACTIONS[tutorials]=" "
     ACTIONS[yaml-cpp]=" "
     #---------------------------------------------------------
     ACTIONS[gitee]="vtk-8.2.0 opencv-4.1.1 "
@@ -879,6 +954,11 @@ function _dj()
     ACTIONS[udev]="uvc-video-capture --dialout "
     ACTIONS[uvc-video-capture]=" "
     ACTIONS[--dialout]=" "
+
+    #---------------------------------------------------------
+    #---------------------------------------------------------
+    ACTIONS[meson]="build "
+    ACTIONS[build]="  "
 
     # --------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

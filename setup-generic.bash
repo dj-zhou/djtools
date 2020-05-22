@@ -70,6 +70,22 @@ function _dj_setup_arm_gcc()
 }
 
 # ===========================================================================================
+function _dj_setup_baidu_netdisk()
+{
+    current_folder=${PWD}
+
+    cd ~ && mkdir -p soft/ &&  cd soft/
+
+    file="baidunetdisk_linux_3.0.1.2.deb"
+    curl -L http://wppkg.baidupcs.com/issue/netdisk/LinuxGuanjia/3.0.1/$file > $file
+
+    sudo dpkg -i $file
+    
+    cd $current_folder
+    unset current_folder
+}
+
+# ===========================================================================================
 function _dj_setup_computer()
 {
     current_folder=${PWD}
@@ -203,14 +219,52 @@ function _dj_setup_i219_v()
 
     cd ~
     
-    git clone https://dj-zhou@github.com/dj-zhou/$1.git
+    git clone https://dj-zhou@github.com/dj-zhou/i219-v.git
     cd $1/src/
     sudo make install
 
     cd ~
-    _ask_to_remove_a_folder ~/$1
+    _ask_to_remove_a_folder ~/i219-v
 
     _ask_to_execute_cmd "sudo reboot"
+
+    cd $current_folder
+}
+
+# ===========================================================================================
+# libev can also be installed by 
+# $ sudo apt-get install -y libev-dev
+# however, it is the v4.22 to be installed, and the installation location is
+#   /usr/lib/x86_64-linux-gnu/
+# install from the source, will have the libev installed into
+#  /usr/local/lib
+function _dj_setup_libev_4_33()
+{
+    current_folder=${PWD}
+
+    cd ~ && mkdir -p soft/ &&  cd soft/
+
+    file="libev-4.33"
+    wget http://dist.schmorp.de/libev/$file.tar.gz
+    tar -zxf $file.tar.gz
+    cd $file
+    ./configure
+    make
+    sudo make install
+
+    # check for the LD_LIBRARY_PATH
+    # if it is not set for libev, then set it
+    result=$(echo $LD_LIBRARY_PATH)
+    if [[ "$result" = *"/usr/local/lib"* ]]; then
+        echo "LD_LIBRARY_PATH is already set, no need to set it again"
+    else 
+        echo "LD_LIBRARY_PATH is not set, set it now"
+        echo 'export LD_LIBRARY_PATH=/usr/local/lib:'$LD_LIBRARY_PATH >> ~/.bashrc
+    fi
+
+    cd ~/soft
+    _ask_to_remove_a_folder $file
+    _ask_to_remove_a_file $file.tar.gz
 
     cd $current_folder
 }
@@ -295,24 +349,39 @@ function _dj_setup_sublime()
 
 # ===========================================================================================
 # make sure the related package is public available in dj-zhou's github
+# compile from the source code will install it to
+#   /usr/local/lib/libyaml-cpp.a
+# apt-get will install it to
+#  /usr/lib/ -----not tested yet!
 function _dj_setup_yaml_cpp()
 {
     cwd_before_running=$PWD
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
-    git clone https://dj-zhou@github.com/dj-zhou/yaml-cpp.git
-    cd yaml-cpp
-    sudo rm -rf build/ && mkdir build
-    cd build && cmake -DYAML_BUILD_SHARED_LIBS=ON ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
-    sudo make install
+    # cd ~ && mkdir -p soft/ &&  cd soft/
+    # git clone https://dj-zhou@github.com/dj-zhou/yaml-cpp.git
+    # cd yaml-cpp
+    # sudo rm -rf build/ && mkdir build
+    # cd build && cmake -DYAML_BUILD_SHARED_LIBS=ON ..
+    # make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    # sudo make install
 
-    echo " "
-    echo "libyaml-cpp.a is installed in /usr/local/lib/"
-    echo "header files are installed in /usr/local/include/yaml-cpp/"
-    echo " "
+    # echo " "
+    # echo "libyaml-cpp.a is installed in /usr/local/lib/"
+    # echo "header files are installed in /usr/local/include/yaml-cpp/"
+    # echo " "
 
-    _ask_to_remove_a_folder yaml-cpp/
+    # _ask_to_remove_a_folder yaml-cpp/
+
+    # a better way to install it
+    sudo apt-get update
+    sudo apt-get install libyaml-cpp-dev -y
+
+    # to show the version
+    sudo apt show libyaml-cpp-dev
+
+    echo ' '
+    echo ' if the version is NOT 0.5.2, it may have some problem.'
+    echo ' '
 
     cd ${cwd_before_running}
 }
