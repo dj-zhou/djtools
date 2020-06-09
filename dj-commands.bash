@@ -2,6 +2,7 @@
 
 source $djtools_path/clone.bash
 source $djtools_path/setup-generic.bash
+source $djtools_path/setup-ros.bash
 source $djtools_path/udev-rules.bash
 
 # ===========================================================================================
@@ -219,6 +220,10 @@ function _dj_setup_container_lxd_4_0()
 {
     sudo apt install snapd
     sudo snap install lxd --channel=4.0/stable
+    echo ' '
+    echo 'next step: '
+    echo ' sudo lxd init'
+    echo ' '
 }
 
 # ===========================================================================================
@@ -571,7 +576,6 @@ function _dj_meson_build()
     echo ' '
     folder_name=`basename "$current_folder"`
     echo "current folder name: "$folder_name
-    echo ' '
     
     # if the curent folder is build, then
     # cd ../ && rm build -r 
@@ -624,10 +628,11 @@ function dj()
     fi
     # ------------------------------
     if [ $1 = 'meson' ] ; then
-        if [ $2 = 'build' ] ; then
+        if [ $# -ge 2 ] && [ $2 = 'build' ] ; then
             _dj_meson_build $3 $4 $5 $6
             return
         fi
+        echo 'arguments wrong, exit'
         return
     fi
     # ------------------------------
@@ -708,6 +713,11 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'matplotlib-cpp' ] ; then
+            _dj_setup_matplotlib_cpp
+            return
+        fi
+        # --------------------------
         if [ $2 = 'foxit' ] ; then
             _dj_setup_foxit_reader
             return
@@ -749,7 +759,12 @@ function dj()
         fi
         # --------------------------
         if [ $2 = 'ros-melodic' ] ; then
-            _dj_setup_ros_melodic
+            _dj_setup_ros_melodic $3 $4 $5
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'ros2-foxy' ] ; then
+            _dj_setup_ros2_foxy $3 $4 $5
             return
         fi
         # --------------------------
@@ -828,10 +843,6 @@ function dj()
         return
     fi
     # ------------------------------
-    if [ $1 = 'work-check' ] ; then
-        _dj_work_check $2 $3 $4 $5
-        return
-    fi
     if [ $1 = 'udev' ] ; then
         if [ $2 = '--dialout' ] ; then
             _dj_udev_dialout $3 $4 $5
@@ -843,6 +854,16 @@ function dj()
         fi
         return
     fi
+    # ------------------------------
+    if [ $1 = 'work-check' ] ; then
+        _dj_work_check $2 $3 $4 $5
+        return
+    fi
+    # # ------------------------------
+    # if [ $1 = 'yocto' ] ; then
+    #     _dj_yocto $2 $3 $4 $5 $6 $7 
+    #     return
+    # fi
     _dj_help
     # ------------------------------
 }
@@ -868,9 +889,9 @@ function _dj()
     #---------------------------------------------------------
     #---------------------------------------------------------
     ACTIONS[setup]+="arm-gcc baidu-netdisk clang-9.0.0 container computer dj-gadgets dropbox eigen foxit "
-    ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog i219-v libev-4.33 mathpix opencv-2.4.13 opencv-4.1.1 "
-    ACTIONS[setup]+="pangolin pip qt-5.11.2 qt-5.13.1 qt-5.14.2 ros-melodic slack stm32tools "
-    ACTIONS[setup]+="sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
+    ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog i219-v libev-4.33 mathpix matplotlib-cpp opencv-2.4.13 "
+    ACTIONS[setup]+="opencv-4.1.1 pangolin pip qt-5.11.2 qt-5.13.1 qt-5.14.2 ros-melodic ros2-foxy slack "
+    ACTIONS[setup]+="stm32tools sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
     ACTIONS[arm-gcc]=" "
     ACTIONS[baidu-netdisk]=" "
     ACTIONS[clang-8.0.0]=" "
@@ -888,6 +909,7 @@ function _dj()
     ACTIONS[i219-v]="e1000e-3.4.2.1 e1000e-3.4.2.4 "
     ACTIONS[libev-4.33]=" "
     ACTIONS[mathpix]=" "
+    ACTIONS[matplotlib-cpp]=" "
     ACTIONS[e1000e-3.4.2.1]=" "
     ACTIONS[e1000e-3.4.2.4]=" "
     ACTIONS[opencv-2.4.13]=" "
@@ -899,7 +921,10 @@ function _dj()
     ACTIONS[qt-5.11.2]=" "
     ACTIONS[qt-5.13.1]=" "
     ACTIONS[qt-5.14.2]=" "
-    ACTIONS[ros-melodic]=" "
+    ACTIONS[ros-melodic]="--from-deb-package --from-source "
+    ACTIONS[ros2-foxy]="--from-deb-package --from-source "
+    ACTIONS[--from-deb-package]=" "
+    ACTIONS[--from-source]=" "
     ACTIONS[slack]=" "
     ACTIONS[stm32tools]=" "
     ACTIONS[sublime]=" "
@@ -959,7 +984,7 @@ function _dj()
     #---------------------------------------------------------
     ACTIONS[meson]="build "
     ACTIONS[build]="  "
-
+    
     # --------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
     if [ ${ACTIONS[$3]+1} ] ; then

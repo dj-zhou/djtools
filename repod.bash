@@ -1,10 +1,10 @@
 #!/bin/bash 
 
 # =============================================================================================
-function _repo_help()
+function _repod_help()
 {
     echo " "
-    echo "----------------------- repo ------------------------"
+    echo "---------------------- repod ------------------------"
     echo " Author      : Dingjiang Zhou"
     echo " Email       : zhoudingjiang@gmail.com "
     echo " Create Date : Mar. 1st, 2020 "
@@ -122,7 +122,7 @@ function _backup_to_gitee()
 }
 
 # =============================================================================================
-function _repo_branches_list()
+function _repod_branches_list()
 {
     # git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format='%(refname:short)'
     # this is not the latest
@@ -133,23 +133,29 @@ function _repo_branches_list()
 }
 
 # =============================================================================================
-function _repo_branches_list_all()
+function _repod_branches_list_all()
 {
     if [ $1 = '--remote' ] ; then
-        repo checkout all-branch
+        repod checkout all-branch
     fi
     
     git for-each-ref --sort=committerdate refs/heads/ --format='%(color:green)%(committerdate:short)%(color:reset)|%(color:red)%(objectname:short)%(color:reset)|%(HEAD)%(color:yellow)%(refname:short)%(color:reset) | %(authorname)'
 }
 
 # =============================================================================================
-function repo()
+function _repod_update_a_repo()
+{
+    echo 'todo'
+}
+
+# =============================================================================================
+function repod()
 {
     current_folder=${PWD}
 
     # ------------------------------
     if [ $# -eq 0 ] ; then
-        _repo_help
+        _repod_help
         return
     fi
 
@@ -163,7 +169,7 @@ function repo()
             _backup_to_gitee $3 $4 $5 $6
             return
         fi
-        _repo_help
+        _repod_help
         return
     fi
 
@@ -199,6 +205,26 @@ function repo()
     fi
 
     # ------------------------------
+    if [ $1 = 'update' ] ; then
+        if [ $2 = '--all' ] ; then
+            # if current folder is a git repo, fetch
+            # then if the current branch exists in remote side and not dirty, pull
+            # if dirty, throw out warnings, do not pull
+            if [ -d .git/ ] ; then
+                echo 'this is a git repo'
+                _repod_update_a_repo
+                return
+            else 
+                echo 'go into the folder and check every subfolders'
+                return
+            fi
+            return
+        fi
+        
+        return
+    fi
+
+    # ------------------------------
     if [ $1 = 'checkout' ] ; then
         if [ $2 = 'all-branch' ] ; then
             echo " checkout all remote branches"
@@ -217,10 +243,10 @@ function repo()
     # ------------------------------
     if [ $1 = 'branches' ] ; then
         if [ $2 = 'list-all' ] ; then
-            _repo_branches_list_all $3 $4 $5
+            _repod_branches_list_all $3 $4 $5
             return
         elif [ $2 = 'list' ] ; then
-            _repo_branches_list
+            _repod_branches_list
             return
         fi
         return
@@ -228,23 +254,24 @@ function repo()
     echo ' '
     echo 'repo : "'$1 '"command not supported'
     echo ' '
-    _repo_help
+    _repod_help
     # ------------------------------
     cd $current_folder
     unset current_folder
 }
 
 # =============================================================================================
-function _repo()
+function _repod()
 {
     COMPREPLY=()
 
     # All possible first values in command line
     local SERVICES=("
         backup-to
-        switch-to
-        checkout
         branches
+        checkout
+        switch-to
+        update
     ")
 
     # declare an associative array for options
@@ -263,6 +290,7 @@ function _repo()
     ACTIONS[list-all]="--local --remote "
     ACTIONS[--local]=" "
     ACTIONS[--remote]=" "
+    ACTIONS[update]+="--all "
     
     # ---------------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
@@ -274,4 +302,4 @@ function _repo()
 }
 
 # =============================================================================================
-complete -F _repo repo
+complete -F _repod repod

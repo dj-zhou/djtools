@@ -74,6 +74,29 @@ function _system_check_nvidia_driver()
 # ===========================================================================================
 function _system_wallpaper_random()
 {
+    # check if wallpaper_folder is set in .bashrc
+    wallpaper_folder_is_set=0
+    while IFS='' read -r line || [[ -n "$line" ]] ; do
+        if [[ $line == *"wallpaper_folder="* ]] ; then
+            wallpaper_folder_is_set=1
+        fi
+    done < ~/.bashrc
+
+    if [ $wallpaper_folder_is_set = 0 ] ; then
+        echo " "
+        echo "wallpaper_folder is NOT set. please enter a path of the wallpapers: "
+        read answer
+        echo '# ================================================================' >> ~/.bashrc
+        echo '# wallpaper setup (djtools)' >> ~/.bashrc
+        echo 'wallpaper_folder='$answer >> ~/.bashrc
+        echo ' ' >> ~/.bashrc
+        echo " "
+        # echo "You need to manually make the setting effective, run:"
+        # echo "   source ~/.bashrc"
+        # echo "and then run:"
+        # echo "   system wallpaper random"
+        # echo " "
+    fi
     _random_wallpaper # from funcs.bash
 }
 
@@ -125,6 +148,15 @@ function system()
         fi
         return
     fi
+    # ------------------------------
+    if [ $1 = 'ubuntu-drivers' ] ; then
+        # --------------------------
+        if [ $2 = 'autoinstall' ] ; then
+            sudo ubuntu-drivers autoinstall
+            return
+        fi
+        return
+    fi
     _dj_help
     # ------------------------------
 }
@@ -140,6 +172,7 @@ function _system()
         disable
         check
         wallpaper
+        ubuntu-drivers
     ")
 
     # declare an associative array for options
@@ -154,6 +187,8 @@ function _system()
     ACTIONS[nvidia-driver]+=" "
     ACTIONS[wallpaper]+="random "
     ACTIONS[random]+=" "
+    ACTIONS[ubuntu-drivers]+="autoinstall "
+    ACTIONS[autoinstall]+=" "
 
     
     # ---------------------------------------------------------------------------------

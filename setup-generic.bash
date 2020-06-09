@@ -91,7 +91,12 @@ function _dj_setup_computer()
     current_folder=${PWD}
 
     cd ~
-
+    sudo rm  -r Documents/
+    sudo rm  -r Music/
+    sudo rm  -r Pictures/
+    sudo rm  -r Public/
+    sudo rm  -r Templates/
+    sudo rm  -r Videos/
     # -----------------------------------
     sudo apt-get update -y
     sudo apt-get upgrade -y
@@ -274,6 +279,24 @@ function _dj_setup_mathpix()
 {
     sudo apt install snapd
     sudo snap install mathpix-snipping-tool
+}
+
+# ===========================================================================================
+function _dj_setup_matplotlib_cpp()
+{
+    current_folder=${PWD}
+
+    cd ~ && mkdir -p soft/ &&  cd soft/
+
+    git clone https://github.com/dj-zhou/matplotlib-cpp.git
+    cd matplotlib-cpp
+    git checkout install-zdj
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    sudo make install
+    cd ~/soft
+    _ask_to_remove_a_folder matplotlib-cpp
+
+    cd $current_folder
 }
 
 # ===========================================================================================
@@ -484,55 +507,6 @@ function _dj_setup_qt_5_14_2()
     ./$filename
 
     _ask_to_remove_a_file $filename
-    
-    cd ${cwd_before_running}
-}
-
-# ===========================================================================================
-function _dj_setup_ros_melodic()
-{
-    cwd_before_running=$PWD
-
-    # only Uubntu 18.04 can install ros-melodic
-    ubuntu_release_version=$(lsb_release -a)
-    if [[ $ubuntu_release_version != *'Ubuntu 18.04'* ]] ; then
-        echo " "
-        echo "ROS Melodic can only be installed in Ubuntu 18.04"
-        echo " "
-        return
-    fi
-
-    # setup sources.list ---------------
-    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-
-    # setup keys ---------------
-    sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-
-    # installation ---------------
-    sudo apt-get -y update || true
-    sudo apt-get install ros-melodic-desktop-full -y
-
-    # initialize rosdep ---------------
-    sudo apt install python-rosdep2
-    sudo rosdep init || true
-    rosdep update
-
-    installed=0
-    while IFS='' read -r line || [[ -n "$line" ]] ; do
-        if [[ $line == *"source /opt/ros/melodic/setup.bash"* ]] ; then
-            installed=1
-        fi
-    done < ~/.bashrc
-
-    if [ $installed = 0 ] ; then 
-        echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-        echo " "
-    fi
-
-    # setup workspace ---------------
-    mkdir -p ~/catkin_ws/src
-    cd ~/catkin_ws
-    catkin_make
     
     cd ${cwd_before_running}
 }

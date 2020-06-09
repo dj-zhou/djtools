@@ -1,31 +1,6 @@
 #!/bin/bash 
 
 # ===========================================================================================
-# setup wallpaper
-function _wallpaper_setup()
-{
-    current_folder=${PWD}
-    file="wallpaper.bash.desktop"
-    if [ ! -d ~/.config/autostart/ ] ; then
-        mkdir -p ~/.config/autostart/
-    fi
-    cd ~/.config/autostart/
-    if [ ! -f $file ] ; then
-        echo  '[Desktop Entry]' > $file
-        echo  'Type=Application' >> $file
-        echo  'Exec='$djtools_path'/wallpaper.bash' >> $file
-        echo  'Hidden=false' >> $file
-        echo  'X-GNOME-Autostart-enabled=true' >> $file
-        echo  'Name[en_US]=wallpaper' >> $file
-        echo  'Name=wallpaper' >> $file
-        echo  'Comment[en_US]=' >> $file
-        echo  'Comment=' >> $file
-    fi
-
-    cd $current_folder
-}
-
-# ===========================================================================================
 function _random_wallpaper()
 {
     current_folder=${PWD}

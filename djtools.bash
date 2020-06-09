@@ -61,19 +61,18 @@ source $djtools_path/coding.bash
 source $djtools_path/dj-commands.bash
 source $djtools_path/funcs.bash
 source $djtools_path/keyremap.bash
-source $djtools_path/repo.bash
+source $djtools_path/mark-down.bash
+source $djtools_path/repod.bash
 source $djtools_path/resized.bash
 source $djtools_path/system.bash
 source $djtools_path/terminal-format.bash
 source $djtools_path/touchpad.bash
 source $djtools_path/work-check.bash
+source $djtools_path/yocto.bash
 
 # ===========================================================================================
 # initial setup -- can be overwrite by other setting, for example, dj-zhou-config.bash
 _terminal_format_user_host_short_path
-
-# ===========================================================================================
-_wallpaper_setup
 
 # ===========================================================================================
 # alias ----------------------------------------------
