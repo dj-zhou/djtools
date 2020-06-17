@@ -115,3 +115,33 @@ function _display_section()
 {
     echo '----------------------------------------------------'
 }
+
+# =============================================================================================
+# example:
+#    _find_argument_after_option -b aa bb -b cc dd
+#                                $1 $2 $3 $4 $5 $6 
+# it will compare the first "-b" with all others, and it will find out $4 matches
+# so the output is $5
+function _find_argument_after_option()
+{
+    # $1 is the one to find in all arguments from $2 to $9
+    find_option=0
+    find_argument=0
+    for var in "$@"
+    do
+        # echo "$var"
+        if [ $var = $1 ] ; then
+            find_option=$((find_option+1))
+            # echo "find_option = "$find_option
+            # echo "find_argument = "$find_argument
+        elif [ $find_option = 2 ] && [ $find_argument = 0 ] ; then
+            arg=$var
+            find_argument=1
+            # echo "arg = "$arg
+            # echo "find_argument = "$find_argument
+        fi
+        # echo "argument_no = "$argument_no
+    done
+    # echo "final result = "$arg
+    echo $arg
+}

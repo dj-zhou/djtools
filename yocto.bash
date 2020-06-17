@@ -28,13 +28,11 @@ function yocto()
 
     # ------------------------------
     if [ $1 = 'clone' ] ; then
-        dj clone github $2
+        dj clone github $2 $3 $4 $5 $6 $7 $8
         return
     fi
 
-    echo ' '
-    echo 'repo : "'$1 '"command not supported'
-    echo ' '
+    echo -e '\r\nyocto : "'$1 '"command not supported\r\n'
     _yocto_help
 
     # ------------------------------
@@ -56,10 +54,11 @@ function _yocto()
     declare -A ACTIONS
 
     # ---------------------------------------------------------------------------------
-    ACTIONS[clone]+="poky meta-openembedded meta-raspberrypi "
+    ACTIONS[clone]+="poky meta-openembedded meta-raspberrypi meta-rpi64 "
     ACTIONS[poky]=" "
     ACTIONS[meta-openembedded]=" "
     ACTIONS[meta-raspberrypi]=" "
+    ACTIONS[meta-rpi64]=" "
     
     # ---------------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

@@ -143,9 +143,36 @@ function _repod_branches_list_all()
 }
 
 # =============================================================================================
-function _repod_update_a_repo()
+function _repod_update_repos_all_folders()
 {
-    echo 'todo'
+    current_folder=${PWD}
+
+    for folder in ./* ; do
+        if [ -d $folder ] ; then
+            echo -e "\r\n----------------------------"
+            printf `basename "$folder"`
+            cd $folder
+            if [ -d ".git/" ] ; then
+                git_status=$(git status)
+                if [[ $git_status = *"Changes not staged for commit"* ]] ; then
+                    printf " ${RED_COLOR}dirty${NO_COLOR}"
+                elif [[ $git_status = *"is ahead"* ]] ; then
+                    printf " ${BLUE_COLOR}ahead${NO_COLOR}"
+                elif [[ $git_status = *"is behind"* ]] ; then
+                    printf " ${CYAN_COLOR}behind${NO_COLOR}"
+                fi
+                echo " "
+                git fetch -p
+            else
+                printf " ${BROWN_COLOR}NOT a git repo${NO_COLOR}"
+                echo " "
+            fi
+            cd $current_folder
+        fi
+    done
+
+    cd $current_folder
+    unset current_folder
 }
 
 # =============================================================================================
@@ -206,18 +233,8 @@ function repod()
 
     # ------------------------------
     if [ $1 = 'update' ] ; then
-        if [ $2 = '--all' ] ; then
-            # if current folder is a git repo, fetch
-            # then if the current branch exists in remote side and not dirty, pull
-            # if dirty, throw out warnings, do not pull
-            if [ -d .git/ ] ; then
-                echo 'this is a git repo'
-                _repod_update_a_repo
-                return
-            else 
-                echo 'go into the folder and check every subfolders'
-                return
-            fi
+        if [ $2 = '--all-sub-forlders' ] ; then
+            _repod_update_repos_all_folders $3 $4 $5 $6
             return
         fi
         
@@ -251,9 +268,8 @@ function repod()
         fi
         return
     fi
-    echo ' '
-    echo 'repo : "'$1 '"command not supported'
-    echo ' '
+    
+    echo -e '\r\nrepod : "'$1 '"command not supported\r\n'
     _repod_help
     # ------------------------------
     cd $current_folder
@@ -290,7 +306,8 @@ function _repod()
     ACTIONS[list-all]="--local --remote "
     ACTIONS[--local]=" "
     ACTIONS[--remote]=" "
-    ACTIONS[update]+="--all "
+    ACTIONS[update]+="--all-sub-forlders "
+    ACTIONS[--all-sub-forlders]+=" "
     
     # ---------------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

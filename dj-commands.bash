@@ -47,7 +47,7 @@ function _clang_vscode_setting_json()
     echo "copy json file: "$json_file" to "$folder
     sudo rm -f $folder/settings.json
     cp $json_file $folder/settings.json
-    cp .clang-format $folder/.clang-format
+    cp .clang-format-dj $folder/.clang-format
 
     cd $current_folder_json
 }
@@ -81,7 +81,7 @@ function _dj_setup_clang_9_0_0()
     unset md5checksum
     if [[ -f $clang_file.tar.xz ]] ; then
         md5checksum=`md5sum $clang_file.tar.xz`
-        echo "md5checksum="$md5checksum
+        echo "md5checksum = "$md5checksum
     fi
     if [[ ( ( ${ubuntu_release_version} = *'18.04'* ) && ( "$md5checksum" = *"9d8044379e151029bb1df3663c2fb2c1"* ) ) \
       || ( ( ${ubuntu_release_version} = *'16.04'* ) && ( "$md5checksum" = *"b3c5618fb3a5d268c371539e9f6a4b1f"* ) ) ]] ; then
@@ -283,7 +283,8 @@ function _dj_setup_slack()
     cwd_before_running=$PWD
     
     cd ~ && mkdir -p soft && cd soft/
-    wget https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.2-amd64.deb
+    # the download page: https://slack.com/downloads/linux
+    wget https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.3-amd64.deb
     sudo dpkg -i slack-desktop*.deb
     _ask_to_remove_a_file slack-desktop*.deb
 

@@ -6,30 +6,22 @@
 djtools_path=$PWD
 echo $djtools_path
 
-echo " "
-echo 'djtools installation...'
-echo " "
+echo -e '\ndjtools installation ...\n'
 
 # =============================================================================================
 # source the package in ~/.bashrc
 
 while IFS='' read -r line || [[ -n "$line" ]] ; do
     if [[ $line == *"source "$djtools_path$"/djtools.bash"* ]] ; then
-        echo " "
-        echo "djtools has already been installed. exit."
-        echo " "
+        echo -e "djtools has already been installed, exit."
+        echo -e "you can still revise ~/.bashrc for manual setup.\n"
         exit
     fi
 done < ~/.bashrc
 
 echo '   ' >> ~/.bashrc
-echo '# ================================================================' >> ~/.bashrc
+echo '# ===========================================================' >> ~/.bashrc
 echo '# djtools setup' >> ~/.bashrc
-
-# =============================================================================================
-echo 'Enter a path for wallpaper'
-read answer
-echo 'wallpaper_folder='$answer >> ~/.bashrc
 
 # =============================================================================================
 # get bitbucket/github, etc, user name

@@ -17,6 +17,25 @@ function _coding_help()
 }
 
 # ===========================================================================================
+function _coding_clang_format()
+{
+    if [ ! -n $1 ] ; then
+        echo "wrong usage"
+        return
+    fi
+    if [ $1 = 'dj' ] ; then
+        echo "copy .clang-format-dj to current folder"
+        cp $djtools_path/.clang-format-dj .clang-format
+        return
+    fi
+    if [ $1 = 'bg' ] ; then
+        echo "copy .clang-format-bg to current folder"
+        cp $djtools_path/.clang-format-bg .clang-format
+        return
+    fi
+}
+
+# ===========================================================================================
 function coding()
 {
     cwd_before_running=$PWD
@@ -35,6 +54,8 @@ function coding()
         else
             echo " coding: not supported!"
         fi
+    elif [ $1 = 'clang-format' ] ; then
+        _coding_clang_format $2 $3 $4 $5 $6
     else
         _coding_help
     fi
@@ -51,6 +72,7 @@ function _coding()
     local SERVICES=("
         -help
         replace
+        clang-format
     ")
 
     # declare an associative array for options
@@ -59,6 +81,9 @@ function _coding()
     # no space in front or after "="
     ACTIONS[replace]+="-help "
     ACTIONS[-help]+=" "
+    ACTIONS[clang-format]+="dj bg "
+    ACTIONS[dj]+=" "
+    ACTIONS[bg]+=" "
 
     
     # ---------------------------------------------------------------------------------

@@ -182,8 +182,9 @@ function _dj_setup_dropbox()
 {
     current_folder=${PWD}
 
-    sudo apt-get install libpango1.0-0 -y
     sudo apt-get --fix-broken install
+    sudo apt-get install libpango1.0-0 -y
+    sudo apt-get install curl -y
     # how to deal with version?
 
     cd ~ && mkdir -p soft/ &&  cd soft/
@@ -454,7 +455,7 @@ function _dj_setup_qt_5_13_1()
     unset md5checksum
     if [[ -f $filename ]] ; then
         md5checksum=`md5sum $filename`
-        echo "md5checksum="$md5checksum
+        echo "md5checksum = "$md5checksum
     fi
     if [[ "$md5checksum" = *"21c3b16f851697fa8da8009f73694373"* ]] ; then
         echo "file exists, no need to download again"
@@ -493,7 +494,7 @@ function _dj_setup_qt_5_14_2()
     unset md5checksum
     if [[ -f $filename ]] ; then
         md5checksum=`md5sum $filename`
-        echo "md5checksum="$md5checksum
+        echo "md5checksum = "$md5checksum
     fi
     if [[ "$md5checksum" = *"dce0588874fd369ce493ea5bc2a21d99"* ]] ; then
         echo "file exists, no need to download again"

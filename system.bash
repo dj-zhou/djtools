@@ -72,6 +72,18 @@ function _system_check_nvidia_driver()
 }
 
 # ===========================================================================================
+function _system_check_udev_rules()
+{
+    current_folder=${PWD}
+
+    cd /etc/udev/rules.d/
+    pwd
+    tree
+
+    cd $current_folder
+}
+
+# ===========================================================================================
 function _system_wallpaper_random()
 {
     # check if wallpaper_folder is set in .bashrc
@@ -86,7 +98,8 @@ function _system_wallpaper_random()
         echo " "
         echo "wallpaper_folder is NOT set. please enter a path of the wallpapers: "
         read answer
-        echo '# ================================================================' >> ~/.bashrc
+        
+        echo '# ===========================================================' >> ~/.bashrc
         echo '# wallpaper setup (djtools)' >> ~/.bashrc
         echo 'wallpaper_folder='$answer >> ~/.bashrc
         echo ' ' >> ~/.bashrc
@@ -136,6 +149,11 @@ function system()
             _system_check_nvidia_driver
             return
         fi
+        # --------------------------
+        if [ $2 = 'udev-rules' ] ; then
+            _system_check_udev_rules
+            return
+        fi
         _system_check_help
         return
     fi
@@ -182,9 +200,10 @@ function _system()
     ACTIONS[enable]+=" "
     ACTIONS[disable]+="program-problem-detected "
     ACTIONS[program-problem-detected]=" "
-    ACTIONS[check]+="temperature nvidia-driver "
+    ACTIONS[check]+="temperature nvidia-driver udev-rules "
     ACTIONS[temperature]+=" "
     ACTIONS[nvidia-driver]+=" "
+    ACTIONS[udev-rules]+=" "
     ACTIONS[wallpaper]+="random "
     ACTIONS[random]+=" "
     ACTIONS[ubuntu-drivers]+="autoinstall "
