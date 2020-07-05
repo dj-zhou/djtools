@@ -8,9 +8,7 @@ function _dj_setup_ros_melodic()
     # only Uubntu 18.04 can install ros-melodic
     ubuntu_release_version=$(lsb_release -a)
     if [[ $ubuntu_release_version != *'Ubuntu 18.04'* ]] ; then
-        echo " "
-        echo "ROS Melodic can only be installed in Ubuntu 18.04"
-        echo " "
+        echo -e "\nROS Melodic can only be installed in Ubuntu 18.04\n"
         return
     fi
 
@@ -37,8 +35,7 @@ function _dj_setup_ros_melodic()
     done < ~/.bashrc
 
     if [ $installed = 0 ] ; then 
-        echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-        echo " "
+        echo -e "source /opt/ros/melodic/setup.bash\n" >> ~/.bashrc
     fi
 
     # setup workspace ---------------

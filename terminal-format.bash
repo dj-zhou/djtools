@@ -2,16 +2,14 @@
 
 # ===========================================================================================
 _terminal_help() {
-    echo " "
-    echo "terminal: supported commands"
+    echo -e "\nterminal: supported commands\n"
     echo " "
     echo "     $ terminal host full-path"
     echo "     $ terminal host full-path no-space"
     echo "     $ terminal host short-path"
     echo "     $ terminal host short-path no-space"
     echo "     $ terminal user full/short-path (no-space)"
-    echo "     $ terminal user@host full/short-path (no-space)"
-    echo " "
+    echo -e "     $ terminal user@host full/short-path (no-space)\n"
 }
 
 # ===========================================================================================

@@ -41,10 +41,9 @@ function _dj_setup_arm_gcc()
 {
     current_folder=${PWD}
 
-    echo " "
-    echo "  remove gcc-arm-none-eabi, and install gcc-arm-embedded ..." 
-    echo " "
-    sleep 2
+    echo -e "\n  remove gcc-arm-none-eabi, and install gcc-arm-embedded ...\n"
+    _press_enter_to_continue
+
     sudo apt-get install -y build-essential git flex bison libgmp3-dev libmpfr-dev 
     sudo apt-get install -y libncurses5-dev libmpc-dev autoconf texinfo libtool
     sudo apt-get install -y libftdi-dev libusb-1.0-0-dev zlib1g zlib1g-dev python-yaml
@@ -90,33 +89,37 @@ function _dj_setup_computer()
 {
     current_folder=${PWD}
 
-    cd ~
-    sudo rm  -r Documents/
-    sudo rm  -r Music/
-    sudo rm  -r Pictures/
-    sudo rm  -r Public/
-    sudo rm  -r Templates/
-    sudo rm  -r Videos/
+    sudo rm -rf ~/Documents/
+    sudo rm -rf ~/Music/
+    sudo rm -rf ~/Pictures/
+    sudo rm -rf ~/Public/
+    sudo rm -rf ~/Templates/
+    sudo rm -rf ~/Videos/
     # -----------------------------------
     sudo apt-get update -y
     sudo apt-get upgrade -y
 
     # -----------------------------------
-    echo " "
-    echo "  going to install the following packages: "
-    echo "      curl g++ git vim terminator kate scrot wmctrl  "
-    echo "      dconf-editor dconf-tools vlc cutecom xclip tree "
-    echo "      ark yasm cmake libgtk2.0-dev htop lsb-core "
-    echo " "
+    echo -e "\n  going to install the following packages: "
+    echo "      ark cmake curl cutecom dconf-editor dconf-tools git "
+    echo "      git-lfs g++ htop kate libgtk2.0-dev lsb-core putty "
+    echo -e "      screen scrot terminator tree vlc vim wmctrl xclip yasm\n"
+
+    echo "how to use cu and screen:"
+    echo "      cu: cu -l /dev/ttyUSB0 -s 115200 [ENTER]"
+    echo "  screen: screen /dev/ttyUSB0 115200 [ENTER]"
+    echo "exit methods for cu and screen:"
+    echo "      cu: input ~. and then [ENTER]"
+    echo "  screen: press Ctrl+A and then \, and [y]"
+
     _press_enter_to_continue
-    sudo apt-get install curl g++ git vim terminator kate scrot wmctrl -y
-    sudo apt-get install dconf-editor dconf-tools vlc cutecom xclip tree -y
-    sudo apt-get install ark yasm cmake libgtk2.0-dev htop lsb-core -y
+
+    sudo apt-get install -y ark cmake curl cutecom dconf-editor dconf-tools git
+    sudo apt-get install -y git-lfs g++ htop kate libgtk2.0-dev lsb-core putty
+    sudo apt-get install -y screen scrot terminator tree vlc vim wmctrl xclip yasm
 
     # -----------------------------------
-    echo " "
-    echo "  going to install Google Chrome "
-    echo " "
+    echo -e "\n  going to install Google Chrome\n"
     _press_enter_to_continue
     cd ~ && mkdir -p soft/ &&  cd soft/
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -127,9 +130,7 @@ function _dj_setup_computer()
 
     # -----------------------------------
     # Windows fonts
-    echo " "
-    echo "  going to support Windows fonts "
-    echo " "
+    echo -e "\n  going to support Windows fonts\n"
     _press_enter_to_continue
     sudo apt-get install ttf-mscorefonts-installer -y
     sudo apt-get install msttcorefonts -y
@@ -137,40 +138,30 @@ function _dj_setup_computer()
 
     # -----------------------------------
     # remove firefox
-    echo " "
-    echo "  going to remove firfox "
-    echo " "
+    echo -e "\n  going to remove firfox\n"
     _press_enter_to_continue
     sudo apt-get purge firefox -y; rm -Rf ~/.mozilla/firefox/;
 
     # -----------------------------------
     # to display simplified Chinese: important, do not comment out!
-    echo " "
-    echo "  going to setup simplified Chinese support "
-    echo " "
+    echo -e "\n  going to setup simplified Chinese support\n"
     _press_enter_to_continue
     gsettings set org.gnome.gedit.preferences.encodings auto-detected "['CURRENT','GB18030','GBK','GB2312','UTF-8','UTF-16']"
     
     # -----------------------------------
     # to disable the fixed dock (in dock setting, it is Auto-hide the Dock option)
-    echo " "
-    echo "  hide the Dock when any windows overlap with it "
-    echo " "
+    echo -e "\n  hide the Dock when any windows overlap with it\n"
     _press_enter_to_continue
     gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
 
     # -----------------------------------
     # to lock the screen from commands
-    echo " "
-    echo "  going to setup lock screen command "
-    echo " "
+    echo -e "\n  going to setup lock screen command\n"
     _press_enter_to_continue
     sudo apt-get install gnome-screensaver -y
 
     # -----------------------------------
-    echo " "
-    echo "  going to setup time & date control"
-    echo " "
+    echo -e "\n  going to setup time & date control\n"
     _press_enter_to_continue
     timedatectl set-local-rtc 1
 
@@ -194,10 +185,8 @@ function _dj_setup_dropbox()
     
     _ask_to_remove_a_file dropbox.deb
     
-    echo " "
-    echo " You can run the following command to setup the Dropbox"
-    echo "   dropbox start -i"
-    echo " "
+    echo -e "\n You can run the following command to setup the Dropbox"
+    echo -e "   dropbox start -i\n"
 
     cd $current_folder
 }
@@ -210,9 +199,7 @@ function _dj_setup_eigen()
     sudo apt-get install libeigen3-dev -y
     sudo updatedb
     # locate eigen3
-    echo " "
-    echo " eigen is installed in: /usr/include/eigen3"
-    echo " "
+    echo -e "\n eigen is installed in: /usr/include/eigen3\n"
 
     cd $current_folder
 }
@@ -305,13 +292,29 @@ function _dj_setup_foxit_reader()
 {
     current_folder=${PWD}
 
+    echo -e "\n  Install Foxit Reader ..."
+    echo -e "  recommended location: /opt/foxitsoftware/foxitreader\n"
+    _press_enter_to_continue
+
     cd ~ && mkdir -p soft/ &&  cd soft/
 
     # no way to get the latest version?
-    wget http://cdn01.foxitsoftware.com/pub/foxit/reader/desktop/linux/2.x/2.4/en_us/FoxitReader.enu.setup.2.4.4.0911.x64.run.tar.gz
-    gzip -d FoxitReader.enu.setup.2.4.4.0911.x64.run.tar.gz
-    tar xvf FoxitReader.enu.setup.2.4.4.0911.x64.run.tar
-    sudo ./FoxitReader.enu.setup.*.run
+    file=FoxitReader.enu.setup.2.4.4.0911.x64.run
+    wget http://cdn01.foxitsoftware.com/pub/foxit/reader/desktop/linux/2.x/2.4/en_us/$file.tar.gz
+    gzip -d $file.tar.gz
+    tar xvf $file.tar
+    sudo ./FoxitReader*.run
+
+    # create a symbolic link
+    foxitreader_location=$(sudo find /opt -name "FoxitReader")
+    echo $foxitreader_location
+    if [ ! -z $foxitreader_location ] ; then
+        echo 'a symbolic link "foxit" is generated in /usr/bin'
+        sudo ln -sf $foxitreader_location /usr/bin/foxit
+    else
+        echo -e "\nFoxitReader not installed into a recommended location"
+        echo -e "a symbolic link cannot be generated\n"
+    fi
 
     cd $current_folder
 }
@@ -321,10 +324,7 @@ function _dj_setup_gitg_kdiff3()
 {
     current_folder=${PWD}
 
-    echo " "
-    echo "  Install gitg and KDiff3 ..." 
-    echo " "
-    # sleep 2
+    echo -e "\n  Install gitg and KDiff3 ...\n"
     _press_enter_to_continue # to check the key pressed TODO
     sudo apt-get install gitg kdiff3 -y
     git config --global credential.helper store
@@ -342,10 +342,7 @@ function _dj_setup_vscode()
 
     cd ~ && mkdir -p soft/ &&  cd soft/
 
-    echo " "
-    echo "  Install vscode ..." 
-    echo " "
-    sleep 2 
+    echo -e "\n  Install vscode ...\n"
     curl -L "https://go.microsoft.com/fwlink/?LinkID=760868" > vscode.deb
     sudo dpkg -i vscode.deb
     sudo rm vscode.deb
@@ -403,9 +400,7 @@ function _dj_setup_yaml_cpp()
     # to show the version
     sudo apt show libyaml-cpp-dev
 
-    echo ' '
-    echo ' if the version is NOT 0.5.2, it may have some problem.'
-    echo ' '
+    echo -e '\n if the version is NOT 0.5.2, it may have some problem.\n'
 
     cd ${cwd_before_running}
 }
@@ -415,10 +410,8 @@ function _dj_setup_qt_5_11_2()
 {
     cwd_before_running=$PWD
 
-    echo "  "
-    echo "Install Qt 5.11.2" 
-    echo "  "
-    sleep 2
+    echo -e "\nInstall Qt 5.11.2\n"
+    _press_enter_to_continue
 
     cd ~ && mkdir -p soft/ &&  cd soft/
     filename="qt-opensource-linux-x64-5.11.2.run"
@@ -440,10 +433,7 @@ function _dj_setup_qt_5_13_1()
 {
     cwd_before_running=$PWD
 
-    echo "  "
-    echo "Install Qt 5.13.1" 
-    echo "  "
-    sleep 2
+    echo -e "\nInstall Qt 5.13.1 \n"
     
     # install serialport module
     sudo apt-get install libqt5serialport5-dev -y
@@ -478,10 +468,8 @@ function _dj_setup_qt_5_14_2()
 {
     cwd_before_running=$PWD
 
-    echo "  "
-    echo "Install Qt 5.14.2" 
-    echo "  "
-    sleep 2
+    echo -e "\nInstall Qt 5.14.2\n"
+    _press_enter_to_continue
     
     # install serialport module
     sudo apt-get install libqt5serialport5-dev -y
@@ -520,5 +508,5 @@ function _dj_setup_typora()
     sudo add-apt-repository 'deb https://typora.io/linux ./'
     sudo apt-get update
     # install typora
-    sudo apt-get install typora
+    sudo apt-get install typora -y
 }

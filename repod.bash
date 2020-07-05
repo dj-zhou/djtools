@@ -3,23 +3,19 @@
 # =============================================================================================
 function _repod_help()
 {
-    echo " "
-    echo "---------------------- repod ------------------------"
+    echo -e "\n---------------------- repod ------------------------"
     echo " Author      : Dingjiang Zhou"
     echo " Email       : zhoudingjiang@gmail.com "
     echo " Create Date : Mar. 1st, 2020 "
     echo "-----------------------------------------------------"
-    echo " "
-    echo " First level commands:"
-    echo "   backup-to   - push the repo to some repo"
-    echo "   branches    - to check branch status"
-    echo "   checkout    - only used to checkout all branches"
-    echo "   switch-to   - change the remote url"
-    echo " "
+    echo -e "\nFirst level arguments:"
+    echo "   backup-to - push the repo to some repo"
+    echo "   branches  - to check branch status"
+    echo "   checkout  - only used to checkout all branches"
+    echo "   switch-to - change the remote url"
+    echo -e "   update    - update the repo information in a folder\n"
     echo "   MORE IS COMMING"
-    echo " "
-    echo " All commands support tab completion"
-    echo " "
+    echo -e "\nAll commands support tab completion\n"
 }
 
 # =============================================================================================
@@ -49,9 +45,7 @@ function _backup_to_github()
     if [ $# = 0 ] ; then
         git push -u origin master
         git push --tags
-        echo " "
-        echo "master and all tags are pushed into GitHub"
-        echo " "
+        echo -e "\n master and all tags are pushed into GitHub\n"
     fi
 
     if [ $# = 1 ] ; then
@@ -60,9 +54,7 @@ function _backup_to_github()
             git push --tags
         else # push a specific branch
             git push -u origin $1
-            echo " "
-            echo " branch "$1" has been pushed to GitHub"
-            echo " "
+            echo -e "\n branch "$1" has been pushed to GitHub\n"
         fi
     fi
     git remote set-url origin $git_original_remote_url
@@ -99,9 +91,7 @@ function _backup_to_gitee()
     if [ $# = 0 ] ; then
         git push -u origin master
         git push --tags
-        echo " "
-        echo "master and all tags are pushed into GiTee"
-        echo " "
+        echo -e "\nmaster and all tags are pushed into GiTee\n"
     fi
 
     if [ $# = 1 ] ; then
@@ -110,9 +100,7 @@ function _backup_to_gitee()
             git push --tags
         else # push a specific branch
             git push -u origin $1
-            echo " "
-            echo " branch "$1" has been pushed to GiTee"
-            echo " "
+            echo -e "\n branch "$1" has been pushed to GiTee\n"
         fi
     fi
     git remote set-url origin $git_original_remote_url
@@ -127,9 +115,7 @@ function _repod_branches_list()
     # git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format='%(refname:short)'
     # this is not the latest
     git for-each-ref --count=10 --sort=committerdate refs/heads/ --format='%(color:green)%(committerdate:short)%(color:reset)|%(color:red)%(objectname:short)%(color:reset)|%(HEAD)%(color:yellow)%(refname:short)%(color:reset) | %(authorname)'
-    echo ' '
-    echo 'not finished yet'
-    echo ' '
+    echo -e '\nnot finished yet\n'
 }
 
 # =============================================================================================
@@ -142,6 +128,14 @@ function _repod_branches_list_all()
     git for-each-ref --sort=committerdate refs/heads/ --format='%(color:green)%(committerdate:short)%(color:reset)|%(color:red)%(objectname:short)%(color:reset)|%(HEAD)%(color:yellow)%(refname:short)%(color:reset) | %(authorname)'
 }
 
+function _repod_update_help()
+{
+    _repod_help
+    _display_section
+    echo -e "repod update\n    supported arguments:"
+    echo -e "      --all-sub-forlders\n"
+
+}
 # =============================================================================================
 function _repod_update_repos_all_folders()
 {
@@ -188,6 +182,10 @@ function repod()
 
     # ------------------------------
     if [ $1 = 'backup-to' ] ; then
+        if [ $# = 1 ] ; then
+            _repod_help
+            return
+        fi
         if [ $2 = 'github' ] ; then
             _backup_to_github $3 $4 $5 $6
             return
@@ -196,12 +194,14 @@ function repod()
             _backup_to_gitee $3 $4 $5 $6
             return
         fi
-        _repod_help
-        return
     fi
 
     # ------------------------------
     if [ $1 = 'switch-to' ] ; then
+        if [ $# = 1 ] ; then
+            _repod_help
+            return
+        fi
         repo=`basename "$current_folder"`
 
         _display_section
@@ -232,17 +232,24 @@ function repod()
     fi
 
     # ------------------------------
-    if [ $1 = 'update' ] ; then
+    if [[ $1 = 'update' ]] ; then
+        if [ $# = 1 ] ; then
+            _repod_update_help
+            return
+        fi
         if [ $2 = '--all-sub-forlders' ] ; then
             _repod_update_repos_all_folders $3 $4 $5 $6
             return
         fi
-        
         return
     fi
 
     # ------------------------------
     if [ $1 = 'checkout' ] ; then
+        if [ $# = 1 ] ; then
+            _repod_help
+            return
+        fi
         if [ $2 = 'all-branch' ] ; then
             echo " checkout all remote branches"
             git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
@@ -254,11 +261,14 @@ function repod()
             _display_section
             return
         fi
-        return
     fi
 
     # ------------------------------
     if [ $1 = 'branches' ] ; then
+        if [ $# = 1 ] ; then
+            _repod_help
+            return
+        fi
         if [ $2 = 'list-all' ] ; then
             _repod_branches_list_all $3 $4 $5
             return
@@ -266,7 +276,6 @@ function repod()
             _repod_branches_list
             return
         fi
-        return
     fi
     
     echo -e '\r\nrepod : "'$1 '"command not supported\r\n'

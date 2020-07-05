@@ -32,9 +32,9 @@ function _zephyr_setup_sdk_0_11_3()
     wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
     sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
     sudo apt-get update
-    sudo apt-get install cmake
+    sudo apt-get install cmake -y
 
-    install west
+    # install west
     pip3 install --user -U west
 
     west_path_set=0
@@ -58,12 +58,32 @@ function _zephyr_setup_sdk_0_11_3()
         zephyr_proj_folder=~/zephyr-project
     fi
 
+    # to search "ZEPHYR_PROJECT_PATH" in ~/.bashrc file to find the original
+    # zephyr_proj_folder location, if does not match, remove it, and install
+    # to the new location, and delete the line in ~/.bashrc ; if match, will 
+    # not delete it, but update it.
+
     zephyr_proj_path_set=0
     while IFS='' read -r line || [[ -n "$line" ]] ; do
         if [[ $line == *"export ZEPHYR_PROJECT_PATH"* ]] ; then
+            zephyr_proj_original_path_line=$line
             zephyr_proj_path_set=1
         fi
     done < ~/.bashrc
+
+    pos=$(_find_a_char_in_str "$zephyr_proj_original_path_line" "=" 1)
+    zephyr_proj_original_path=${zephyr_proj_original_path_line:$((pos+1)):${#zephyr_proj_original_path_line}}
+    echo "zephyr_proj_original_path = "$zephyr_proj_original_path 
+    echo "zephyr_proj_folder = "$zephyr_proj_folder
+
+    if [[ $zephyr_proj_path_set = 1 ]] ; then
+        if [[ $zephyr_proj_original_path != $zephyr_proj_folder ]] ; then
+            sed -i "s%"$zephyr_proj_original_path"%"$zephyr_proj_folder"%g" ~/.bashrc
+            # must delete the original folder
+            rm -rf $zephyr_proj_original_path
+        fi
+    fi
+
     if [ $zephyr_proj_path_set = 0 ] ; then
         echo '# Zephyr Project path:' >> ~/.bashrc
         echo 'export ZEPHYR_PROJECT_PATH='$zephyr_proj_folder >> ~/.bashrc
@@ -71,7 +91,7 @@ function _zephyr_setup_sdk_0_11_3()
     fi
 
     if [ -d $zephyr_proj_folder ] ; then
-        echo -e "zephyr pojrect foler already exists, do you want to delete it? [Yes/No]\r\n"
+        echo -e "zephyr pojrect fodler already exists, do you want to delete it? [Yes/No]\r\n"
         read asw
         if [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || ($asw = 'Yes') || ($asw = 'yes') ]] ; then
             sudo rm -rf $zephyr_proj_folder
@@ -95,7 +115,6 @@ function _zephyr_setup_sdk_0_11_3()
     pip3 install --user -r $zephyr_proj_folder/zephyr/scripts/requirements.txt
 
     #install the toolchain ---------------------------------
-
     cd ~ && mkdir -p soft/ &&  cd soft/
 
     sdk_ver="0.11.3"
@@ -150,6 +169,7 @@ function _zephyr_setup_sdk_0_11_3()
             echo "wrong input."
         esac
     done
+
     # remove the folder, if it exists
     if [ -d $zephyr_sdk_folder ] ; then
         sudo rm $zephyr_sdk_folder -r
@@ -163,29 +183,79 @@ function _zephyr_setup_sdk_0_11_3()
     zephyr_sdk_path_set=0
     while IFS='' read -r line || [[ -n "$line" ]] ; do
         if [[ $line == *"export ZEPHYR_SDK_PATH"* ]] ; then
+            zephyr_sdk_original_path_line=$line
             zephyr_sdk_path_set=1
         fi
     done < ~/.bashrc
+
+    if [ $zephyr_sdk_path_set = 1 ] ; then
+        pos=$(_find_a_char_in_str "$zephyr_sdk_original_path_line" "=" 1)
+        zephyr_sdk_original_path=${zephyr_sdk_original_path_line:$((pos+1)):${#zephyr_sdk_original_path_line}}
+        echo "zephyr_sdk_original_path = "$zephyr_sdk_original_path 
+        echo "zephyr_sdk_folder = "$zephyr_sdk_folder
+        if [ $zephyr_sdk_original_path != $zephyr_sdk_folder ] ; then
+            sudo rm -rf $zephyr_sdk_original_path
+            sed -i "s%"$zephyr_sdk_original_path"%"$zephyr_sdk_folder"%g" ~/.bashrc
+        fi
+    fi
+
     if [ $zephyr_sdk_path_set = 0 ] ; then
         echo '# Zephyr SDK path:' >> ~/.bashrc
         echo 'export ZEPHYR_SDK_PATH='$zephyr_sdk_folder >> ~/.bashrc
         echo ' ' >>~/.bashrc
     fi
 
+    echo -e "\nTry the following commands to verify installation"
+    echo -e "  cd $zephyr_proj_folder/zephyr/"
+    echo -e "  west build -p auto -b nucleo_f767zi samples/basic/blinky\n"
     # ------------------------------
     cd $current_folder
     unset current_folder
 }
 
 # =============================================================================================
+function _zephyr_build_help()
+{
+    echo -e "\n------------ zephyr build (simplified tool) --------------"
+    echo "  maitainer: Dingjiang Zhou "
+    echo -e "----------------------------------------------------------\n"
+    echo "supported commands:"
+    echo " zephyr build -b <board> [-G <make tool>]"
+    echo " - <board> "
+    echo "   supported boards. includes the following: "
+    echo "      nucleo_f767zi"
+    echo "      ..."
+    echo " - <make tool>"
+    echo "   ninja or cmake, or west (wip)"
+    echo -e "   the default tool is ninja\n"
+}
+
+# =============================================================================================
 # usage:
 # zephyr build -b nucleo_f767zi
 # todo: add -G option to choose between ninja and cmake, and even west
+# todo: use -DBOARD_ROOT to specify the path of the custom board repository
+# todo: use -DDTS_ROOT to specify the path of the DeviceTree (a repository)
+
+# update:
+# if there is no build folder, must use -b option and assign a build target board
+# if there is a build folder: 1) if no -b option used, then just build; 2) if -b
+# option is used, then ALWAYS delete the build folder and rebuild from scratch 
 function _zephyr_build()
 {
+    if [ $# = 0 ] ; then
+        if [ -d build ] ; then
+            cmake -B build -GNinja
+            ninja -C build
+            return
+        fi
+        echo -e "\n no previous build, need a target board to build, for example:"
+        echo -e " zephyr build -b nucleo_f767zi\n"
+        return
+    fi
     # search the arguments to find the board name
     board=$(_find_argument_after_option -b $1 $2 $3 $4 $5 $6 $7 $8)
-
+    rm -rf build/
     # echo "board = "$board
     # the default build tool is ninja
     cmake -B build -GNinja -DBOARD=$board .
@@ -193,8 +263,27 @@ function _zephyr_build()
 }
 
 # =============================================================================================
+function _zephyr_flash_help()
+{
+    echo -e "\n------------ zephyr flash (simplified tool) --------------"
+    echo "  maitainer: Dingjiang Zhou "
+    echo -e "----------------------------------------------------------\n"
+    echo "supported commands:"
+    echo " zephyr flash <platform>"
+    echo " - <platform> "
+    echo "   supported platform. includes the following: "
+    echo "      stm32"
+    echo -e "      ...\n"
+}
+
+# =============================================================================================
 function _zephyr_flash()
 {
+
+    if [ $# = 0 ] ; then
+        _zephyr_flash_help
+        return
+    fi
     if [ ! -f ./build/zephyr/zephyr.bin ] ; then
         echo -e "\nbinary does not exist, you can build it by:"
         echo -e "   zephyr build -b <board name>\n"
@@ -221,7 +310,7 @@ function zephyr()
     # ------------------------------
     if [ $1 = 'setup' ] ; then
         if [ $2 = 'sdk-0.11.3' ] ; then
-            _zephyr_setup_sdk_0_11_3
+            _zephyr_setup_sdk_0_11_3 $3 $4 $5 $6
             return
         fi
         return
@@ -261,9 +350,13 @@ function _zephyr()
     # ---------------------------------------------------------------------------------
     ACTIONS[setup]+="sdk-0.11.3 "
     ACTIONS[sdk-0.11.3]=" "
-    ACTIONS[build]=" "
+    ACTIONS[build]="-b "
     ACTIONS[flash]="stm32 "
     ACTIONS[stm32]=" "
+
+    # supported board can be added here
+    ACTIONS[-b]+="nucleo_f767zi "
+    ACTIONS[nucleo_f767zi]=" "
     
     # ---------------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

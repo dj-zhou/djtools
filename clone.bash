@@ -10,25 +10,20 @@ function _dj_clone_help()
     echo "   github   - to clone repo from github"
     echo "   gitee    - to clone repo from gitee"
     echo "   MORE IS COMMING"
-    echo "-----------------------------------------------------"
-    echo " "
+    echo -e "-----------------------------------------------------\n"
 }
 
 # ===========================================================================================
 function _dj_clone_bitbucket()
 {
-    echo " "
-    echo "dj clone "$1" with bitbucket username "$bitbucket_username
-    echo " "
+    echo -e "\ndj clone "$1" with bitbucket username "$bitbucket_username"\n"
     git clone https://$bitbucket_username@bitbucket.org/$bitbucket_username/$1.git
 }
 
 # ===========================================================================================
 function _dj_clone_github()
 {
-    echo " "
-    echo "dj clone "$1" with github username "$github_username
-    echo " "
+    echo -e "\ndj clone "$1" with github username "$github_username"\n"
     # echo "argment 2 = "$2
     # echo "argment 3 = "$3
     # echo "argment 4 = "$4
@@ -61,8 +56,6 @@ function _dj_clone_github()
 # ===========================================================================================
 function _dj_clone_gitee()
 {
-    echo " "
-    echo "dj clone "$1" with gitee username "$gitee_username
-    echo " "
+    echo -e "\ndj clone "$1" with gitee username "$gitee_username"\n"
     git clone https://gitee.com/$gitee_username/$1.git
 }

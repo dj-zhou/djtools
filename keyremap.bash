@@ -2,30 +2,23 @@
 
 # ===========================================================================================
 _keyremap_help() {
-    echo " "
-    echo "keyremap usage: " 
-    echo " "
+    echo -e "\nkeyremap usage: \n"
     echo "    keyremap enable "
-    echo "       -- swap Alt and Ctrl keys" 
-    echo "    keyremap disable " 
-    echo "       -- set Alt and Ctrl keys to default" 
-    echo " "
+    echo "       -- swap Alt and Ctrl keys"
+    echo "    keyremap disable "
+    echo -e "       -- set Alt and Ctrl keys to default\n"
 }
 
 # ===========================================================================================
 _keyremap_enable() {
     xmodmap $djtools_path/keyremap-enable.txt
-    echo " "
-    echo "keyremap enabled"
-    echo " "
+    echo -e "\nkeyremap enabled\n"
 }
 
 # ===========================================================================================
 _keyremap_disable() {
     xmodmap $djtools_path/keyremap-disable.txt
-    echo " "
-    echo "keyremap disabled"
-    echo " "
+    echo -e "\nkeyremap disabled\n"
 }
 
 # ===========================================================================================
@@ -56,8 +49,8 @@ _keyremap() {
     # All possible first values in command line
     local SERVICES=(
         "enable"
-          "disable"
-      "help"
+        "disable"
+        "help"
     )
 
     # declare an associative array for options

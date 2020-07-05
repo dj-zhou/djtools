@@ -17,7 +17,7 @@ function _coding_help()
 }
 
 # ===========================================================================================
-function _coding_clang_format()
+function _coding_clang_format_implement()
 {
     if [ ! -n $1 ] ; then
         echo "wrong usage"
@@ -33,6 +33,26 @@ function _coding_clang_format()
         cp $djtools_path/.clang-format-bg .clang-format
         return
     fi
+}
+
+# ===========================================================================================
+function _coding_clang_format_show()
+{
+    echo -e '\n               clang format naming conventions'
+    echo " +-----------------------------------------------------------+"
+    echo " |          Code Element | Stype                             |"
+    echo " +-----------------------------------------------------------+"
+    echo " |             Namespace | under_scored                      |"
+    echo " |            Class name | CamelCase                         |"
+    echo " |         Function name | camelCase                         |"
+    echo " |     Parameters/Locals | under_scored                      |"
+    echo " |      Member Variables | under_socred_with_                |"
+    echo " | Enums and its mumbers | CamelCase                         |"
+    echo " |               Globals | g_under_scored                    |"
+    echo " |             Constants | UPPER_CASE                        |"
+    echo " |            File names | Match the case of the class name  |"
+    echo " +-----------------------------------------------------------+"
+    echo -e "\n"
 }
 
 # ===========================================================================================
@@ -55,7 +75,20 @@ function coding()
             echo " coding: not supported!"
         fi
     elif [ $1 = 'clang-format' ] ; then
-        _coding_clang_format $2 $3 $4 $5 $6
+        if [ $# = 1 ] ; then
+            _coding_help
+            return
+        fi
+        if [ $2 = 'implement' ] ; then
+            _coding_clang_format_implement $3 $4 $5 $6 $7
+            return
+        fi
+        if [ $2 = 'show' ] ; then
+            _coding_clang_format_show $3 $4 $5 $6 $7
+            return
+        fi
+        _coding_help
+        return
     else
         _coding_help
     fi
@@ -81,9 +114,11 @@ function _coding()
     # no space in front or after "="
     ACTIONS[replace]+="-help "
     ACTIONS[-help]+=" "
-    ACTIONS[clang-format]+="dj bg "
+    ACTIONS[clang-format]+="implement show "
+    ACTIONS[implement]+="dj bg "
     ACTIONS[dj]+=" "
     ACTIONS[bg]+=" "
+    ACTIONS[show]+=" "
 
     
     # ---------------------------------------------------------------------------------

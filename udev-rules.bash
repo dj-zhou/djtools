@@ -17,32 +17,25 @@ function _dj_udev_help()
 # ===========================================================================================
 function _dj_udev_dialout()
 {
-    echo " "
-    echo "This is to solve the serial port problem: Permission denied"
-    echo " "
+    echo \-e "\nThis is to solve the serial port problem: Permission denied\n"
 
     sudo usermod -a -G dialout $USER
 
     rule_file=udev-dialout.rules
-    echo "udev rule file: "$rule_file" written to /etc/udev/rule.d/"
-    echo " "
+    echo -e "udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo 'KERNEL=="ttyUSB[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
     echo 'KERNEL=="ttyACM[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
     sudo service udev restart
-    echo " "
-    echo "You can plug off the USB-serial doggle and plug it in to use it"
-    echo " "
+    echo -e "\nYou can plug off the USB-serial doggle and plug it in to use it\n"
 }
 
 # ===========================================================================================
 function _dj_udev_uvc_video_capture()
 {
-    echo " "
     rule_file=uvc-video-capture.rules
-    echo "udev rule file: "$rule_file" written to /etc/udev/rule.d/"
-    echo " "
+    echo -e "\nudev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
     
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo 'SUBSYSTEMS=="usb", KERNEL=="video[0-99]*", ACTION=="add", ATTRS{idVendor}=="18ec", ATTRS{idProduct}=="5555", ATTRS{product}=="USB2.0 PC CAMERA", MODE="666", SYMLINK+="uvc/videoCapture", GROUP="dialout"' | sudo tee -a /etc/udev/rules.d/$rule_file

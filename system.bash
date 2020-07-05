@@ -69,6 +69,8 @@ function _system_check_nvidia_driver()
         sudo apt-get install inxi
     fi
     inxi -G
+
+    nvidia-smi
 }
 
 # ===========================================================================================
@@ -128,17 +130,22 @@ function system()
     fi
     # ------------------------------
     if [ $1 = 'disable' ] ; then
+        if [ $# = 1 ] ; then
+            _system_disable_help
+            return
+        fi
         # --------------------------
         if [ $2 = 'program-problem-detected' ] ; then
             _system_disable_program_problem_detected $3 $4 $5 $6 $7
             return
         fi
-        # --------------------------
-        _system_disable_help
-        return
     fi
     # ------------------------------
     if [ $1 = 'check' ] ; then
+        if [ $# = 1 ] ; then
+            _system_check_help
+            return
+        fi
         # --------------------------
         if [ $2 = 'temperature' ] ; then
             _system_check_temperature
@@ -154,11 +161,13 @@ function system()
             _system_check_udev_rules
             return
         fi
-        _system_check_help
-        return
     fi
     # ------------------------------
     if [ $1 = 'wallpaper' ] ; then
+        if [ $# = 1 ] ; then
+            echo "system wallpaper: need argument"
+            return
+        fi
         # --------------------------
         if [ $2 = 'random' ] ; then
             _system_wallpaper_random
@@ -168,12 +177,15 @@ function system()
     fi
     # ------------------------------
     if [ $1 = 'ubuntu-drivers' ] ; then
+        if [ $# = 1 ] ; then
+            echo "sudo ubuntu-drivers: need argument"
+            return
+        fi
         # --------------------------
         if [ $2 = 'autoinstall' ] ; then
             sudo ubuntu-drivers autoinstall
             return
         fi
-        return
     fi
     _dj_help
     # ------------------------------

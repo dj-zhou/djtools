@@ -57,7 +57,7 @@ function _dj_setup_clang_9_0_0()
 {
     current_folder=${PWD}
 
-    echo " "
+    echo -e "\n"
     if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
         echo "  Install clang for Ubuntu 16.04..."
     elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
@@ -65,8 +65,8 @@ function _dj_setup_clang_9_0_0()
     elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
         echo " TODO"
     fi
-    echo " "
-    sleep 1
+    echo -e "\n"
+    _press_enter_to_continue
 
     cd ~ && mkdir -p soft/ && cd soft/
     
@@ -318,9 +318,7 @@ function _dj_setup_stm32tools()
     fi
     cd ~/workspace/$repo
 
-    echo " " 
-    echo "install st-link v2"
-    echo " "
+    echo -e "\ninstall st-link v2 software\n"
     sudo apt-get install libusb-1.0.0-dev -y
 
     cd ~/workspace/stm32tools
@@ -330,22 +328,25 @@ function _dj_setup_stm32tools()
     sudo ldconfig
 
     cd $cwd_before_running
-    echo " "
-    echo "compile stm32flash"
-    echo " "
+    echo -e "\ncompile stm32flash\n"
     cd ~/workspace/stm32tools/stm32flash
     make clean
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
-    echo "  "
-    echo "install cu & cutecom -- serial port console"
-    echo "  "
-    sudo apt-get install cu cutecom -y
+    echo -e "\ninstall cu, cutecom, screen & putty -- serial port console\n"
+    
+    echo "how to use cu and screen:"
+    echo "      cu: cu -l /dev/ttyUSB0 -s 115200 [ENTER]"
+    echo "  screen: screen /dev/ttyUSB0 115200 [ENTER]"
+    echo "exit methods for cu and screen:"
+    echo "      cu: input ~. and then [ENTER]"
+    echo "  screen: press Ctrl+A and then \, and [y]"
 
-    echo "  "
-    echo "add serial port privilege to current user"
-    echo "  "
+    _press_enter_to_continue
+    sudo apt-get install cu cutecom putty screen -y
+
+    echo -e "\nadd serial port privilege to current user\n"
     sudo usermod -a -G dialout $(whoami)
     rule_file=stm32tools.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
@@ -365,11 +366,8 @@ function _dj_setup_glfw3_gtest_glog()
 {
     cwd_before_running=$PWD
 
-    echo " "
-    echo "  Install glfw3, gtest, glog ..."
-    echo " "
-    sleep 2
-    cd ~
+    echo -e "\n  Install glfw3, gtest, glog ...\n"
+    _press_enter_to_continue
     
     cd ~ && mkdir -p soft && cd soft/
 
@@ -399,18 +397,36 @@ function _dj_setup_glfw3_gtest_glog()
 }
 
 # ===========================================================================================
+# ninja is used to compile
+function _dj_setup_grpc_1_29_1()
+{
+    cwd_before_running=$PWD
+
+    cd ~ && mkdir -p soft && cd soft/
+    git clone https://github.com/grpc/grpc.git --recurse-submodules --shallow-submodules --depth 1 --branch v1.29.1
+    cd grpc
+    mkdir build && cd build
+    cmake .. -GNinja
+    cmake --build .
+    sudo cmake --build . -- install
+
+    cd ~/soft/
+    _ask_to_remove_a_folder grpc
+
+    cd ${cwd_before_running}
+}
+
+# ===========================================================================================
 # may not be a good way to install opencv
 # recommend to install opencv-4.1.1
 function _dj_setup_opencv_2_4_13()
 {
     cwd_before_running=$PWD
 
-    echo " "
-    echo " Have you installed Qt? The openCV installation may need Qt"
+    echo -e "\n Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.11.2"
-    echo "     dj setup qt-5.11.2"
-    echo " "
-    sleep 3
+    echo -e "     dj setup qt-5.11.2\n\n"
+    _press_enter_to_continue
     
     cd ~ && mkdir -p soft && cd soft/
 
@@ -443,13 +459,10 @@ function _dj_setup_opencv_4_1_1()
 {
     cwd_before_running=$PWD
 
-    echo " "
-    echo " Have you installed Qt? The openCV installation may need Qt"
+    echo -e "\n Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.14.2"
-    echo "     dj setup qt-5.14.2"
-    echo
-    echo " "
-    sleep 3
+    echo -e "     dj setup qt-5.14.2\n\n"
+    _press_enter_to_continue
 
     # install dependency:
     sudo apt-get install -y libopencv-dev build-essential cmake libdc1394-22
@@ -572,11 +585,7 @@ function _dj_work_check()
 # ===========================================================================================
 function _dj_meson_build()
 {
-    current_folder=${PWD}
-    
-    echo ' '
     folder_name=`basename "$current_folder"`
-    echo "current folder name: "$folder_name
     
     # if the curent folder is build, then
     # cd ../ && rm build -r 
@@ -588,7 +597,7 @@ function _dj_meson_build()
         cd build
         ninja
 
-    # if the curent folder containes a build/ folder, then
+    # if the curent folder contains a build/ folder, then
     # rm build -r 
     # meson build && cd build && ninja
     elif [ -d build ] ; then
@@ -596,13 +605,16 @@ function _dj_meson_build()
         meson build
         cd build
         ninja
+        
+    # if the current folder does not contain a build/ folder,then
+    # check if there is a meson.build file, then build
+    elif [ -f meson.build ] ; then
+        meson build
+        cd build
+        ninja
     else
-        echo ' '
-        echo 'not in the build/ folder'
-        echo 'neither contains a build/ folder'
-        echo ' '
+        echo -e '\nmeson: not in a meson folder\n'
     fi
-    cd $current_folder
 }
 
 # ===========================================================================================
@@ -788,6 +800,10 @@ function dj()
             _dj_setup_glfw3_gtest_glog
             return
         fi
+        if [ $2 = 'grpc-1.29.1' ] ; then
+            _dj_setup_grpc_1_29_1
+            return
+        fi
         # --------------------------
         if [ $2 = 'opencv-2.4.13' ] ; then
             _dj_setup_opencv_2_4_13
@@ -890,9 +906,9 @@ function _dj()
     #---------------------------------------------------------
     #---------------------------------------------------------
     ACTIONS[setup]+="arm-gcc baidu-netdisk clang-9.0.0 container computer dj-gadgets dropbox eigen foxit "
-    ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog i219-v libev-4.33 mathpix matplotlib-cpp opencv-2.4.13 "
-    ACTIONS[setup]+="opencv-4.1.1 pangolin pip qt-5.11.2 qt-5.13.1 qt-5.14.2 ros-melodic ros2-foxy slack "
-    ACTIONS[setup]+="stm32tools sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
+    ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog grpc-1.29.1 i219-v libev-4.33 mathpix matplotlib-cpp "
+    ACTIONS[setup]+="opencv-2.4.13 opencv-4.1.1 pangolin pip qt-5.11.2 qt-5.13.1 qt-5.14.2 ros-melodic "
+    ACTIONS[setup]+="ros2-foxy slack stm32tools sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
     ACTIONS[arm-gcc]=" "
     ACTIONS[baidu-netdisk]=" "
     ACTIONS[clang-8.0.0]=" "
@@ -907,6 +923,7 @@ function _dj()
     ACTIONS[eigen]=" "
     ACTIONS[foxit]=" "
     ACTIONS[glfw3-gtest-glog]=" "
+    ACTIONS[grpc-1.29.1]=" "
     ACTIONS[i219-v]="e1000e-3.4.2.1 e1000e-3.4.2.4 "
     ACTIONS[libev-4.33]=" "
     ACTIONS[mathpix]=" "

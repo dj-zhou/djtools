@@ -21,25 +21,20 @@
 # ===========================================================================================
 _resized_help()
 {
-    echo " "
-    echo " "
-    echo "---------------------- resized ----------------------"
+    echo -e "\n\n---------------------- resized ----------------------"
     echo " Author      : Dingjiang Zhou"
     echo " Email       : zhoudingjiang@gmail.com "
     echo " Create Date : 2019-09-16"
     echo "-----------------------------------------------------"
-    echo " "
-    echo " First level commands:"
+    echo -e "\n First level commands:"
     echo "   embedded   - to arrange terminator and vscode"
     echo "   gitg       - to arrange terminator and gitg"
     echo "   fullscreen - to make terminator full screen"
     echo "   kdiff3     - to arrange kdiff3"
     echo "   difftool   - the same as kdiff3"
     echo "   typora     - to arrange terminator, Typora"
-    echo "   MORE IS COMMING"
-    echo " "
-    echo " All commands support tab completion"
-    echo " "
+    echo -e "   MORE IS COMMING\n"
+    echo -e " All commands support tab completion\n"
     echo "-----------------------------------------------------"
 }
 
@@ -62,6 +57,7 @@ _resize_embedded()
         wmctrl -r "eclipse" -e 0,5370,0,2710,2150
         wmctrl -r "Sublime Text" -e 0,5660,0,1500,2150
         wmctrl -r ${vs_code_window} -e 0,5660,0,2000,2080
+        return
     elif [[ $SCREENSIZE = *"3840x2160"* ]]; then
         echo "resized embedded: Single 3840x2160 screen"
         #                   none, x,     y,   width,   height
@@ -69,14 +65,24 @@ _resize_embedded()
         wmctrl -r "eclipse" -e 0,1830,0,2000,2050
         wmctrl -r "Sublime Text" -e 0,1730,0,2000,2050
         wmctrl -r ${vs_code_window} -e 0,1730,0,2300,2030
+        return
     elif [[ "$SCREENSIZE" = *"1920x1200"*"1920x1200"* ]]; then
         echo "resized embedded: Double 1920x1200 screen"
-        #                   none, x,     y,   width,   height
+        if [[ $1 = 'right' ]] ; then
+            #               none, x,     y,   width,   height
+            wmctrl -r "/bin/bash" -e 0,1920,0,800,1170
+            wmctrl -r "Terminal" -e 0,1200,0,710,1150
+            wmctrl -r "eclipse" -e 0,2720,0,1200,1150
+            wmctrl -r "Sublime Text" -e 0,2830,0,1500,1100
+            wmctrl -r ${vs_code_window} -e 0,2720,0,1120,1170
+            return
+        fi
         wmctrl -r "/bin/bash" -e 0,0,10,800,1120
         wmctrl -r "Terminal" -e 0,1200,0,710,1150
         wmctrl -r "eclipse" -e 0,2720,0,1200,1150
         wmctrl -r "Sublime Text" -e 0,2830,0,1500,1100
         wmctrl -r ${vs_code_window} -e 0,800,0,1120,1150
+        return
     elif [[ "$SCREENSIZE" = *"1920x1080"*"1920x1080"* ]]; then
         echo "resized embedded: Double 1920x1080 screen"
         #                   none, x,     y,   width,   height
@@ -85,6 +91,7 @@ _resize_embedded()
         wmctrl -r "eclipse" -e 0,2720,0,1200,1050
         wmctrl -r "Sublime Text" -e 0,2830,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,2720,0,1120,1050
+        return
     elif [[ "$SCREENSIZE" = *"1920x1080"* ]]; then
         echo "resized embedded: Single 1920x1080 screen"
         #                   none, x,     y,   width,   height
@@ -92,6 +99,7 @@ _resize_embedded()
         wmctrl -r "eclipse" -e 0,820,0,1200,1000
         wmctrl -r "Sublime Text" -e 0,1030,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,600,0,1340,1080
+        return
     elif [[ "$SCREENSIZE" = *"2560x1080"* ]]; then
         echo "resized embedded: Single 2560x1080 screen"
         #                   none, x,     y,   width,   height
@@ -99,18 +107,20 @@ _resize_embedded()
         wmctrl -r "eclipse" -e 0,1530,0,1200,1060
         wmctrl -r "Sublime Text" -e 0,810,0,800,1040
         wmctrl -r ${vs_code_window} -e 0,1020,0,1530,1070
+        return
     elif [[ "$SCREENSIZE" = *"1366x768"* ]]; then
         echo "resized embedded: Single 1366x768 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,600,700
         wmctrl -r ${vs_code_window} -e 0,620,0,800,700
+        return
     elif [[ "$SCREENSIZE" = *"1280x800"* ]]; then
         echo "resized embedded: Single 1280x800 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,600,700
         wmctrl -r ${vs_code_window} -e 0,620,0,800,700
+        return
     fi
-    clear
 }
 
 # ===========================================================================================
@@ -303,7 +313,7 @@ function resized()
         return
     fi
     if [ $1 = 'embedded' ] ; then
-        _resize_embedded
+        _resize_embedded $2 $3 $4
         return
     fi
     if [ $1 = 'gitg' ] ; then
@@ -344,12 +354,14 @@ function _resized()
     # declare an associative array for options
     declare -A ACTIONS
     # -------------------------------------------------------------------------
-    ACTIONS[embedded]=" "
+    ACTIONS[embedded]="left right "
     ACTIONS[gitg]=" "
     ACTIONS[fullscreen]=" "
     ACTIONS[kdiff3]=" "
     ACTIONS[difftool]=" "
     ACTIONS[typora]=" "
+    ACTIONS[left]=" "
+    ACTIONS[right]=" "
     local cur=${COMP_WORDS[COMP_CWORD]}
     if [ ${ACTIONS[$3]+1} ] ; then
         COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )

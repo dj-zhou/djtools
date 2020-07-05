@@ -3,23 +3,18 @@
 # =============================================================================================
 function _mark-down_help()
 {
-    echo " "
-    echo "-------------------- mark-down -----------------------"
+    echo -e "\n-------------------- mark-down -----------------------"
     echo " Author      : Dingjiang Zhou"
     echo " Email       : zhoudingjiang@gmail.com "
     echo " Create Date : June 8th, 2020 "
-    echo "-----------------------------------------------------"
-    echo " "
-    echo " TODO"
-    echo " "
+    echo -e "-----------------------------------------------------\n"
+    echo " TODO\n"
 }
 
 # =============================================================================================
 function _mark_down_help_insert_figure()
 {
-    echo ' '
-    echo ' <img src="./figures/sample-figure.png" width="500px"> '
-    echo ' '
+    echo -e '\n <img src="./figures/sample-figure.png" width="500px"> \n'
 }
 
 # =============================================================================================
@@ -35,11 +30,17 @@ function _mark_down_help_insert_table()
 # =============================================================================================
 function _mark_down_help_color_text()
 {
-    echo ' '
-    echo '  <span style="color:blue">this content is blue.</span>'
-    echo '  <span style="color:red">this content is red.</span>'
-    echo ' '
+    echo -e '\n  <span style="color:blue">this content is blue.</span>'
+    echo -e '  <span style="color:red">this content is red.</span>\n'
+    echo -e '   available colors:\n     blue, red, green, cyan, yellow, purple, white, etc.'
 }
+
+# =============================================================================================
+function _mark_down_help_table_of_content()
+{
+    echo -e "\n {:toc}\n"
+}
+
 # =============================================================================================
 function mark-down()
 {
@@ -65,12 +66,14 @@ function mark-down()
             _mark_down_help_color_text
             return
         fi
+        if [ $2 = 'table-of-content' ] ; then
+            _mark_down_help_table_of_content
+            return
+        fi
         return
     fi
 
-    echo ' '
-    echo 'repo : "'$1 '"command not supported'
-    echo ' '
+    echo -e '\nrepo : "'$1 '"command not supported\n'
     _mark-down_help
 
     # ------------------------------
@@ -92,10 +95,11 @@ function _mark-down()
     declare -A ACTIONS
 
     # ---------------------------------------------------------------------------------
-    ACTIONS[help]+="insert-figure insert-table color-text "
+    ACTIONS[help]+="insert-figure insert-table color-text table-of-content "
     ACTIONS[insert-figure]=" "
     ACTIONS[insert-table]=" "
     ACTIONS[color-text]=" "
+    ACTIONS[table-of-content]=" "
     
     # ---------------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
