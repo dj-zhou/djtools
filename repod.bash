@@ -1,6 +1,12 @@
 #!/bin/bash 
 
-# =============================================================================================
+# remove the local branches that the upstreams are gone: to test
+# git fetch -p 
+# for branch in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do 
+#     git branch -D $branch;
+# done
+
+# ===============================================================================
 function _repod_help()
 {
     echo -e "\n---------------------- repod ------------------------"
@@ -18,7 +24,7 @@ function _repod_help()
     echo -e "\nAll commands support tab completion\n"
 }
 
-# =============================================================================================
+# ===============================================================================
 function _backup_to_github()
 {
     current_folder=${PWD}
@@ -63,7 +69,7 @@ function _backup_to_github()
     unset current_folder
 }
 
-# =============================================================================================
+# ===============================================================================
 # only back up to personal private repo
 function _backup_to_gitee()
 {
@@ -109,7 +115,7 @@ function _backup_to_gitee()
     unset current_folder
 }
 
-# =============================================================================================
+# ===============================================================================
 function _repod_branches_list()
 {
     # git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format='%(refname:short)'
@@ -118,7 +124,7 @@ function _repod_branches_list()
     echo -e '\nnot finished yet\n'
 }
 
-# =============================================================================================
+# ===============================================================================
 function _repod_branches_list_all()
 {
     if [ $1 = '--remote' ] ; then
@@ -136,15 +142,15 @@ function _repod_update_help()
     echo -e "      --all-sub-forlders\n"
 
 }
-# =============================================================================================
+# ===============================================================================
 function _repod_update_repos_all_folders()
 {
     current_folder=${PWD}
 
     for folder in ./* ; do
         if [ -d $folder ] ; then
-            echo -e "\r\n----------------------------"
-            printf `basename "$folder"`
+            echo -e "${CYAN_COLOR}\r\n----------------------------"
+            printf `basename "$folder"${NO_COLOR}`
             cd $folder
             if [ -d ".git/" ] ; then
                 git_status=$(git status)
@@ -169,7 +175,7 @@ function _repod_update_repos_all_folders()
     unset current_folder
 }
 
-# =============================================================================================
+# ===============================================================================
 function repod()
 {
     current_folder=${PWD}
@@ -285,7 +291,7 @@ function repod()
     unset current_folder
 }
 
-# =============================================================================================
+# ===============================================================================
 function _repod()
 {
     COMPREPLY=()
@@ -327,5 +333,5 @@ function _repod()
     fi
 }
 
-# =============================================================================================
+# ===============================================================================
 complete -F _repod repod

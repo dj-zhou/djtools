@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ===========================================================================================
+# =============================================================================
 function _dj_udev_help()
 {
     _dj_help
@@ -14,7 +14,7 @@ function _dj_udev_help()
     echo " "
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_udev_dialout()
 {
     echo \-e "\nThis is to solve the serial port problem: Permission denied\n"
@@ -31,7 +31,7 @@ function _dj_udev_dialout()
     echo -e "\nYou can plug off the USB-serial doggle and plug it in to use it\n"
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_udev_uvc_video_capture()
 {
     rule_file=uvc-video-capture.rules

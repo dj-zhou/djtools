@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-# =============================================================================================
+# ===============================================================================
 function _yocto_help()
 {
     echo " "
@@ -14,8 +14,24 @@ function _yocto_help()
     echo " "
 }
 
-# =============================================================================================
+# ===============================================================================
 # note: the arguments imx7 or raspberry-pi-4 are not serious names of the platfroms
+# original scripts for imx7-cl-som:
+# sudo umount /dev/sda1
+# sudo umount /dev/sda2
+# sudo chmod 666 /dev/sda
+# cd ~/yocto-cl-com-imx7/build/
+# oe-run-native bmap-tools-native bmaptool copy tmp/deploy/images/imx7-cl-som/flexbot2-image-imx7-cl-som.wic.gz /dev/sda
+# the above works only for the case when a USB-SD card reader is used:
+# sda           8:0    1   3.6G  0 disk 
+# ├─sda1        8:1    1  24.2M  0 part /media/robot/boot
+# └─sda2        8:2    1 573.8M  0 part /media/robot/root
+# if the native SD card reader is used, I see:
+# mmcblk0     179:0    0   3.6G  0 disk 
+# ├─mmcblk0p1 179:1    0    30M  0 part /media/robot/boot
+# └─mmcblk0p2 179:2    0   2.6G  0 part /media/robot/root
+
+
 function _yocto_flash()
 {
     # argument check -------------------
@@ -61,6 +77,7 @@ function _yocto_flash()
     fi
 
     # umount all partitions: /dev/sda1; /dev/sda2; /dev/sda3; etc -------------
+    #                   or /dev/mmcblk0p1; /dev/mmcblk0p2; etc
     for i in {1..9} ; do
         partition=$DEV"${i}"
         if [ -b $partition ] ; then
@@ -68,6 +85,19 @@ function _yocto_flash()
             sudo mount | grep '^/' | grep -q $partition
             if [ $? -ne 1 ]; then # is mounted
                 echo "to umount partition "$partition
+                sleep 4 # just make it noticable
+                sudo umount $partition
+            fi
+        fi
+    done
+    for i in {1..9} ; do
+        partition=$DEV"p${i}"
+        if [ -b $partition ] ; then
+            # check if mounted
+            sudo mount | grep '^/' | grep -q $partition
+            if [ $? -ne 1 ]; then # is mounted
+                echo "to umount partition "$partition
+                sleep 4 # just make it noticable
                 sudo umount $partition
             fi
         fi
@@ -97,7 +127,7 @@ function _yocto_flash()
     return
 }
 
-# =============================================================================================
+# ===============================================================================
 function yocto()
 {
     current_folder=${PWD}
@@ -127,7 +157,7 @@ function yocto()
     unset current_folder
 }
 
-# =============================================================================================
+# ===============================================================================
 function _yocto()
 {
     COMPREPLY=()
@@ -160,5 +190,5 @@ function _yocto()
     fi
 }
 
-# =============================================================================================
+# ===============================================================================
 complete -F _yocto yocto

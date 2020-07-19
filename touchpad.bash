@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-# ===========================================================================================
+# =============================================================================
 _touchpad_help() {
     echo -e "\ntouchpad usage:\n"
     echo "    touchpad thinkpad enable "
@@ -9,7 +9,7 @@ _touchpad_help() {
     echo -e "       -- disable the touchpad on ThinkPad laptops\n"
 }
 
-# ===========================================================================================
+# =============================================================================
 function _touchpad_thinkpad_control() {
     # xinput list | grep TouchPad
     touchpad=$(xinput list | grep TouchPad | tr -dc '0-9')
@@ -24,7 +24,7 @@ function _touchpad_thinkpad_control() {
     xinput set-prop $touchpadID "Device Enabled" $1
 }
 
-# ===========================================================================================
+# =============================================================================
 # ⎡ Virtual core pointer                    	id=2	[master pointer  (3)]
 # ⎜   ↳ Virtual core XTEST pointer              	id=4	[slave  pointer  (2)]
 # ⎜   ↳ ASUSTeK Computer Inc. N-KEY Device Consumer Control	id=14	[slave  pointer  (2)]
@@ -74,7 +74,7 @@ function _touchpad_roc_control() {
     xinput set-prop $touchpadID "Device Enabled" $1
 }
 
-# ===========================================================================================
+# =============================================================================
 function touchpad {
     # --------------------------------
     if [ $# = 0 ] ; then
@@ -129,7 +129,7 @@ function touchpad {
     fi
 }
 
-# ===========================================================================================
+# =============================================================================
 # auto completion reference:
 # https://blog.bouzekri.net/2017-01-28-custom-bash-autocomplete-script.html
 _touchpad() {
@@ -186,5 +186,5 @@ _touchpad() {
     fi
 }
 
-# ===========================================================================================
+# =============================================================================
 complete -F _touchpad touchpad

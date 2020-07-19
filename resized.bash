@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-# ===========================================================================================
+# =============================================================================
 # wmctrl -r ${vs_code_window} -b add,fullscreen
 # wmctrl -r ${vs_code_window} -b remove,fullscreen
 # wmctrl -R <win>
@@ -18,7 +18,7 @@
     #  v
     #  y
 
-# ===========================================================================================
+# =============================================================================
 _resized_help()
 {
     echo -e "\n\n---------------------- resized ----------------------"
@@ -38,19 +38,17 @@ _resized_help()
     echo "-----------------------------------------------------"
 }
 
-# ===========================================================================================
+# =============================================================================
 _resize_embedded()
 {
     # ---------------------------------------------------------------
     # get the real screen size
     SCREENSIZE=$(xrandr |grep '*')
     current_folder=$(pwd | xargs -n1 basename)
-    echo $current_folder
     # vs_code_window=${current_folder}"Visual Studio Code" # did not work!
     vs_code_window="Visual Studio Code"
-    echo ${vs_code_window}
     if [[ "$SCREENSIZE" = *"3840x2160"*"3840x2160"* ]]; then
-        echo "resized embedded: Double 3840x2160 screen"
+        echo "resized embedded: Double 3840x2160 screens"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,3840,0,1800,2080
         wmctrl -r "Terminal" -e 0,2340,0,1500,2160
@@ -67,7 +65,7 @@ _resize_embedded()
         wmctrl -r ${vs_code_window} -e 0,1730,0,2300,2030
         return
     elif [[ "$SCREENSIZE" = *"1920x1200"*"1920x1200"* ]]; then
-        echo "resized embedded: Double 1920x1200 screen"
+        echo "resized embedded: at least double 1920x1200 screens"
         if [[ $1 = 'right' ]] ; then
             #               none, x,     y,   width,   height
             wmctrl -r "/bin/bash" -e 0,1920,0,800,1170
@@ -84,7 +82,7 @@ _resize_embedded()
         wmctrl -r ${vs_code_window} -e 0,800,0,1120,1150
         return
     elif [[ "$SCREENSIZE" = *"1920x1080"*"1920x1080"* ]]; then
-        echo "resized embedded: Double 1920x1080 screen"
+        echo "resized embedded: Double 1920x1080 screens"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,1930,0,800,1020
         wmctrl -r "Terminal" -e 0,1200,0,710,1050
@@ -99,6 +97,13 @@ _resize_embedded()
         wmctrl -r "eclipse" -e 0,820,0,1200,1000
         wmctrl -r "Sublime Text" -e 0,1030,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,600,0,1340,1080
+        return
+    elif [[ "$SCREENSIZE" = *"1920x994"* ]]; then
+        echo "resized embedded: Single 1920x994 screen (in VMware)"
+        #                   none, x,     y,   width,   height
+        wmctrl -r "/bin/bash" -e 0,10,0,800,930
+        wmctrl -r "Sublime Text" -e 0,1030,0,1500,1000
+        wmctrl -r ${vs_code_window} -e 0,700,0,1250,930
         return
     elif [[ "$SCREENSIZE" = *"2560x1080"* ]]; then
         echo "resized embedded: Single 2560x1080 screen"
@@ -123,7 +128,7 @@ _resize_embedded()
     fi
 }
 
-# ===========================================================================================
+# =============================================================================
 # special use, do not put this function to funcs.bash
 function _resized_get_current_folder_name()
 {
@@ -145,7 +150,7 @@ function _resized_get_current_folder_name()
     echo $folder_name "("
 }
 
-# ===========================================================================================
+# =============================================================================
 function _resize_gitg()
 {
     echo " "
@@ -185,7 +190,7 @@ function _resize_gitg()
     clear
 }
 
-# ===========================================================================================
+# =============================================================================
 _resize_fullscreen()
 {  
     # ---------------------------------------------------------------
@@ -226,7 +231,7 @@ _resize_fullscreen()
     clear
 }
 
-# ===========================================================================================
+# =============================================================================
 _resize_kdiff3()
 {  
     # ---------------------------------------------------------------
@@ -270,7 +275,7 @@ _resize_kdiff3()
     fi
     clear
 }
-# ===========================================================================================
+# =============================================================================
 _resize_typora()
 {  
     # ---------------------------------------------------------------
@@ -291,6 +296,12 @@ _resize_typora()
         wmctrl -r "/bin/bash" -e 0,10,0,800,1000
         wmctrl -r "Typora" -e 0,730,0,1200,1080
         wmctrl -R "Typora"
+    elif [[ "$SCREENSIZE" = *"1920x994"* ]]; then
+        echo "resized embedded: Single 1920x994 screen (in VMware)"
+        #                   none, x,     y,   width,   height
+        wmctrl -r "/bin/bash" -e 0,10,0,800,930
+        wmctrl -r "Typora" -e 0,730,0,1200,930
+        wmctrl -R "Typora"
     elif [[ "$SCREENSIZE" = *"2560x1080"* ]]; then
         echo "resized typora: Single 2560x1080 screen"
         #                   none, x,     y,   width,   height
@@ -305,7 +316,7 @@ _resize_typora()
     clear
 }
 
-# ===========================================================================================
+# =============================================================================
 function resized()
 {
     if [ $# -eq 0 ] ; then
@@ -335,7 +346,7 @@ function resized()
     _resized_help
 }
 
-# ===========================================================================================
+# =============================================================================
 # auto tab completion
 function _resized()
 {
@@ -370,5 +381,5 @@ function _resized()
     fi
 }
 
-# ===========================================================================================
+# =============================================================================
 complete -F _resized resized

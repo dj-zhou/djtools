@@ -5,7 +5,7 @@ source $djtools_path/setup-generic.bash
 source $djtools_path/setup-ros.bash
 source $djtools_path/udev-rules.bash
 
-# ===========================================================================================
+# =============================================================================
 function _dj_help()
 {
     echo " "
@@ -27,7 +27,7 @@ function _dj_help()
     echo " "
 }
 
-# ===========================================================================================
+# =============================================================================
 function _clang_vscode_setting_json()
 {
     # echo "hello world"
@@ -52,7 +52,7 @@ function _clang_vscode_setting_json()
     cd $current_folder_json
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_clang_9_0_0()
 {
     current_folder=${PWD}
@@ -127,7 +127,7 @@ function _dj_setup_clang_9_0_0()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_dj_gadgets()
 {
     current_folder=${PWD}
@@ -147,7 +147,7 @@ function _dj_setup_dj_gadgets()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 # https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04
 # this is only tested in Ubuntu 18.04
 function _dj_setup_container_docker()
@@ -190,7 +190,7 @@ function _dj_setup_container_docker()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 # https://github.com/wagoodman/dive
 # how to clone the repo and use its Makefile to install? -- don't know
 function _dj_setup_container_dive()
@@ -215,7 +215,7 @@ function _dj_setup_container_dive()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_container_lxd_4_0()
 {
     sudo apt install snapd
@@ -226,7 +226,7 @@ function _dj_setup_container_lxd_4_0()
     echo ' '
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_pangolin()
 {
     current_folder=${PWD}
@@ -249,11 +249,21 @@ function _dj_setup_pangolin()
 
     _ask_to_remove_a_folder pangolin
 
+    echo -e '\n' >> ~/.bashrc
+    echo '# ===========================================================' >> ~/.bashrc
+    echo '# Pangolin setup (djtools)' >> ~/.bashrc
+    echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+    echo -e "\n LD_LIBRARY_PATH is set in ~/.bashrc.\n"
+
+    _press_enter_to_continue
+
     echo " "
     echo "libpangolin.so is in path: /usr/local/lib/"
     echo "header files (i.e., pangolin/pangolin.h) are in path: /usr/local/include/"
     echo " "
     
+    _press_enter_to_continue
+
     echo "If you see error like this:"
     echo "   Could not find GLEW"
     echo " you should run the following command first:"
@@ -263,7 +273,7 @@ function _dj_setup_pangolin()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_pip()
 {
     cwd_before_running=$PWD
@@ -277,7 +287,7 @@ function _dj_setup_pip()
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_slack()
 {
     cwd_before_running=$PWD
@@ -291,7 +301,7 @@ function _dj_setup_slack()
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_stm32tools()
 {
 
@@ -361,7 +371,7 @@ function _dj_setup_stm32tools()
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_glfw3_gtest_glog()
 {
     cwd_before_running=$PWD
@@ -396,7 +406,7 @@ function _dj_setup_glfw3_gtest_glog()
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
+# =============================================================================
 # ninja is used to compile
 function _dj_setup_grpc_1_29_1()
 {
@@ -416,7 +426,29 @@ function _dj_setup_grpc_1_29_1()
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
+# =============================================================================
+function _dj_setup_gpp_10()
+{
+    echo -e "\n  Installing gcc-10, g++-10"
+    _press_enter_to_continue
+
+    sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+    sudo apt-get update
+    sudo apt install -y gcc-10 g++-10
+    echo -e "\n do you want to set up gcc-10 and g++-10 as the default gcc/g++?? [Yes/No]"
+    read anw
+    if [[ ($anw = 'n') || ($anw = 'N') || ($anw = 'NO') || ($anw = 'No') || ($anw = 'no') ]] ; then
+        echo -e '\n gcc/g++ are not to set to use gcc-10/g++-10\n'
+    elif [[ ($anw = 'y') || ($anw = 'Y') || ($anw = 'YES') || ($anw = 'Yes') || ($anw = 'yes') ]] ; then
+        echo -e '\n gcc/g++ are set to use gcc-10/g++-10\n'
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 50
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 50
+    else
+        echo "Wrong answer! No action was taken!"
+    fi
+}
+
+# =============================================================================
 # may not be a good way to install opencv
 # recommend to install opencv-4.1.1
 function _dj_setup_opencv_2_4_13()
@@ -450,7 +482,7 @@ function _dj_setup_opencv_2_4_13()
     echo " "
 }
 
-# ===========================================================================================
+# =============================================================================
 # the installation is from the book, which has a github repo:
 # https://github.com/PacktPublishing/Learn-OpenCV-4-By-Building-Projects-Second-Edition
 # however, this is a bad reference
@@ -512,7 +544,7 @@ function _dj_setup_opencv_4_1_1()
     echo " https://github.com/dj-zhou/opencv4-demo/001-imread-imshow"
 }
 
-# ===========================================================================================
+# =============================================================================
 # https://www.linuxbabe.com/desktop-linux/how-to-install-chinese-wubi-input-method-on-debian-8-gnome-desktop
 function _dj_setup_wubi()
 {
@@ -540,7 +572,7 @@ function _dj_setup_wubi()
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_vtk_8_2_0()
 {
     echo "vtk 8.2.0 installation"
@@ -575,14 +607,14 @@ function _dj_setup_vtk_8_2_0()
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
+# =============================================================================
 # call function in workspace-check.bash
 function _dj_work_check()
 {
     _work_check $1 $2 $3 $4
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_meson_build()
 {
     folder_name=`basename "$current_folder"`
@@ -617,7 +649,7 @@ function _dj_meson_build()
     fi
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_open_file()
 {
     # --------------------------
@@ -631,7 +663,18 @@ function _dj_open_file()
         return
     fi
 }
-# ===========================================================================================
+
+function _dj_ssh_no_password()
+{
+    user_ip="$1"
+    # check if there is a file: ~/.ssh/id_rsa.pub
+    # then run:
+    # cat .ssh/id_rsa.pub | ssh uesrname@ip_address 'cat >> .ssh/authorized_keys'
+    # if there is no .ssh folder, create it
+    ssh
+}
+
+# =============================================================================
 function dj()
 {
     # ------------------------------
@@ -736,6 +779,11 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'git-lfs' ] ; then
+            _dj_setup_git_lfs
+            return
+        fi
+        # --------------------------
         if [ $2 = 'gitg-kdiff3' ] ; then
             _dj_setup_gitg_kdiff3
             return
@@ -748,11 +796,6 @@ function dj()
         # --------------------------
         if [ $2 = 'yaml-cpp' ] ; then
             _dj_setup_yaml_cpp
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'qt-5.11.2' ] ; then
-            _dj_setup_qt_5_11_2
             return
         fi
         # --------------------------
@@ -800,8 +843,14 @@ function dj()
             _dj_setup_glfw3_gtest_glog
             return
         fi
+        # --------------------------
         if [ $2 = 'grpc-1.29.1' ] ; then
             _dj_setup_grpc_1_29_1
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'g++-10' ] ; then
+            _dj_setup_gpp_10
             return
         fi
         # --------------------------
@@ -836,6 +885,14 @@ function dj()
         fi
         # --------------------------
         _dj_setup_help
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'ssh' ] ; then
+        if [ $2 = 'no-password' ] ; then
+            _dj_ssh_no_password $3 $4 $5 $6 $7
+            return
+        fi
         return
     fi
     # ------------------------------
@@ -885,7 +942,7 @@ function dj()
     # ------------------------------
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj()
 {
     COMPREPLY=()
@@ -896,6 +953,7 @@ function _dj()
         meson
         open
         setup
+        ssh
         udev
         work-check
     ")
@@ -906,9 +964,9 @@ function _dj()
     #---------------------------------------------------------
     #---------------------------------------------------------
     ACTIONS[setup]+="arm-gcc baidu-netdisk clang-9.0.0 container computer dj-gadgets dropbox eigen foxit "
-    ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog grpc-1.29.1 i219-v libev-4.33 mathpix matplotlib-cpp "
-    ACTIONS[setup]+="opencv-2.4.13 opencv-4.1.1 pangolin pip qt-5.11.2 qt-5.13.1 qt-5.14.2 ros-melodic "
-    ACTIONS[setup]+="ros2-foxy slack stm32tools sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
+    ACTIONS[setup]+="git-lfs gitg-kdiff3 glfw3-gtest-glog grpc-1.29.1 i219-v libev-4.33 mathpix matplotlib-cpp "
+    ACTIONS[setup]+="opencv-2.4.13 opencv-4.1.1 pangolin pip qt-5.13.1 qt-5.14.2 ros-melodic ros2-foxy "
+    ACTIONS[setup]+="slack stm32tools sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
     ACTIONS[arm-gcc]=" "
     ACTIONS[baidu-netdisk]=" "
     ACTIONS[clang-8.0.0]=" "
@@ -922,8 +980,10 @@ function _dj()
     ACTIONS[dropbox]=" "
     ACTIONS[eigen]=" "
     ACTIONS[foxit]=" "
+    ACTIONS[git-lfs]=" "
     ACTIONS[glfw3-gtest-glog]=" "
     ACTIONS[grpc-1.29.1]=" "
+    ACTIONS[g++-10]=" "
     ACTIONS[i219-v]="e1000e-3.4.2.1 e1000e-3.4.2.4 "
     ACTIONS[libev-4.33]=" "
     ACTIONS[mathpix]=" "
@@ -936,7 +996,6 @@ function _dj()
     ACTIONS[no-contrib]=" "
     ACTIONS[pangolin]=" "
     ACTIONS[pip]=" "
-    ACTIONS[qt-5.11.2]=" "
     ACTIONS[qt-5.13.1]=" "
     ACTIONS[qt-5.14.2]=" "
     ACTIONS[ros-melodic]="--from-deb-package --from-source "
@@ -993,6 +1052,11 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
+    ACTIONS[ssh]="no-password "
+    ACTIONS[no-password]=" "
+
+    #---------------------------------------------------------
+    #---------------------------------------------------------
     ACTIONS[work-check]=" "
     ACTIONS[udev]="uvc-video-capture --dialout "
     ACTIONS[uvc-video-capture]=" "
@@ -1012,5 +1076,5 @@ function _dj()
     fi
 }
 
-# ===========================================================================================
+# =============================================================================
 complete -F _dj dj

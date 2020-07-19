@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_help()
 {
     _dj_help
@@ -36,7 +36,7 @@ function _dj_setup_help()
     echo " "
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_arm_gcc()
 {
     current_folder=${PWD}
@@ -68,7 +68,7 @@ function _dj_setup_arm_gcc()
     unset current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_baidu_netdisk()
 {
     current_folder=${PWD}
@@ -84,7 +84,7 @@ function _dj_setup_baidu_netdisk()
     unset current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_computer()
 {
     current_folder=${PWD}
@@ -168,7 +168,7 @@ function _dj_setup_computer()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_dropbox()
 {
     current_folder=${PWD}
@@ -191,7 +191,7 @@ function _dj_setup_dropbox()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_eigen()
 {
     current_folder=${PWD}
@@ -204,7 +204,7 @@ function _dj_setup_eigen()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 # make sure the related package is public available in dj-zhou's github
 function _dj_setup_i219_v()
 {
@@ -224,7 +224,7 @@ function _dj_setup_i219_v()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 # libev can also be installed by 
 # $ sudo apt-get install -y libev-dev
 # however, it is the v4.22 to be installed, and the installation location is
@@ -252,7 +252,7 @@ function _dj_setup_libev_4_33()
         echo "LD_LIBRARY_PATH is already set, no need to set it again"
     else 
         echo "LD_LIBRARY_PATH is not set, set it now"
-        echo 'export LD_LIBRARY_PATH=/usr/local/lib:'$LD_LIBRARY_PATH >> ~/.bashrc
+        echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
     fi
 
     cd ~/soft
@@ -262,14 +262,14 @@ function _dj_setup_libev_4_33()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_mathpix()
 {
     sudo apt install snapd
     sudo snap install mathpix-snipping-tool
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_matplotlib_cpp()
 {
     current_folder=${PWD}
@@ -287,7 +287,7 @@ function _dj_setup_matplotlib_cpp()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_foxit_reader()
 {
     current_folder=${PWD}
@@ -319,7 +319,16 @@ function _dj_setup_foxit_reader()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
+function _dj_setup_git_lfs()
+{
+    current_folder=${PWD}
+    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+    sudo apt-get install git-lfs
+    cd $current_folder
+}
+
+# =============================================================================
 function _dj_setup_gitg_kdiff3()
 {
     current_folder=${PWD}
@@ -335,7 +344,7 @@ function _dj_setup_gitg_kdiff3()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_vscode()
 {
     current_folder=${PWD}
@@ -350,7 +359,7 @@ function _dj_setup_vscode()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_sublime()
 {
     current_folder=${PWD}
@@ -368,7 +377,7 @@ function _dj_setup_sublime()
     cd $current_folder
 }
 
-# ===========================================================================================
+# =============================================================================
 # make sure the related package is public available in dj-zhou's github
 # compile from the source code will install it to
 #   /usr/local/lib/libyaml-cpp.a
@@ -405,30 +414,7 @@ function _dj_setup_yaml_cpp()
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
-function _dj_setup_qt_5_11_2()
-{
-    cwd_before_running=$PWD
-
-    echo -e "\nInstall Qt 5.11.2\n"
-    _press_enter_to_continue
-
-    cd ~ && mkdir -p soft/ &&  cd soft/
-    filename="qt-opensource-linux-x64-5.11.2.run"
-    wget http://qt.mirror.constant.com/archive/qt/5.11/5.11.2/$filename
-    chmod +x $filename
-    
-    ./$filename
-
-    _ask_to_remove_a_file $filename
-    
-    # install serialport module
-    sudo apt-get install libqt5serialport5-dev -y
-
-    cd ${cwd_before_running}
-}
-
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_qt_5_13_1()
 {
     cwd_before_running=$PWD
@@ -456,14 +442,25 @@ function _dj_setup_qt_5_13_1()
         chmod +x $filename
     fi
 
+    echo -e "\n It is recommended to install the Qt into ${HOME}/Qt5.13.1/"
+    _press_enter_to_continue
+
     ./$filename
 
     _ask_to_remove_a_file $filename
+
+    # setup the PATH and LD_LIBRARY_PATH into ~/.bashrc
+    echo -e '\n' >> ~/.bashrc
+    echo '# ===========================================================' >> ~/.bashrc
+    echo '# Qt5.13.1 setup (djtools)' >> ~/.bashrc
+    echo 'export PATH=~/Qt5.13.1/5.13.1/gcc_64/bin:$PATH' >> ~/.bashrc
+    echo 'export LD_LIBRARY_PATH=~/Qt5.13.1/5.13.1/gcc_64/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+    echo -e "\n PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
     
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_qt_5_14_2()
 {
     cwd_before_running=$PWD
@@ -493,14 +490,25 @@ function _dj_setup_qt_5_14_2()
         chmod +x $filename
     fi
 
+    echo -e "\n It is recommended to install the Qt into ${HOME}/Qt5.14.2/"
+    _press_enter_to_continue
+
     ./$filename
 
     _ask_to_remove_a_file $filename
-    
+
+    # setup the PATH and LD_LIBRARY_PATH into ~/.bashrc
+    echo -e '\n' >> ~/.bashrc
+    echo '# ===========================================================' >> ~/.bashrc
+    echo '# Qt5.14.2 setup (djtools)' >> ~/.bashrc
+    echo 'export PATH=~/Qt5.14.2/5.14.2/gcc_64/bin:$PATH' >> ~/.bashrc
+    echo 'export LD_LIBRARY_PATH=~/Qt5.14.2/5.14.2/gcc_64/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+    echo -e "\n PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
+
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_typora()
 {
     wget -qO - https://typora.io/linux/public-key.asc | sudo apt-key add -

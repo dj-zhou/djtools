@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ===========================================================================================
+# =============================================================================
 # color definition
 NO_COLOR='\033[0m' # No Color
 RED_COLOR='\033[0;31m'
@@ -29,12 +29,12 @@ WHITE_COLOR='\033[1;37m'
 # Light Gray   0;37     White         1;37
 
 
-# ===========================================================================================
+# =============================================================================
 # by doing so, the system can find the whole tooklit
 djtools_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ubuntu_release_version=$(lsb_release -a)
 
-# ===========================================================================================
+# =============================================================================
 source $djtools_path/block-device.bash
 source $djtools_path/code-name.bash
 source $djtools_path/coding.bash
@@ -51,11 +51,7 @@ source $djtools_path/work-check.bash
 source $djtools_path/yocto.bash
 source $djtools_path/zephyr.bash
 
-# ===========================================================================================
-# initial setup -- can be overwrite by other setting, for example, dj-zhou-config.bash
-_terminal_format_user_host_short_path
-
-# ===========================================================================================
+# =============================================================================
 # alias ----------------------------------------------
 alias ls="ls -l --color=always"
 alias ll='ls -alF'
@@ -85,21 +81,3 @@ alias cdcv="cd ~/workspace/work/openCV/"
 alias cdml="cd ~/ml/"
 alias cdqt="cd ~/qt/"
 alias cdsoft="cd ~/soft/"
-
-# ===========================================================================================
-export HOSTNAME
-
-# ===========================================================================================
-# ROS ---------------------------------------------------------
-# set some ROS IP address
-export ROS_MASTER_URI=http://localhost:11311
-export ROS_IP=localhost
-
-# ===========================================================================================
-# Qt
-export PATH=~/Qt5.14.2/5.14.2/gcc_64/bin:$PATH
-export  LD_LIBRARY_PATH=~/Qt5.14.2/5.14.2/gcc_64/lib:$LD_LIBRARY_PATH
-
-# ===========================================================================================
-# pangolin
-export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH

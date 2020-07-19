@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_ros_melodic()
 {
     cwd_before_running=$PWD
@@ -42,11 +42,21 @@ function _dj_setup_ros_melodic()
     mkdir -p ~/catkin_ws/src
     cd ~/catkin_ws
     catkin_make
-    
+
+    echo -e '\n' >> ~/.bashrc
+    echo '# ===========================================================' >> ~/.bashrc
+    echo '# ROS (1) setup' >> ~/.bashrc
+    echo 'export HOSTNAME:' >> ~/.bashrc
+    echo 'export ROS_MASTER_URI=http://localhost:11311' >> ~/.bashrc
+    echo 'export ROS_IP=localhost' >> ~/.bashrc
+    echo -e "\n ROS (1) settings are in ~/.bashrc.\n"
+
+    _press_enter_to_continue
+
     cd ${cwd_before_running}
 }
 
-# ===========================================================================================
+# =============================================================================
 function _dj_setup_ros2_foxy()
 {
     echo "1 = "$1
