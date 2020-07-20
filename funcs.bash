@@ -98,7 +98,7 @@ function _write_to_text_file_with_width()
 # =============================================================================
 function _press_enter_to_continue()
 {
-    echo -e '  Press [ENTER] to continue'
+    echo -e '  Press [ENTER] to continue ...'
     read answer
     echo $answer
 }

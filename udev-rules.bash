@@ -10,8 +10,7 @@ function _dj_udev_help()
     echo "   uvc-video-capture - to assign static device name to the UVC"
     echo "                       video capture device"
     echo "   MORE IS COMMING"
-    echo "-----------------------------------------------------"
-    echo " "
+    echo -e "-----------------------------------------------------\n"
 }
 
 # =============================================================================

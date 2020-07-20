@@ -19,6 +19,7 @@ LPURPLE_COLOR='\033[1;35m'
 LCYAN_COLOR='\033[1;36m'
 WHITE_COLOR='\033[1;37m'
 
+# =============================================================================
 # Black        0;30     Dark Gray     1;30
 # Red          0;31     Light Red     1;31
 # Green        0;32     Light Green   1;32
@@ -27,7 +28,6 @@ WHITE_COLOR='\033[1;37m'
 # Purple       0;35     Light Purple  1;35
 # Cyan         0;36     Light Cyan    1;36
 # Light Gray   0;37     White         1;37
-
 
 # =============================================================================
 # by doing so, the system can find the whole tooklit
@@ -47,6 +47,7 @@ source $djtools_path/resized.bash
 source $djtools_path/system.bash
 source $djtools_path/terminal-format.bash
 source $djtools_path/touchpad.bash
+source $djtools_path/version.bash
 source $djtools_path/work-check.bash
 source $djtools_path/yocto.bash
 source $djtools_path/zephyr.bash
@@ -77,7 +78,3 @@ alias lock="gnome-screensaver-command -l"
 # folder alias ----------------------------------------------
 # dropbox related folders will be removed at a later time
 alias cddj="cd "$djtools_path
-alias cdcv="cd ~/workspace/work/openCV/"
-alias cdml="cd ~/ml/"
-alias cdqt="cd ~/qt/"
-alias cdsoft="cd ~/soft/"

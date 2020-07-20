@@ -8,23 +8,23 @@ source $djtools_path/udev-rules.bash
 # =============================================================================
 function _dj_help()
 {
-    echo " "
+    echo -e "\n"
     echo "------------------------ dj -------------------------"
     echo " Author      : Dingjiang Zhou"
     echo " Email       : zhoudingjiang@gmail.com "
     echo " Create Date : Mar. 1st, 2020"
     echo "-----------------------------------------------------"
-    echo " "
+    echo -e "\n"
     echo " First level commands:"
     echo "   setup         - to install some software"
     echo "   clone         - clone a repo from bitbucket/github"
     echo "   udev          - udev rule setup for usb devices"
     echo "   work-check    - check work status of all repos in a folder"
-    echo " "
+    echo -e "\n"
     echo "   MORE IS COMMING"
-    echo " "
+    echo -e "\n"
     echo " All commands support tab completion"
-    echo " "
+    echo -e "\n"
 }
 
 # =============================================================================
@@ -107,15 +107,13 @@ function _dj_setup_clang_9_0_0()
         cat clang-setting-ubuntu-18.04.json
     fi
 
-    echo ' '
-    echo "Do you want to apply the above settings? [Yes/No]"
-    echo ' '
+    echo -e "\nDo you want to apply the above settings? [Yes/No]\n"
+
+    read asw
     
-    read answer
-    
-    if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || ($answer = 'No') || ($answer = 'no') ]] ; then
+    if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || ($asw = 'No') || ($asw = 'no') ]] ; then
         echo "You can edit ~/.config/Code/User/settings.json manually."
-    elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || ($answer = 'Yes') || ($answer = 'yes') ]] ; then
+    elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || ($asw = 'Yes') || ($asw = 'yes') ]] ; then
         _clang_vscode_setting_json
     else
         echo "wrong answer, not setting applied!"
@@ -204,12 +202,12 @@ function _dj_setup_container_dive()
     sudo dpkg -i dive_*.deb
     _ask_to_remove_a_file dive_*.deb
 
-    echo " "
+    echo -e "\n"
     echo "use the following command to check the docker image layouts"
     echo "  sudo dive <image-tag/hash>"
-    echo " "
+    echo -e "\n"
     echo "you can find the image-tag/hash from command: sudo docker images -a"
-    echo " "
+    echo -e "\n"
 
     # ----------------------------------------------
     cd $current_folder
@@ -220,10 +218,10 @@ function _dj_setup_container_lxd_4_0()
 {
     sudo apt install snapd
     sudo snap install lxd --channel=4.0/stable
-    echo ' '
+    echo -e "\n"
     echo 'next step: '
     echo ' sudo lxd init'
-    echo ' '
+    echo -e "\n"
 }
 
 # =============================================================================
@@ -257,10 +255,10 @@ function _dj_setup_pangolin()
 
     _press_enter_to_continue
 
-    echo " "
+    echo -e "\n"
     echo "libpangolin.so is in path: /usr/local/lib/"
     echo "header files (i.e., pangolin/pangolin.h) are in path: /usr/local/include/"
-    echo " "
+    echo -e "\n"
     
     _press_enter_to_continue
 
@@ -268,7 +266,7 @@ function _dj_setup_pangolin()
     echo "   Could not find GLEW"
     echo " you should run the following command first:"
     echo "   dj setup glfw3-gtest-glog"
-    echo " "
+    echo -e "\n"
     
     cd $current_folder
 }
@@ -308,20 +306,14 @@ function _dj_setup_stm32tools()
     cwd_before_running=$PWD
 
     mkdir -p ~/workspace && cd ~/workspace
-    echo "  "
-    echo " ----------------------------------------------- "
-    echo " " 
+
     cd ~/workspace
     repo=stm32tools
     if [ ! -d $repo ] ; then
-        echo " " 
-        echo "stm32tools does not exist, git clone ..."
-        echo " " 
+        echo -e "\nstm32tools does not exist, git clone ...\n"
         git clone https://dj-zhou@github.com/dj-zhou/stm32tools.git
     else 
-        echo " " 
-        echo ${repo} "exists, git pull in master branch ..."
-        echo " " 
+        echo -e "\n"${repo} "exists, git pull in master branch ...\n"
         cd $repo
         git checkout master
         git pull
@@ -364,7 +356,7 @@ function _dj_setup_stm32tools()
     echo 'KERNEL=="ttyACM[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
     sudo service udev restart
 
-    echo "  "
+    echo -e "\n" 
     cd ~
     _ask_to_remove_a_folder ~/workspace/stm32tools
 
@@ -435,14 +427,20 @@ function _dj_setup_gpp_10()
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
     sudo apt-get update
     sudo apt install -y gcc-10 g++-10
-    echo -e "\n do you want to set up gcc-10 and g++-10 as the default gcc/g++?? [Yes/No]"
+    echo -e "\n do you want to set up the default gcc/g++?? [Yes/No]"
     read anw
     if [[ ($anw = 'n') || ($anw = 'N') || ($anw = 'NO') || ($anw = 'No') || ($anw = 'no') ]] ; then
         echo -e '\n gcc/g++ are not to set to use gcc-10/g++-10\n'
     elif [[ ($anw = 'y') || ($anw = 'Y') || ($anw = 'YES') || ($anw = 'Yes') || ($anw = 'yes') ]] ; then
         echo -e '\n gcc/g++ are set to use gcc-10/g++-10\n'
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 50
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  48
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 50
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7  48
+        echo -e "\n-------------------\n"
+        sudo update-alternatives --config gcc
+        echo -e "\n-------------------\n"
+        sudo update-alternatives --config g++
     else
         echo "Wrong answer! No action was taken!"
     fi
@@ -476,10 +474,10 @@ function _dj_setup_opencv_2_4_13()
     _ask_to_remove_a_file opencv-2.4.13.zip
 
     cd ${cwd_before_running}
-    echo " "
+    echo -e "\n" 
     echo " lib files *.so are installed in /usr/local/lib/"
     echo " header files are installded in /usr/local/include/opencv2/"
-    echo " "
+    echo -e "\n" 
 }
 
 # =============================================================================
@@ -536,10 +534,10 @@ function _dj_setup_opencv_4_1_1()
     fi
 
     cd ${cwd_before_running}
-    echo " "
+    echo -e "\n"
     echo " lib files *.so are installed in /usr/local/lib/"
     echo " header files are installded in /usr/local/include/opencv4/, in which there is another folder opencv2/"
-    echo " "
+    echo -e "\n"
     echo " example code or template project can be seen from:"
     echo " https://github.com/dj-zhou/opencv4-demo/001-imread-imshow"
 }
@@ -552,9 +550,9 @@ function _dj_setup_wubi()
 
     sudo apt-get install ibus ibus-table-wubi -y
     if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
-        echo " "
+        echo -e "\n"
         echo "Following the steps:"
-        echo " "
+        echo -e "\n"
         echo "  $ ibus-setup"
         echo "  in the opened window: Input Method -> Add -> Chinese -> choose WuBi-Jidian-86-JiShuang"
         echo "  (it may need reboot the computer if the WuBi input is not shown) "
@@ -562,12 +560,12 @@ function _dj_setup_wubi()
         echo "  Add an Input Source to Gnome:"
         echo "  Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chise (WuBi-Jidian-86-JiShuang-6.0) "
         echo "  use Windows Key (or named Super Key) + Space to switch the two input methods"
-        echo " "
+        echo -e "\n"
     elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
-        echo " "
+        echo -e "\n"
         echo " pleaase follow the link below to finish the setup"
         echo " https://www.pinyinjoe.com/linux/ubuntu-18-gnome-chinese-setup.htm"
-        echo " "
+        echo -e "\n"
     fi
     cd ${cwd_before_running}
 }
@@ -597,10 +595,10 @@ function _dj_setup_vtk_8_2_0()
     #     QT5_DIR
     # however, the compilation seems have no problem
 
-    echo " "
+    echo -e "\n"
     echo " the installed library seems to be in /usr/local/lib folder"
     echo " the installed header files seem to be in /usr/local/include/vtk-8.2/ folder"
-    echo " "
+    echo -e "\n"
 
     cd ~/soft/
     _ask_to_remove_a_folder VTK-8.2.0
@@ -699,11 +697,6 @@ function dj()
     # ------------------------------
     if [ $1 = 'setup' ] ; then
         # --------------------------
-        if [ $2 = 'arm-gcc' ] ; then
-            _dj_setup_arm_gcc
-            return
-        fi
-        # --------------------------
         if [ $2 = 'baidu-netdisk' ] ; then
             _dj_setup_baidu_netdisk
             return
@@ -755,6 +748,21 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'foxit' ] ; then
+            _dj_setup_foxit_reader
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'gcc-arm-embedded' ] ; then
+            _dj_setup_gcc_arm_embedded
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'gcc-arm-linux-gnueabi' ] ; then
+            _dj_setup_gcc_arm_linux_gnueabi
+            return
+        fi
+        # --------------------------
         if [ $2 = 'i219-v' ] ; then
             _dj_setup_i219_v $3
             return
@@ -771,11 +779,6 @@ function dj()
         # --------------------------
         if [ $2 = 'matplotlib-cpp' ] ; then
             _dj_setup_matplotlib_cpp
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'foxit' ] ; then
-            _dj_setup_foxit_reader
             return
         fi
         # --------------------------
@@ -933,11 +936,6 @@ function dj()
         _dj_work_check $2 $3 $4 $5
         return
     fi
-    # # ------------------------------
-    # if [ $1 = 'yocto' ] ; then
-    #     _dj_yocto $2 $3 $4 $5 $6 $7 
-    #     return
-    # fi
     _dj_help
     # ------------------------------
 }
@@ -963,11 +961,10 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    ACTIONS[setup]+="arm-gcc baidu-netdisk clang-9.0.0 container computer dj-gadgets dropbox eigen foxit "
-    ACTIONS[setup]+="git-lfs gitg-kdiff3 glfw3-gtest-glog grpc-1.29.1 i219-v libev-4.33 mathpix matplotlib-cpp "
-    ACTIONS[setup]+="opencv-2.4.13 opencv-4.1.1 pangolin pip qt-5.13.1 qt-5.14.2 ros-melodic ros2-foxy "
-    ACTIONS[setup]+="slack stm32tools sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
-    ACTIONS[arm-gcc]=" "
+    ACTIONS[setup]+="baidu-netdisk clang-9.0.0 container computer dj-gadgets dropbox eigen foxit gcc-arm-embedded "
+    ACTIONS[setup]+="gcc-arm-linux-gnueabi git-lfs gitg-kdiff3 glfw3-gtest-glog grpc-1.29.1 g++-10 i219-v libev-4.33 "
+    ACTIONS[setup]+="mathpix matplotlib-cpp opencv-2.4.13 opencv-4.1.1 pangolin pip qt-5.13.1 qt-5.14.2 "
+    ACTIONS[setup]+="ros-melodic ros2-foxy slack stm32tools sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
     ACTIONS[baidu-netdisk]=" "
     ACTIONS[clang-8.0.0]=" "
     ACTIONS[clang-9.0.0]=" "
@@ -980,6 +977,8 @@ function _dj()
     ACTIONS[dropbox]=" "
     ACTIONS[eigen]=" "
     ACTIONS[foxit]=" "
+    ACTIONS[gcc-arm-embedded]=" "
+    ACTIONS[gcc-arm-linux-gnueabi]=" "
     ACTIONS[git-lfs]=" "
     ACTIONS[glfw3-gtest-glog]=" "
     ACTIONS[grpc-1.29.1]=" "

@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-# ===============================================================================
+# =============================================================================
 function _zephyr_help()
 {
     echo " "
@@ -14,7 +14,7 @@ function _zephyr_help()
     echo " "
 }
 
-# ===============================================================================
+# =============================================================================
 # $1: zephyr project folder, the default is ~/zephyr-project
 function _zephyr_setup_sdk_0_11_3()
 {
@@ -36,6 +36,7 @@ function _zephyr_setup_sdk_0_11_3()
 
     # install west
     pip3 install --user -U west
+    # the west installation can fail!
 
     west_path_set=0
     while IFS='' read -r line || [[ -n "$line" ]] ; do
@@ -45,10 +46,10 @@ function _zephyr_setup_sdk_0_11_3()
     done < ~/.bashrc
 
     if [ $west_path_set = 0 ] ; then
+        echo -e '\n' >>~/.bashrc
         echo '# ===========================================================' >>~/.bashrc
-        echo '# Zephyr setup: west' >> ~/.bashrc
+        echo '# (djtools) zephyr setup: west' >> ~/.bashrc
         echo 'export PATH=~/.local/bin:"$PATH"' >> ~/.bashrc
-        echo ' ' >>~/.bashrc
     fi
 
     # use west to get Zephyr source code
@@ -85,9 +86,10 @@ function _zephyr_setup_sdk_0_11_3()
     fi
 
     if [ $zephyr_proj_path_set = 0 ] ; then
-        echo '# Zephyr Project path:' >> ~/.bashrc
+        echo -e '\n' >>~/.bashrc
+        echo '# ===========================================================' >>~/.bashrc
+        echo '# (djtools) Zephyr Project path:' >> ~/.bashrc
         echo 'export ZEPHYR_PROJECT_PATH='$zephyr_proj_folder >> ~/.bashrc
-        echo ' ' >>~/.bashrc
     fi
 
     if [ -d $zephyr_proj_folder ] ; then
@@ -104,6 +106,8 @@ function _zephyr_setup_sdk_0_11_3()
     fi
     
     # use west to initialize the zephyr --------------------
+    # if west is freshly installed, it cannot find the west
+    PATH="~/.local/bin:"$PATH
     west init $zephyr_proj_folder
     cd $zephyr_proj_folder
     west update
@@ -200,9 +204,10 @@ function _zephyr_setup_sdk_0_11_3()
     fi
 
     if [ $zephyr_sdk_path_set = 0 ] ; then
-        echo '# Zephyr SDK path:' >> ~/.bashrc
+        echo -e '\n' >>~/.bashrc
+        echo '# ===========================================================' >>~/.bashrc
+        echo '# (djtools) Zephyr SDK path:' >> ~/.bashrc
         echo 'export ZEPHYR_SDK_PATH='$zephyr_sdk_folder >> ~/.bashrc
-        echo ' ' >>~/.bashrc
     fi
 
     echo -e "\nTry the following commands to verify installation"
@@ -213,7 +218,7 @@ function _zephyr_setup_sdk_0_11_3()
     unset current_folder
 }
 
-# ===============================================================================
+# =============================================================================
 function _zephyr_build_help()
 {
     echo -e "\n------------ zephyr build (simplified tool) --------------"
@@ -230,7 +235,7 @@ function _zephyr_build_help()
     echo -e "   the default tool is ninja\n"
 }
 
-# ===============================================================================
+# =============================================================================
 # usage:
 # zephyr build -b nucleo_f767zi
 # todo: add -G option to choose between ninja and cmake, and even west
@@ -262,7 +267,7 @@ function _zephyr_build()
     ninja -C build
 }
 
-# ===============================================================================
+# =============================================================================
 function _zephyr_flash_help()
 {
     echo -e "\n------------ zephyr flash (simplified tool) --------------"
@@ -276,7 +281,7 @@ function _zephyr_flash_help()
     echo -e "      ...\n"
 }
 
-# ===============================================================================
+# =============================================================================
 function _zephyr_flash()
 {
 
@@ -296,7 +301,7 @@ function _zephyr_flash()
     fi
 }
 
-# ===============================================================================
+# =============================================================================
 function zephyr()
 {
     current_folder=${PWD}
@@ -332,7 +337,7 @@ function zephyr()
     unset current_folder
 }
 
-# ===============================================================================
+# =============================================================================
 function _zephyr()
 {
     COMPREPLY=()
@@ -347,7 +352,7 @@ function _zephyr()
     # declare an associative array for options
     declare -A ACTIONS
 
-    # ---------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     ACTIONS[setup]+="sdk-0.11.3 "
     ACTIONS[sdk-0.11.3]=" "
     ACTIONS[build]="-b "
@@ -358,7 +363,7 @@ function _zephyr()
     ACTIONS[-b]+="nucleo_f767zi "
     ACTIONS[nucleo_f767zi]=" "
     
-    # ---------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
     if [ ${ACTIONS[$3]+1} ] ; then
         COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
@@ -367,5 +372,5 @@ function _zephyr()
     fi
 }
 
-# ===============================================================================
+# =============================================================================
 complete -F _zephyr zephyr

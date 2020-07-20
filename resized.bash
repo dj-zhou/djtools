@@ -1,6 +1,7 @@
 #!/bin/bash 
 
 # =============================================================================
+# wmctrl -l : to list all windows
 # wmctrl -r ${vs_code_window} -b add,fullscreen
 # wmctrl -r ${vs_code_window} -b remove,fullscreen
 # wmctrl -R <win>
@@ -14,7 +15,6 @@
     #  |
     #  |
     #  |
-    # \|/
     #  v
     #  y
 

@@ -3,17 +3,14 @@
 # =============================================================================
 function _coding_help()
 {
-    echo ' '
-    echo ' coding help'
-    echo ' '
+    echo -e '\n coding help\n'
     echo ' exmaple command 1:'
     echo ' code replace <original> <new> .'
     echo '     - to replace the text content of <original> to <new> in the current folder '
-    echo ' '
-    echo ' exmaple command 2:'
+    echo -e'\n exmaple command 2:'
     echo ' code replace <original> <new> <path to file>'
     echo '     - to replace the text content of <original> to <new> in the file <path to file> '
-    echo ' '
+    echo -e'\n'
 }
 
 # =============================================================================
@@ -122,9 +119,8 @@ function _coding()
     ACTIONS[dj]+=" "
     ACTIONS[bg]+=" "
     ACTIONS[show]+=" "
-
     
-    # ---------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
     if [ ${ACTIONS[$3]+1} ] ; then
         COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )

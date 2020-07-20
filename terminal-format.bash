@@ -3,7 +3,6 @@
 # =============================================================================
 _terminal_help() {
     echo -e "\nterminal: supported commands\n"
-    echo " "
     echo "     $ terminal host full-path"
     echo "     $ terminal host full-path no-space"
     echo "     $ terminal host short-path"
@@ -36,7 +35,7 @@ function _terminal_format_user_full_path() {
 function _terminal_format_user_short_path() {
     export PS1='${debian_chroot:+($debian_chroot)}\[\033[01;29m\]\u \[\033[00m\]: \[\033[01;36m\]\W\[\033[00m\] $ '
 }
-#-------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
 function _terminal_format_user_host_full_path_no_space() {
     export PS1='${debian_chroot:+($debian_chroot)}\[\033[01;29m\]\u@\h\[\033[00m\]:\[\033[01;36m\]\w\[\033[00m\]$ '
 }
@@ -68,7 +67,7 @@ function terminal {
     else 
         echo -e '\n' >> ~/.bashrc
         echo '# ===========================================================' >> ~/.bashrc
-        echo '# terminal format setup (djtools)' >> ~/.bashrc
+        echo '# (djtools) terminal format setup' >> ~/.bashrc
         if [ ${1} = 'user@host' ] ; then
             if [ $# = 1 ] ; then
                 _terminal_format_user_host_short_path

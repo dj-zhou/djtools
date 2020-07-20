@@ -1,20 +1,17 @@
 #!/bin/bash 
 
-# ===============================================================================
+# =============================================================================
 function _yocto_help()
 {
-    echo " "
-    echo "---------------------  yocto ------------------------"
+    echo -e "\n---------------------  yocto ------------------------"
     echo " Author      : Dingjiang Zhou"
     echo " Email       : zhoudingjiang@gmail.com "
     echo " Create Date : June 8th, 2020 "
     echo "-----------------------------------------------------"
-    echo " "
-    echo " TODO"
-    echo " "
+    echo -e "\n TODO\n"
 }
 
-# ===============================================================================
+# =============================================================================
 # note: the arguments imx7 or raspberry-pi-4 are not serious names of the platfroms
 # original scripts for imx7-cl-som:
 # sudo umount /dev/sda1
@@ -37,7 +34,7 @@ function _yocto_flash()
     # argument check -------------------
     if [ $# -le 1 ] ; then
         echo -e "usage:\n   yocto flash <platform> /dev/sdx"
-        echo "      or \n   yocto flash <platform> sdx"
+        echo -e "      or \n   yocto flash <platform> sdx"
         echo " use lsblk to find what is the sdx"
         return
     fi
@@ -103,7 +100,7 @@ function _yocto_flash()
         fi
     done
     _display_section
-    echo " "
+    echo -e "\n"
     
     # flash to SD card, depending on the platform
     if [ $1 = 'cl-som-imx7' ] ;  then
@@ -115,7 +112,8 @@ function _yocto_flash()
         fi
         echo -e "   IMAGE:" $IMAGE
         _display_section
-        echo " "
+        echo -e "\n"
+        
         oe-run-native bmap-tools-native bmaptool copy $IMAGE $DEV
         return
     fi
@@ -127,7 +125,7 @@ function _yocto_flash()
     return
 }
 
-# ===============================================================================
+# =============================================================================
 function yocto()
 {
     current_folder=${PWD}
@@ -157,7 +155,7 @@ function yocto()
     unset current_folder
 }
 
-# ===============================================================================
+# =============================================================================
 function _yocto()
 {
     COMPREPLY=()
@@ -171,7 +169,7 @@ function _yocto()
     # declare an associative array for options
     declare -A ACTIONS
 
-    # ---------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     ACTIONS[clone]+="poky meta-openembedded meta-raspberrypi meta-rpi64 "
     ACTIONS[poky]=" "
     ACTIONS[meta-openembedded]=" "
@@ -181,7 +179,7 @@ function _yocto()
     ACTIONS[cl-som-imx7]=" "
     ACTIONS[raspberry-pi-4]=" "
     
-    # ---------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
     if [ ${ACTIONS[$3]+1} ] ; then
         COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
@@ -190,5 +188,5 @@ function _yocto()
     fi
 }
 
-# ===============================================================================
+# =============================================================================
 complete -F _yocto yocto

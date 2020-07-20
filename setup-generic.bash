@@ -32,12 +32,11 @@ function _dj_setup_help()
     echo "   wubi             - to install Chinese wubi input method"
     echo "   yaml-cpp         - to install C++ based yaml file parser"
     echo "   MORE IS COMMING"
-    echo "-----------------------------------------------------"
-    echo " "
+    echo -e "-----------------------------------------------------\n"
 }
 
 # =============================================================================
-function _dj_setup_arm_gcc()
+function _dj_setup_gcc_arm_embedded()
 {
     current_folder=${PWD}
 
@@ -49,7 +48,8 @@ function _dj_setup_arm_gcc()
     sudo apt-get install -y libftdi-dev libusb-1.0-0-dev zlib1g zlib1g-dev python-yaml
     
     if [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
-        sudo echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" | sudo tee -a /etc/apt/sources.list
+        sudo echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" \
+        | sudo tee -a /etc/apt/sources.list
     elif  [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
         echo "just do nothing"
     fi
@@ -59,10 +59,35 @@ function _dj_setup_arm_gcc()
     sudo apt-get update
     sudo apt-get install gcc-arm-embedded -y
 
-    echo " "
+    echo -e "\n"
     echo " (just maybe) gcc-arm-embedded is installed in /usr/share/gcc-arm-embedded/"
     echo " (question) Is there still an arm-none-eabi? "
-    echo " "
+    echo -e "\n"
+
+    cd $current_folder
+    unset current_folder
+}
+
+# =============================================================================
+function _dj_setup_gcc_arm_linux_gnueabi()
+{
+    current_folder=${PWD}
+
+    echo -e "\n  install gcc-arm-linux-gnueabi ...\n"
+    _press_enter_to_continue
+    sudo apt-get install -y qemu libncurses5-dev build-essential 
+    sudo apt-get install -y gcc-arm-linux-gnueabi gcc-5-arm-linux-gnueabi
+
+    # update-alternatives configuration
+    sudo update-alternatives --install \
+        /usr/bin/arm-linux-gnueabi-gcc arm-linux-gnueabi-gcc \
+        /usr/bin/arm-linux-gnueabi-gcc-5 5
+    sudo update-alternatives --install \
+        /usr/bin/arm-linux-gnueabi-gcc arm-linux-gnueabi-gcc \
+        /usr/bin/arm-linux-gnueabi-gcc-7 7
+
+    echo -e "\n-------------------\n"
+    sudo update-alternatives --config arm-linux-gnueabi-gcc
 
     cd $current_folder
     unset current_folder
@@ -146,20 +171,24 @@ function _dj_setup_computer()
     # to display simplified Chinese: important, do not comment out!
     echo -e "\n  going to setup simplified Chinese support\n"
     _press_enter_to_continue
-    gsettings set org.gnome.gedit.preferences.encodings auto-detected "['CURRENT','GB18030','GBK','GB2312','UTF-8','UTF-16']"
-    
+    gnome_version=$(version check gnome)
+    if [ ! $gnome_version = ' ' ] ; then
+        gsettings set org.gnome.gedit.preferences.encodings auto-detected "['CURRENT','GB18030','GBK','GB2312','UTF-8','UTF-16']"
+    fi
     # -----------------------------------
     # to disable the fixed dock (in dock setting, it is Auto-hide the Dock option)
     echo -e "\n  hide the Dock when any windows overlap with it\n"
     _press_enter_to_continue
-    gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
-
+    if [ ! $gnome_version = ' ' ] ; then
+        gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
+    fi
     # -----------------------------------
     # to lock the screen from commands
     echo -e "\n  going to setup lock screen command\n"
     _press_enter_to_continue
-    sudo apt-get install gnome-screensaver -y
-
+    if [ ! $gnome_version = ' ' ] ; then
+        sudo apt-get install gnome-screensaver -y
+    fi
     # -----------------------------------
     echo -e "\n  going to setup time & date control\n"
     _press_enter_to_continue

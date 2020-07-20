@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ===============================================================================
+# =============================================================================
 # make sure the package is in ~/workspace folder
 # or make sure it can be sourced from anywhere
 djtools_path=$PWD
@@ -8,7 +8,7 @@ echo $djtools_path
 
 echo -e '\ndjtools installation ...\n'
 
-# ===============================================================================
+# =============================================================================
 # source the package in ~/.bashrc
 while IFS='' read -r line || [[ -n "$line" ]] ; do
     if [[ $line == *"source "$djtools_path$"/djtools.bash"* ]] ; then
@@ -22,7 +22,7 @@ echo -e '\n' >> ~/.bashrc
 echo '# ===========================================================' >> ~/.bashrc
 echo '# djtools setup' >> ~/.bashrc
 
-# ===============================================================================
+# =============================================================================
 # get bitbucket/github, etc, user name
 # -----------------------------------------------------------------
 echo -e '\nDo you have a BitBucket username? [Yes/No]'

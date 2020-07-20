@@ -6,7 +6,7 @@
 #     git branch -D $branch;
 # done
 
-# ===============================================================================
+# =============================================================================
 function _repod_help()
 {
     echo -e "\n---------------------- repod ------------------------"
@@ -24,7 +24,7 @@ function _repod_help()
     echo -e "\nAll commands support tab completion\n"
 }
 
-# ===============================================================================
+# =============================================================================
 function _backup_to_github()
 {
     current_folder=${PWD}
@@ -69,7 +69,7 @@ function _backup_to_github()
     unset current_folder
 }
 
-# ===============================================================================
+# =============================================================================
 # only back up to personal private repo
 function _backup_to_gitee()
 {
@@ -115,7 +115,7 @@ function _backup_to_gitee()
     unset current_folder
 }
 
-# ===============================================================================
+# =============================================================================
 function _repod_branches_list()
 {
     # git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format='%(refname:short)'
@@ -124,7 +124,7 @@ function _repod_branches_list()
     echo -e '\nnot finished yet\n'
 }
 
-# ===============================================================================
+# =============================================================================
 function _repod_branches_list_all()
 {
     if [ $1 = '--remote' ] ; then
@@ -142,7 +142,7 @@ function _repod_update_help()
     echo -e "      --all-sub-forlders\n"
 
 }
-# ===============================================================================
+# =============================================================================
 function _repod_update_repos_all_folders()
 {
     current_folder=${PWD}
@@ -175,7 +175,7 @@ function _repod_update_repos_all_folders()
     unset current_folder
 }
 
-# ===============================================================================
+# =============================================================================
 function repod()
 {
     current_folder=${PWD}
@@ -214,7 +214,7 @@ function repod()
         echo 'remote url before switching:'
         git remote get-url origin
         _display_section
-        echo ' '
+        echo -e "\n"
 
         if [ $2 = 'bitbucket' ] ; then
             echo " switch to bitbucket"
@@ -229,7 +229,7 @@ function repod()
             echo " switch to gitee"
         fi
 
-        echo ' '
+        echo -e "\n"
         _display_section
         echo 'remote url after switching:'
         git remote get-url origin
@@ -291,7 +291,7 @@ function repod()
     unset current_folder
 }
 
-# ===============================================================================
+# =============================================================================
 function _repod()
 {
     COMPREPLY=()
@@ -324,7 +324,7 @@ function _repod()
     ACTIONS[update]+="--all-sub-forlders "
     ACTIONS[--all-sub-forlders]+=" "
     
-    # ---------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
     if [ ${ACTIONS[$3]+1} ] ; then
         COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
@@ -333,5 +333,5 @@ function _repod()
     fi
 }
 
-# ===============================================================================
+# =============================================================================
 complete -F _repod repod

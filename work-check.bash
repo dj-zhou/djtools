@@ -52,12 +52,12 @@ function _work_check()
     CURRENT_DATE_TIME=`date +"%Y%m%d-%I%M%S"`
     OUTPUT_FILE="${HOME}/work-check-${HOSTNAME}-${CURRENT_DATE_TIME}.txt"
     echo -e '\c' > $OUTPUT_FILE
-    echo -ne "-----------------------------------------------------------------------------------------------------\n" >> $OUTPUT_FILE
+    echo -ne "--------------------------------------------------------------------------------------------\n" >> $OUTPUT_FILE
     echo -ne "----- Tool      : Work Check ------------------------------------------------------------------------\n" >> $OUTPUT_FILE
     echo -ne "----- Command   : dj work-check <path> --------------------------------------------------------------\n" >> $OUTPUT_FILE
     echo -ne "----- Developer : Dingjiang Zhou --------------------------------------------------------------------\n" >> $OUTPUT_FILE
     echo -ne "----- Date      : Mar, 15th, 2020 -------------------------------------------------------------------\n" >> $OUTPUT_FILE
-    echo -ne "-----------------------------------------------------------------------------------------------------\n" >> $OUTPUT_FILE
+    echo -ne "--------------------------------------------------------------------------------------------\n" >> $OUTPUT_FILE
     echo -ne "\nWorking Directory : "$workspace_path"\n" >> $OUTPUT_FILE
     echo -ne "Computer Hostname : "$HOSTNAME"\n" >> $OUTPUT_FILE
     echo -ne "Computer Username : "$USER"\n" >> $OUTPUT_FILE
@@ -208,6 +208,4 @@ function _work_check()
     done
 
     cd ${cwd_before_running}
-    # open the file!
-    # gedit $OUTPUT_FILE
 }

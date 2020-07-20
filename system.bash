@@ -3,14 +3,12 @@
 # =============================================================================
 function _system_help()
 {
-    echo ' '
-    echo ' system help'
-    echo ' '
+    echo -e '\n system help\n'
     echo ' exmaple command 1:'
     echo '   -- enable '
     echo '   -- disable '
     echo '   -- check '
-    echo "   -- MORE IS COMMING "
+    echo -e "   -- MORE IS COMMING\n"
 }
 
 # =============================================================================
@@ -24,18 +22,17 @@ function _system_enable_help()
 # =============================================================================
 function _system_disable_help()
 {
-    echo " system disable <argument>"
+    echo -e "\n system disable <argument>"
     echo "   -- program-problem-detected : to disable an Ubuntu error report"
-    echo "   -- MORE IS COMMING "
+    echo -e "   -- MORE IS COMMING\n"
 }
 
 # =============================================================================
 function _system_check_help()
 {
-    echo " system check <argument>"
+    echo -e "\n system check <argument>"
     echo "   -- temperature : to check CPU temperature"
-    echo "   -- MORE IS COMMING "
-    echo " "
+    echo -e "   -- MORE IS COMMING\n"
 }
 
 # =============================================================================
@@ -43,10 +40,9 @@ function _system_disable_program_problem_detected()
 {
     sudo rm -f /var/crash/*
     sudo sed -i "s/enabled=1/enabled=0/g" /etc/default/apport
-    echo "/etc/default/apport is revised to "
-    echo ' '
+    echo -e "/etc/default/apport is revised to\n"
     cat /etc/default/apport
-    echo ' '
+    echo -e '\n'
 }
 
 # =============================================================================
@@ -97,15 +93,14 @@ function _system_wallpaper_random()
     done < ~/.bashrc
 
     if [ $wallpaper_folder_is_set = 0 ] ; then
-        echo " "
-        echo "wallpaper_folder is NOT set. please enter a path of the wallpapers: "
+        echo -e "\nwallpaper_folder is NOT set. please enter a path of the wallpapers: "
         read answer
         
         echo '# ===========================================================' >> ~/.bashrc
-        echo '# wallpaper setup (djtools)' >> ~/.bashrc
+        echo '# (djtools) wallpaper setup' >> ~/.bashrc
         echo 'wallpaper_folder='$answer >> ~/.bashrc
         echo -e '\n' >> ~/.bashrc
-        echo " "
+        echo -e "\n"
         # echo "You need to manually make the setting effective, run:"
         # echo "   source ~/.bashrc"
         # echo "and then run:"
@@ -222,7 +217,7 @@ function _system()
     ACTIONS[autoinstall]+=" "
 
     
-    # ---------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
     if [ ${ACTIONS[$3]+1} ] ; then
         COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
