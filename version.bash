@@ -25,6 +25,30 @@ function _version_check_arm_linux_gnueabi_gcc()
 }
 
 # =============================================================================
+function _version_check_arm_linux_gnueabihf_gcc()
+{
+    v=$(arm-linux-gnueabihf-gcc --version | awk '{ print $4 }')
+    vv=$(echo $v | awk '{ print $1 }')
+    echo $vv
+}
+
+# =============================================================================
+function _version_check_arm_linux_gnueabihf_gpp()
+{
+    v=$(arm-linux-gnueabihf-g++ --version | awk '{ print $4 }')
+    vv=$(echo $v | awk '{ print $1 }')
+    echo $vv
+}
+
+# =============================================================================
+function _version_check_aarch64_linux_gnu_gcc()
+{
+    v=$(aarch64-linux-gnu-gcc --version | awk '{ print $4 }')
+    vv=$(echo $v | awk '{ print $1 }')
+    echo $vv
+}
+
+# =============================================================================
 function _version_check_cmake()
 {
     v=$(cmake --version | grep -v kitware | awk '{ print $3 }')
@@ -66,8 +90,6 @@ function _version_check_ubuntu()
 # =============================================================================
 function version()
 {
-    current_folder=${PWD}
-
     # ------------------------------
     if [ $# -eq 0 ] ; then
         _version_help
@@ -84,6 +106,21 @@ function version()
         # ------------------------------
         if [ $2 = 'arm-linux-gnueabi-gcc' ] ; then
             _version_check_arm_linux_gnueabi_gcc
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'arm-linux-gnueabihf-gcc' ] ; then
+            _version_check_arm_linux_gnueabihf_gcc
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'arm-linux-gnueabihf-g++' ] ; then
+            _version_check_arm_linux_gnueabihf_gpp
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'aarch64-linux-gnu-gcc' ] ; then
+            _version_check_aarch64_linux_gnu_gcc
             return
         fi
         # ------------------------------
@@ -112,9 +149,10 @@ function version()
             return
         fi
         # ------------------------------
+        echo -e "\n version check: $2: argument not supported\n"
         return
     fi
-        # ------------------------------
+    # ------------------------------
     if [ $1 = 'swap' ] ; then
         # ------------------------------
         if [ $# = 1 ] ; then
@@ -136,13 +174,22 @@ function version()
             sudo update-alternatives --config arm-linux-gnueabi-gcc
             return
         fi
+        # ------------------------------
+        if [ $2 = 'arm-linux-gnueabihf-gxx' ] ; then
+            sudo update-alternatives --config arm-linux-gnueabihf-gcc
+            sudo update-alternatives --config arm-linux-gnueabihf-g++
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'aarch64-linux-gnu-gcc' ] ; then
+            sudo update-alternatives --config aarch64-linux-gnu-gcc
+            return
+        fi
+        echo -e "\n version swap: $2: argument not supported\n"
+        return
     fi
     echo -e '\r\nversion : "'$1 '"command not supported\r\n'
     _version_help
-
-    # ------------------------------
-    cd $current_folder
-    unset current_folder
 }
 
 # =============================================================================
@@ -160,14 +207,20 @@ function _version()
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
-    ACTIONS[check]+="arm-linux-gnueabi-gcc cmake gcc g++ gnome ubuntu "
+    ACTIONS[check]+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc aarch64-linux-gnu-gcc "
+    ACTIONS[check]+="arm-linux-gnueabihf-g++ "
+    ACTIONS[check]+="cmake gcc g++ gnome ubuntu "
     ACTIONS[arm-linux-gnueabi-gcc]=" "
+    ACTIONS[arm-linux-gnueabihf-gcc]=" "
+    ACTIONS[arm-linux-gnueabihf-g++]=" "
+    ACTIONS[aarch64-linux-gnu-gcc]=" "
     ACTIONS[cmake]=" "
     ACTIONS[gcc]=" "
     ACTIONS[g++]=" "
     ACTIONS[gnome]=" "
     ACTIONS[ubuntu]=" "
-    ACTIONS[swap]+="gcc g++ arm-linux-gnueabi-gcc "
+    ACTIONS[swap]+="gcc g++ arm-linux-gnueabi-gcc arm-linux-gnueabihf-gxx aarch64-linux-gnu-gcc "
+
     
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

@@ -28,9 +28,11 @@ echo '# djtools setup' >> ~/.bashrc
 echo -e '\nDo you have a BitBucket username? [Yes/No]'
 read answer
 username=" "
-if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || ($answer = 'No') || ($answer = 'no') ]] ; then
+if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || \
+    ($answer = 'No') || ($answer = 'no') ]] ; then
     echo 'BitBucket username is not set.'
-elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || ($answer = 'Yes') || ($answer = 'yes') ]] ; then
+elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || \
+    ($answer = 'Yes') || ($answer = 'yes') ]] ; then
     echo " "
     echo 'Please enter your BitBucket username'
     read username
@@ -42,9 +44,11 @@ echo 'bitbucket_username='$username >> ~/.bashrc
 echo -e '\nDo you have a GitHub username? [Yes/No]'
 read answer
 username=" "
-if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || ($answer = 'No') || ($answer = 'no') ]] ; then
+if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || \
+    ($answer = 'No') || ($answer = 'no') ]] ; then
     echo 'GitHub username is not set.'
-elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || ($answer = 'Yes') || ($answer = 'yes') ]] ; then
+elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || \
+    ($answer = 'Yes') || ($answer = 'yes') ]] ; then
     echo " "
     echo 'Please enter your GitHub username:'
     read username
@@ -56,9 +60,11 @@ echo 'github_username='$username >> ~/.bashrc
 echo -e '\nDo you have a GiTee username? [Yes/No]'
 read answer
 username=" "
-if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || ($answer = 'No') || ($answer = 'no') ]] ; then
+if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || ($answer = 'No') || \
+    ($answer = 'no') ]] ; then
     echo 'GiTee username is not set.'
-elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || ($answer = 'Yes') || ($answer = 'yes') ]] ; then
+elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || ($answer = 'Yes') || \
+    ($answer = 'yes') ]] ; then
     echo " "
     echo 'Please enter your GiTee username:'
     read username
@@ -67,8 +73,6 @@ fi
 echo 'gitee_username='$username >> ~/.bashrc
 
 echo -e '\nIf bitbucket/github/gitee usernames set wrong, you can still edit them in ~/.bashrc\n'
-
-
 echo "source "$djtools_path"/djtools.bash" >> ~/.bashrc
 echo -e "\ndjtools installation finished.\n"
 echo -e "\n" >> ~/.bashrc

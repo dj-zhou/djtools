@@ -40,7 +40,7 @@ function _dj_setup_gcc_arm_embedded()
 {
     current_folder=${PWD}
 
-    echo -e "\n  remove gcc-arm-none-eabi, and install gcc-arm-embedded ...\n"
+    echo -e "\n remove gcc-arm-none-eabi, and install gcc-arm-embedded ...\n"
     _press_enter_to_continue
 
     sudo apt-get install -y build-essential git flex bison libgmp3-dev libmpfr-dev 
@@ -73,9 +73,9 @@ function _dj_setup_gcc_arm_linux_gnueabi()
 {
     current_folder=${PWD}
 
-    echo -e "\n  install gcc-arm-linux-gnueabi ...\n"
+    echo -e "\n install gcc-arm-linux-gnueabi ...\n"
     _press_enter_to_continue
-    sudo apt-get install -y qemu libncurses5-dev build-essential 
+    sudo apt-get install -y libncurses5-dev build-essential
     sudo apt-get install -y gcc-arm-linux-gnueabi gcc-5-arm-linux-gnueabi
 
     # update-alternatives configuration
@@ -88,6 +88,63 @@ function _dj_setup_gcc_arm_linux_gnueabi()
 
     echo -e "\n-------------------\n"
     sudo update-alternatives --config arm-linux-gnueabi-gcc
+
+    cd $current_folder
+    unset current_folder
+}
+# =============================================================================
+function _dj_setup_gcc_arm_linux_gnueabihf()
+{
+    current_folder=${PWD}
+
+    echo -e "\n install gcc-arm-linux-gnueabihf ...\n"
+    _press_enter_to_continue
+    sudo apt-get install -y libncurses5-dev build-essential
+    sudo apt-get install -y gcc-arm-linux-gnueabihf gcc-5-arm-linux-gnueabihf
+    sudo apt-get install -y g++-arm-linux-gnueabihf g++-5-arm-linux-gnueabihf
+
+    # update-alternatives configuration
+    sudo update-alternatives --install \
+        /usr/bin/arm-linux-gnueabihf-gcc arm-linux-gnueabihf-gcc \
+        /usr/bin/arm-linux-gnueabihf-gcc-5 5
+    sudo update-alternatives --install \
+        /usr/bin/arm-linux-gnueabihf-gcc arm-linux-gnueabihf-gcc \
+        /usr/bin/arm-linux-gnueabihf-gcc-7 7
+    sudo update-alternatives --install \
+        /usr/bin/arm-linux-gnueabihf-g++ arm-linux-gnueabihf-g++ \
+        /usr/bin/arm-linux-gnueabihf-g++-5 5
+    sudo update-alternatives --install \
+        /usr/bin/arm-linux-gnueabihf-g++ arm-linux-gnueabihf-g++ \
+        /usr/bin/arm-linux-gnueabihf-g++-7 7
+
+    echo -e "\n-------------------\n"
+    sudo update-alternatives --config arm-linux-gnueabihf-gcc
+    sudo update-alternatives --config arm-linux-gnueabihf-g++
+
+    cd $current_folder
+    unset current_folder
+}
+
+# =============================================================================
+function _dj_setup_gcc_aarch64_linux()
+{
+    current_folder=${PWD}
+
+    echo -e "\n install gcc-aarch64-linux-gnu ...\n"
+    _press_enter_to_continue
+    sudo apt-get install -y gcc-aarch64-linux-gnu gcc-5-aarch64-linux-gnu
+    sudo apt-get install -y libssl-dev # needed for compiling the Linux Kernel for ARMv8
+
+    # update-alternatives configuration
+    sudo update-alternatives --install \
+        /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc \
+        /usr/bin/aarch64-linux-gnu-gcc-5 5
+    sudo update-alternatives --install \
+        /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc \
+        /usr/bin/aarch64-linux-gnu-gcc-7 7
+
+    echo -e "\n-------------------\n"
+    sudo update-alternatives --config aarch64-linux-gnu-gcc
 
     cd $current_folder
     unset current_folder
@@ -120,12 +177,14 @@ function _dj_setup_computer()
     sudo rm -rf ~/Public/
     sudo rm -rf ~/Templates/
     sudo rm -rf ~/Videos/
+    sudo rm -rf ~/examples.desktop
+    
     # -----------------------------------
     sudo apt-get update -y
     sudo apt-get upgrade -y
 
     # -----------------------------------
-    echo -e "\n  going to install the following packages: "
+    echo -e "\n going to install the following packages: "
     echo "      ark cmake curl cutecom dconf-editor dconf-tools git "
     echo "      git-lfs g++ htop kate libgtk2.0-dev lsb-core putty "
     echo -e "      screen scrot terminator tree vlc vim wmctrl xclip yasm\n"
@@ -144,7 +203,7 @@ function _dj_setup_computer()
     sudo apt-get install -y screen scrot terminator tree vlc vim wmctrl xclip yasm
 
     # -----------------------------------
-    echo -e "\n  going to install Google Chrome\n"
+    echo -e "\n going to install Google Chrome\n"
     _press_enter_to_continue
     cd ~ && mkdir -p soft/ &&  cd soft/
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -155,7 +214,7 @@ function _dj_setup_computer()
 
     # -----------------------------------
     # Windows fonts
-    echo -e "\n  going to support Windows fonts\n"
+    echo -e "\n going to support Windows fonts\n"
     _press_enter_to_continue
     sudo apt-get install ttf-mscorefonts-installer -y
     sudo apt-get install msttcorefonts -y
@@ -163,34 +222,35 @@ function _dj_setup_computer()
 
     # -----------------------------------
     # remove firefox
-    echo -e "\n  going to remove firfox\n"
+    echo -e "\n going to remove firfox\n"
     _press_enter_to_continue
     sudo apt-get purge firefox -y; rm -Rf ~/.mozilla/firefox/;
 
     # -----------------------------------
     # to display simplified Chinese: important, do not comment out!
-    echo -e "\n  going to setup simplified Chinese support\n"
+    echo -e "\n going to setup simplified Chinese support\n"
     _press_enter_to_continue
     gnome_version=$(version check gnome)
     if [ ! $gnome_version = ' ' ] ; then
-        gsettings set org.gnome.gedit.preferences.encodings auto-detected "['CURRENT','GB18030','GBK','GB2312','UTF-8','UTF-16']"
+        gsettings set org.gnome.gedit.preferences.encodings \
+            auto-detected "['CURRENT','GB18030','GBK','GB2312','UTF-8','UTF-16']"
     fi
     # -----------------------------------
     # to disable the fixed dock (in dock setting, it is Auto-hide the Dock option)
-    echo -e "\n  hide the Dock when any windows overlap with it\n"
+    echo -e "\n hide the Dock when any windows overlap with it\n"
     _press_enter_to_continue
     if [ ! $gnome_version = ' ' ] ; then
         gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     fi
     # -----------------------------------
     # to lock the screen from commands
-    echo -e "\n  going to setup lock screen command\n"
+    echo -e "\n going to setup lock screen command\n"
     _press_enter_to_continue
     if [ ! $gnome_version = ' ' ] ; then
         sudo apt-get install gnome-screensaver -y
     fi
     # -----------------------------------
-    echo -e "\n  going to setup time & date control\n"
+    echo -e "\n going to setup time & date control\n"
     _press_enter_to_continue
     timedatectl set-local-rtc 1
 
@@ -321,7 +381,7 @@ function _dj_setup_foxit_reader()
 {
     current_folder=${PWD}
 
-    echo -e "\n  Install Foxit Reader ..."
+    echo -e "\n install Foxit Reader ..."
     echo -e "  recommended location: /opt/foxitsoftware/foxitreader\n"
     _press_enter_to_continue
 
@@ -341,7 +401,7 @@ function _dj_setup_foxit_reader()
         echo 'a symbolic link "foxit" is generated in /usr/bin'
         sudo ln -sf $foxitreader_location /usr/bin/foxit
     else
-        echo -e "\nFoxitReader not installed into a recommended location"
+        echo -e "\n FoxitReader not installed into a recommended location"
         echo -e "a symbolic link cannot be generated\n"
     fi
 
@@ -362,7 +422,7 @@ function _dj_setup_gitg_kdiff3()
 {
     current_folder=${PWD}
 
-    echo -e "\n  Install gitg and KDiff3 ...\n"
+    echo -e "\n install gitg and KDiff3 ...\n"
     _press_enter_to_continue # to check the key pressed TODO
     sudo apt-get install gitg kdiff3 -y
     git config --global credential.helper store
@@ -380,10 +440,25 @@ function _dj_setup_vscode()
 
     cd ~ && mkdir -p soft/ &&  cd soft/
 
-    echo -e "\n  Install vscode ...\n"
+    echo -e "\n install vscode ...\n"
     curl -L "https://go.microsoft.com/fwlink/?LinkID=760868" > vscode.deb
     sudo dpkg -i vscode.deb
     sudo rm vscode.deb
+
+    echo -e "\n recommended vscode plugins:"
+    echo    "         bitbake: BitBake recipe language support in Visual Studio Code "
+    echo    "     CMake Tools: Extended CMake support in Visual Studio Code "
+    echo    "      DeviceTree: DeviceTree Language Support for Visual Studio Code "
+    echo    "         GitLens: Supercharge the Git capabilities built into Visual "
+    echo    "                  Studio Code — Visualize code authorship at a glance "
+    echo    "                  via Git blame annotations and code le"
+    echo    "  LaTeX Workshop: Boost LaTeX typesetting efficiency with preview, "
+    echo    "                  compile, autocomplete, colorize, and more. "
+    echo    "          Python: Linting, Debugging (multi-threaded, remote), "
+    echo    "                  Intellisense, Jupyter Notebooks, code formatting, "
+    echo    "                  refactoring, unit tests, snippets, and more. "
+    echo    "           C/C++: C/C++ IntelliSense, debugging, and code browsing."
+    echo -e "      Bash Debug: A debugger extension for bash scripts (using bashdb). \n"
 
     cd $current_folder
 }
@@ -448,7 +523,7 @@ function _dj_setup_qt_5_13_1()
 {
     cwd_before_running=$PWD
 
-    echo -e "\nInstall Qt 5.13.1 \n"
+    echo -e "\n install Qt 5.13.1 \n"
     
     # install serialport module
     sudo apt-get install libqt5serialport5-dev -y

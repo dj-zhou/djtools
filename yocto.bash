@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # =============================================================================
 function _yocto_help()
@@ -27,7 +27,6 @@ function _yocto_help()
 # mmcblk0     179:0    0   3.6G  0 disk 
 # ├─mmcblk0p1 179:1    0    30M  0 part /media/robot/boot
 # └─mmcblk0p2 179:2    0   2.6G  0 part /media/robot/root
-
 
 function _yocto_flash()
 {
@@ -82,7 +81,7 @@ function _yocto_flash()
             sudo mount | grep '^/' | grep -q $partition
             if [ $? -ne 1 ]; then # is mounted
                 echo "to umount partition "$partition
-                sleep 4 # just make it noticable
+                sleep 2 # just make it noticable
                 sudo umount $partition
             fi
         fi
@@ -91,10 +90,11 @@ function _yocto_flash()
         partition=$DEV"p${i}"
         if [ -b $partition ] ; then
             # check if mounted
+            echo " check if the partition is mounted: "
             sudo mount | grep '^/' | grep -q $partition
             if [ $? -ne 1 ]; then # is mounted
                 echo "to umount partition "$partition
-                sleep 4 # just make it noticable
+                sleep 2 # just make it noticable
                 sudo umount $partition
             fi
         fi

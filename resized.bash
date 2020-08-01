@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # =============================================================================
 # wmctrl -l : to list all windows
@@ -24,7 +24,7 @@ _resized_help()
     echo -e "\n\n---------------------- resized ----------------------"
     echo " Author      : Dingjiang Zhou"
     echo " Email       : zhoudingjiang@gmail.com "
-    echo " Create Date : 2019-09-16"
+    echo " Create Date : 2020-03-11"
     echo "-----------------------------------------------------"
     echo -e "\n First level commands:"
     echo "   embedded   - to arrange terminator and vscode"

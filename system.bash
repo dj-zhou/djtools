@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # =============================================================================
 function _system_help()
@@ -101,13 +101,18 @@ function _system_wallpaper_random()
         echo 'wallpaper_folder='$answer >> ~/.bashrc
         echo -e '\n' >> ~/.bashrc
         echo -e "\n"
-        # echo "You need to manually make the setting effective, run:"
-        # echo "   source ~/.bashrc"
-        # echo "and then run:"
-        # echo "   system wallpaper random"
-        # echo " "
     fi
-    _random_wallpaper # from funcs.bash
+    # _random_wallpaper # from funcs.bash
+    current_folder=${PWD}
+
+    cd $wallpaper_folder
+    set -- *
+    length=$#
+    random_num=$((( $RANDOM % ($length) ) + 1))
+    # it only works for gnome
+    gsettings set org.gnome.desktop.background picture-uri "file://$wallpaper_folder/${!random_num}"
+    
+    cd $current_folder
 }
 
 # =============================================================================

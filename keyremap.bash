@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # =============================================================================
 _keyremap_help() {
@@ -11,13 +11,13 @@ _keyremap_help() {
 
 # =============================================================================
 _keyremap_enable() {
-    xmodmap $djtools_path/keyremap-enable.txt
+    xmodmap $djtools_path/settings/keyremap-enable.txt
     echo -e "\nkeyremap enabled\n"
 }
 
 # =============================================================================
 _keyremap_disable() {
-    xmodmap $djtools_path/keyremap-disable.txt
+    xmodmap $djtools_path/settings/keyremap-disable.txt
     echo -e "\nkeyremap disabled\n"
 }
 

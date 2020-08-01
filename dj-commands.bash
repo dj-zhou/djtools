@@ -46,8 +46,8 @@ function _clang_vscode_setting_json()
     fi
     echo "copy json file: "$json_file" to "$folder
     sudo rm -f $folder/settings.json
-    cp $json_file $folder/settings.json
-    cp .clang-format-dj $folder/.clang-format
+    cp settings/$json_file $folder/settings.json
+    cp settings/.clang-format-dj $folder/.clang-format
 
     cd $current_folder_json
 }
@@ -83,8 +83,10 @@ function _dj_setup_clang_9_0_0()
         md5checksum=`md5sum $clang_file.tar.xz`
         echo "md5checksum = "$md5checksum
     fi
-    if [[ ( ( ${ubuntu_release_version} = *'18.04'* ) && ( "$md5checksum" = *"9d8044379e151029bb1df3663c2fb2c1"* ) ) \
-      || ( ( ${ubuntu_release_version} = *'16.04'* ) && ( "$md5checksum" = *"b3c5618fb3a5d268c371539e9f6a4b1f"* ) ) ]] ; then
+    if [[ ( ( ${ubuntu_release_version} = *'18.04'* ) && \
+        ( "$md5checksum" = *"9d8044379e151029bb1df3663c2fb2c1"* ) ) \
+      || ( ( ${ubuntu_release_version} = *'16.04'* ) && \
+        ( "$md5checksum" = *"b3c5618fb3a5d268c371539e9f6a4b1f"* ) ) ]] ; then
         echo "file exists, no need to download again."
     else
         wget http://releases.llvm.org/9.0.0/${clang_file}.tar.xz
@@ -102,9 +104,9 @@ function _dj_setup_clang_9_0_0()
     cd $djtools_path
 
     if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
-        cat clang-setting-ubuntu-16.04.json
+        cat settings/clang-setting-ubuntu-16.04.json
     elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
-        cat clang-setting-ubuntu-18.04.json
+        cat settings/clang-setting-ubuntu-18.04.json
     fi
 
     echo -e "\nDo you want to apply the above settings? [Yes/No]\n"
@@ -160,7 +162,8 @@ function _dj_setup_container_docker()
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
     # Add the Docker repository to APT sources
-    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+    sudo add-apt-repository \
+        "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
     sudo apt update
 
     # Install
@@ -286,6 +289,31 @@ function _dj_setup_pip()
 }
 
 # =============================================================================
+function _dj_setup_qemu()
+{
+    cwd_before_running=$PWD
+
+    version=$1
+    echo $version
+    if [ $version = "2.11.1" ] ; then
+        # this may only work within Ubuntu 18.04, not tested on other platforms
+        sudo apt-get install qemu
+    elif [ $version = "4.2.0" ] ; then
+        cd ~ && mkdir -p soft && cd soft/
+        git clone git://git.qemu-project.org/qemu.git
+        cd qemu
+        git checkout stable-4.2
+        mkdir build && cd build
+        # is this only for ARM? will fix it later if needed
+        ../configure --target-list=arm-softmmu --audio-drv-list=
+        make -j8 && sudo make install
+        echo -e "\n $CYAN_COLOR the installed qemu is probably for ARM only, check it later$NO_COLOR\n"
+    fi
+
+    cd ${cwd_before_running}
+}
+
+# =============================================================================
 function _dj_setup_slack()
 {
     cwd_before_running=$PWD
@@ -405,7 +433,8 @@ function _dj_setup_grpc_1_29_1()
     cwd_before_running=$PWD
 
     cd ~ && mkdir -p soft && cd soft/
-    git clone https://github.com/grpc/grpc.git --recurse-submodules --shallow-submodules --depth 1 --branch v1.29.1
+    git clone https://github.com/grpc/grpc.git --recurse-submodules \
+         --shallow-submodules --depth 1 --branch v1.29.1
     cd grpc
     mkdir build && cd build
     cmake .. -GNinja
@@ -467,7 +496,10 @@ function _dj_setup_opencv_2_4_13()
     unzip opencv-2.4.13.6.zip
     cd opencv-2.4.13.6
     mkdir build && cd build
-    cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON WITH_OPENCL=ON WITH_GDAL=ON WITH_IPP=ON BUILD_JASPER=ON BUILD_JPEG=ON BUILD_PNG=ON BUIILD_TIFF=ON WITH_OPENMP=ON ..
+    cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
+          -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON \
+          WITH_OPENCL=ON WITH_GDAL=ON WITH_IPP=ON BUILD_JASPER=ON BUILD_JPEG=ON \
+          BUILD_PNG=ON BUIILD_TIFF=ON WITH_OPENMP=ON ..
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
 
     _ask_to_remove_a_folder opencv-2.4.13
@@ -519,9 +551,12 @@ function _dj_setup_opencv_4_1_1()
     git checkout add-eigen3-include
     sudo rm -rf build && mkdir build && cd build
     if [ $# = 1 ] && [ $1 = 'with-contrib' ] ; then
-        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.1.1/modules ..
+        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
+              -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON \
+              -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.1.1/modules ..
     else
-        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON ..
+        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
+              -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON ..
     fi
     
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
@@ -536,7 +571,8 @@ function _dj_setup_opencv_4_1_1()
     cd ${cwd_before_running}
     echo -e "\n"
     echo " lib files *.so are installed in /usr/local/lib/"
-    echo " header files are installded in /usr/local/include/opencv4/, in which there is another folder opencv2/"
+    echo " header files are installded in /usr/local/include/opencv4/, "
+         "   in which there is another folder opencv2/"
     echo -e "\n"
     echo " example code or template project can be seen from:"
     echo " https://github.com/dj-zhou/opencv4-demo/001-imread-imshow"
@@ -586,7 +622,10 @@ function _dj_setup_vtk_8_2_0()
     git clone https://gitee.com/dj-zhou/vtk-8.2.0.git
 
     cd vtk-8.2.0 && sudo rm -rf build/ && mkdir -p build && cd build
-    cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DVTK_RENDERING_BACKEND=OpenGL2 -DQT5_DIR=$HOME/Qt5.14.2/5.14.2/gcc_64/lib/cmake/Qt5 -DVTK_QT_VERSION=5 -DVTK_Group_Qt=ON ..
+    cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX=/usr/local -DVTK_RENDERING_BACKEND=OpenGL2 \
+          -DQT5_DIR=$HOME/Qt5.14.2/5.14.2/gcc_64/lib/cmake/Qt5 \
+          -DVTK_QT_VERSION=5 -DVTK_Group_Qt=ON ..
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
     # some warning:
     # CMake Warning:
@@ -662,14 +701,177 @@ function _dj_open_file()
     fi
 }
 
+# =============================================================================
 function _dj_ssh_no_password()
 {
-    user_ip="$1"
+    if [ $# = 0 ] ; then
+        echo -e "usage:"
+        echo -e " dj ssh no-password username@ip_address\n"
+        return
+    fi
+    user_and_ip="$1"
+    user=${user_and_ip%"@"*}
+    pos=$(_find_a_char_in_str $user_and_ip "@" 1)
+    ip=${user_and_ip:${pos}+1:${#user_and_ip}-${pos}}
+
     # check if there is a file: ~/.ssh/id_rsa.pub
+    key_file=~/.ssh/id_rsa.pub
+    if [ ! -f $key_file ] ; then
+        echo -e "$key_file not found, generate it by \n    ssh-keygen\n"
+        return
+    fi
+
+    # just to create this folder
+    echo "ssh -l $user $ip \"mkdir -p ~/.ssh\""
+    ssh -l $user $ip "mkdir -p ~/.ssh"
+
     # then run:
-    # cat .ssh/id_rsa.pub | ssh uesrname@ip_address 'cat >> .ssh/authorized_keys'
-    # if there is no .ssh folder, create it
-    ssh
+    echo "cat $key_file | ssh $user_and_ip \"cat >> .ssh/authorized_keys\""
+    cat $key_file | ssh $user_and_ip "cat >> .ssh/authorized_keys"
+}
+
+# =============================================================================
+function _dj_setup_vim_env()
+{
+    echo -e "\n setup the vim as an IDE\n"
+    _press_enter_to_continue
+
+    cwd_before_running=$PWD
+
+    VIMRC=~/.vimrc
+
+    # install software, if not installed already
+    sudo apt-get install -y vim
+    sudo apt-get install -y ctags # Generate tag files for source code
+    sudo apt-get install -y cscope
+    # software needed to compile YouCompleteMe
+    sudo apt-get install -y build-essential cmake
+    sudo apt-get install -y python-dev python3-dev
+
+    # install Vundle -- plugin manager
+    rm -rf ~/.vim/bundle/Vundle.vim
+    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    
+    # configure Vundle in ${VIMRC}
+    # also configure tagbar, nerdtree, ALE
+    rm -rf ${VIMRC}
+    echo    '" ===========================================================' >> ${VIMRC}
+    echo    '" Vundle manage'                                               >> ${VIMRC}
+    echo    'set nocompatible      " be iMproved, required'                 >> ${VIMRC}
+    echo -e 'filetype off          " required\n'                            >> ${VIMRC}
+    echo    '" set the runtime path to include Vundle and initialize'       >> ${VIMRC}
+    echo    'set rtp+=~/.vim/bundle/Vundle.vim'                             >> ${VIMRC}
+    echo -e 'call vundle#begin()\n'                                         >> ${VIMRC}
+    echo    '" let Vundle manage Vundle, required'                          >> ${VIMRC}
+    printf  "Plugin 'VundleVim/Vundle.vim'\n"                               >> ${VIMRC}
+    printf  "Plugin 'majutsushi/tagbar'\n"                                  >> ${VIMRC}
+    printf  "Plugin 'scrooloose/nerdtree'\n"                                >> ${VIMRC}
+    printf  "Plugin 'w0rp/ale'\n"                                           >> ${VIMRC}
+    printf  "Plugin 'Valloric/YouCompleteMe'\n"                             >> ${VIMRC}
+    printf  "Plugin 'ludovicchabant/vim-gutentags'\n\n"                     >> ${VIMRC}
+    echo    '" All of your Plugins must be added before the following line' >> ${VIMRC}
+    echo    'call vundle#end()         " required'                          >> ${VIMRC}
+    echo -e 'filetype plugin indent on " required\n\n'                      >> ${VIMRC}
+    echo    '" ===========================================================' >> ${VIMRC}
+    echo    '" cscope setup'                                                >> ${VIMRC}
+    echo    '"-------------------------------------------'                  >> ${VIMRC}
+    echo    '" cscope to create database: cscope -Rbq'                      >> ${VIMRC}
+    echo    '" F5: to look for C symbol                              (s)'   >> ${VIMRC}
+    echo    '" F6: to look for a string                              (t)'   >> ${VIMRC}
+    echo    '" F7: to look for function definition                   (g)'   >> ${VIMRC}
+    echo    '" F8: to look for which function calls current function (c)'   >> ${VIMRC}
+    echo    '"-------------------------------------------'                  >> ${VIMRC}
+    echo    'if has("cscope")'                                              >> ${VIMRC}
+    echo    '  set csprg=/usr/bin/cscope'                                   >> ${VIMRC}
+    echo    '  set csto=1'                                                  >> ${VIMRC}
+    echo    '  set cst'                                                     >> ${VIMRC}
+    echo    '  set nocsverb'                                                >> ${VIMRC}
+    echo    '  " add any database in current directory'                     >> ${VIMRC}
+    echo    '  if filereadable("cscope.out")'                               >> ${VIMRC}
+    echo    '    cs add cscope.out'                                         >> ${VIMRC}
+    echo    '  endif'                                                       >> ${VIMRC}
+    echo    '  set csverb'                                                  >> ${VIMRC}
+    echo -e 'endif\n'                                                       >> ${VIMRC}
+
+    echo    ':set cscopequickfix=s-,c-,d-,i-,t-,e-'                         >> ${VIMRC}
+    echo    '"nmap <C-_>s :cs find s <C-R>=expand("<cword>")<CR><CR>'       >> ${VIMRC}
+    echo    'nmap <silent> <F5> :cs find s <C-R>=expand("<cword>")<CR><CR>' >> ${VIMRC}
+    echo    'nmap <silent> <F6> :cs find g <C-R>=expand("<cword>")<CR><CR>' >> ${VIMRC}
+    echo    'nmap <silent> <F7> :cs find t <C-R>=expand("<cword>")<CR><CR>' >> ${VIMRC}
+    echo    'nmap <silent> <F8> :cs find c <C-R>=expand("<cword>")<CR><CR>' >> ${VIMRC}
+    echo -e '\n'                                                            >> ${VIMRC}
+    echo    '" ===========================================================' >> ${VIMRC}
+    echo    '" Tagbar setup'                                                >> ${VIMRC}
+    echo    'let g:tagbar_width=25'                                         >> ${VIMRC}
+    echo    'autocmd BufReadPost *.cpp,*.c,*.hpp,s*.h,*.cc,*.cxx call tagbar#autoopen()' >> ${VIMRC}
+    echo -e '\n'                                                            >> ${VIMRC}
+    echo    '" ===========================================================' >> ${VIMRC}
+    echo    '" Nerdtree setup'                                              >> ${VIMRC}
+    echo    'autocmd StdinReadPre * let s:std_in=1'                         >> ${VIMRC}
+    echo -e 'autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif' >> ${VIMRC} # this line does not work?
+    echo -e 'let NERDTreeWinSize=15'                                        >> ${VIMRC}
+    echo -e 'let NERDTreeShowLineNumbers=1'                                 >> ${VIMRC}
+    echo -e 'let NERDTreeAutoCenter=1'                                      >> ${VIMRC}
+    echo -e 'let NERDTreeShowBookmarks=1'                                   >> ${VIMRC}
+    echo -e '\n'                                                            >> ${VIMRC}
+    echo    '" ===========================================================' >> ${VIMRC}
+    echo    '" ALE (Asynchronization Line Engine) setup'                    >> ${VIMRC}
+    printf  "let g:ale_sign_column_always = 1\n"                            >> ${VIMRC}
+    printf  "let g:ale_sign_error = '>>'\n"                                 >> ${VIMRC}
+    printf  "let g:ale_sign_warning = '--'\n"                               >> ${VIMRC}
+    printf  "let g:ale_statusline_format = ['x %%d', 'z %%d', 'y OK']\n"    >> ${VIMRC}
+    printf  "let g:ale_echo_msg_format = '[%%linter%%] %%code: %%%%s'\n"    >> ${VIMRC}
+    printf  "let g:ale_lint_on_text_changed = 'normal'\n"                   >> ${VIMRC}
+    printf  "let g:ale_lint_on_insert_leave = 1\n"                          >> ${VIMRC}
+    printf  "let g:ale_c_gcc_options = '-Wall -O2 -std=c99'\n"              >> ${VIMRC}
+    printf  "let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++20'\n"          >> ${VIMRC}
+    printf  "let g:ale_c_cppcheck_options = ' '\n"                          >> ${VIMRC}
+    printf  "let g:ale_cpp_cppcheck_options = ' '\n"                        >> ${VIMRC}
+    echo -e '\n'                                                            >> ${VIMRC}
+    echo    '" ===========================================================' >> ${VIMRC}
+    echo    '" YouCompleteMe setup'                                         >> ${VIMRC}
+    printf  "let g:ycm_server_python_interpreter='/usr/bin/python3'\n"      >> ${VIMRC}
+    printf  "let g:ycm_global_ycm_extra_conf='~/.vim/.ycm_extra_conf.py'"   >> ${VIMRC}
+    echo -e '\n\n'                                                          >> ${VIMRC}
+    echo    '" ===========================================================' >> ${VIMRC}
+    echo    '" vim-gutentags setup'                                         >> ${VIMRC}
+    printf  "let g:gutentags_project_root= ['.root', '.svn', '.git', '.hg',  '.project']\n" >> ${VIMRC}
+    printf  "let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']\n" >> ${VIMRC}
+    printf  "let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']\n"     >> ${VIMRC}
+    printf  "let g:gutentags_ctags_extra_args += ['--c-kinds=+px']\n"       >> ${VIMRC}
+    echo -e '\n'                                                            >> ${VIMRC}
+    echo    '" ===========================================================' >> ${VIMRC}
+    echo    '" some other setup'                                            >> ${VIMRC}
+    echo    'set nu! " display line number'                                 >> ${VIMRC}
+    echo    'syntax enable'                                                 >> ${VIMRC}
+    echo    'syntax on'                                                     >> ${VIMRC}
+    echo    'colorscheme desert'                                            >> ${VIMRC}
+    echo -e ':set autowrite "auto save\n\n'                                 >> ${VIMRC}
+
+    echo -e "\n\n to make effects of the plugins, start vim, and enter:"
+    echo -e " :PluginInstall\n"
+    echo -e "YouCompleteMe needs to be compiled after the plugins are installed:"
+    echo -e "  dj setup you-complete-me\n"
+
+    cd ${cwd_before_running}
+}
+
+# =============================================================================
+function _dj_setup_you_complete_me()
+{
+    cwd_before_running=$PWD
+
+    folder=~/.vim/bundle/YouCompleteMe
+    if [ -d $folder ] ; then
+        cd $folder
+        ./install.py --clang-completer
+        cp third_party/ycmd/examples/.ycm_extra_conf.py ~/.vim/
+    else
+        echo "You need to install the YouCompleteMe plugin for Vim by"
+        echo -e "dj setup vim-env\n"
+    fi
+
+    cd ${cwd_before_running}
 }
 
 # =============================================================================
@@ -763,6 +965,16 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'gcc-arm-linux-gnueabihf' ] ; then
+            _dj_setup_gcc_arm_linux_gnueabihf
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'gcc-aarch64-linux-gnu' ] ; then
+            _dj_setup_gcc_aarch64_linux
+            return
+        fi
+        # --------------------------
         if [ $2 = 'i219-v' ] ; then
             _dj_setup_i219_v $3
             return
@@ -817,6 +1029,11 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'qemu' ] ; then
+            _dj_setup_qemu $3 $4 $5 $6
+            return
+        fi
+        # --------------------------
         if [ $2 = 'ros-melodic' ] ; then
             _dj_setup_ros_melodic $3 $4 $5
             return
@@ -839,6 +1056,16 @@ function dj()
         # --------------------------
         if [ $2 = 'typora' ] ; then
             _dj_setup_typora
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'vim-env' ] ; then
+            _dj_setup_vim_env
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'YouCompleteMe' ] || [ $2 = 'you-complete-me' ] ; then
+            _dj_setup_you_complete_me
             return
         fi
         # --------------------------
@@ -961,10 +1188,13 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    ACTIONS[setup]+="baidu-netdisk clang-9.0.0 container computer dj-gadgets dropbox eigen foxit gcc-arm-embedded "
-    ACTIONS[setup]+="gcc-arm-linux-gnueabi git-lfs gitg-kdiff3 glfw3-gtest-glog grpc-1.29.1 g++-10 i219-v libev-4.33 "
-    ACTIONS[setup]+="mathpix matplotlib-cpp opencv-2.4.13 opencv-4.1.1 pangolin pip qt-5.13.1 qt-5.14.2 "
-    ACTIONS[setup]+="ros-melodic ros2-foxy slack stm32tools sublime typora vscode vtk-8.2.0 wubi yaml-cpp "
+    ACTIONS[setup]+="baidu-netdisk clang-9.0.0 container computer dj-gadgets "
+    ACTIONS[setup]+="dropbox eigen foxit gcc-arm-embedded gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
+    ACTIONS[setup]+="gcc-aarch64-linux-gnu git-lfs gitg-kdiff3 glfw3-gtest-glog "
+    ACTIONS[setup]+="grpc-1.29.1 g++-10 i219-v libev-4.33 mathpix matplotlib-cpp "
+    ACTIONS[setup]+="opencv-2.4.13 opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 "
+    ACTIONS[setup]+="ros-melodic ros2-foxy slack stm32tools sublime typora vim-env "
+    ACTIONS[setup]+="scode vtk-8.2.0 wubi yaml-cpp YouCompleteMe you-complete-me "
     ACTIONS[baidu-netdisk]=" "
     ACTIONS[clang-8.0.0]=" "
     ACTIONS[clang-9.0.0]=" "
@@ -979,22 +1209,27 @@ function _dj()
     ACTIONS[foxit]=" "
     ACTIONS[gcc-arm-embedded]=" "
     ACTIONS[gcc-arm-linux-gnueabi]=" "
+    ACTIONS[gcc-arm-linux-gnueabihf]=" "
+    ACTIONS[gcc-aarch64-linux-gnu]=" "
     ACTIONS[git-lfs]=" "
     ACTIONS[glfw3-gtest-glog]=" "
     ACTIONS[grpc-1.29.1]=" "
     ACTIONS[g++-10]=" "
     ACTIONS[i219-v]="e1000e-3.4.2.1 e1000e-3.4.2.4 "
+    ACTIONS[e1000e-3.4.2.1]=" "
+    ACTIONS[e1000e-3.4.2.4]=" "
     ACTIONS[libev-4.33]=" "
     ACTIONS[mathpix]=" "
     ACTIONS[matplotlib-cpp]=" "
-    ACTIONS[e1000e-3.4.2.1]=" "
-    ACTIONS[e1000e-3.4.2.4]=" "
     ACTIONS[opencv-2.4.13]=" "
     ACTIONS[opencv-4.1.1]="with-contrib no-contrib "
     ACTIONS[with-contrib]=" "
     ACTIONS[no-contrib]=" "
     ACTIONS[pangolin]=" "
     ACTIONS[pip]=" "
+    ACTIONS[qemu]="2.11.1 4.2.0 "
+    ACTIONS[2.11.1]=" "
+    ACTIONS[4.2.0]=" "
     ACTIONS[qt-5.13.1]=" "
     ACTIONS[qt-5.14.2]=" "
     ACTIONS[ros-melodic]="--from-deb-package --from-source "
@@ -1005,10 +1240,13 @@ function _dj()
     ACTIONS[stm32tools]=" "
     ACTIONS[sublime]=" "
     ACTIONS[typora]=" "
+    ACTIONS[vim-env]=" "
     ACTIONS[vscode]=" "
     ACTIONS[vtk-8.2.0]=" "
     ACTIONS[wubi]=" "
     ACTIONS[yaml-cpp]=" "
+    ACTIONS[YouCompleteMe]=" "
+    ACTIONS[you-complete-me]=" "
 
     #---------------------------------------------------------
     #---------------------------------------------------------
@@ -1016,12 +1254,13 @@ function _dj()
     ACTIONS[open]=" "
     #---------------------------------------------------------
     ACTIONS[bitbucket]+=" "
-    # ACTIONS[lib-stm32f4-v2]=" "
     #---------------------------------------------------------
-    ACTIONS[github]+="algorithm-note avr-gcc can-analyzer cpp-practise cv dj-gadgets dj-lib-cpp "
-    ACTIONS[github]+="djtools embedded-debug-gui glfw3 math-for-ml-note matplotlib-cpp opencv-4.1.1 "
-    ACTIONS[github]+="pads-clear-up pangolin robotics-note stl-practise stm32-lib stm32tools tutorials "
-    ACTIONS[github]+="yaml-cpp "
+    # how to make the below reading from a text file??
+    ACTIONS[github]+="algorithm-note avr-gcc can-analyzer cpp-practise cv "
+    ACTIONS[github]+="dj-gadgets dj-lib-cpp djtools embedded-debug-gui "
+    ACTIONS[github]+="glfw3 math-for-ml-note matplotlib-cpp opencv-4.1.1 "
+    ACTIONS[github]+="pads-clear-up pangolin robotics-note stl-practise "
+    ACTIONS[github]+="stm32-lib stm32tools tutorials yaml-cpp "
     ACTIONS[algorithm-note]=" "
     ACTIONS[avr-gcc]=" "
     ACTIONS[can-analyzer]=" "

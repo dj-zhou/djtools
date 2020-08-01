@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # remove the local branches that the upstreams are gone: to test
 # git fetch -p 
@@ -120,7 +120,8 @@ function _repod_branches_list()
 {
     # git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format='%(refname:short)'
     # this is not the latest
-    git for-each-ref --count=10 --sort=committerdate refs/heads/ --format='%(color:green)%(committerdate:short)%(color:reset)|%(color:red)%(objectname:short)%(color:reset)|%(HEAD)%(color:yellow)%(refname:short)%(color:reset) | %(authorname)'
+    git for-each-ref --count=10 --sort=committerdate refs/heads/ \
+        --format='%(color:green)%(committerdate:short)%(color:reset)|%(color:red)%(objectname:short)%(color:reset)|%(HEAD)%(color:yellow)%(refname:short)%(color:reset) | %(authorname)'
     echo -e '\nnot finished yet\n'
 }
 
@@ -131,7 +132,8 @@ function _repod_branches_list_all()
         repod checkout all-branch
     fi
     
-    git for-each-ref --sort=committerdate refs/heads/ --format='%(color:green)%(committerdate:short)%(color:reset)|%(color:red)%(objectname:short)%(color:reset)|%(HEAD)%(color:yellow)%(refname:short)%(color:reset) | %(authorname)'
+    git for-each-ref --sort=committerdate refs/heads/ \
+        --format='%(color:green)%(committerdate:short)%(color:reset)|%(color:red)%(objectname:short)%(color:reset)|%(HEAD)%(color:yellow)%(refname:short)%(color:reset) | %(authorname)'
 }
 
 function _repod_update_help()
@@ -218,14 +220,17 @@ function repod()
 
         if [ $2 = 'bitbucket' ] ; then
             echo " switch to bitbucket"
-            git remote set-url origin https://$bitbucket_username@bitbucket.org/$bitbucket_username/$repo.git
+            git remote set-url origin \
+                https://$bitbucket_username@bitbucket.org/$bitbucket_username/$repo.git
         fi
         if [ $2 = 'github' ] ; then
             echo " switch to github"
-            git remote set-url origin https://$github_username@github.com/$github_username/$repo.git
+            git remote set-url origin \
+                https://$github_username@github.com/$github_username/$repo.git
         fi
         if [ $2 = 'gitee' ] ; then
-            git remote set-url origin https://$gitee_username@gitee.com/$gitee_username/$repo.git
+            git remote set-url origin \
+                https://$gitee_username@gitee.com/$gitee_username/$repo.git
             echo " switch to gitee"
         fi
 

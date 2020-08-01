@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # =============================================================================
 function _coding_help()
@@ -22,12 +22,12 @@ function _coding_clang_format_implement()
     fi
     if [ $1 = 'dj' ] ; then
         echo "copy .clang-format-dj to current folder"
-        cp $djtools_path/.clang-format-dj .clang-format
+        cp $djtools_path/settings/.clang-format-dj .clang-format
         return
     fi
     if [ $1 = 'bg' ] ; then
         echo "copy .clang-format-bg to current folder"
-        cp $djtools_path/.clang-format-bg .clang-format
+        cp $djtools_path/settings/.clang-format-bg .clang-format
         return
     fi
 }
@@ -103,7 +103,7 @@ function _coding()
 
     # All possible first values in command line
     local SERVICES=("
-        -help
+        help
         replace
         clang-format
     ")
@@ -112,8 +112,8 @@ function _coding()
     declare -A ACTIONS
 
     # no space in front or after "="
-    ACTIONS[replace]+="-help "
-    ACTIONS[-help]+=" "
+    ACTIONS[replace]+="help "
+    ACTIONS[help]+=" "
     ACTIONS[clang-format]+="implement show "
     ACTIONS[implement]+="dj bg "
     ACTIONS[dj]+=" "

@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/bin/bash
 
 # =============================================================================
 function _random_wallpaper()
@@ -9,33 +9,35 @@ function _random_wallpaper()
     set -- *
     length=$#
     random_num=$((( $RANDOM % ($length) ) + 1))
-    gsettings set org.gnome.desktop.background picture-uri "file://$wallpaper_folder/${!random_num}"
+    gsettings set org.gnome.desktop.background picture-uri \
+        "file://$wallpaper_folder/${!random_num}"
     
     cd $current_folder
 }
 
 # =============================================================================
-function _random_wallpaper_pickup()
-{
-    _random_wallpaper
-    time_sec=0
-    up_limit=120
-    while true ; do
-        time_sec=$((time_sec+1))
-        if [ "$time_sec" -eq "$up_limit" ] ; then
-            time_sec=0
-            _random_wallpaper
-            sleep 1
-        fi
-        echo $time_sec ": wallpaper_folder :"$wallpaper_folder
-        sleep 5
-    done
-}
+# function _random_wallpaper_pickup()
+# {
+#     _random_wallpaper
+#     time_sec=0
+#     up_limit=120
+#     while true ; do
+#         time_sec=$((time_sec+1))
+#         if [ "$time_sec" -eq "$up_limit" ] ; then
+#             time_sec=0
+#             _random_wallpaper
+#             sleep 1
+#         fi
+#         echo $time_sec ": wallpaper_folder :"$wallpaper_folder
+#         sleep 5
+#     done
+# }
 
 # =============================================================================
 function _ask_to_remove_a_file()
 {
-    gdialog --title 'Remove a File (djtools)' --yesno 'Do you want to remove file "'$1'"?' 9 50
+    gdialog --title 'Remove a File (djtools)' --yesno \
+        'Do you want to remove file "'$1'"?' 9 50
     if [ $? != 0 ] ; then
         gdialog --infobox 'File "'$1'" is NOT removed!' 9 50
     else
@@ -48,7 +50,8 @@ function _ask_to_remove_a_file()
 # =============================================================================
 function _ask_to_remove_a_folder()
 {
-    gdialog --title 'Remove a Folder (djtools)' --yesno 'Do you want to remove folder "'$1'"?' 9 50
+    gdialog --title 'Remove a Folder (djtools)' --yesno \
+        'Do you want to remove folder "'$1'"?' 9 50
     if [ $? != 0 ] ; then
         gdialog --infobox 'Folder "'$1'" is NOT removed!' 9 50
     else
@@ -64,9 +67,11 @@ function _ask_to_execute_cmd()
     echo "command: "$1
     echo -e '\nDo you want to execute command "'${1}'"?\n'
     read answer
-    if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || ($answer = 'No') || ($answer = 'no') ]] ; then
+    if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || \
+        ($answer = 'No') || ($answer = 'no') ]] ; then
         echo 'Command "'$1'" is NOT executed!'
-    elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || ($answer = 'Yes') || ($answer = 'yes') ]] ; then
+    elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || \
+        ($answer = 'Yes') || ($answer = 'yes') ]] ; then
         echo 'Command "'$1'" is going to be executed!'
         $1
     else
@@ -98,7 +103,7 @@ function _write_to_text_file_with_width()
 # =============================================================================
 function _press_enter_to_continue()
 {
-    echo -e '  Press [ENTER] to continue ...'
+    echo -e ' Press [ENTER] to continue ...'
     read answer
     echo $answer
 }
@@ -138,7 +143,6 @@ function _find_argument_after_option()
     # echo "final result = "$arg
     echo $arg
 }
-
 
 # =============================================================================
 # argument 1: the string
