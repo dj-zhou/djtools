@@ -25,6 +25,7 @@ function _touchpad_thinkpad_control() {
 }
 
 # =============================================================================
+# xinput list
 # ⎡ Virtual core pointer                    	id=2	[master pointer  (3)]
 # ⎜   ↳ Virtual core XTEST pointer              	id=4	[slave  pointer  (2)]
 # ⎜   ↳ ASUSTeK Computer Inc. N-KEY Device Consumer Control	id=14	[slave  pointer  (2)]
@@ -44,6 +45,7 @@ function _touchpad_thinkpad_control() {
 #     ↳ Asus WMI hotkeys                        	id=18	[slave  keyboard (3)]
 #     ↳ AT Translated Set 2 keyboard            	id=19	[slave  keyboard (3)]
 #     ↳ ASUSTeK Computer Inc. N-KEY Device Consumer Control	id=20	[slave  keyboard (3)]
+# on Ubuntu 20.04 in a virtual machine, it does not show so many things
 function _touchpad_roc_control() {
     # xinput list | grep TouchPad
     touchpad=$(xinput list | grep Touchpad)
@@ -66,10 +68,11 @@ function _touchpad_roc_control() {
             found_space=1
         fi
     done
+    
     # echo "equal_pos = " $equal_pos
-    # echo "first_space_after_equal = " $first_space_after_equal
-    touchpadID=${touchpad:$equal_pos:$first_space_after_equal-$equal_pos}
-    # echo $touchpadID
+    echo "first_space_after_equal = " $first_space_after_equal
+    touchpadID=${touchpad:$equal_pos:${first_space_after_equal} - ${equal_pos}}
+    echo $touchpadID
     # enable or disable the ROC touchpad
     xinput set-prop $touchpadID "Device Enabled" $1
 }

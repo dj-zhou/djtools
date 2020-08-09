@@ -1,8 +1,17 @@
 #!/bin/bash
 
 # =============================================================================
+# Black        0;30     Dark Gray     1;30
+# Red          0;31     Light Red     1;31
+# Green        0;32     Light Green   1;32
+# Brown/Orange 0;33     Yellow        1;33
+# Blue         0;34     Light Blue    1;34
+# Purple       0;35     Light Purple  1;35
+# Cyan         0;36     Light Cyan    1;36
+# Light Gray   0;37     White         1;37
+
 # color definition
-NO_COLOR='\033[0m' # No Color
+NO_COLOR='\033[0m'
 RED_COLOR='\033[0;31m'
 GREEN_COLOR='\033[0;32m'
 BROWN_COLOR='\033[0;33m'
@@ -18,16 +27,6 @@ LBLUE_COLOR='\033[1;34m'
 LPURPLE_COLOR='\033[1;35m'
 LCYAN_COLOR='\033[1;36m'
 WHITE_COLOR='\033[1;37m'
-
-# =============================================================================
-# Black        0;30     Dark Gray     1;30
-# Red          0;31     Light Red     1;31
-# Green        0;32     Light Green   1;32
-# Brown/Orange 0;33     Yellow        1;33
-# Blue         0;34     Light Blue    1;34
-# Purple       0;35     Light Purple  1;35
-# Cyan         0;36     Light Cyan    1;36
-# Light Gray   0;37     White         1;37
 
 # =============================================================================
 # by doing so, the system can find the whole tooklit
@@ -67,9 +66,6 @@ alias mkae="m"
 alias amke="m"
 alias maek="m"
 alias mc="make clean"
-alias mm="make clean && make -j$(cat /proc/cpuinfo | grep processor | wc -l) && make -j$(cat /proc/cpuinfo | grep processor | wc -l)"
-alias md="make clean && make release -j$(cat /proc/cpuinfo | grep processor | wc -l) && make download"
-alias mdd="make clean && make debug  -j$(cat /proc/cpuinfo | grep processor | wc -l) && make download-debug"
 alias d="djfile"
 alias ccc="clear"
 alias geidt="gedit"
@@ -77,5 +73,4 @@ alias logout="gnome-session-quit"
 alias lock="gnome-screensaver-command -l"
 
 # folder alias ----------------------------------------------
-# dropbox related folders will be removed at a later time
 alias cddj="cd "$djtools_path

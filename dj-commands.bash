@@ -42,7 +42,7 @@ function _clang_vscode_setting_json()
     elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
         json_file="clang-setting-ubuntu-18.04.json"
     elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
-        echo " TODO"
+        json_file="clang-setting-ubuntu-18.04.json"
     fi
     echo "copy json file: "$json_file" to "$folder
     sudo rm -f $folder/settings.json
@@ -59,11 +59,11 @@ function _dj_setup_clang_9_0_0()
 
     echo -e "\n"
     if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
-        echo "  Install clang for Ubuntu 16.04..."
+        echo "  Install clang for Ubuntu 16.04 ..."
     elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
-        echo "  Install clang for Ubuntu 18.04..."
+        echo "  Install clang for Ubuntu 18.04 ..."
     elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
-        echo " TODO"
+        echo " Install clang for Ubuntu 20.04 ..."
     fi
     echo -e "\n"
     _press_enter_to_continue
@@ -75,8 +75,10 @@ function _dj_setup_clang_9_0_0()
         clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04"
     elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
         clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
+    elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
+        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
     fi
-
+    echo "clang_file = "$clang_file
     # check if the file exists --------------------
     unset md5checksum
     if [[ -f $clang_file.tar.xz ]] ; then
@@ -106,6 +108,8 @@ function _dj_setup_clang_9_0_0()
     if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
         cat settings/clang-setting-ubuntu-16.04.json
     elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
+        cat settings/clang-setting-ubuntu-18.04.json
+    elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
         cat settings/clang-setting-ubuntu-18.04.json
     fi
 
@@ -314,20 +318,6 @@ function _dj_setup_qemu()
 }
 
 # =============================================================================
-function _dj_setup_slack()
-{
-    cwd_before_running=$PWD
-    
-    cd ~ && mkdir -p soft && cd soft/
-    # the download page: https://slack.com/downloads/linux
-    wget https://downloads.slack-edge.com/linux_releases/slack-desktop-4.4.3-amd64.deb
-    sudo dpkg -i slack-desktop*.deb
-    _ask_to_remove_a_file slack-desktop*.deb
-
-    cd ${cwd_before_running}
-}
-
-# =============================================================================
 function _dj_setup_stm32tools()
 {
 
@@ -427,6 +417,20 @@ function _dj_setup_glfw3_gtest_glog()
 }
 
 # =============================================================================
+# instlal gnome, need more test
+function _dj_setup_gnome()
+{
+    echo -e "\n install gnome on ubuntu\n"
+    _press_enter_to_continue
+
+    sudo apt-get install tasksel
+    sudo apt-get install gnome-session
+    sudo tasksel install ubuntu-desktop
+    
+    echo -e "\n when log in, choose GNOME\n"
+}
+
+# =============================================================================
 # ninja is used to compile
 function _dj_setup_grpc_1_29_1()
 {
@@ -450,7 +454,7 @@ function _dj_setup_grpc_1_29_1()
 # =============================================================================
 function _dj_setup_gpp_10()
 {
-    echo -e "\n  Installing gcc-10, g++-10"
+    echo -e "\n instal gcc-10, g++-10"
     _press_enter_to_continue
 
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -462,10 +466,10 @@ function _dj_setup_gpp_10()
         echo -e '\n gcc/g++ are not to set to use gcc-10/g++-10\n'
     elif [[ ($anw = 'y') || ($anw = 'Y') || ($anw = 'YES') || ($anw = 'Yes') || ($anw = 'yes') ]] ; then
         echo -e '\n gcc/g++ are set to use gcc-10/g++-10\n'
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 50
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  48
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 50
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7  48
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  7
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7  7
         echo -e "\n-------------------\n"
         sudo update-alternatives --config gcc
         echo -e "\n-------------------\n"
@@ -904,11 +908,6 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'clang-8.0.0' ] ; then
-            _dj_setup_clang_8_0_0
-            return
-        fi
-        # --------------------------
         if [ $2 = 'clang-9.0.0' ] ; then
             _dj_setup_clang_9_0_0
             return
@@ -916,11 +915,6 @@ function dj()
         # --------------------------
         if [ $2 = 'computer' ] ; then
             _dj_setup_computer
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'dj-gadgets' ] ; then
-            _dj_setup_dj_gadgets
             return
         fi
         # --------------------------
@@ -937,6 +931,11 @@ function dj()
                 _dj_setup_container_lxd_4_0
                 return
             fi
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'dj-gadgets' ] ; then
+            _dj_setup_dj_gadgets
             return
         fi
         # --------------------------
@@ -975,10 +974,41 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'git-lfs' ] ; then
+            _dj_setup_git_lfs
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'gitg-kdiff3' ] ; then
+            _dj_setup_gitg_kdiff3
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'glfw3-gtest-glog' ] ; then
+            _dj_setup_glfw3_gtest_glog
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'gnome' ] ; then
+            _dj_setup_gnome
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'grpc-1.29.1' ] ; then
+            _dj_setup_grpc_1_29_1
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'g++-10' ] ; then
+            _dj_setup_gpp_10
+            return
+        fi
+        # --------------------------
         if [ $2 = 'i219-v' ] ; then
             _dj_setup_i219_v $3
             return
         fi
+        # --------------------------
         if [ $2 = 'libev-4.33' ] ; then
             _dj_setup_libev_4_33
             return
@@ -994,33 +1024,18 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'git-lfs' ] ; then
-            _dj_setup_git_lfs
+        if [ $2 = 'opencv-2.4.13' ] ; then
+            _dj_setup_opencv_2_4_13 $3 $4 $5 $6
             return
         fi
         # --------------------------
-        if [ $2 = 'gitg-kdiff3' ] ; then
-            _dj_setup_gitg_kdiff3
+        if [ $2 = 'opencv-4.1.1' ] ; then
+            _dj_setup_opencv_4_1_1 $3 $4 $5 $6
             return
         fi
         # --------------------------
         if [ $2 = 'pangolin' ] ; then
             _dj_setup_pangolin
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'yaml-cpp' ] ; then
-            _dj_setup_yaml_cpp
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'qt-5.13.1' ] ; then
-            _dj_setup_qt_5_13_1
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'qt-5.14.2' ] ; then
-            _dj_setup_qt_5_14_2
             return
         fi
         # --------------------------
@@ -1031,6 +1046,16 @@ function dj()
         # --------------------------
         if [ $2 = 'qemu' ] ; then
             _dj_setup_qemu $3 $4 $5 $6
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'qt-5.13.1' ] ; then
+            _dj_setup_qt_5_13_1
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'qt-5.14.2' ] ; then
+            _dj_setup_qt_5_14_2
             return
         fi
         # --------------------------
@@ -1054,6 +1079,11 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'sublime' ] ; then
+            _dj_setup_sublime
+            return
+        fi
+        # --------------------------
         if [ $2 = 'typora' ] ; then
             _dj_setup_typora
             return
@@ -1064,38 +1094,8 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'YouCompleteMe' ] || [ $2 = 'you-complete-me' ] ; then
-            _dj_setup_you_complete_me
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'glfw3-gtest-glog' ] ; then
-            _dj_setup_glfw3_gtest_glog
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'grpc-1.29.1' ] ; then
-            _dj_setup_grpc_1_29_1
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'g++-10' ] ; then
-            _dj_setup_gpp_10
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'opencv-2.4.13' ] ; then
-            _dj_setup_opencv_2_4_13
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'opencv-4.1.1' ] ; then
-            _dj_setup_opencv_4_1_1
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'wubi' ] ; then
-            _dj_setup_wubi
+        if [ $2 = 'vscode' ] ; then
+            _dj_setup_vscode
             return
         fi
         # --------------------------
@@ -1104,13 +1104,18 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'sublime' ] ; then
-            _dj_setup_sublime
+        if [ $2 = 'wubi' ] ; then
+            _dj_setup_wubi
             return
         fi
         # --------------------------
-        if [ $2 = 'vscode' ] ; then
-            _dj_setup_vscode
+        if [ $2 = 'yaml-cpp' ] ; then
+            _dj_setup_yaml_cpp
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'YouCompleteMe' ] || [ $2 = 'you-complete-me' ] ; then
+            _dj_setup_you_complete_me
             return
         fi
         # --------------------------
@@ -1188,22 +1193,22 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    ACTIONS[setup]+="baidu-netdisk clang-9.0.0 container computer dj-gadgets "
-    ACTIONS[setup]+="dropbox eigen foxit gcc-arm-embedded gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
-    ACTIONS[setup]+="gcc-aarch64-linux-gnu git-lfs gitg-kdiff3 glfw3-gtest-glog "
-    ACTIONS[setup]+="grpc-1.29.1 g++-10 i219-v libev-4.33 mathpix matplotlib-cpp "
-    ACTIONS[setup]+="opencv-2.4.13 opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 "
-    ACTIONS[setup]+="ros-melodic ros2-foxy slack stm32tools sublime typora vim-env "
-    ACTIONS[setup]+="scode vtk-8.2.0 wubi yaml-cpp YouCompleteMe you-complete-me "
+    ACTIONS[setup]+="baidu-netdisk clang-9.0.0 computer container dj-gadgets "
+    ACTIONS[setup]+="dropbox eigen foxit gcc-arm-embedded gcc-arm-linux-gnueabi "
+    ACTIONS[setup]+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
+    ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog gnome grpc-1.29.1 g++-10 i219-v "
+    ACTIONS[setup]+="libev-4.33 mathpix matplotlib-cpp opencv-2.4.13 opencv-4.1.1 "
+    ACTIONS[setup]+="pangolin pip qemu qt-5.13.1 qt-5.14.2 ros-melodic ros2-foxy "
+    ACTIONS[setup]+="slack stm32tools sublime typora vim-env vscode vtk-8.2.0 "
+    ACTIONS[setup]+="wubi yaml-cpp YouCompleteMe you-complete-me "
     ACTIONS[baidu-netdisk]=" "
-    ACTIONS[clang-8.0.0]=" "
     ACTIONS[clang-9.0.0]=" "
     ACTIONS[computer]=" "
-    ACTIONS[dj-gadgets]=" "
     ACTIONS[container]="docker dive lxd-4.0 "
     ACTIONS[docker]=" "
     ACTIONS[dive]=" "
     ACTIONS[lxd-4.0]=" "
+    ACTIONS[dj-gadgets]=" "
     ACTIONS[dropbox]=" "
     ACTIONS[eigen]=" "
     ACTIONS[foxit]=" "
@@ -1212,7 +1217,9 @@ function _dj()
     ACTIONS[gcc-arm-linux-gnueabihf]=" "
     ACTIONS[gcc-aarch64-linux-gnu]=" "
     ACTIONS[git-lfs]=" "
+    ACTIONS[gitg-kdiff3]=" "
     ACTIONS[glfw3-gtest-glog]=" "
+    ACTIONS[gnome]=" "
     ACTIONS[grpc-1.29.1]=" "
     ACTIONS[g++-10]=" "
     ACTIONS[i219-v]="e1000e-3.4.2.1 e1000e-3.4.2.4 "

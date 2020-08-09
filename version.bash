@@ -170,8 +170,9 @@ function version()
             return
         fi
         # ------------------------------
-        if [ $2 = 'arm-linux-gnueabi-gcc' ] ; then
+        if [ $2 = 'arm-linux-gnueabi-gxx' ] ; then
             sudo update-alternatives --config arm-linux-gnueabi-gcc
+            sudo update-alternatives --config arm-linux-gnueabi-g++
             return
         fi
         # ------------------------------
@@ -207,8 +208,8 @@ function _version()
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
-    ACTIONS[check]+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc aarch64-linux-gnu-gcc "
-    ACTIONS[check]+="arm-linux-gnueabihf-g++ "
+    ACTIONS[check]+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc"
+    ACTIONS[check]+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
     ACTIONS[check]+="cmake gcc g++ gnome ubuntu "
     ACTIONS[arm-linux-gnueabi-gcc]=" "
     ACTIONS[arm-linux-gnueabihf-gcc]=" "
@@ -219,7 +220,8 @@ function _version()
     ACTIONS[g++]=" "
     ACTIONS[gnome]=" "
     ACTIONS[ubuntu]=" "
-    ACTIONS[swap]+="gcc g++ arm-linux-gnueabi-gcc arm-linux-gnueabihf-gxx aarch64-linux-gnu-gcc "
+    ACTIONS[swap]+="gcc g++ arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
+    ACTIONS[swap]+="aarch64-linux-gnu-gcc "
 
     
     # ------------------------------------------------------------------------

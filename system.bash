@@ -8,6 +8,8 @@ function _system_help()
     echo '   -- enable '
     echo '   -- disable '
     echo '   -- check '
+    echo '   -- wallpaper '
+    echo '   -- ubuntu-drivers '
     echo -e "   -- MORE IS COMMING\n"
 }
 
@@ -31,7 +33,10 @@ function _system_disable_help()
 function _system_check_help()
 {
     echo -e "\n system check <argument>"
-    echo "   -- temperature : to check CPU temperature"
+    echo "   -- cpu-memory    : to check CPU and memory usage of a PID"
+    echo "   -- nvidia-driver : to check nvidia driver"
+    echo "   -- temperature   : to check CPU temperature"
+    echo "   -- udev-rules    : to check udev rules"
     echo -e "   -- MORE IS COMMING\n"
 }
 
@@ -43,6 +48,23 @@ function _system_disable_program_problem_detected()
     echo -e "/etc/default/apport is revised to\n"
     cat /etc/default/apport
     echo -e '\n'
+}
+
+# =============================================================================
+function _system_check_cpu_memory()
+{
+    if [ $# = 0 ] ; then
+        echo -e "\n system check cpu-memory"
+        echo    "    usage (example): "
+        echo -e "   system check cpu-memory \"./bin/main\"\n"
+        return
+    fi
+    cmd=$1
+    pre_pid=$(ps aux | grep "$cmd" | awk '{print $2}') 
+    final_pid=$(echo $pre_pid | awk '{print $1}')
+    echo -e "[$LRED_COLOR"$final_pid"$NO_COLOR] "$cmd
+    ps -p $final_pid -o %cpu,%mem
+    
 }
 
 # =============================================================================
@@ -147,6 +169,11 @@ function system()
             return
         fi
         # --------------------------
+        if [ $2 = 'cpu-memory' ] ; then
+            _system_check_cpu_memory $3 $4 $5
+            return
+        fi
+        # --------------------------
         if [ $2 = 'temperature' ] ; then
             _system_check_temperature
             return
@@ -212,7 +239,8 @@ function _system()
     ACTIONS[enable]+=" "
     ACTIONS[disable]+="program-problem-detected "
     ACTIONS[program-problem-detected]=" "
-    ACTIONS[check]+="temperature nvidia-driver udev-rules "
+    ACTIONS[check]+="cpu-memory temperature nvidia-driver udev-rules "
+    ACTIONS[cpu-memory]+=" "
     ACTIONS[temperature]+=" "
     ACTIONS[nvidia-driver]+=" "
     ACTIONS[udev-rules]+=" "

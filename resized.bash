@@ -7,7 +7,6 @@
 # wmctrl -R <win>
 # wmctrl -c <win>
 
-    # note 
     # coordinate
     #
     #  o ----------> X

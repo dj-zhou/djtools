@@ -3,7 +3,7 @@
 
 This repo contains some useful scripts for installing software, check daily work, check status on repos, and so on.
 
-Supported system: Ubuntu 16.04/18.04. Note that Ubuntu 16.04 is not fully tested.
+Supported system: Ubuntu 16.04/18.04/20.04. Note that Ubuntu 16.04 is not fully tested, and Ubuntu 20.04 is under test.
 
 The commands in this repo are **tab-completable**. 
 
@@ -82,6 +82,16 @@ eigen             opencv-2.4.13     slack
 foxit             opencv-4.1.1      stm32tools 
 ```
 
+#### `dj ssh`
+
+SSH related commands.
+
+```bash
+dj ssh nopassword user@ip
+```
+
+This command is used to copy the ssh key to a remote computer such that you will no need to enter password every time when ssh to it.
+
 #### `dj udev`
 
 Used to setup some udev for USB to serial ports, and  video capture card.
@@ -142,15 +152,80 @@ coding clang-format show
 
 ### `repod` Commands
 
-TODO
+#### `repod branches`
+
+Branched related commands. For example, to list all local or remote branches:
+
+```bash
+repod branches list-all --local
+repod branches list-all --remote
+```
+
+#### `repod checkout`
+
+Used to checkout all branches:
+
+```bash
+repod checkout all-branch
+```
+
+Todo: when a branch checked out out is older, pull it; when the upstream of a branch checked out is gone, delete it.
+
+#### `repod update`
+
+This command works in a folder that contains multiple repos. It is similar to `dj work-check` command, but gives more information. For example, in `~/workspace`, I run `repod update --all-sub-folders`, the output is (with color):
+
+```text
+----------------------------
+djtools dirty 
+
+----------------------------
+one-third-demo 
+
+----------------------------
+one-third-stm32 
+
+----------------------------
+tutorials dirty 
+```
 
 ### `system` Commands
 
-TODO
+#### `system check`
+
+Used to check some system information. For example, temperature, udev rules, cpu-memory, and so on.
+
+#### `system enable`
+
+Used to enable something, not implemented yet.
+
+#### `system disable`
+
+Used to disable something, for example:
+
+```bash
+system disable program-problem-detected
+```
+
+#### `system wallpaper`
+
+Used to setup the wallpaper:
+
+```bash
+system wallpaper random
+```
+
+This command will leave settings in the `~/.bashrc` file.
 
 ### `yocto` Commands
 
-TODO
+#### `yocto clone`
+
+To clone Yocto related meta data or repos.
+
+#### `yocto flash`
+
+Used to flash the image to the SD card.
 
 ### `zephyr` Commands
 

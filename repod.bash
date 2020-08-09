@@ -141,7 +141,7 @@ function _repod_update_help()
     _repod_help
     _display_section
     echo -e "repod update\n    supported arguments:"
-    echo -e "      --all-sub-forlders\n"
+    echo -e "      --all-sub-folders\n"
 
 }
 # =============================================================================
@@ -248,7 +248,7 @@ function repod()
             _repod_update_help
             return
         fi
-        if [ $2 = '--all-sub-forlders' ] ; then
+        if [ $2 = '--all-sub-folders' ] ; then
             _repod_update_repos_all_folders $3 $4 $5 $6
             return
         fi
@@ -326,8 +326,8 @@ function _repod()
     ACTIONS[list-all]="--local --remote "
     ACTIONS[--local]=" "
     ACTIONS[--remote]=" "
-    ACTIONS[update]+="--all-sub-forlders "
-    ACTIONS[--all-sub-forlders]+=" "
+    ACTIONS[update]+="--all-sub-folders "
+    ACTIONS[--all-sub-folders]+=" "
     
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

@@ -64,8 +64,7 @@ function _terminal_format_user_short_path_no_space() {
 function terminal {
     if [ $# -eq 0 ] ; then
         _terminal_help
-    else 
-        echo -e '\n' >> ~/.bashrc
+    else
         echo '# ===========================================================' >> ~/.bashrc
         echo '# (djtools) terminal format setup' >> ~/.bashrc
         if [ ${1} = 'user@host' ] ; then
@@ -127,6 +126,7 @@ function terminal {
         else
             echo 'terminal: argument not supported.'
         fi
+        echo -e '\n' >> ~/.bashrc
     fi
 }
 

@@ -16,24 +16,6 @@ function _random_wallpaper()
 }
 
 # =============================================================================
-# function _random_wallpaper_pickup()
-# {
-#     _random_wallpaper
-#     time_sec=0
-#     up_limit=120
-#     while true ; do
-#         time_sec=$((time_sec+1))
-#         if [ "$time_sec" -eq "$up_limit" ] ; then
-#             time_sec=0
-#             _random_wallpaper
-#             sleep 1
-#         fi
-#         echo $time_sec ": wallpaper_folder :"$wallpaper_folder
-#         sleep 5
-#     done
-# }
-
-# =============================================================================
 function _ask_to_remove_a_file()
 {
     gdialog --title 'Remove a File (djtools)' --yesno \
