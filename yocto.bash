@@ -3,12 +3,22 @@
 # =============================================================================
 function _yocto_help()
 {
-    echo -e "\n---------------------  yocto ------------------------"
-    echo " Author      : Dingjiang Zhou"
-    echo " Email       : zhoudingjiang@gmail.com "
-    echo " Create Date : June 8th, 2020 "
-    echo "-----------------------------------------------------"
-    echo -e "\n TODO\n"
+    cat << EOM
+
+------------------------------------  yocto -----------------------------------
+   Author      : Dingjiang Zhou
+   Email       : zhoudingjiang@gmail.com
+   Create Date : June 8th, 2020
+-------------------------------------------------------------------------------
+
+  The yocto toolset is to make the Yocto related commands simpler, supported
+  commands:
+     clone   -- to clone some common used repos
+     flash   -- to flash the image into SD card
+     install -- to install Yocto related software
+
+
+EOM
 }
 
 # =============================================================================
@@ -27,7 +37,6 @@ function _yocto_help()
 # mmcblk0     179:0    0   3.6G  0 disk 
 # ├─mmcblk0p1 179:1    0    30M  0 part /media/robot/boot
 # └─mmcblk0p2 179:2    0   2.6G  0 part /media/robot/root
-
 function _yocto_flash()
 {
     # argument check -------------------
@@ -126,6 +135,70 @@ function _yocto_flash()
 }
 
 # =============================================================================
+function _yocto_install_dependencies()
+{
+    sudo apt-get install -y autoconf
+    sudo apt-get install -y automake
+    sudo apt-get install -y bmap-tools
+    sudo apt-get install -y bsdmainutils
+    sudo apt-get install -y build-essential
+    sudo apt-get install -y chrpath
+    sudo apt-get install -y coreutils
+    sudo apt-get install -y cpio
+    sudo apt-get install -y curl
+    sudo apt-get install -y dblatex
+    sudo apt-get install -y debianutils
+    sudo apt-get install -y desktop-file-utils
+    sudo apt-get install -y diffstat
+    sudo apt-get install -y docbook-utils
+    sudo apt-get install -y dosfstools
+    sudo apt-get install -y dos2unix # added due to any error report when bitbake
+    sudo apt-get install -y fop
+    sudo apt-get install -y gawk
+    sudo apt-get install -y gcc
+    sudo apt-get install -y gcc-multilib
+    sudo apt-get install -y git-core
+    sudo apt-get install -y gnupg
+    sudo apt-get install -y groff
+    sudo apt-get install -y g++
+    sudo apt-get install -y iputils-ping
+    sudo apt-get install -y libegl1-mesa
+    sudo apt-get install -y libgl1-mesa-dev
+    sudo apt-get install -y libglib2.0-dev
+    sudo apt-get install -y libglu1-mesa-dev
+    sudo apt-get install -y libsdl1.2-dev
+    sudo apt-get install -y libstdc++-5-dev # unavailable on Ubuntu 20.04
+    sudo apt-get install -y libtool
+    sudo apt-get install -y libx11-dev
+    sudo apt-get install -y libxml-parser-perl
+    sudo apt-get install -y make
+    sudo apt-get install -y mtools
+    sudo apt-get install -y parted
+    sudo apt-get install -y pylint3
+    sudo apt-get install -y python
+    sudo apt-get install -y python-git # unavailable on Ubuntu 20.04
+    sudo apt-get install -y python-gtk2
+    sudo apt-get install -y python-pysqlite2
+    sudo apt-get install -y python3
+    sudo apt-get install -y python3-git
+    sudo apt-get install -y python3-jinja2
+    sudo apt-get install -y python3-pexpect
+    sudo apt-get install -y python3-pip
+    sudo apt-get install -y screen
+    sudo apt-get install -y sed
+    sudo apt-get install -y socat
+    sudo apt-get install -y subversion
+    sudo apt-get install -y texi2html
+    sudo apt-get install -y texinfo
+    sudo apt-get install -y unzip
+    sudo apt-get install -y wget
+    sudo apt-get install -y xmlto
+    sudo apt-get install -y xsltproc
+    sudo apt-get install -y xterm
+    sudo apt-get install -y xz-utils
+}
+
+# =============================================================================
 function yocto()
 {
     current_folder=${PWD}
@@ -141,13 +214,25 @@ function yocto()
         dj clone github $2 $3 $4 $5 $6 $7 $8
         return
     fi
-
     # ------------------------------
     if [ $1 = 'flash' ] ; then
         _yocto_flash $2 $3 $4 $5 $6 $7 $8
         return
     fi
-    echo -e '\r\nyocto : "'$1 '"command not supported\r\n'
+    # ------------------------------
+    if [ $1 = 'install' ] ; then
+        if [ $# = 1 ] ; then
+            _yocto_help
+            return
+        fi
+        if [ $2 = 'dependencies' ] ; then
+            _yocto_install_dependencies $3 $4 $5 $6 $7
+            return
+        fi
+        echo -e "\n yocto install: $2 command not supported\n"
+        return
+    fi
+    echo -e '\n yocto : "'$1 '"command not supported\n'
     _yocto_help
 
     # ------------------------------
@@ -164,6 +249,7 @@ function _yocto()
     local SERVICES=("
         clone
         flash
+        install
     ")
 
     # declare an associative array for options
@@ -178,6 +264,8 @@ function _yocto()
     ACTIONS[flash]="cl-som-imx7 raspberry-pi-4 "
     ACTIONS[cl-som-imx7]=" "
     ACTIONS[raspberry-pi-4]=" "
+    ACTIONS[install]+="dependencies "
+    ACTIONS[dependencies]=" "
     
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

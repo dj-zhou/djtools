@@ -42,7 +42,7 @@ _resize_embedded()
 {
     # ---------------------------------------------------------------
     # get the real screen size
-    SCREENSIZE=$(xrandr |grep '*')
+    SCREENSIZE=$(xrandr | grep '*')
     current_folder=$(pwd | xargs -n1 basename)
     # vs_code_window=${current_folder}"Visual Studio Code" # did not work!
     vs_code_window="Visual Studio Code"

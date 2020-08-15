@@ -17,7 +17,7 @@ function _terminal_format_user_host_full_path() {
 }
 
 function _terminal_format_user_host_short_path() {
-    export PS1='${debian_chroot:+($debian_chroot)}\[\033[02;40m\]\u@\h\[\033[00m\]: \[\033[01;36m\]\W\[\033[00m\] $ '
+    export PS1='${debian_chroot:+($debian_chroot)}\[\033[01;40m\]\u\[\033[01;33m\]@\[\033[01;34m\]\h\[\033[00m\]: \[\033[01;36m\]\W\[\033[00m\] $ '
 }
 
 function _terminal_format_host_full_path() {

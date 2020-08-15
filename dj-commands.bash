@@ -27,27 +27,108 @@ function _dj_help()
     echo -e "\n"
 }
 
-# =============================================================================
-function _clang_vscode_setting_json()
-{
+function _clang_write_to_file_part1() {
+    file=$1
+    echo '{'                                            >> ${file}
+    echo '    "files.hotExit": "onExit",'               >> ${file}
+    echo '    "editor.tabSize": 4,'                     >> ${file}
+    echo '    "workbench.editor.enablePreview": false,' >> ${file}
+    echo '    "C_Cpp.updateChannel": "Insiders",'       >> ${file}
+    echo '    "editor.detectIndentation": false,'       >> ${file}
+    echo '    "files.autoSave": "afterDelay",'          >> ${file}
+    echo '    "workbench.iconTheme": "vscode-icons",'   >> ${file}
+    echo '    "editor.fontSize": 16,'                   >> ${file}
+    echo '    "cSpell.enabledLanguageIds": ['           >> ${file}
+    echo '        "asciidoc",'                          >> ${file}
+    echo '        "c",'                                 >> ${file}
+    echo '        "cpp",'                               >> ${file}
+    echo '        "csharp",'                            >> ${file}
+    echo '        "css",'                               >> ${file}
+    echo '        "git-commit",'                        >> ${file}
+    echo '        "go",'                                >> ${file}
+    echo '        "handlebars",'                        >> ${file}
+    echo '        "haskell",'                           >> ${file}
+    echo '        "html",'                              >> ${file}
+    echo '        "jade",'                              >> ${file}
+    echo '        "java",'                              >> ${file}
+    echo '        "javascript",'                        >> ${file}
+    echo '        "javascriptreact",'                   >> ${file}
+    echo '        "json",'                              >> ${file}
+    echo '        "jsonc",'                             >> ${file}
+    echo '        "less",'                              >> ${file}
+    echo '        "markdown",'                          >> ${file}
+    echo '        "php",'                               >> ${file}
+    echo '        "plaintext",'                         >> ${file}
+    echo '        "pug",'                               >> ${file}
+    echo '        "python",'                            >> ${file}
+    echo '        "restructuredtext",'                  >> ${file}
+    echo '        "rust",'                              >> ${file}
+    echo '        "scala",'                             >> ${file}
+    echo '        "scss",'                              >> ${file}
+    echo '        "text",'                              >> ${file}
+    echo '        "typescript",'                        >> ${file}
+    echo '        "typescriptreact",'                   >> ${file}
+    echo '        "yaml",'                              >> ${file}
+    echo '        "yml"'                                >> ${file}
+    echo '    ],'                                       >> ${file}
+    echo '    "[cpp]": {'                               >> ${file}
+    echo '        "editor.defaultFormatter": "ms-vscode.cpptools"' >> ${file}
+    echo '    },'                                       >> ${file}
+    echo '    "Clang_format_style": "file",'            >> ${file}
+    echo '    "clang-format.assumeFilename": "~/.config/Code/User/.clang-format",' >> ${file}
+}
+
+function _clang_write_to_file_part2_clang_version() {
     # echo "hello world"
+    file=$1
+    if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
+        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04/bin"
+    fi
+    if [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
+        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04/bin"
+    fi
+    if [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
+        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04/bin"
+    fi
+    string1="\"C_Cpp.clang_format_path\": \"${clang_file_path}/clang-format\""
+    string2="\"clang.executable\": \"${clang_file_path}/clang\""
+    # echo "$string1"
+    # echo "$string2"
+    echo "    $string1," >> ${file}
+    echo "    $string2," >> ${file}
+}
+
+function _clang_write_to_file_part3_format_on_save() {
+    file=$1
+    save_or_not=$2
+    if [ $save_or_not = 'true' ] ; then
+        echo '    "editor.formatOnSave": true,'  >> ${file}
+    elif [ $save_or_not = 'false' ] ; then
+        echo '    "editor.formatOnSave": false,' >> ${file}
+    fi
+}
+
+function _clang_write_to_file_partN() {
+    file=$1
+    echo '}' >> ${file}
+}
+
+# =============================================================================
+function _clang_vscode_setting_json_format_on_save()
+{
+    format_on_save=$1
     current_folder_json=${PWD}
-    cd $djtools_path # otherwise there will be no copy
+    # cd $djtools_path # otherwise there will be no copy
     # pwd
     folder="/home/$USER/.config/Code/User"
     mkdir -p $folder
 
-    if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
-        json_file="clang-setting-ubuntu-16.04.json"
-    elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
-        json_file="clang-setting-ubuntu-18.04.json"
-    elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
-        json_file="clang-setting-ubuntu-18.04.json"
-    fi
-    echo "copy json file: "$json_file" to "$folder
-    sudo rm -f $folder/settings.json
-    cp settings/$json_file $folder/settings.json
-    cp settings/.clang-format-dj $folder/.clang-format
+    target_file=$folder/settings.json
+    sudo rm -f $target_file
+    _clang_write_to_file_part1 $target_file
+    _clang_write_to_file_part2_clang_version $target_file
+    _clang_write_to_file_part3_format_on_save $target_file "$format_on_save"
+    _clang_write_to_file_partN $target_file
 
     cd $current_folder_json
 }
@@ -105,22 +186,15 @@ function _dj_setup_clang_9_0_0()
 
     cd $djtools_path
 
-    if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
-        cat settings/clang-setting-ubuntu-16.04.json
-    elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
-        cat settings/clang-setting-ubuntu-18.04.json
-    elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
-        cat settings/clang-setting-ubuntu-18.04.json
-    fi
-
-    echo -e "\nDo you want to apply the above settings? [Yes/No]\n"
-
+    echo -e "\nDo you want to apply the default vscode settings? [Yes/No]\n"
     read asw
     
-    if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || ($asw = 'No') || ($asw = 'no') ]] ; then
+    if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') \
+      || ($asw = 'No') || ($asw = 'no') ]] ; then
         echo "You can edit ~/.config/Code/User/settings.json manually."
-    elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || ($asw = 'Yes') || ($asw = 'yes') ]] ; then
-        _clang_vscode_setting_json
+    elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') \
+       || ($asw = 'Yes') || ($asw = 'yes') ]] ; then
+        _clang_vscode_setting_json_format_on_save "true"
     else
         echo "wrong answer, not setting applied!"
         echo "You can edit ~/.config/Code/User/settings.json manually."
@@ -191,6 +265,10 @@ function _dj_setup_container_docker()
     else
         echo 'The user '${USER}' is NOT in the docker group'
     fi
+    
+    # to solve a problem: dial unix /var/run/docker.sock: connect: permission denied
+    sudo chmod 666 /var/run/docker.sock
+    
     # ----------------------------------------------
     cd $current_folder
 }
@@ -205,7 +283,8 @@ function _dj_setup_container_dive()
     # ----------------------------------------------
     cd ~ && mkdir -p soft/ &&  cd soft/
     dive_version="0.9.2"
-    wget "https://github.com/wagoodman/dive/releases/download/v"$dive_version"/dive_"$dive_version"_linux_amd64.deb"
+    drive_url="https://github.com/wagoodman/dive/releases/download/v"
+    wget $drive_url$dive_version"/dive_"$dive_version"_linux_amd64.deb"
     sudo dpkg -i dive_*.deb
     _ask_to_remove_a_file dive_*.deb
 
@@ -392,7 +471,7 @@ function _dj_setup_glfw3_gtest_glog()
     cd ~ && mkdir -p soft && cd soft/
 
     # glfw3
-    sudo apt-get -y install build-essential cmake git xorg-dev libglu1-mesa-dev -y
+    sudo apt-get -y install build-essential cmake git xorg-dev libglu1-mesa-dev
     sudo rm -rf glfw3/
     git clone https://github.com/dj-zhou/glfw3.git
     cd glfw3/
@@ -462,9 +541,11 @@ function _dj_setup_gpp_10()
     sudo apt install -y gcc-10 g++-10
     echo -e "\n do you want to set up the default gcc/g++?? [Yes/No]"
     read anw
-    if [[ ($anw = 'n') || ($anw = 'N') || ($anw = 'NO') || ($anw = 'No') || ($anw = 'no') ]] ; then
+    if [[ ($anw = 'n') || ($anw = 'N') || ($anw = 'NO') \
+      || ($anw = 'No') || ($anw = 'no') ]] ; then
         echo -e '\n gcc/g++ are not to set to use gcc-10/g++-10\n'
-    elif [[ ($anw = 'y') || ($anw = 'Y') || ($anw = 'YES') || ($anw = 'Yes') || ($anw = 'yes') ]] ; then
+    elif [[ ($anw = 'y') || ($anw = 'Y') || ($anw = 'YES') \
+       || ($anw = 'Yes') || ($anw = 'yes') ]] ; then
         echo -e '\n gcc/g++ are set to use gcc-10/g++-10\n'
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  7
@@ -584,6 +665,7 @@ function _dj_setup_opencv_4_1_1()
 
 # =============================================================================
 # https://www.linuxbabe.com/desktop-linux/how-to-install-chinese-wubi-input-method-on-debian-8-gnome-desktop
+# tested on Ubuntu 16.04, 18.04 and 20.04
 function _dj_setup_wubi()
 {
     cwd_before_running=$PWD
@@ -601,7 +683,8 @@ function _dj_setup_wubi()
         echo "  Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chise (WuBi-Jidian-86-JiShuang-6.0) "
         echo "  use Windows Key (or named Super Key) + Space to switch the two input methods"
         echo -e "\n"
-    elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
+    elif [[ ${ubuntu_release_version} = *'18.04'* \
+        || ${ubuntu_release_version} = *'20.04'* ]] ; then
         echo -e "\n"
         echo " pleaase follow the link below to finish the setup"
         echo " https://www.pinyinjoe.com/linux/ubuntu-18-gnome-chinese-setup.htm"
@@ -1014,6 +1097,11 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'lib-serialport' ] ; then
+            _dj_setup_libserialport
+            return
+        fi
+        # --------------------------
         if [ $2 = 'mathpix' ] ; then
             _dj_setup_mathpix
             return
@@ -1074,6 +1162,11 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'spdlog' ] ; then
+            _dj_setup_spdlog $3
+            return
+        fi
+        # --------------------------
         if [ $2 = 'stm32tools' ] ; then
             _dj_setup_stm32tools
             return
@@ -1109,8 +1202,8 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'yaml-cpp' ] ; then
-            _dj_setup_yaml_cpp
+        if [ $2 = 'lib-yamlcpp' ] ; then
+            _dj_setup_yaml_cpp $3
             return
         fi
         # --------------------------
@@ -1197,10 +1290,10 @@ function _dj()
     ACTIONS[setup]+="dropbox eigen foxit gcc-arm-embedded gcc-arm-linux-gnueabi "
     ACTIONS[setup]+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
     ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog gnome grpc-1.29.1 g++-10 i219-v "
-    ACTIONS[setup]+="libev-4.33 mathpix matplotlib-cpp opencv-2.4.13 opencv-4.1.1 "
-    ACTIONS[setup]+="pangolin pip qemu qt-5.13.1 qt-5.14.2 ros-melodic ros2-foxy "
-    ACTIONS[setup]+="slack stm32tools sublime typora vim-env vscode vtk-8.2.0 "
-    ACTIONS[setup]+="wubi yaml-cpp YouCompleteMe you-complete-me "
+    ACTIONS[setup]+="libev-4.33 lib-serialport mathpix matplotlib-cpp opencv-2.4.13 "
+    ACTIONS[setup]+="opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 ros-melodic "
+    ACTIONS[setup]+="ros2-foxy spdlog slack stm32tools sublime typora vim-env vscode "
+    ACTIONS[setup]+="vtk-8.2.0 wubi lib-yamlcpp YouCompleteMe you-complete-me "
     ACTIONS[baidu-netdisk]=" "
     ACTIONS[clang-9.0.0]=" "
     ACTIONS[computer]=" "
@@ -1226,6 +1319,7 @@ function _dj()
     ACTIONS[e1000e-3.4.2.1]=" "
     ACTIONS[e1000e-3.4.2.4]=" "
     ACTIONS[libev-4.33]=" "
+    ACTIONS[lib-serialport]=" "
     ACTIONS[mathpix]=" "
     ACTIONS[matplotlib-cpp]=" "
     ACTIONS[opencv-2.4.13]=" "
@@ -1243,6 +1337,9 @@ function _dj()
     ACTIONS[ros2-foxy]="--from-deb-package --from-source "
     ACTIONS[--from-deb-package]=" "
     ACTIONS[--from-source]=" "
+    ACTIONS[spdlog]="static shared "
+    ACTIONS[static]=" "
+    ACTIONS[shared]=" "
     ACTIONS[slack]=" "
     ACTIONS[stm32tools]=" "
     ACTIONS[sublime]=" "
@@ -1251,7 +1348,7 @@ function _dj()
     ACTIONS[vscode]=" "
     ACTIONS[vtk-8.2.0]=" "
     ACTIONS[wubi]=" "
-    ACTIONS[yaml-cpp]=" "
+    ACTIONS[lib-yamlcpp]="static shared "
     ACTIONS[YouCompleteMe]=" "
     ACTIONS[you-complete-me]=" "
 

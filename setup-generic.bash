@@ -172,13 +172,13 @@ function _dj_setup_eigen()
     current_folder=${PWD}
 
     sudo apt-get install libeigen3-dev -y
+    echo -e "\n sudo updatedb\n this may take a few minutes\n"
     sudo updatedb
     # locate eigen3
     echo -e "\n eigen is installed in: /usr/include/eigen3\n"
 
     cd $current_folder
 }
-
 
 # =============================================================================
 function _dj_setup_foxit_reader()
@@ -424,6 +424,8 @@ function _dj_setup_i219_v()
 #   /usr/lib/x86_64-linux-gnu/
 # install from the source, will have the libev installed into
 #  /usr/local/lib
+# this setup works only for the host computer, don't know how to do it for cross
+# compilers
 function _dj_setup_libev_4_33()
 {
     current_folder=${PWD}
@@ -452,6 +454,42 @@ function _dj_setup_libev_4_33()
     _ask_to_remove_a_folder $file
     _ask_to_remove_a_file $file.tar.gz
 
+    cd $current_folder
+}
+
+# =============================================================================
+function _dj_setup_libserialport()
+{
+    current_folder=${PWD}
+
+    cd ~ && mkdir -p soft/ &&  cd soft/
+
+    sudo rm -rf libserialport/
+    git clone git://sigrok.org/libserialport.git
+    
+    cd libserialport
+    ./autogen.sh
+    ./configure
+    make
+    sudo make install
+
+    cat << EOM
+
+    --------------------------------------------
+    the library is installed:
+        /usr/local/lib/libserialport.la
+        /usr/local/lib/libserialport.so
+    
+    the header is:
+        /usr/local/include/libserialport.h
+
+    example code:
+        TODO
+
+EOM
+    cd ~/soft/
+    _ask_to_remove_a_folder libserialport/
+    
     cd $current_folder
 }
 
@@ -589,6 +627,40 @@ function _dj_setup_slack()
 }
 
 # =============================================================================
+function _dj_setup_spdlog()
+{
+    static_shared=$1
+    cwd_before_running=$PWD
+    
+    cd ~ && mkdir -p soft && cd soft/
+    sudo rm -rf spdlog
+
+    git clone https://github.com/gabime/spdlog.git
+    cd spdlog && mkdir build && cd build
+    if [ $static_shared = 'static' ] ; then
+        cmake .. -DSPDLOG_BUILD_SHARED="off"
+    elif [ $static_shared = 'shared' ] ; then
+        cmake .. -DSPDLOG_BUILD_SHARED="on"
+    fi
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    sudo make install
+    
+    if [ $static_shared = 'static' ] ; then
+        echo -e "\n ---------------------------------------\n"
+        echo    " spdlog is installed statically: "
+        echo -e "     /usr/local/lib/libspdlog.a\n"
+    elif [ $static_shared = 'shared' ] ; then
+        echo -e "\n ---------------------------------------\n"
+        echo    " spdlog is installed sharedally: "
+        echo -e "     /usr/local/lib/libspdlog.so\n"
+        echo -e " you can run \"sudo ldconfig\" before running programs\n"
+    fi
+    _ask_to_remove_a_folder spdlog
+
+    cd ${cwd_before_running}
+}
+
+# =============================================================================
 function _dj_setup_sublime()
 {
     current_folder=${PWD}
@@ -657,33 +729,41 @@ function _dj_setup_vscode()
 #   /usr/local/lib/libyaml-cpp.a
 # apt-get will install it to
 #  /usr/lib/ -----not tested yet!
+# shared library build seems not working!
 function _dj_setup_yaml_cpp()
 {
+    static_or_shared=$1
     cwd_before_running=$PWD
 
-    # cd ~ && mkdir -p soft/ &&  cd soft/
-    # git clone https://dj-zhou@github.com/dj-zhou/yaml-cpp.git
-    # cd yaml-cpp
-    # sudo rm -rf build/ && mkdir build
-    # cd build && cmake -DYAML_BUILD_SHARED_LIBS=ON ..
-    # make -j$(cat /proc/cpuinfo | grep processor | wc -l)
-    # sudo make install
+    cd ~ && mkdir -p soft/ &&  cd soft/
+    sudo rm yaml-cpp -rf
+    git clone https://dj-zhou@github.com/dj-zhou/yaml-cpp.git
+    cd yaml-cpp
+    sudo rm -rf build/ && mkdir build && cd build
+    if [ $static_or_shared = 'static' ] ; then
+        cmake .. -DYAML_BUILD_SHARED_LIBS="off"
+    elif [ $static_or_shared = 'shared' ] ; then
+        cmake .. -DYAML_BUILD_SHARED_LIBS="on"
+    fi
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    sudo make install
 
-    # echo " "
-    # echo "libyaml-cpp.a is installed in /usr/local/lib/"
-    # echo "header files are installed in /usr/local/include/yaml-cpp/"
-    # echo " "
+    echo " "
+    echo "libyaml-cpp.a is installed in /usr/local/lib/"
+    echo "header files are installed in /usr/local/include/yaml-cpp/"
+    echo " "
 
-    # _ask_to_remove_a_folder yaml-cpp/
+    _ask_to_remove_a_folder yaml-cpp/
 
-    # a better way to install it
-    sudo apt-get update
-    sudo apt-get install libyaml-cpp-dev -y
+    # ---------------------------------------------
+    # # a better way to install it
+    # sudo apt-get update
+    # sudo apt-get install libyaml-cpp-dev -y
 
-    # to show the version
-    sudo apt show libyaml-cpp-dev
+    # # to show the version
+    # sudo apt show libyaml-cpp-dev
 
-    echo -e '\n if the version is NOT 0.5.2, it may have some problem.\n'
+    # echo -e '\n if the version is NOT 0.5.2, it may have some problem.\n'
 
     cd ${cwd_before_running}
 }

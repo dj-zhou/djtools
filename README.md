@@ -106,7 +106,7 @@ Used to check if the repositories have been pushed, for example, the following c
 dj work-check .
 ```
 
-will check all the folders (possibly repositories) in the current folder (`.`), and tell if the repo is <span style="color:red">dirty</span>,  <span style="color:cyan">ahead</span> or <span style="color:blue">ahead</span>. Meanwhile, it will write those information: commit time, source (github/bitbuckekt/gitee, etc), status (dirty/ahead/behind), branch name, the tag, commit value, commit message, to a text file in the home directory. For example: `work-check-dj-dell-20200709-121415.txt`.
+will check all the folders (possibly repositories) in the current folder (`.`), and tell if the repo is <span style="color:red">dirty</span>,  <span style="color:cyan">ahead</span> or <span style="color:blue">ahead</span>. Meanwhile, it will write those information: commit time, source (github/bitbucket/gitee, etc), status (dirty/ahead/behind), branch name, the tag, commit value, commit message, to a text file in the home directory. For example: `work-check-dj-dell-20200709-121415.txt`.
 
 It is recommended to run this command to see if there is some work have not been finished, committed or pushed.
 

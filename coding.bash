@@ -7,10 +7,10 @@ function _coding_help()
     echo ' exmaple command 1:'
     echo ' code replace <original> <new> .'
     echo '     - to replace the text content of <original> to <new> in the current folder '
-    echo -e'\n exmaple command 2:'
+    echo -e '\n exmaple command 2:'
     echo ' code replace <original> <new> <path to file>'
     echo '     - to replace the text content of <original> to <new> in the file <path to file> '
-    echo -e'\n'
+    echo -e '\n'
 }
 
 # =============================================================================
@@ -35,24 +35,28 @@ function _coding_clang_format_implement()
 # =============================================================================
 function _coding_clang_format_show()
 {
-    echo -e '\n               clang format naming conventions'
-    echo " +-----------------------------------------------------------+"
-    echo " |          Code Element | Stype                             |"
-    echo " +-----------------------------------------------------------+"
-    echo " |             Namespace | under_scored                      |"
-    echo " |            Class name | CamelCase                         |"
-    echo " |         Function name | camelCase                         |"
-    echo " |     Parameters/Locals | under_scored                      |"
-    echo " |      Member Variables | under_socred_with_                |"
-    echo " | Enums and its mumbers | CamelCase                         |"
-    echo " |               Globals | g_under_scored                    |"
-    echo " |             Constants | UPPER_CASE                        |"
-    echo " |            File names | Match the case of the class name  |"
-    echo " +-----------------------------------------------------------+"
-    echo -e "\n"
-    echo -e "If you want to use Hungarian notation, refer to this page:\n"
-    echo -e "  http://web.mst.edu/~cpp/common/hungarian.html\n"
-    echo -e "However, this is not encouraged\n"
+    cat << EOM
+
+                  clang format naming conventions
+ +-----------------------------------------------------------+
+ |          Code Element | Stype                             |
+ +-----------------------------------------------------------+
+ |             Namespace | under_scored                      |
+ |            Class name | CamelCase                         |
+ |         Function name | camelCase                         |
+ |     Parameters/Locals | under_scored                      |
+ |      Member Variables | under_socred_with_                |
+ | Enums and its mumbers | CamelCase                         |
+ |               Globals | g_under_scored                    |
+ |             Constants | UPPER_CASE                        |
+ |            File names | Match the case of the class name  |
+ +-----------------------------------------------------------+
+
+If you want to use Hungarian notation, refer to this page:
+    http://web.mst.edu/~cpp/common/hungarian.html
+
+  However, this is not encouraged
+EOM
 }
 
 # =============================================================================
@@ -87,6 +91,14 @@ function coding()
             _coding_clang_format_show $3 $4 $5 $6 $7
             return
         fi
+        if [ $2 = 'enable' ] ; then
+            _clang_vscode_setting_json_format_on_save "true"
+            return
+        fi
+        if [ $2 = 'disable' ] ; then
+            _clang_vscode_setting_json_format_on_save "false"
+            return
+        fi
         _coding_help
         return
     else
@@ -114,11 +126,12 @@ function _coding()
     # no space in front or after "="
     ACTIONS[replace]+="help "
     ACTIONS[help]+=" "
-    ACTIONS[clang-format]+="implement show "
+    ACTIONS[clang-format]+="implement show enable disable "
     ACTIONS[implement]+="dj bg "
     ACTIONS[dj]+=" "
     ACTIONS[bg]+=" "
-    ACTIONS[show]+=" "
+    ACTIONS[enable]+=" "
+    ACTIONS[disable]+=" "
     
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
