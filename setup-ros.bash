@@ -6,7 +6,7 @@ function _dj_setup_ros_melodic()
     cwd_before_running=$PWD
 
     # only Uubntu 18.04 can install ros-melodic
-    if [[ $ubuntu_release_version != *'Ubuntu 18.04'* ]] ; then
+    if [[ $ubuntu_v != *'Ubuntu 18.04'* ]] ; then
         echo -e "\nROS Melodic can only be installed on Ubuntu 18.04\n"
         return
     fi
@@ -62,7 +62,7 @@ function _dj_setup_ros2_foxy_from_deb_package()
     cwd_before_running=$PWD
 
     # only Uubntu 20.04 can install ros2 Foxy Fitzroy
-    if [[ $ubuntu_release_version != *'Ubuntu 20.04'* ]] ; then
+    if [[ $ubuntu_v != *'Ubuntu 20.04'* ]] ; then
         echo -e "\n ROS2 Foxy Fitzroy can only be installed on Ubuntu 20.04\n"
         return
     fi

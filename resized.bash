@@ -89,6 +89,14 @@ _resize_embedded()
         wmctrl -r "Sublime Text" -e 0,2830,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,2720,0,1120,1050
         return
+    elif [[ "$SCREENSIZE" = *"2560x1440"*"1920x1080"* ]]; then
+        echo "resized embedded: 2560x1440 + 1920x1080 screens"
+        #                   none, x,     y,   width,   height
+        wmctrl -r "/bin/bash" -e 0,10,0,1000,1380
+        wmctrl -r "eclipse" -e 0,1530,0,1200,1380
+        wmctrl -r "Sublime Text" -e 0,810,0,800,1380
+        wmctrl -r ${vs_code_window} -e 0,1020,0,1530,1380
+        return
     elif [[ "$SCREENSIZE" = *"1920x1080"* ]]; then
         echo "resized embedded: Single 1920x1080 screen"
         #                   none, x,     y,   width,   height
@@ -98,7 +106,7 @@ _resize_embedded()
         wmctrl -r ${vs_code_window} -e 0,600,0,1340,1080
         return
     elif [[ "$SCREENSIZE" = *"1920x994"* ]]; then
-        echo "resized embedded: Single 1920x994 screen (in VMware)"
+        echo "resized embedded: Single 1920x994 screen (in VMware, non fullscreen mode)"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,800,930
         wmctrl -r "Sublime Text" -e 0,1030,0,1500,1000
@@ -296,7 +304,7 @@ _resize_typora()
         wmctrl -r "Typora" -e 0,730,0,1200,1080
         wmctrl -R "Typora"
     elif [[ "$SCREENSIZE" = *"1920x994"* ]]; then
-        echo "resized embedded: Single 1920x994 screen (in VMware)"
+        echo "resized embedded: Single 1920x994 screen (in VMware, non fullscreen mode)"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,800,930
         wmctrl -r "Typora" -e 0,730,0,1200,930

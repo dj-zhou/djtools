@@ -62,7 +62,7 @@ function _system_check_cpu_memory()
     cmd=$1
     pre_pid=$(ps aux | grep "$cmd" | awk '{print $2}') 
     final_pid=$(echo $pre_pid | awk '{print $1}')
-    echo -e "[$LRED_COLOR"$final_pid"$NO_COLOR] "$cmd
+    echo -e "[$LRED"$final_pid"$NOC] "$cmd
     ps -p $final_pid -o %cpu,%mem
     
 }

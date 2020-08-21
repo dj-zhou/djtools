@@ -16,7 +16,7 @@ function _zephyr_help()
 
 # =============================================================================
 # $1: zephyr project folder, the default is ~/zephyr-project
-function _zephyr_setup_sdk_0_11_3()
+function _zephyr_setup_sdk_0_11_4()
 {
     current_folder=${PWD}
 
@@ -30,9 +30,10 @@ function _zephyr_setup_sdk_0_11_3()
 
     # install CMakie 3.17.3 (Ubuntu 18.04.4 LTS)
     wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
-    sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
-    sudo apt-get update
-    sudo apt-get install cmake -y
+    sudo sh -c 'echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" >> /etc/apt/sources.list.d/kitware-latest.list'
+
+    sudo apt-get -y update
+    sudo apt-get -y install cmake
 
     # install west
     pip3 install --user -U west
@@ -49,7 +50,7 @@ function _zephyr_setup_sdk_0_11_3()
         echo -e '\n' >>~/.bashrc
         echo '# ===========================================================' >>~/.bashrc
         echo '# (djtools) zephyr setup: west' >> ~/.bashrc
-        echo 'export PATH=~/.local/bin:"$PATH"' >> ~/.bashrc
+        echo 'export PATH=~/.local/bin:$PATH' >> ~/.bashrc
     fi
 
     # use west to get Zephyr source code
@@ -121,7 +122,7 @@ function _zephyr_setup_sdk_0_11_3()
     #install the toolchain ---------------------------------
     cd ~ && mkdir -p soft/ &&  cd soft/
 
-    sdk_ver="0.11.3"
+    sdk_ver="0.11.4"
     zephyr_sdk=zephyr-sdk-$sdk_ver-setup.run
     if [[ -f $zephyr_sdk ]] ; then
         md5checksum=`md5sum $zephyr_sdk`
@@ -130,7 +131,8 @@ function _zephyr_setup_sdk_0_11_3()
     if [[ "$md5checksum" = *"15e003c49acc282c95cdf7543023f53d"* ]] ; then
         echo "file exists, no need to download again"
     else
-        wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v$sdk_ver/$zephyr_sdk
+        sdk_rul=https://github.com/zephyrproject-rtos/sdk-ng/releases
+        wget $sdk_rul/download/v$sdk_ver/$zephyr_sdk
     fi
     chmod +x $zephyr_sdk
 
@@ -245,8 +247,11 @@ function _zephyr_build_help()
 # update:
 # if there is no build folder, must use -b option and assign a build target board
 # if there is a build folder: 1) if no -b option used, then just build; 2) if -b
-# option is used, then ALWAYS delete the build folder and rebuild from scratch 
-function _zephyr_build()
+# option is used, then ALWAYS delete the build folder and rebuild from scratch
+
+# the old fucntion has some problem due to environment setup, keep it until it is 
+# solved
+function _zephyr_build_old()
 {
     if [ $# = 0 ] ; then
         if [ -d build ] ; then
@@ -268,37 +273,140 @@ function _zephyr_build()
 }
 
 # =============================================================================
+# echo -e "\nTry the following commands to verify installation"
+#     echo -e "  cd $zephyr_proj_folder/zephyr/"
+#     echo -e "  west build -p auto -b nucleo_f767zi samples/basic/blinky\n"
+# the new build function: copy everything into $zephyr_proj_folder/zephyr/
+# $1: -b
+# $2: board
+function _zephyr_build_new1()
+{
+    board=$(_find_argument_after_option -b $1 $2 $3 $4 $5 $6 $7 $8)
+    if [ -z $ZEPHYR_PROJECT_PATH ] ; then
+        echo -e "\n ZEPHYR_PROJECT_PATH is not set, exit.\n"
+    fi
+    project_path=${PWD}
+    project_name=`basename "$project_path"`
+    echo "project_path = "$project_path
+    echo "project_name = "$project_name
+    
+    # remove build in current project path -----
+    rm -rf build
+
+    # copy source file to zephyr project path ------
+    rm -rf $ZEPHYR_PROJECT_PATH/zephyr/$project_name
+    cp -rf $project_path $ZEPHYR_PROJECT_PATH/zephyr/
+
+    # go there and compile ------
+    cd $ZEPHYR_PROJECT_PATH/zephyr/$project_name
+    
+    west build -p auto -b $board
+    
+    # if successful (how to check?), copy build folder to current project path
+    mv build $project_path
+    rm -rf $ZEPHYR_PROJECT_PATH/zephyr/$project_name
+
+    cd ${project_path}
+}
+
+function _zephyr_build_new()
+{
+    # find the board --------------
+    board=$(_find_argument_after_option -b $1 $2 $3 $4 $5 $6 $7 $8)
+    if [ -z $board ] ; then
+        echo -e "\n ${RED}target board is not assigned, exit.${NOC}\n"
+        echo    " you can assign it by (tab-completable):"
+        echo -e "   zephyr -build -b [board name]\n"
+        return
+    fi
+
+    # check environment --------------
+    if [ -z $ZEPHYR_PROJECT_PATH ] ; then
+        echo -e "\n ${RED}ZEPHYR_PROJECT_PATH is not set, exit.${NOC}\n"
+        return
+    fi
+    project_path=${PWD}
+    project_name=`basename "$project_path"`
+
+    # remove build folder in current project
+    rm -rf build
+
+    # to build ------
+    cd $ZEPHYR_PROJECT_PATH/zephyr/
+    # if the current build board or project name is different with previous one
+    if [ -f build/board.txt ] ; then
+        prv_board=$(cat build/board.txt)
+    else
+        prv_board=" "
+    fi
+    if [ -f build/project-name.txt ] ; then
+        prv_project=$(cat build/project-name.txt)
+    else
+        prv_project=" "
+    fi
+    if [[ $prv_board != $board ]] || [[ $prv_project != $project_name ]] ; then
+        echo -e "\n ${GRN}different board or project,${NOC} build from scratch ...\n"
+        rm -rf build/*
+        # rm build/CMakeCache.txt
+        # rm build/CMakeFiles -rf
+    else
+        echo -e "\n same board and project ...\n"
+    fi
+    # build
+    west build -p auto -b $board $project_path
+    # record current build board, and project name
+    echo "$board" > $ZEPHYR_PROJECT_PATH/zephyr/build/board.txt
+    echo "$project_name" > $ZEPHYR_PROJECT_PATH/zephyr/build/project-name.txt
+
+    # copy the build/ to current project path ------
+    cp build -rf $project_path
+
+    cd ${project_path}
+}
+
+# =============================================================================
 function _zephyr_flash_help()
 {
     echo -e "\n------------ zephyr flash (simplified tool) --------------"
     echo "  maitainer: Dingjiang Zhou "
     echo -e "----------------------------------------------------------\n"
     echo "supported commands:"
-    echo " zephyr flash <platform>"
-    echo " - <platform> "
-    echo "   supported platform. includes the following: "
-    echo "      stm32"
-    echo -e "      ...\n"
+    echo -e " zephyr flash\n"
 }
 
 # =============================================================================
+# todo: if the $ZEPHYR_PROJECT_PATH/zephyr/ is older, then rebuild
 function _zephyr_flash()
 {
-
-    if [ $# = 0 ] ; then
-        _zephyr_flash_help
+    project_path=${PWD}
+    project_name=`basename "$project_path"`
+    
+    # if no build directory, need to build --------
+    cd $ZEPHYR_PROJECT_PATH/zephyr/
+    if [ ! -d build ] ; then
+        echo -e "\n${RED} no build directory, need to build ... ${NOC}\n"
         return
     fi
-    if [ ! -f ./build/zephyr/zephyr.bin ] ; then
-        echo -e "\nbinary does not exist, you can build it by:"
-        echo -e "   zephyr build -b <board name>\n"
-    fi
-    if [ $1 = 'stm32' ] ; then
-        st-flash write ./build/zephyr/zephyr.bin 0x8000000
+    # only if the current project is just build, then flash --------
+    
+    if [ -f build/project-name.txt ] ; then
+        prv_project=$(cat build/project-name.txt)
     else
-        echo -e "\nplatform not supported: "$1
-        echo -e "you need to extend this command to support it!\n"
+        echo -e "\n ${RED}project not built, need to build ...${NOC}\n"
+        return
     fi
+    if [[ $prv_project != $project_name ]] ; then
+        echo -e "\n ${RED}different project, need to rebuild ...${NOC}\n"
+        cd ${project_path}
+        return
+    else
+        # to flash --------
+        board=$(cat build/board.txt)
+        echo -e "\n  the build target board is ${GRN}${board}${NOC}\n"
+        west flash
+    fi
+
+    cd ${project_path}
 }
 
 # =============================================================================
@@ -314,14 +422,14 @@ function zephyr()
 
     # ------------------------------
     if [ $1 = 'setup' ] ; then
-        if [ $2 = 'sdk-0.11.3' ] ; then
-            _zephyr_setup_sdk_0_11_3 $3 $4 $5 $6
+        if [ $2 = 'sdk-0.11.4' ] ; then
+            _zephyr_setup_sdk_0_11_4 $3 $4 $5 $6
             return
         fi
         return
     fi
     if [ $1 = 'build' ] ; then
-        _zephyr_build $2 $3 $4 $5 $6 $7 $8 $9 ${10}
+        _zephyr_build_new $2 $3 $4 $5 $6 $7 $8 $9 ${10}
         return
     fi
     if [ $1 = 'flash' ] ; then
@@ -353,13 +461,13 @@ function _zephyr()
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
-    ACTIONS[setup]+="sdk-0.11.3 "
-    ACTIONS[sdk-0.11.3]=" "
-    ACTIONS[build]="-b "
-    ACTIONS[flash]="stm32 "
-    ACTIONS[stm32]=" "
+    ACTIONS[setup]+="sdk-0.11.4 "
+    ACTIONS[sdk-0.11.4]=" "
+    # ACTIONS[build]="-b "
+    ACTIONS[flash]=" "
+    # ACTIONS[stm32]=" "
 
-    # supported board can be added here
+    # supported boards, can be added here
     ACTIONS[-b]+="nucleo_f767zi "
     ACTIONS[nucleo_f767zi]=" "
     

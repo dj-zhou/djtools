@@ -103,17 +103,17 @@ function _work_check()
                     git_status=$(git status)
                     if [[ $git_status = *"is ahead"* ]] ; then
                         git_status_str="ahead"
-                        printf " ${BLUE_COLOR}ahead${NO_COLOR}"
+                        printf " ${BLU}ahead${NOC}"
                     elif [[ $git_status = *"is behind"* ]] ; then
                         git_status_str="behind"
-                        printf " ${CYAN_COLOR}behind${NO_COLOR}"
+                        printf " ${CYN}behind${NOC}"
                     else
                         git_status_str="    "
                     fi
                     if [[ $t_name = *"dirty"* ]] ; then
                         if [[ $git_status_str = "    " ]] ; then
                             git_status_str="dirty"
-                            printf " ${RED_COLOR}dirty${NO_COLOR}"
+                            printf " ${RED}dirty${NOC}"
                         else
                             git_status_str=$git_status_str" + dirty"
                         fi

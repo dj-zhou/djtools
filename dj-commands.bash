@@ -81,13 +81,13 @@ function _clang_write_to_file_part1() {
 function _clang_write_to_file_part2_clang_version() {
     # echo "hello world"
     file=$1
-    if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
+    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
         clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04/bin"
     fi
-    if [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
+    if [[ ${ubuntu_v} = *'18.04'* ]] ; then
         clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04/bin"
     fi
-    if [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
+    if [[ ${ubuntu_v} = *'20.04'* ]] ; then
         clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04/bin"
     fi
     string1="\"C_Cpp.clang_format_path\": \"${clang_file_path}/clang-format\""
@@ -139,11 +139,11 @@ function _dj_setup_clang_9_0_0()
     current_folder=${PWD}
 
     echo -e "\n"
-    if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
+    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
         echo "  Install clang for Ubuntu 16.04 ..."
-    elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
+    elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
         echo "  Install clang for Ubuntu 18.04 ..."
-    elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
+    elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
         echo " Install clang for Ubuntu 20.04 ..."
     fi
     echo -e "\n"
@@ -152,11 +152,11 @@ function _dj_setup_clang_9_0_0()
     cd ~ && mkdir -p soft/ && cd soft/
     
     # how to choose a version?
-    if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
+    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
         clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04"
-    elif [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
+    elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
         clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
-    elif [[ ${ubuntu_release_version} = *'20.04'* ]] ; then
+    elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
         clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
     fi
     echo "clang_file = "$clang_file
@@ -166,9 +166,9 @@ function _dj_setup_clang_9_0_0()
         md5checksum=`md5sum $clang_file.tar.xz`
         echo "md5checksum = "$md5checksum
     fi
-    if [[ ( ( ${ubuntu_release_version} = *'18.04'* ) && \
+    if [[ ( ( ${ubuntu_v} = *'18.04'* ) && \
         ( "$md5checksum" = *"9d8044379e151029bb1df3663c2fb2c1"* ) ) \
-      || ( ( ${ubuntu_release_version} = *'16.04'* ) && \
+      || ( ( ${ubuntu_v} = *'16.04'* ) && \
         ( "$md5checksum" = *"b3c5618fb3a5d268c371539e9f6a4b1f"* ) ) ]] ; then
         echo "file exists, no need to download again."
     else
@@ -236,16 +236,18 @@ function _dj_setup_container_docker()
     sudo apt-get install -y apt-transport-https ca-certificates curl 
     sudo apt-get install -y software-properties-common
 
+    docker_url="https://download.docker.com/linux/ubuntu"
+
     # Add the GPG key for the official Docker repository
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    curl -fsSL $docker_url/gpg | sudo apt-key add -
 
     # Add the Docker repository to APT sources
     sudo add-apt-repository \
-        "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
-    sudo apt update
+        "deb [arch=amd64] $docker_url $(lsb_release -cs) stable"
+    sudo apt-get -y update
 
     # Install
-    sudo apt install docker-ce
+    sudo apt-get -y install docker-ce
 
     # check the status -- not sure if the "active status" need a system reboot
     sudo systemctl status docker
@@ -253,18 +255,20 @@ function _dj_setup_container_docker()
     # ----------------------------------------------
     # add current user to the docker group, which was created from above scripts
     # to avoid typing "sudo" whenever run the docker command 
-    # -- comment out, -- do not delete
-    # sudo usermod -aG docker ${USER}
     # (to remove a user from a group: sudo gpasswd -d user group, need log in/out)
+    sudo usermod -aG docker ${USER}
+    su - ${USER}
 
-    # to list the users in the docker group
-    # result=$(getent group docker)
-    result=$(id -nG)
-    if [ $result=*'docker'* ] ; then
-        echo 'The user '${USER}' is in the docker group'
-    else
-        echo 'The user '${USER}' is NOT in the docker group'
-    fi
+    # I am not sure the purpose of the below scripts
+    # # to list the users in the docker group
+    # # result=$(getent group docker)
+    # result=$(id -nG)
+    # echo $result
+    # if [[ $result=*'docker'* ]] ; then
+    #     echo 'The user '${USER}' is in the docker group'
+    # else
+    #     echo 'The user '${USER}' is NOT in the docker group'
+    # fi
     
     # to solve a problem: dial unix /var/run/docker.sock: connect: permission denied
     sudo chmod 666 /var/run/docker.sock
@@ -350,8 +354,9 @@ function _dj_setup_pangolin()
 
     echo "If you see error like this:"
     echo "   Could not find GLEW"
-    echo " you should run the following command first:"
-    echo "   dj setup glfw3-gtest-glog"
+    echo " you should run the following commands first:"
+    echo "   dj setup glfw3"
+    echo "   dj setup gtest-glog"
     echo -e "\n"
     
     cd $current_folder
@@ -365,9 +370,14 @@ function _dj_setup_pip()
     cd ~/
     sudo apt-get install python3-pip -y
     sudo apt-get install python-pip -y
-    # pip upgrade, only for python 2
-    sudo pip install --upgrade pip
 
+    sudo pip  install --upgrade pip
+    sudo pip3 install --upgrade pip
+
+    echo -e "\n check the pip/pip3 version by\n"
+    echo    "   pip --version"
+    echo -e "   pip3 --version\n"
+    
     cd ${cwd_before_running}
 }
 
@@ -390,82 +400,75 @@ function _dj_setup_qemu()
         # is this only for ARM? will fix it later if needed
         ../configure --target-list=arm-softmmu --audio-drv-list=
         make -j8 && sudo make install
-        echo -e "\n $CYAN_COLOR the installed qemu is probably for ARM only, check it later$NO_COLOR\n"
+        echo -e "\n $CYN the installed qemu is probably for ARM only, check it later$NOC\n"
     fi
 
     cd ${cwd_before_running}
 }
 
 # =============================================================================
-function _dj_setup_stm32tools()
+# v1.6.1 can be installed on Ubuntu 20.04
+function _dj_setup_stm32_tools()
 {
-
     cwd_before_running=$PWD
 
+    echo -e "\n install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
+    echo -e "\n${RED} stlink may not compile, use it with caution${NOC}\n"
+    _press_enter_to_continue
+    v=$1
+    if [ -z $v ] ; then
+        v="1.3.1"
+    fi
+    
     mkdir -p ~/workspace && cd ~/workspace
 
-    cd ~/workspace
-    repo=stm32tools
-    if [ ! -d $repo ] ; then
-        echo -e "\nstm32tools does not exist, git clone ...\n"
-        git clone https://dj-zhou@github.com/dj-zhou/stm32tools.git
-    else 
-        echo -e "\n"${repo} "exists, git pull in master branch ...\n"
-        cd $repo
-        git checkout master
-        git pull
-    fi
-    cd ~/workspace/$repo
+    # install dependencies and some software ----------------
+    sudo apt-get install -y libusb-1.0.0-dev gtk+-3.0
+    sudo apt-get install -y cu cutecom putty screen
 
-    echo -e "\ninstall st-link v2 software\n"
-    sudo apt-get install libusb-1.0.0-dev -y
+    sudo rm stm32-tools -rf
+    git clone https://github.com/dj-zhou/stm32-tools.git
 
-    cd ~/workspace/stm32tools
-    sudo rm -rf stlink-master/build/
-    cd stlink-master && make release
-    cd build/Release/ && sudo make install
+    # install stlink ----------------
+    echo -e "\n install  stlink-v$v \n"
+    _press_enter_to_continue
+    cd stm32-tools/stlink-v$v
+    make release -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    cd build/Release/
+    sudo make install
     sudo ldconfig
 
-    cd $cwd_before_running
-    echo -e "\ncompile stm32flash\n"
-    cd ~/workspace/stm32tools/stm32flash
+    # install stm32flash ----------------
+    echo -e "\n install  stm32flash\n"
+    _press_enter_to_continue
+    cd ~/workspace/stm32-tools/stm32flash
     make clean
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
-    echo -e "\ninstall cu, cutecom, screen & putty -- serial port console\n"
-    
-    echo "how to use cu and screen:"
-    echo "      cu: cu -l /dev/ttyUSB0 -s 115200 [ENTER]"
-    echo "  screen: screen /dev/ttyUSB0 115200 [ENTER]"
-    echo "exit methods for cu and screen:"
-    echo "      cu: input ~. and then [ENTER]"
-    echo "  screen: press Ctrl+A and then \, and [y]"
-
+    # udev rule ----------------
+    echo -e "\n add serial port privilege to current user\n"
     _press_enter_to_continue
-    sudo apt-get install cu cutecom putty screen -y
-
-    echo -e "\nadd serial port privilege to current user\n"
     sudo usermod -a -G dialout $(whoami)
-    rule_file=stm32tools.rules
+    rule_file=stm32-tools.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo 'KERNEL=="ttyUSB[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
     echo 'KERNEL=="ttyACM[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
     sudo service udev restart
 
-    echo -e "\n" 
-    cd ~
-    _ask_to_remove_a_folder ~/workspace/stm32tools
+    echo -e "\n"
+    cd ~/workspace
+    _ask_to_remove_a_folder ~/workspace/stm32-tools
 
     cd ${cwd_before_running}
 }
 
 # =============================================================================
-function _dj_setup_glfw3_gtest_glog()
+function _dj_setup_glfw3()
 {
     cwd_before_running=$PWD
 
-    echo -e "\n  Install glfw3, gtest, glog ...\n"
+    echo -e "\n install glfw3 ...\n"
     _press_enter_to_continue
     
     cd ~ && mkdir -p soft && cd soft/
@@ -481,6 +484,38 @@ function _dj_setup_glfw3_gtest_glog()
     sudo make install && sudo ldconfig
     cd ~/soft/
     _ask_to_remove_a_folder glfw3
+
+    cd ${cwd_before_running}
+}
+
+# =============================================================================
+function _dj_setup_google_repo()
+{
+    cwd_before_running=$PWD
+    
+    curl https://storage.googleapis.com/git-repo-downloads/repo > repo
+    chmod a+x repo
+    sudo mv repo /bin/
+    
+    cat << EOM
+
+    -----------------------------------
+    Google tool "repo" is installed into folder: /bin/
+    -----------------------------------
+
+EOM
+    cd ${cwd_before_running}
+}
+
+# =============================================================================
+function _dj_setup_gtest_glog()
+{
+    cwd_before_running=$PWD
+
+    echo -e "\n install gtest ...\n"
+    _press_enter_to_continue
+    
+    cd ~ && mkdir -p soft && cd soft/
     
     # gtest
     sudo apt-get install libgtest-dev -y
@@ -671,7 +706,7 @@ function _dj_setup_wubi()
     cwd_before_running=$PWD
 
     sudo apt-get install ibus ibus-table-wubi -y
-    if [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
+    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
         echo -e "\n"
         echo "Following the steps:"
         echo -e "\n"
@@ -683,8 +718,8 @@ function _dj_setup_wubi()
         echo "  Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chise (WuBi-Jidian-86-JiShuang-6.0) "
         echo "  use Windows Key (or named Super Key) + Space to switch the two input methods"
         echo -e "\n"
-    elif [[ ${ubuntu_release_version} = *'18.04'* \
-        || ${ubuntu_release_version} = *'20.04'* ]] ; then
+    elif [[ ${ubuntu_v} = *'18.04'* \
+        || ${ubuntu_v} = *'20.04'* ]] ; then
         echo -e "\n"
         echo " pleaase follow the link below to finish the setup"
         echo " https://www.pinyinjoe.com/linux/ubuntu-18-gnome-chinese-setup.htm"
@@ -1067,8 +1102,18 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'glfw3-gtest-glog' ] ; then
-            _dj_setup_glfw3_gtest_glog
+        if [ $2 = 'glfw3' ] ; then
+            _dj_setup_glfw3
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'google-repo' ] ; then
+            _dj_setup_google_repo
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'gtest-glog' ] ; then
+            _dj_setup_gtest_glog
             return
         fi
         # --------------------------
@@ -1167,8 +1212,8 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'stm32tools' ] ; then
-            _dj_setup_stm32tools
+        if [ $2 = 'stm32-tools' ] ; then
+            _dj_setup_stm32_tools $3 $4
             return
         fi
         # --------------------------
@@ -1289,11 +1334,12 @@ function _dj()
     ACTIONS[setup]+="baidu-netdisk clang-9.0.0 computer container dj-gadgets "
     ACTIONS[setup]+="dropbox eigen foxit gcc-arm-embedded gcc-arm-linux-gnueabi "
     ACTIONS[setup]+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-    ACTIONS[setup]+="gitg-kdiff3 glfw3-gtest-glog gnome grpc-1.29.1 g++-10 i219-v "
-    ACTIONS[setup]+="libev-4.33 lib-serialport mathpix matplotlib-cpp opencv-2.4.13 "
-    ACTIONS[setup]+="opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 ros-melodic "
-    ACTIONS[setup]+="ros2-foxy spdlog slack stm32tools sublime typora vim-env vscode "
-    ACTIONS[setup]+="vtk-8.2.0 wubi lib-yamlcpp YouCompleteMe you-complete-me "
+    ACTIONS[setup]+="gitg-kdiff3 glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
+    ACTIONS[setup]+="g++-10 i219-v libev-4.33 lib-serialport mathpix matplotlib-cpp "
+    ACTIONS[setup]+="opencv-2.4.13 opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 "
+    ACTIONS[setup]+="ros-melodic ros2-foxy spdlog slack stm32-tools sublime typora "
+    ACTIONS[setup]+="vim-env vscode vtk-8.2.0 wubi lib-yamlcpp "
+    ACTIONS[setup]+="YouCompleteMe you-complete-me "
     ACTIONS[baidu-netdisk]=" "
     ACTIONS[clang-9.0.0]=" "
     ACTIONS[computer]=" "
@@ -1311,7 +1357,9 @@ function _dj()
     ACTIONS[gcc-aarch64-linux-gnu]=" "
     ACTIONS[git-lfs]=" "
     ACTIONS[gitg-kdiff3]=" "
-    ACTIONS[glfw3-gtest-glog]=" "
+    ACTIONS[glfw3]=" "
+    ACTIONS[google-repo]=" "
+    ACTIONS[gtest-glog]=" "
     ACTIONS[gnome]=" "
     ACTIONS[grpc-1.29.1]=" "
     ACTIONS[g++-10]=" "
@@ -1341,7 +1389,13 @@ function _dj()
     ACTIONS[static]=" "
     ACTIONS[shared]=" "
     ACTIONS[slack]=" "
-    ACTIONS[stm32tools]=" "
+    ACTIONS[stm32-tools]+="1.3.1 1.4.0 1.5.0 1.5.1 1.6.0 1.6.1 "
+    ACTIONS[1.3.1]=" "
+    ACTIONS[1.4.0]=" "
+    ACTIONS[1.5.0]=" "
+    ACTIONS[1.5.1]=" "
+    ACTIONS[1.6.0]=" "
+    ACTIONS[1.6.1]=" "
     ACTIONS[sublime]=" "
     ACTIONS[typora]=" "
     ACTIONS[vim-env]=" "
@@ -1355,42 +1409,39 @@ function _dj()
     #---------------------------------------------------------
     #---------------------------------------------------------
     ACTIONS[clone]="bitbucket github gitee "
-    ACTIONS[open]=" "
     #---------------------------------------------------------
     ACTIONS[bitbucket]+=" "
+    if [ -f $djtools_path/.bitbucket-repos ] ; then
+        ACTIONS[bitbucket]+=$(cat $djtools_path/.bitbucket-repos)
+    else
+        ACTIONS[bitbucket]+=" "
+    fi
     #---------------------------------------------------------
-    # how to make the below reading from a text file??
-    ACTIONS[github]+="algorithm-note avr-gcc can-analyzer cpp-practise cv "
-    ACTIONS[github]+="dj-gadgets dj-lib-cpp djtools embedded-debug-gui "
-    ACTIONS[github]+="glfw3 math-for-ml-note matplotlib-cpp opencv-4.1.1 "
-    ACTIONS[github]+="pads-clear-up pangolin robotics-note stl-practise "
-    ACTIONS[github]+="stm32-lib stm32tools tutorials yaml-cpp "
-    ACTIONS[algorithm-note]=" "
-    ACTIONS[avr-gcc]=" "
-    ACTIONS[can-analyzer]=" "
-    ACTIONS[cpp-practise]=" "
-    ACTIONS[cv]=" "
-    ACTIONS[dj-gadgets]=" "
-    ACTIONS[dj-lib-cpp]=" "
-    ACTIONS[djtools]=" "
-    ACTIONS[embedded-debug-gui]=" "
-    ACTIONS[glfw3]=" "
-    ACTIONS[math-for-ml-note]=" "
-    ACTIONS[matplotlib-cpp]=" "
-    ACTIONS[opencv-4.1.1]=" "
-    ACTIONS[pads-clear-up]=" "
-    ACTIONS[pangolin]=" "
-    ACTIONS[robotics-note]=" "
-    ACTIONS[stl-practise]=" "
-    ACTIONS[stm32-lib]=" "
-    ACTIONS[stm32-embedded-demo]=" "
-    ACTIONS[stm32tools]=" "
-    ACTIONS[tutorials]=" "
-    ACTIONS[yaml-cpp]=" "
+    if [ -f $djtools_path/.github-repos ] ; then
+        github_repos="$(cat $djtools_path/.github-repos)"
+        ACTIONS[github]+="$github_repos "
+        # for loop on repos to attach space (" ") to them
+        for i in $github_repos ; do
+            ACTIONS[$i]=" "
+        done
+    else
+        ACTIONS[github]+=" "
+    fi
     #---------------------------------------------------------
-    ACTIONS[gitee]="vtk-8.2.0 opencv-4.1.1 "
-    ACTIONS[vtk-8.2.0]=" "
-    ACTIONS[opencv-4.1.1]=" "
+    if [ -f $djtools_path/.gitee-repos ] ; then
+        gitee_repos="$(cat $djtools_path/.gitee-repos)"
+        ACTIONS[gitee]+="$gitee_repos "
+        # for loop on repos to attach space (" ") to them
+        for i in $gitee_repos ; do
+            ACTIONS[$i]=" "
+        done
+    else
+        ACTIONS[gitee]+=" "
+    fi
+
+    #---------------------------------------------------------
+    #---------------------------------------------------------
+    ACTIONS[open]=" "
 
     #---------------------------------------------------------
     #---------------------------------------------------------

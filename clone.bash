@@ -16,21 +16,14 @@ function _dj_clone_help()
 # =============================================================================
 function _dj_clone_bitbucket()
 {
-    echo -e "\ndj clone "$1" with bitbucket username "$bitbucket_username"\n"
+    echo -e "\n dj clone ${GRN}$1${NOC} with ${GRN}bitbucket${NOC} username ${GRN}$bitbucket_username${NOC}\n"
     git clone https://$bitbucket_username@bitbucket.org/$bitbucket_username/$1.git
 }
 
 # =============================================================================
 function _dj_clone_github()
 {
-    echo -e "\ndj clone "$1" with github username "$github_username"\n"
-    # echo "argment 2 = "$2
-    # echo "argment 3 = "$3
-    # echo "argment 4 = "$4
-    # echo "argment 5 = "$5
-    # echo "argment 6 = "$6
-    # echo "argment 7 = "$7
-    # echo "argment 8 = "$8
+    echo -e "\n dj clone ${GRN}$1${NOC} with ${GRN}github${NOC} username ${GRN}$github_username${NOC}\n"
 
     # get the branch to clone ---------------------
     clone_a_branch=0
@@ -56,6 +49,6 @@ function _dj_clone_github()
 # =============================================================================
 function _dj_clone_gitee()
 {
-    echo -e "\ndj clone "$1" with gitee username "$gitee_username"\n"
+    echo -e "\n dj clone ${GRN}$1${NOC} with ${GRN}gitee${NOC} username ${GRN}$github_username${NOC}\n"
     git clone https://gitee.com/$gitee_username/$1.git
 }

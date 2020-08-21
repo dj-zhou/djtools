@@ -127,6 +127,24 @@ function _find_argument_after_option()
 }
 
 # =============================================================================
+function _if_option_exist()
+{
+    # echo $@
+    find_option=0
+    for var in "$@"
+    do
+        if [ $var = $1 ] ; then
+            find_option=$((find_option+1))
+        fi
+        if [ $find_option = 2 ]; then
+            echo "true"
+            return
+        fi
+    done
+    echo "false"
+}
+
+# =============================================================================
 # argument 1: the string
 # argument 2: the charactor
 # argument 3: the 1st, 2nd, or the i-th item to be found in the string
@@ -157,4 +175,34 @@ function _find_a_char_in_str()
     # echo "found_count = "$found_count
     # echo "pos = "$pos
     echo $pos
+}
+
+# =============================================================================
+function _size_calculate() # $fz_byte $output_control
+{
+   fz_byte=$1
+   output_control=$2
+    if [ $output_control = 'true' ] ; then
+        echo $fz_byte
+    elif [ $output_control = 'false' ] ; then
+        fz_kbyte=$(awk "BEGIN {print $((fz_byte)) / 1024}")
+        fz_kbyte_int=${fz_kbyte%.*}
+        fz_mbyte=$(awk "BEGIN {print $((fz_kbyte_int)) / 1024}")
+        fz_mbyte_int=${fz_mbyte%.*}
+        fz_gbyte=$(awk "BEGIN {print $((fz_mbyte_int)) / 1024}")
+        fz_gbyte_int=${fz_gbyte%.*}
+        fz_tbyte=$(awk "BEGIN {print $((fz_gbyte_int)) / 1024}")
+        fz_tbyte_int=${fz_tbyte%.*}
+        if [[ $fz_kbyte_int = '0' ]] ;  then
+            echo "$fz_byte bytes"
+        elif [[ $fz_mbyte_int = '0' ]] ;  then
+            echo "$fz_kbyte KiB"
+        elif [[ $fz_gbyte_int = '0' ]] ;  then
+            echo "$fz_mbyte MiB"
+        elif [[ $fz_tbyte_int = '0' ]] ;  then
+            echo "$fz_gbyte GiB"
+        else
+            echo "$fz_tbyte TiB"
+        fi
+    fi
 }

@@ -151,22 +151,22 @@ function _repod_update_repos_all_folders()
 
     for folder in ./* ; do
         if [ -d $folder ] ; then
-            echo -e "${CYAN_COLOR}\r\n----------------------------"
-            printf `basename "$folder"${NO_COLOR}`
+            echo -e "${CYN}\r\n----------------------------"
+            printf `basename "$folder"${NOC}`
             cd $folder
             if [ -d ".git/" ] ; then
                 git_status=$(git status)
                 if [[ $git_status = *"Changes not staged for commit"* ]] ; then
-                    printf " ${RED_COLOR}dirty${NO_COLOR}"
+                    printf " ${RED}dirty${NOC}"
                 elif [[ $git_status = *"is ahead"* ]] ; then
-                    printf " ${BLUE_COLOR}ahead${NO_COLOR}"
+                    printf " ${BLU}ahead${NOC}"
                 elif [[ $git_status = *"is behind"* ]] ; then
-                    printf " ${CYAN_COLOR}behind${NO_COLOR}"
+                    printf " ${CYN}behind${NOC}"
                 fi
                 echo " "
                 git fetch -p
             else
-                printf " ${BROWN_COLOR}NOT a git repo${NO_COLOR}"
+                printf " ${BRN}NOT a git repo${NOC}"
                 echo " "
             fi
             cd $current_folder

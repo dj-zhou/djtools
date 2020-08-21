@@ -130,6 +130,7 @@ function _coding()
     ACTIONS[implement]+="dj bg "
     ACTIONS[dj]+=" "
     ACTIONS[bg]+=" "
+    ACTIONS[show]+=" "
     ACTIONS[enable]+=" "
     ACTIONS[disable]+=" "
     

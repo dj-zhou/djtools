@@ -4,35 +4,60 @@
 function _dj_setup_help()
 {
     _dj_help
-    echo "--------------------- dj setup ----------------------"
-    echo " Second level commands:"
-    echo "   arm-gcc          - to install arm-gcc-embedded compiler"
-    echo "   clang-8.0.0      - to install clang v8.0.0 for use of vscode"
-    echo "   computer         - to pre install lots of necessary"
-    echo "                      software package"
-    echo "   dropbox          - to install dropbox"
-    echo "   eigen            - to install eigen library"
-    echo "   foxit            - to install foxit pdf reader"
-    echo "   glfw3-gtest-glog - to install glfw3/gtest/glog"
-    echo "   i219-v           - to install Intel I219-V WiFi chipset"
-    echo "                      driver"
-    echo "   opencv-2.4.13    - to install OpenCV version 2.4.13"
-    echo "   opencv-4.1.1     - to install OpenCV version 4.1.1"
-    echo "   pangolin         - to install openGL based visualization package"
-    echo "   pip              - to install python software pip"
-    echo "   qt-5.11.2        - to install Qt version 5.11.2"
-    echo "   qt-5.13.1        - to install Qt version 5.13.1"
-    echo "   ros-melodic      - to install ROS Melodic (Ubuntu 18.04)"
-    echo "   shadowsocks      - to install a vpn tool"
-    echo "   stm32tools       - to install stm32 tool"
-    echo "   sublime          - to install sublime-text-3"
-    echo "   vscode           - to install VS Code"
-    echo "   typora           - to install Markdown editor typora"
-    echo "   vtk-8.2.0        - to install visualization tool vtk-8.2.0"
-    echo "   wubi             - to install Chinese wubi input method"
-    echo "   yaml-cpp         - to install C++ based yaml file parser"
-    echo "   MORE IS COMMING"
-    echo -e "-----------------------------------------------------\n"
+    cat << EOM
+  ------------------------------- dj setup --------------------------------
+    second level commands:"
+      baidu-netdisk  - to install the baidu netdisk tool
+      clang-9.0.0    - to install clang v9.0.0 for use of vscode
+      computer       - to install lots of necessary software packages
+      dj-gadgets     - to install small gadget tools
+      dropbox        - to install dropbox
+      eigen          - to install eigen library
+      foxit          - to install foxit pdf reader
+      g++10          - to install compile g++ of version 10, then ask to 
+                       choose version
+      gitg-kdiff3    - to install gitg and kdiff3
+      git-lfs        - to install large file storage of git
+      glfw3          - to install glfw3"
+      gnome          - to install Gnome, for Ubuntu 20.04, etc
+      google-repo    - to install the repo utility developed by Google
+      grpc-1.29.1    - to install the gRPC, v1.29.1
+      gtest-glog     - to install gtest/glog
+      i219-v         - to install Intel I219-V WiFi chipset driver
+      libev-4.33     - to install libev, v4.33
+      lib-serialport - to install libserialport
+      lib-yamlcpp    - to install yaml-cpp
+      mathpix        - to install math latex equation tool mathpix
+      matplotlib-cpp - to install the matplotlib, a cpp version
+      opencv-2.4.13  - to install OpenCV version 2.4.13
+      opencv-4.1.1   - to install OpenCV version 4.1.1
+      pangolin       - to install openGL based visualization package
+      pip            - to install python software pip
+      qemu           - to install the emulation tool qemu
+      qt-5.13.1      - to install Qt version 5.13.1
+      qt-5.14.2      - to install Qt version 5.14.2
+      ros2-foxy      - to install ROS2 Foxy, with deb package, or from source
+      ros-melodic    - to install ROS Melodic with deb package on Ubuntu 18.04
+      slack          - to install Slack
+      spdlog         - to install spdlog
+      stm32tools     - to install stm32 tool
+      sublime        - to install sublime-text-3
+      typora         - to install Markdown editor typora
+      vscode         - to install VS Code
+      vtk-8.2.0      - to install visualization tool vtk-8.2.0
+      wubi           - to install Chinese wubi input method
+      YouCompleteMe  - to install a Vim plugin: YouCompleteMe
+
+      gcc-aarch64-linux-gnu   - to install the 64-bit arm compiler
+      gcc-arm-embedded        - to install micro controller development tool
+      gcc-arm-linux-gnueabi   - to install the 32-bit arm compiler
+      gcc-arm-linux-gnueabihf - to install the 32-bit arm compiler with hard
+                                float unit
+
+      MORE IS COMMING"
+  -------------------------------------------------------------------------
+
+EOM
 }
 
 # =============================================================================
@@ -69,17 +94,20 @@ function _dj_setup_computer()
     sudo apt-get upgrade -y
 
     # -----------------------------------
-    echo -e "\n going to install the following packages: "
-    echo "      ark cmake curl cutecom dconf-editor dconf-tools git "
-    echo "      git-lfs g++ htop kate libgtk2.0-dev lsb-core putty "
-    echo -e "      screen scrot terminator tree vlc vim wmctrl xclip yasm\n"
+    cat << EOM
+    
+    going to install the following packages: 
+       ark cmake curl cutecom dconf-editor dconf-tools git
+       git-lfs g++ htop kate libgtk2.0-dev lsb-core putty
+       screen scrot terminator tree vlc vim wmctrl xclip yasm
 
-    echo "how to use cu and screen:"
-    echo "      cu: cu -l /dev/ttyUSB0 -s 115200 [ENTER]"
-    echo "  screen: screen /dev/ttyUSB0 115200 [ENTER]"
-    echo "exit methods for cu and screen:"
-    echo "      cu: input ~. and then [ENTER]"
-    echo "  screen: press Ctrl+A and then \, and [y]"
+    how to use cu and screen:
+        cu: cu -l /dev/ttyUSB0 -s 115200 [ENTER]
+        screen: screen /dev/ttyUSB0 115200 [ENTER]
+    exit methods for cu and screen:
+        cu: input ~. and then [ENTER]
+        screen: press Ctrl+A and then \, and [y]
+EOM
 
     _press_enter_to_continue
 
@@ -254,14 +282,14 @@ function _dj_setup_gcc_arm_embedded()
     sudo apt-get install -y libftdi-dev libusb-1.0-0-dev zlib1g zlib1g-dev python-yaml
     sudo apt-get install -y libncurses-dev
 
-    if [[ ${ubuntu_release_version} = *'18.04'* ]] ; then
+    if [[ ${ubuntu_v} = *'18.04'* ]] ; then
         sudo echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" \
         | sudo tee -a /etc/apt/sources.list
-    elif  [[ ${ubuntu_release_version} = *'16.04'* ]] ; then
+    elif  [[ ${ubuntu_v} = *'16.04'* ]] ; then
         echo "just do nothing"
     fi
-    if [[ ${ubuntu_release_version} = *'18.04'* || \
-          ${ubuntu_release_version} = *'16.04'* ]] ; then
+    if [[ ${ubuntu_v} = *'18.04'* || \
+          ${ubuntu_v} = *'16.04'* ]] ; then
         sudo apt-get remove gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
         sudo apt-add-repository ppa:team-gcc-arm-embedded/ppa
         sudo apt-get update
@@ -271,7 +299,7 @@ function _dj_setup_gcc_arm_embedded()
         echo " (just maybe) gcc-arm-embedded is installed in /usr/share/gcc-arm-embedded/"
         echo " (question) Is there still an arm-none-eabi? "
         echo -e "\n"
-    elif [[ ${ubuntu_release_version} = *'20.04'* ]] ;then
+    elif [[ ${ubuntu_v} = *'20.04'* ]] ;then
         sudo apt remove gcc-arm-none-eabi
         compiler_date="9-2020"
         compiler_q="q2"
@@ -339,6 +367,7 @@ function _dj_setup_gcc_arm_linux_gnueabi()
     cd $current_folder
     unset current_folder
 }
+
 # =============================================================================
 function _dj_setup_gcc_arm_linux_gnueabihf()
 {
@@ -705,21 +734,26 @@ function _dj_setup_vscode()
     sudo dpkg -i vscode.deb
     sudo rm vscode.deb
 
-    echo -e "\n recommended vscode plugins:"
-    echo    "         bitbake: BitBake recipe language support in Visual Studio Code "
-    echo    "     CMake Tools: Extended CMake support in Visual Studio Code "
-    echo    "      DeviceTree: DeviceTree Language Support for Visual Studio Code "
-    echo    "         GitLens: Supercharge the Git capabilities built into Visual "
-    echo    "                  Studio Code — Visualize code authorship at a glance "
-    echo    "                  via Git blame annotations and code le"
-    echo    "  LaTeX Workshop: Boost LaTeX typesetting efficiency with preview, "
-    echo    "                  compile, autocomplete, colorize, and more. "
-    echo    "          Python: Linting, Debugging (multi-threaded, remote), "
-    echo    "                  Intellisense, Jupyter Notebooks, code formatting, "
-    echo    "                  refactoring, unit tests, snippets, and more. "
-    echo    "           C/C++: C/C++ IntelliSense, debugging, and code browsing."
-    echo -e "      Bash Debug: A debugger extension for bash scripts (using bashdb). \n"
+    cat << EOM
 
+-------------------------------------------------------------------------------
+    recommended vscode plugins:
+             bitbake: BitBake recipe language support in Visual Studio Code
+         CMake Tools: Extended CMake support in Visual Studio Code
+          DeviceTree: DeviceTree Language Support for Visual Studio Code
+             GitLens: Supercharge the Git capabilities built into Visual
+                      Studio Code — Visualize code authorship at a glance
+                      via Git blame annotations and ...
+      LaTeX Workshop: Boost LaTeX typesetting efficiency with preview,
+                      compile, autocomplete, colorize, and more.
+              Python: Linting, Debugging (multi-threaded, remote),
+                      Intellisense, Jupyter Notebooks, code formatting,
+                      refactoring, unit tests, snippets, and more.
+               C/C++: C/C++ IntelliSense, debugging, and code browsing.
+          Bash Debug: A debugger extension for bash scripts (using bashdb).
+-------------------------------------------------------------------------------
+
+EOM
     cd $current_folder
 }
 
@@ -748,10 +782,8 @@ function _dj_setup_yaml_cpp()
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
-    echo " "
-    echo "libyaml-cpp.a is installed in /usr/local/lib/"
-    echo "header files are installed in /usr/local/include/yaml-cpp/"
-    echo " "
+    echo -e "\n libyaml-cpp.a is installed in /usr/local/lib/"
+    echo -e " header files are installed in /usr/local/include/yaml-cpp/\n"
 
     _ask_to_remove_a_folder yaml-cpp/
 

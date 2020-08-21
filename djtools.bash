@@ -11,27 +11,27 @@
 # Light Gray   0;37     White         1;37
 
 # color definition
-NO_COLOR='\033[0m'
-RED_COLOR='\033[0;31m'
-GREEN_COLOR='\033[0;32m'
-BROWN_COLOR='\033[0;33m'
-BLUE_COLOR='\033[0;34m'
-PURPLE_COLOR='\033[0;35m'
-CYAN_COLOR='\033[0;36m'
-LGRAY_COLOR='\033[0;37m'
-DGRAY_COLOR='\033[1;30m'
-LRED_COLOR='\033[1;31m'
-LGREEN_COLOR='\033[1;32m'
-YELLOW_COLOR='\033[1;33m'
-LBLUE_COLOR='\033[1;34m'
-LPURPLE_COLOR='\033[1;35m'
-LCYAN_COLOR='\033[1;36m'
-WHITE_COLOR='\033[1;37m'
+NOC='\033[0m'
+RED='\033[0;31m'
+GRN='\033[0;32m'
+BRN='\033[0;33m'
+BLU='\033[0;34m'
+PRP='\033[0;35m'
+CYN='\033[0;36m'
+LGRY='\033[0;37m'
+DGRY='\033[1;30m'
+LRED='\033[1;31m'
+LGRN='\033[1;32m'
+YLW='\033[1;33m'
+LBLU='\033[1;34m'
+LPRP='\033[1;35m'
+LCYN='\033[1;36m'
+WHT='\033[1;37m'
 
 # =============================================================================
 # by doing so, the system can find the whole tooklit
 djtools_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-ubuntu_release_version=$(lsb_release -a)
+ubuntu_v=$(lsb_release -a)
 
 # =============================================================================
 source $djtools_path/block-device.bash
@@ -54,7 +54,7 @@ source $djtools_path/zephyr.bash
 
 # =============================================================================
 # alias ----------------------------------------------
-alias ls="ls -l --color=always"
+alias lc="ls -l --color=always"
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
