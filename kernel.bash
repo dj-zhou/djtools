@@ -2,11 +2,11 @@
 
 function _kernel_help()
 {
-    echo -e "\n\n---------------------- kernel ----------------------"
-    echo " Author      : Dingjiang Zhou"
-    echo " Email       : zhoudingjiang@gmail.com "
-    echo " Create Date : 2020-08-01"
-    echo "-----------------------------------------------------"
+    echo -e "\n\n ---------------------- kernel ----------------------"
+    echo "  Author      : Dingjiang Zhou"
+    echo "  Email       : zhoudingjiang@gmail.com "
+    echo "  Create Date : 2020-08-01"
+    echo " -----------------------------------------------------"
     echo -e "\n First level commands:"
     echo "   config   - to config the _install foldre within the linux kernel"
     echo -e "   MORE IS COMMING\n"
@@ -90,50 +90,53 @@ function _kernel_config_initramfs()
 
     # start the configuration
     echo -e "\n going to copy $busybox_folder/$_install_folder to the folder \n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
 
     cp $busybox_folder/$_install_folder -r .
     cd $_install_folder
     mkdir etc dev mnt lib
     mkdir -p etc/init.d/
     
-    echo -e "\n going to creete file: etc/init.d/rcS \n"
-    _press_enter_to_continue
+    file="etc/init.d/rcS"
+    echo -e "\n going to creete file: $file \n"
+    _press_enter_or_wait_s_continue 20
 
-    touch etc/init.d/rcS
-    echo "#!/bin/sh" >> etc/init.d/rcS
-    echo "mkdir -p /proc" >> etc/init.d/rcS
-    echo "mkdir -p /tmp" >> etc/init.d/rcS
-    echo "mkdir -p /sys" >> etc/init.d/rcS
-    echo "mkdir -p /mnt" >> etc/init.d/rcS
-    echo "/bin/mount -a" >> etc/init.d/rcS
-    echo "mkdir -p /dev/pts" >> etc/init.d/rcS
-    echo "mount -t devpts devpts /dev/pts" >> etc/init.d/rcS
-    echo "echo /sbin/mdev > /proc/sys/kernel/hotplug" >> etc/init.d/rcS
-    echo "mdev -s" >> etc/init.d/rcS
-    chmod +x etc/init.d/rcS
+    touch $file
+    echo "#!/bin/sh" >> $file
+    echo "mkdir -p /proc" >> $file
+    echo "mkdir -p /tmp" >> $file
+    echo "mkdir -p /sys" >> $file
+    echo "mkdir -p /mnt" >> $file
+    echo "/bin/mount -a" >> $file
+    echo "mkdir -p /dev/pts" >> $file
+    echo "mount -t devpts devpts /dev/pts" >> $file
+    echo "echo /sbin/mdev > /proc/sys/kernel/hotplug" >> $file
+    echo "mdev -s" >> $file
+    chmod +x $file
     
-    echo -e "\n going to creete file: etc/fstab \n"
-    _press_enter_to_continue
+    file="etc/fstab"
+    echo -e "\n going to creete file: $file \n"
+    _press_enter_or_wait_s_continue 20
 
-    touch etc/fstab
-    echo "proc /proc proc defaults 0 0" >> etc/fstab
-    echo "tmpfs /tmp tmpfs defaults 0 0" >> etc/fstab
-    echo "sysfs /sys sysfs defaults 0 0" >> etc/fstab
-    echo "tmpfs /dev tmpfs defaults 0 0" >> etc/fstab
-    echo "debugfs /sys/kernel/debug debugfs defaults 0 0" >> etc/fstab
+    touch $file
+    echo "proc /proc proc defaults 0 0" >> $file
+    echo "tmpfs /tmp tmpfs defaults 0 0" >> $file
+    echo "sysfs /sys sysfs defaults 0 0" >> $file
+    echo "tmpfs /dev tmpfs defaults 0 0" >> $file
+    echo "debugfs /sys/kernel/debug debugfs defaults 0 0" >> $file
 
-    echo -e "\n going to creete file: etc/inittab \n"
-    _press_enter_to_continue
+    file="etc/inittab"
+    echo -e "\n going to creete file: $file \n"
+    _press_enter_or_wait_s_continue 20
 
-    touch etc/inittab
-    echo "::sysinit:/etc/init.d/rcS" >> etc/inittab
-    echo "::respawn:-/bin/sh" >> etc/inittab
-    echo "::askfirst:-/bin/sh" >> etc/inittab
-    echo "::ctrlaltdel:/bin/umount -a -r" >> etc/inittab
+    touch $file
+    echo "::sysinit:/etc/init.d/rcS" >> $file
+    echo "::respawn:-/bin/sh" >> $file
+    echo "::askfirst:-/bin/sh" >> $file
+    echo "::ctrlaltdel:/bin/umount -a -r" >> $file
 
     echo -e "\n going to creete device nodes in dev/ \n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
 
     cd dev
     sudo mknod -m 666 tty1 c 4 1
@@ -144,7 +147,7 @@ function _kernel_config_initramfs()
     sudo mknod null c 1 3
 
     echo -e "\n going to copy the arm linux libraries into lib/ \n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
 
     cd ../
     cp /usr/arm-linux-gnueabi/lib/* lib/ -rfp

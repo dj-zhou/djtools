@@ -4,7 +4,6 @@
 # usage:
 #   result=$(_is_block_device_mounted sda)
 #   echo $result
-#
 function _is_block_device_mounted()
 {
     if [ ! -n "$1" ] ; then
@@ -28,11 +27,15 @@ function _is_block_device_mounted()
 # =============================================================================
 function _disk_size_help()
 {
-    echo "_disk_size: wrong usage, use it like:"
-    echo "   _disk_size sda true"
-    echo "   _disk_size /dev/sda true"
-    echo "   _disk_size sda false"
-    echo "   _disk_size /dev/sda false"
+    cat << eom
+
+    _disk_size: wrong usage, use it like:
+       _disk_size sda true
+       _disk_size /dev/sda true
+       _disk_size sda false
+       _disk_size /dev/sda false
+    
+eom
 }
 
 # =============================================================================

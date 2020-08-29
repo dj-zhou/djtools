@@ -147,7 +147,7 @@ function _dj_setup_clang_9_0_0()
         echo " Install clang for Ubuntu 20.04 ..."
     fi
     echo -e "\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
 
     cd ~ && mkdir -p soft/ && cd soft/
     
@@ -258,17 +258,6 @@ function _dj_setup_container_docker()
     # (to remove a user from a group: sudo gpasswd -d user group, need log in/out)
     sudo usermod -aG docker ${USER}
     su - ${USER}
-
-    # I am not sure the purpose of the below scripts
-    # # to list the users in the docker group
-    # # result=$(getent group docker)
-    # result=$(id -nG)
-    # echo $result
-    # if [[ $result=*'docker'* ]] ; then
-    #     echo 'The user '${USER}' is in the docker group'
-    # else
-    #     echo 'The user '${USER}' is NOT in the docker group'
-    # fi
     
     # to solve a problem: dial unix /var/run/docker.sock: connect: permission denied
     sudo chmod 666 /var/run/docker.sock
@@ -343,14 +332,14 @@ function _dj_setup_pangolin()
     echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
     echo -e "\n LD_LIBRARY_PATH is set in ~/.bashrc.\n"
 
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
 
     echo -e "\n"
     echo "libpangolin.so is in path: /usr/local/lib/"
     echo "header files (i.e., pangolin/pangolin.h) are in path: /usr/local/include/"
     echo -e "\n"
     
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
 
     echo "If you see error like this:"
     echo "   Could not find GLEW"
@@ -414,7 +403,7 @@ function _dj_setup_stm32_tools()
 
     echo -e "\n install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
     echo -e "\n${RED} stlink may not compile, use it with caution${NOC}\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
     v=$1
     if [ -z $v ] ; then
         v="1.3.1"
@@ -431,7 +420,7 @@ function _dj_setup_stm32_tools()
 
     # install stlink ----------------
     echo -e "\n install  stlink-v$v \n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     cd stm32-tools/stlink-v$v
     make release -j$(cat /proc/cpuinfo | grep processor | wc -l)
     cd build/Release/
@@ -440,7 +429,7 @@ function _dj_setup_stm32_tools()
 
     # install stm32flash ----------------
     echo -e "\n install  stm32flash\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     cd ~/workspace/stm32-tools/stm32flash
     make clean
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
@@ -448,7 +437,7 @@ function _dj_setup_stm32_tools()
 
     # udev rule ----------------
     echo -e "\n add serial port privilege to current user\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     sudo usermod -a -G dialout $(whoami)
     rule_file=stm32-tools.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
@@ -458,7 +447,7 @@ function _dj_setup_stm32_tools()
 
     echo -e "\n"
     cd ~/workspace
-    _ask_to_remove_a_folder ~/workspace/stm32-tools
+    _ask_to_remove_a_folder stm32-tools
 
     cd ${cwd_before_running}
 }
@@ -469,7 +458,7 @@ function _dj_setup_glfw3()
     cwd_before_running=$PWD
 
     echo -e "\n install glfw3 ...\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
     
     cd ~ && mkdir -p soft && cd soft/
 
@@ -492,16 +481,23 @@ function _dj_setup_glfw3()
 function _dj_setup_google_repo()
 {
     cwd_before_running=$PWD
-    
-    curl https://storage.googleapis.com/git-repo-downloads/repo > repo
-    chmod a+x repo
-    sudo mv repo /bin/
-    
+
+    if [ -f tools/repo ] ; then
+        echo -e "\n use repo from tools/ \n"
+        sudo cp tools/repo /bin/
+        chmod a+x /bin/repo
+    else
+        echo -e "\n fetch from google \n"
+        curl https://storage.googleapis.com/git-repo-downloads/repo > repo
+        chmod a+x repo
+        sudo mv repo /bin/
+    fi
+
     cat << EOM
 
-    -----------------------------------
-    Google tool "repo" is installed into folder: /bin/
-    -----------------------------------
+ -----------------------------------------
+  Google tool "repo" is installed into folder: /bin/
+ -----------------------------------------
 
 EOM
     cd ${cwd_before_running}
@@ -512,8 +508,8 @@ function _dj_setup_gtest_glog()
 {
     cwd_before_running=$PWD
 
-    echo -e "\n install gtest ...\n"
-    _press_enter_to_continue
+    echo -e "\n install gtest and glog ...\n"
+    _press_enter_or_wait_s_continue 20
     
     cd ~ && mkdir -p soft && cd soft/
     
@@ -534,8 +530,8 @@ function _dj_setup_gtest_glog()
 # instlal gnome, need more test
 function _dj_setup_gnome()
 {
-    echo -e "\n install gnome on ubuntu\n"
-    _press_enter_to_continue
+    echo -e "\n install gnome on Ubuntu\n"
+    _press_enter_or_wait_s_continue 20
 
     sudo apt-get install tasksel
     sudo apt-get install gnome-session
@@ -569,7 +565,7 @@ function _dj_setup_grpc_1_29_1()
 function _dj_setup_gpp_10()
 {
     echo -e "\n instal gcc-10, g++-10"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
 
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
     sudo apt-get update
@@ -605,7 +601,7 @@ function _dj_setup_opencv_2_4_13()
     echo -e "\n Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.11.2"
     echo -e "     dj setup qt-5.11.2\n\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
     
     cd ~ && mkdir -p soft && cd soft/
 
@@ -644,7 +640,7 @@ function _dj_setup_opencv_4_1_1()
     echo -e "\n Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.14.2"
     echo -e "     dj setup qt-5.14.2\n\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
 
     # install dependency:
     sudo apt-get install -y libopencv-dev build-essential cmake libdc1394-22
@@ -707,23 +703,22 @@ function _dj_setup_wubi()
 
     sudo apt-get install ibus ibus-table-wubi -y
     if [[ ${ubuntu_v} = *'16.04'* ]] ; then
-        echo -e "\n"
-        echo "Following the steps:"
-        echo -e "\n"
-        echo "  $ ibus-setup"
-        echo "  in the opened window: Input Method -> Add -> Chinese -> choose WuBi-Jidian-86-JiShuang"
-        echo "  (it may need reboot the computer if the WuBi input is not shown) "
-        echo "  $ im-config -n ibus (nothing will happen after ENTER)"
-        echo "  Add an Input Source to Gnome:"
-        echo "  Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chise (WuBi-Jidian-86-JiShuang-6.0) "
-        echo "  use Windows Key (or named Super Key) + Space to switch the two input methods"
-        echo -e "\n"
+        cat << EOM
+
+        Follow the steps:
+            1. log out and log in again;
+            2. $ ibus-setup
+               then in the opened window: Input Method -> Add -> Chinese -> choose WuBi-Jidian-86-JiShuang
+            3. im-config -n ibus 
+               this step will show nothing
+            4. add an input source:
+               Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chinese (WuBi-Jidian-86-JiShuang-6.0)
+
+EOM
     elif [[ ${ubuntu_v} = *'18.04'* \
         || ${ubuntu_v} = *'20.04'* ]] ; then
-        echo -e "\n"
-        echo " pleaase follow the link below to finish the setup"
-        echo " https://www.pinyinjoe.com/linux/ubuntu-18-gnome-chinese-setup.htm"
-        echo -e "\n"
+        echo -e "\n please follow the link below to finish the setup:"
+        echo -e " https://www.pinyinjoe.com/linux/ubuntu-18-gnome-chinese-setup.htm\n"
     fi
     cd ${cwd_before_running}
 }
@@ -749,12 +744,6 @@ function _dj_setup_vtk_8_2_0()
           -DQT5_DIR=$HOME/Qt5.14.2/5.14.2/gcc_64/lib/cmake/Qt5 \
           -DVTK_QT_VERSION=5 -DVTK_Group_Qt=ON ..
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
-    # some warning:
-    # CMake Warning:
-    #     Manually-specified variables were not used by the project:
-
-    #     QT5_DIR
-    # however, the compilation seems have no problem
 
     echo -e "\n"
     echo " the installed library seems to be in /usr/local/lib folder"
@@ -856,7 +845,7 @@ function _dj_ssh_no_password()
 function _dj_setup_vim_env()
 {
     echo -e "\n setup the vim as an IDE\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
 
     cwd_before_running=$PWD
 
@@ -1002,6 +991,48 @@ function dj()
     # ------------------------------
     if [ $# -eq 0 ] ; then
         _dj_help
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'clone' ] ; then
+        # --------------------------
+        if [ $2 = 'bitbucket' ] ; then
+            _dj_clone_bitbucket $3 $4 $5 $6 $7
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'github' ] ; then
+            _dj_clone_github $3 $4 $5 $6 $7
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'gitee' ] ; then
+            _dj_clone_gitee $3 $4 $5 $6 $7
+            return
+        fi
+        # --------------------------
+        _dj_clone_help
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'clone-ssh' ] ; then
+        # --------------------------
+        if [ $2 = 'bitbucket' ] ; then
+            _dj_clone_ssh_bitbucket $3 $4 $5 $6 $7
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'github' ] ; then
+            _dj_clone_ssh_github $3 $4 $5 $6 $7
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'gitee' ] ; then
+            _dj_clone_ssh_gitee $3 $4 $5 $6 $7
+            return
+        fi
+        # --------------------------
+        _dj_clone_help
         return
     fi
     # ------------------------------
@@ -1269,27 +1300,6 @@ function dj()
         return
     fi
     # ------------------------------
-    if [ $1 = 'clone' ] ; then
-        # --------------------------
-        if [ $2 = 'bitbucket' ] ; then
-            _dj_clone_bitbucket $3 $4 $5 $6 $7
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'github' ] ; then
-            _dj_clone_github $3 $4 $5 $6 $7
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'gitee' ] ; then
-            _dj_clone_gitee $3 $4 $5 $6 $7
-            return
-        fi
-        # --------------------------
-        _dj_clone_help
-        return
-    fi
-    # ------------------------------
     if [ $1 = 'udev' ] ; then
         if [ $2 = '--dialout' ] ; then
             _dj_udev_dialout $3 $4 $5
@@ -1318,6 +1328,7 @@ function _dj()
     # All possible first values in command line
     local SERVICES=("
         clone
+        clone-ssh
         meson
         open
         setup
@@ -1331,84 +1342,57 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    ACTIONS[setup]+="baidu-netdisk clang-9.0.0 computer container dj-gadgets "
-    ACTIONS[setup]+="dropbox eigen foxit gcc-arm-embedded gcc-arm-linux-gnueabi "
-    ACTIONS[setup]+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-    ACTIONS[setup]+="gitg-kdiff3 glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
-    ACTIONS[setup]+="g++-10 i219-v libev-4.33 lib-serialport mathpix matplotlib-cpp "
-    ACTIONS[setup]+="opencv-2.4.13 opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 "
-    ACTIONS[setup]+="ros-melodic ros2-foxy spdlog slack stm32-tools sublime typora "
-    ACTIONS[setup]+="vim-env vscode vtk-8.2.0 wubi lib-yamlcpp "
-    ACTIONS[setup]+="YouCompleteMe you-complete-me "
-    ACTIONS[baidu-netdisk]=" "
-    ACTIONS[clang-9.0.0]=" "
-    ACTIONS[computer]=" "
+    setup_tools+="baidu-netdisk clang-9.0.0 computer container dj-gadgets "
+    setup_tools+="dropbox eigen foxit gcc-arm-embedded gcc-arm-linux-gnueabi "
+    setup_tools+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
+    setup_tools+="gitg-kdiff3 glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
+    setup_tools+="g++-10 i219-v libev-4.33 lib-serialport mathpix matplotlib-cpp "
+    setup_tools+="opencv-2.4.13 opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 "
+    setup_tools+="ros-melodic ros2-foxy spdlog slack stm32-tools sublime typora "
+    setup_tools+="vim-env vscode vtk-8.2.0 wubi lib-yamlcpp "
+    setup_tools+="YouCompleteMe you-complete-me "
+    ACTIONS[setup]="$setup_tools "
+    for i in $setup_tools ; do
+        ACTIONS[$i]=" "
+    done
+    # special ones -----------------
     ACTIONS[container]="docker dive lxd-4.0 "
     ACTIONS[docker]=" "
-    ACTIONS[dive]=" "
+    ACTIONS[dive]="  "
     ACTIONS[lxd-4.0]=" "
-    ACTIONS[dj-gadgets]=" "
-    ACTIONS[dropbox]=" "
-    ACTIONS[eigen]=" "
-    ACTIONS[foxit]=" "
-    ACTIONS[gcc-arm-embedded]=" "
-    ACTIONS[gcc-arm-linux-gnueabi]=" "
-    ACTIONS[gcc-arm-linux-gnueabihf]=" "
-    ACTIONS[gcc-aarch64-linux-gnu]=" "
-    ACTIONS[git-lfs]=" "
-    ACTIONS[gitg-kdiff3]=" "
-    ACTIONS[glfw3]=" "
-    ACTIONS[google-repo]=" "
-    ACTIONS[gtest-glog]=" "
-    ACTIONS[gnome]=" "
-    ACTIONS[grpc-1.29.1]=" "
-    ACTIONS[g++-10]=" "
+    # ---------------------
     ACTIONS[i219-v]="e1000e-3.4.2.1 e1000e-3.4.2.4 "
     ACTIONS[e1000e-3.4.2.1]=" "
     ACTIONS[e1000e-3.4.2.4]=" "
-    ACTIONS[libev-4.33]=" "
-    ACTIONS[lib-serialport]=" "
-    ACTIONS[mathpix]=" "
-    ACTIONS[matplotlib-cpp]=" "
-    ACTIONS[opencv-2.4.13]=" "
+    # ---------------------
     ACTIONS[opencv-4.1.1]="with-contrib no-contrib "
     ACTIONS[with-contrib]=" "
     ACTIONS[no-contrib]=" "
-    ACTIONS[pangolin]=" "
-    ACTIONS[pip]=" "
+    # ---------------------
     ACTIONS[qemu]="2.11.1 4.2.0 "
     ACTIONS[2.11.1]=" "
     ACTIONS[4.2.0]=" "
-    ACTIONS[qt-5.13.1]=" "
-    ACTIONS[qt-5.14.2]=" "
+    # ---------------------
     ACTIONS[ros-melodic]="--from-deb-package --from-source "
     ACTIONS[ros2-foxy]="--from-deb-package --from-source "
     ACTIONS[--from-deb-package]=" "
     ACTIONS[--from-source]=" "
+    # ---------------------
     ACTIONS[spdlog]="static shared "
+    ACTIONS[lib-yamlcpp]="static shared "
     ACTIONS[static]=" "
     ACTIONS[shared]=" "
-    ACTIONS[slack]=" "
-    ACTIONS[stm32-tools]+="1.3.1 1.4.0 1.5.0 1.5.1 1.6.0 1.6.1 "
-    ACTIONS[1.3.1]=" "
-    ACTIONS[1.4.0]=" "
-    ACTIONS[1.5.0]=" "
-    ACTIONS[1.5.1]=" "
-    ACTIONS[1.6.0]=" "
-    ACTIONS[1.6.1]=" "
-    ACTIONS[sublime]=" "
-    ACTIONS[typora]=" "
-    ACTIONS[vim-env]=" "
-    ACTIONS[vscode]=" "
-    ACTIONS[vtk-8.2.0]=" "
-    ACTIONS[wubi]=" "
-    ACTIONS[lib-yamlcpp]="static shared "
-    ACTIONS[YouCompleteMe]=" "
-    ACTIONS[you-complete-me]=" "
+    # ---------------------
+    stm32_tools_v="1.3.1 1.4.0 1.5.0 1.5.1 1.6.0 1.6.1 "
+    ACTIONS[stm32-tools]="$stm32_tools_v "
+    for i in $stm32_tools_v ; do
+        ACTIONS[$i]=" "
+    done
 
     #---------------------------------------------------------
     #---------------------------------------------------------
     ACTIONS[clone]="bitbucket github gitee "
+    ACTIONS[clone-ssh]="bitbucket github gitee "
     #---------------------------------------------------------
     ACTIONS[bitbucket]+=" "
     if [ -f $djtools_path/.bitbucket-repos ] ; then

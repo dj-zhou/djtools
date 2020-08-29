@@ -47,7 +47,7 @@ function _ask_to_remove_a_folder()
 function _ask_to_execute_cmd()
 {
     echo "command: "$1
-    echo -e '\nDo you want to execute command "'${1}'"?\n'
+    echo -e '\n Do you want to execute command "'${1}'"?\n'
     read answer
     if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || \
         ($answer = 'No') || ($answer = 'no') ]] ; then
@@ -69,7 +69,7 @@ function _write_to_text_file_with_width()
     file="$3"
     str_len=${#str}
     if [[ str_len > width ]] ; then
-        echo -e "\n\n_write_to_text_file_with_width: width set too short!\n\n"
+        echo -e "\n\n _write_to_text_file_with_width: width set too short!\n\n"
         for ((c=1;c<=$width;c++ )) ; do
             single_char=${str:${c}-1:1}
             echo -ne "$single_char" >> $file
@@ -89,11 +89,29 @@ function _press_enter_to_continue()
     read answer
     echo $answer
 }
+# =============================================================================
+function _press_enter_or_wait_s_continue()
+{
+    second=$1
+    while [ 0 -lt $second ] ; do
+        if [ $second = '1' ] ; then
+            echo -ne "\r  Press [ENTER] or wait $second second to continue ...    "
+        else
+            echo -ne "\r  Press [ENTER] or wait $second seconds to continue ...   "
+        fi
+        read -s -N 1 -t 1 key
+        if [ "$key" == $'\x0a' ] ;then
+            break
+        fi
+        second=$((second-1))
+    done
+    echo -e "\n"
+}
 
 # =============================================================================
 function _display_section()
 {
-    echo '----------------------------------------------------'
+    echo ' ----------------------------------------------------'
 }
 
 # =============================================================================
@@ -185,13 +203,13 @@ function _size_calculate() # $fz_byte $output_control
     if [ $output_control = 'true' ] ; then
         echo $fz_byte
     elif [ $output_control = 'false' ] ; then
-        fz_kbyte=$(awk "BEGIN {print $((fz_byte)) / 1024}")
+        fz_kbyte=$(awk "BEGIN {print $((fz_byte)) / 1024}" | awk '{printf("%d",$0);}')
         fz_kbyte_int=${fz_kbyte%.*}
-        fz_mbyte=$(awk "BEGIN {print $((fz_kbyte_int)) / 1024}")
+        fz_mbyte=$(awk "BEGIN {print $((fz_kbyte_int)) / 1024}" | awk '{printf("%d",$0);}')
         fz_mbyte_int=${fz_mbyte%.*}
-        fz_gbyte=$(awk "BEGIN {print $((fz_mbyte_int)) / 1024}")
+        fz_gbyte=$(awk "BEGIN {print $((fz_mbyte_int)) / 1024}" | awk '{printf("%d",$0);}')
         fz_gbyte_int=${fz_gbyte%.*}
-        fz_tbyte=$(awk "BEGIN {print $((fz_gbyte_int)) / 1024}")
+        fz_tbyte=$(awk "BEGIN {print $((fz_gbyte_int)) / 1024}" | awk '{printf("%d",$0);}')
         fz_tbyte_int=${fz_tbyte%.*}
         if [[ $fz_kbyte_int = '0' ]] ;  then
             echo "$fz_byte bytes"

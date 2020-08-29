@@ -6,7 +6,7 @@
 djtools_path=$PWD
 echo $djtools_path
 
-echo -e '\ndjtools installation ...\n'
+echo -e '\n djtools installation ...\n'
 
 # =============================================================================
 # source the package in ~/.bashrc
@@ -25,7 +25,7 @@ echo '# djtools setup' >> ~/.bashrc
 # =============================================================================
 # get bitbucket/github, etc, user name
 # -----------------------------------------------------------------
-echo -e '\nDo you have a BitBucket username? [Yes/No]'
+echo -e '\n Do you have a BitBucket username? [Yes/No]'
 read answer
 username=" "
 if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || \
@@ -41,7 +41,7 @@ fi
 echo 'bitbucket_username='$username >> ~/.bashrc
 
 # -----------------------------------------------------------------
-echo -e '\nDo you have a GitHub username? [Yes/No]'
+echo -e '\n Do you have a GitHub username? [Yes/No]'
 read answer
 username=" "
 if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || \
@@ -57,7 +57,7 @@ fi
 echo 'github_username='$username >> ~/.bashrc
 
 # -----------------------------------------------------------------
-echo -e '\nDo you have a GiTee username? [Yes/No]'
+echo -e '\n Do you have a GiTee username? [Yes/No]'
 read answer
 username=" "
 if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || ($answer = 'No') || \
@@ -72,7 +72,7 @@ fi
 
 echo 'gitee_username='$username >> ~/.bashrc
 
-echo -e '\nIf bitbucket/github/gitee usernames set wrong, you can still edit them in ~/.bashrc\n'
+echo -e '\n If bitbucket/github/gitee usernames set wrong, you can still edit them in ~/.bashrc\n'
 echo "source "$djtools_path"/djtools.bash" >> ~/.bashrc
-echo -e "\ndjtools installation finished.\n"
+echo -e "\n djtools installation finished.\n"
 echo -e "\n" >> ~/.bashrc

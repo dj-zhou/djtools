@@ -7,7 +7,7 @@ function _dj_setup_ros_melodic()
 
     # only Uubntu 18.04 can install ros-melodic
     if [[ $ubuntu_v != *'Ubuntu 18.04'* ]] ; then
-        echo -e "\nROS Melodic can only be installed on Ubuntu 18.04\n"
+        echo -e "\n ROS Melodic can only be installed on Ubuntu 18.04\n"
         return
     fi
 
@@ -49,8 +49,6 @@ function _dj_setup_ros_melodic()
     echo 'export ROS_MASTER_URI=http://localhost:11311' >> ~/.bashrc
     echo 'export ROS_IP=localhost' >> ~/.bashrc
     echo -e "\n ROS (1) settings are in ~/.bashrc.\n"
-
-    _press_enter_to_continue
 
     cd ${cwd_before_running}
 }
@@ -123,8 +121,6 @@ function _dj_setup_ros2_foxy_from_deb_package()
     https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/#install-additional-packages-using-ros-1-packages
 
 EOM
-
-    _press_enter_to_continue
 
     cd ${cwd_before_running}
 }

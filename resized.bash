@@ -20,11 +20,11 @@
 # =============================================================================
 _resized_help()
 {
-    echo -e "\n\n---------------------- resized ----------------------"
-    echo " Author      : Dingjiang Zhou"
-    echo " Email       : zhoudingjiang@gmail.com "
-    echo " Create Date : 2020-03-11"
-    echo "-----------------------------------------------------"
+    echo -e "\n\n ---------------------- resized ----------------------"
+    echo "  Author      : Dingjiang Zhou"
+    echo "  Email       : zhoudingjiang@gmail.com "
+    echo "  Create Date : 2020-03-11"
+    echo " -----------------------------------------------------"
     echo -e "\n First level commands:"
     echo "   embedded   - to arrange terminator and vscode"
     echo "   gitg       - to arrange terminator and gitg"
@@ -312,9 +312,8 @@ _resize_typora()
     elif [[ "$SCREENSIZE" = *"2560x1080"* ]]; then
         echo "resized typora: Single 2560x1080 screen"
         #                   none, x,     y,   width,   height
-        wmctrl -r "/bin/bash" -e 0,10,0,800,1000
-        wmctrl -r "Typora" -e 0,1330,0,1200,1080
-        wmctrl -R "Typora"
+        wmctrl -r "/bin/bash" -e 0,10,0,1200,1000
+        wmctrl -r "Typora" -e 0,1210,0,1350,1080
     elif [[ "$SCREENSIZE" = *"1366x768"* ]]; then
         echo "resized typora: Single 1366x768 screen"
         #                   none, x,     y,   width,   height

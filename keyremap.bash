@@ -2,7 +2,7 @@
 
 # =============================================================================
 _keyremap_help() {
-    echo -e "\nkeyremap usage: \n"
+    echo -e "\n keyremap usage: \n"
     echo "    keyremap enable "
     echo "       -- swap Alt and Ctrl keys"
     echo "    keyremap disable "
@@ -12,13 +12,13 @@ _keyremap_help() {
 # =============================================================================
 _keyremap_enable() {
     xmodmap $djtools_path/settings/keyremap-enable.txt
-    echo -e "\nkeyremap enabled\n"
+    echo -e "\n keyremap enabled\n"
 }
 
 # =============================================================================
 _keyremap_disable() {
     xmodmap $djtools_path/settings/keyremap-disable.txt
-    echo -e "\nkeyremap disabled\n"
+    echo -e "\n keyremap disabled\n"
 }
 
 # =============================================================================

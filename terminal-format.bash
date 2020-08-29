@@ -2,7 +2,7 @@
 
 # =============================================================================
 _terminal_help() {
-    echo -e "\nterminal: supported commands\n"
+    echo -e "\n terminal: supported commands\n"
     echo "     $ terminal host full-path"
     echo "     $ terminal host full-path no-space"
     echo "     $ terminal host short-path"

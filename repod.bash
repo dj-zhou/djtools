@@ -9,19 +9,19 @@
 # =============================================================================
 function _repod_help()
 {
-    echo -e "\n---------------------- repod ------------------------"
-    echo " Author      : Dingjiang Zhou"
-    echo " Email       : zhoudingjiang@gmail.com "
-    echo " Create Date : Mar. 1st, 2020 "
-    echo "-----------------------------------------------------"
-    echo -e "\nFirst level arguments:"
+    echo -e "\n ---------------------- repod ------------------------"
+    echo "  Author      : Dingjiang Zhou"
+    echo "  Email       : zhoudingjiang@gmail.com "
+    echo "  Create Date : Mar. 1st, 2020 "
+    echo " -----------------------------------------------------"
+    echo -e "\n First level arguments:"
     echo "   backup-to - push the repo to some repo"
     echo "   branches  - to check branch status"
     echo "   checkout  - only used to checkout all branches"
     echo "   switch-to - change the remote url"
     echo -e "   update    - update the repo information in a folder\n"
     echo "   MORE IS COMMING"
-    echo -e "\nAll commands support tab completion\n"
+    echo -e "\n All commands support tab completion\n"
 }
 
 # =============================================================================
@@ -97,7 +97,7 @@ function _backup_to_gitee()
     if [ $# = 0 ] ; then
         git push -u origin master
         git push --tags
-        echo -e "\nmaster and all tags are pushed into GiTee\n"
+        echo -e "\n master and all tags are pushed into GiTee\n"
     fi
 
     if [ $# = 1 ] ; then
@@ -122,7 +122,7 @@ function _repod_branches_list()
     # this is not the latest
     git for-each-ref --count=10 --sort=committerdate refs/heads/ \
         --format='%(color:green)%(committerdate:short)%(color:reset)|%(color:red)%(objectname:short)%(color:reset)|%(HEAD)%(color:yellow)%(refname:short)%(color:reset) | %(authorname)'
-    echo -e '\nnot finished yet\n'
+    echo -e '\n not finished yet\n'
 }
 
 # =============================================================================
@@ -289,7 +289,7 @@ function repod()
         fi
     fi
     
-    echo -e '\r\nrepod : "'$1 '"command not supported\r\n'
+    echo -e '\r\n repod : "'$1 '"command not supported\r\n'
     _repod_help
     # ------------------------------
     cd $current_folder

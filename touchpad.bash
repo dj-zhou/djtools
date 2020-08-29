@@ -2,7 +2,7 @@
 
 # =============================================================================
 _touchpad_help() {
-    echo -e "\ntouchpad usage:\n"
+    echo -e "\n touchpad usage:\n"
     echo "    touchpad thinkpad enable "
     echo "       -- enable the touchpad on ThinkPad laptops"
     echo "    touchpad thinkpad disable " 

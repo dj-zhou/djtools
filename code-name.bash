@@ -4,12 +4,12 @@
 function _code_name_help()
 {
     echo -e "-------------- code-name --------------------"
-    echo -e "\r\nTODO\r\n"
+    echo -e "\r\n TODO\r\n"
 }
 
 function _code_name_compuer_name()
 {
-    echo -e "\r\nComputer code names: Types of Snakes\r\n"
+    echo -e "\r\n Computer code names: Types of Snakes\r\n"
     echo "  Anaconda Boa Cobra Copperhead Cottonmouth Garter "
     echo "  Kingsnake Mamba Python Rattler Sidewinder Taipan "
     echo "  Viper"
@@ -17,7 +17,7 @@ function _code_name_compuer_name()
 
 function _code_name_others()
 {
-    echo -e "\r\nOther code names to consider\r\n"
+    echo -e "\r\n Other code names to consider\r\n"
     echo "--------------"
     echo "Weather & Atmosphere:"
     echo "  Aurora Avalanche Blizzard Cyclone Dewdrop Downpour"

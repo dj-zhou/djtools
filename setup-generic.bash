@@ -109,7 +109,7 @@ function _dj_setup_computer()
         screen: press Ctrl+A and then \, and [y]
 EOM
 
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
 
     sudo apt-get install -y ark cmake curl cutecom dconf-editor dconf-tools git
     sudo apt-get install -y git-lfs g++ htop kate libgtk2.0-dev lsb-core putty
@@ -117,7 +117,7 @@ EOM
 
     # -----------------------------------
     echo -e "\n going to install Google Chrome\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     cd ~ && mkdir -p soft/ &&  cd soft/
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     sudo dpkg -i google-chrome*
@@ -128,7 +128,7 @@ EOM
     # -----------------------------------
     # Windows fonts
     echo -e "\n going to support Windows fonts\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     sudo apt-get install ttf-mscorefonts-installer -y
     sudo apt-get install msttcorefonts -y
     sudo apt-get install gtk2-engines-pixbuf -y # works for solving the GTK warning
@@ -136,13 +136,13 @@ EOM
     # -----------------------------------
     # remove firefox
     echo -e "\n going to remove firfox\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     sudo apt-get purge firefox -y; rm -Rf ~/.mozilla/firefox/;
 
     # -----------------------------------
     # to display simplified Chinese: important, do not comment out!
     echo -e "\n going to setup simplified Chinese support\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     gnome_version=$(version check gnome)
     if [ ! $gnome_version = ' ' ] ; then
         gsettings set org.gnome.gedit.preferences.encodings \
@@ -151,14 +151,14 @@ EOM
     # -----------------------------------
     # to disable the fixed dock (in dock setting, it is Auto-hide the Dock option)
     echo -e "\n hide the Dock when any windows overlap with it\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     if [ ! $gnome_version = ' ' ] ; then
         gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     fi
     # -----------------------------------
     # to lock the screen from commands
     echo -e "\n going to setup lock screen command\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     if [ ! $gnome_version = ' ' ] ; then
         sudo apt-get install gnome-screensaver -y
     fi
@@ -215,7 +215,7 @@ function _dj_setup_foxit_reader()
 
     echo -e "\n install Foxit Reader ..."
     echo -e "  recommended location: /opt/foxitsoftware/foxitreader\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
 
     cd ~ && mkdir -p soft/ &&  cd soft/
 
@@ -246,7 +246,7 @@ function _dj_setup_gcc_aarch64_linux()
     current_folder=${PWD}
 
     echo -e "\n install gcc-aarch64-linux-gnu ...\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     sudo apt-get install -y gcc-aarch64-linux-gnu gcc-5-aarch64-linux-gnu
     sudo apt-get install -y libssl-dev # needed for compiling the Linux Kernel for ARMv8
 
@@ -273,7 +273,7 @@ function _dj_setup_gcc_arm_embedded()
     current_folder=${PWD}
 
     echo -e "\n remove gcc-arm-none-eabi, and install gcc-arm-embedded ...\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
 
     cd ~ && mkdir -p soft/ &&  cd soft/
 
@@ -341,7 +341,7 @@ function _dj_setup_gcc_arm_linux_gnueabi()
     current_folder=${PWD}
 
     echo -e "\n install gcc-arm-linux-gnueabi ...\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     sudo apt-get install -y libncurses5-dev build-essential
     sudo apt-get install -y gcc-arm-linux-gnueabi gcc-5-arm-linux-gnueabi
     sudo apt-get install -y g++-arm-linux-gnueabi g++-5-arm-linux-gnueabi
@@ -374,7 +374,7 @@ function _dj_setup_gcc_arm_linux_gnueabihf()
     current_folder=${PWD}
 
     echo -e "\n install gcc-arm-linux-gnueabihf ...\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     sudo apt-get install -y libncurses5-dev build-essential
     sudo apt-get install -y gcc-arm-linux-gnueabihf gcc-5-arm-linux-gnueabihf
     sudo apt-get install -y g++-arm-linux-gnueabihf g++-5-arm-linux-gnueabihf
@@ -416,7 +416,7 @@ function _dj_setup_gitg_kdiff3()
     current_folder=${PWD}
 
     echo -e "\n install gitg and KDiff3 ...\n"
-    _press_enter_to_continue # to check the key pressed TODO
+    _press_enter_or_wait_s_continue 10 # to check the key pressed TODO
     sudo apt-get install gitg kdiff3 -y
     git config --global credential.helper store
     # git config --global credential.helper 'cache --timeout=36000'  
@@ -576,7 +576,7 @@ function _dj_setup_qt_5_13_1()
     fi
 
     echo -e "\n It is recommended to install the Qt into ${HOME}/Qt5.13.1/"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
 
     ./$filename
 
@@ -599,7 +599,7 @@ function _dj_setup_qt_5_14_2()
     cwd_before_running=$PWD
 
     echo -e "\nInstall Qt 5.14.2\n"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 10
     
     # install serialport module
     sudo apt-get install libqt5serialport5-dev -y
@@ -624,7 +624,7 @@ function _dj_setup_qt_5_14_2()
     fi
 
     echo -e "\n It is recommended to install the Qt into ${HOME}/Qt5.14.2/"
-    _press_enter_to_continue
+    _press_enter_or_wait_s_continue 20
 
     ./$filename
 

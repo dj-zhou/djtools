@@ -136,7 +136,7 @@ function _zephyr_setup_sdk_0_11_4()
     fi
     chmod +x $zephyr_sdk
 
-    echo -e "\n------------------------\nWhich location are you going to install the Zephyr SDK?"
+    echo -e "\n------------------------\n Which location are you going to install the Zephyr SDK?"
     echo -e "1: ~/zephyr-sdk-$sdk_ver"
     echo -e "2: ~/.local/zephyr-sdk-$sdk_ver"
     echo -e "3: ~/.local/optzephyr-sdk-$sdk_ver"
@@ -212,7 +212,7 @@ function _zephyr_setup_sdk_0_11_4()
         echo 'export ZEPHYR_SDK_PATH='$zephyr_sdk_folder >> ~/.bashrc
     fi
 
-    echo -e "\nTry the following commands to verify installation"
+    echo -e "\n Try the following commands to verify installation"
     echo -e "  cd $zephyr_proj_folder/zephyr/"
     echo -e "  west build -p auto -b nucleo_f767zi samples/basic/blinky\n"
     # ------------------------------
@@ -223,9 +223,9 @@ function _zephyr_setup_sdk_0_11_4()
 # =============================================================================
 function _zephyr_build_help()
 {
-    echo -e "\n------------ zephyr build (simplified tool) --------------"
+    echo -e "\n ------------ zephyr build (simplified tool) --------------"
     echo "  maitainer: Dingjiang Zhou "
-    echo -e "----------------------------------------------------------\n"
+    echo -e " ----------------------------------------------------------\n"
     echo "supported commands:"
     echo " zephyr build -b <board> [-G <make tool>]"
     echo " - <board> "
@@ -273,42 +273,12 @@ function _zephyr_build_old()
 }
 
 # =============================================================================
-# echo -e "\nTry the following commands to verify installation"
+# echo -e "\n Try the following commands to verify installation"
 #     echo -e "  cd $zephyr_proj_folder/zephyr/"
 #     echo -e "  west build -p auto -b nucleo_f767zi samples/basic/blinky\n"
 # the new build function: copy everything into $zephyr_proj_folder/zephyr/
 # $1: -b
 # $2: board
-function _zephyr_build_new1()
-{
-    board=$(_find_argument_after_option -b $1 $2 $3 $4 $5 $6 $7 $8)
-    if [ -z $ZEPHYR_PROJECT_PATH ] ; then
-        echo -e "\n ZEPHYR_PROJECT_PATH is not set, exit.\n"
-    fi
-    project_path=${PWD}
-    project_name=`basename "$project_path"`
-    echo "project_path = "$project_path
-    echo "project_name = "$project_name
-    
-    # remove build in current project path -----
-    rm -rf build
-
-    # copy source file to zephyr project path ------
-    rm -rf $ZEPHYR_PROJECT_PATH/zephyr/$project_name
-    cp -rf $project_path $ZEPHYR_PROJECT_PATH/zephyr/
-
-    # go there and compile ------
-    cd $ZEPHYR_PROJECT_PATH/zephyr/$project_name
-    
-    west build -p auto -b $board
-    
-    # if successful (how to check?), copy build folder to current project path
-    mv build $project_path
-    rm -rf $ZEPHYR_PROJECT_PATH/zephyr/$project_name
-
-    cd ${project_path}
-}
-
 function _zephyr_build_new()
 {
     # find the board --------------
@@ -367,9 +337,9 @@ function _zephyr_build_new()
 # =============================================================================
 function _zephyr_flash_help()
 {
-    echo -e "\n------------ zephyr flash (simplified tool) --------------"
-    echo "  maitainer: Dingjiang Zhou "
-    echo -e "----------------------------------------------------------\n"
+    echo -e "\n ------------ zephyr flash (simplified tool) --------------"
+    echo "   maitainer: Dingjiang Zhou "
+    echo -e " ----------------------------------------------------------\n"
     echo "supported commands:"
     echo -e " zephyr flash\n"
 }
@@ -402,7 +372,7 @@ function _zephyr_flash()
     else
         # to flash --------
         board=$(cat build/board.txt)
-        echo -e "\n  the build target board is ${GRN}${board}${NOC}\n"
+        echo -e "\n the build target board is ${GRN}${board}${NOC}\n"
         west flash
     fi
 
@@ -437,7 +407,7 @@ function zephyr()
         return
     fi
 
-    echo -e '\r\nzephyr : "'$1 '"command not supported\r\n'
+    echo -e '\r\n zephyr : "'$1 '"command not supported\r\n'
     _zephyr_help
 
     # ------------------------------
@@ -463,13 +433,14 @@ function _zephyr()
     # ------------------------------------------------------------------------
     ACTIONS[setup]+="sdk-0.11.4 "
     ACTIONS[sdk-0.11.4]=" "
-    # ACTIONS[build]="-b "
     ACTIONS[flash]=" "
-    # ACTIONS[stm32]=" "
 
-    # supported boards, can be added here
-    ACTIONS[-b]+="nucleo_f767zi "
-    ACTIONS[nucleo_f767zi]=" "
+    # supported boards, can be added here --------------------
+    supported_boards+="nucleo_f767zi "
+    ACTIONS[-b]="$supported_boards "
+    for i in $supported_boards ; do
+        ACTIONS[$i]=" "
+    done
     
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

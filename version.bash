@@ -6,11 +6,11 @@
 # =============================================================================
 function _version_help()
 {
-    echo -e "\n---------------------  version ------------------------"
-    echo " Author      : Dingjiang Zhou"
-    echo " Email       : zhoudingjiang@gmail.com "
-    echo " Create Date : July 19th, 2020 "
-    echo "-----------------------------------------------------"
+    echo -e "\n ---------------------  version ------------------------"
+    echo "  Author      : Dingjiang Zhou"
+    echo "  Email       : zhoudingjiang@gmail.com "
+    echo "  Create Date : July 19th, 2020 "
+    echo " -----------------------------------------------------"
     echo -e "\n supported commands:\n"
     echo " check - to check software version"
     echo " swap  - to swap softwaare version, for example, gcc/g++"
@@ -189,7 +189,7 @@ function version()
         echo -e "\n version swap: $2: argument not supported\n"
         return
     fi
-    echo -e '\r\nversion : "'$1 '"command not supported\r\n'
+    echo -e '\r\n version : "'$1 '"command not supported\r\n'
     _version_help
 }
 
@@ -208,21 +208,19 @@ function _version()
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
-    ACTIONS[check]+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc"
-    ACTIONS[check]+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
-    ACTIONS[check]+="cmake gcc g++ gnome ubuntu "
-    ACTIONS[arm-linux-gnueabi-gcc]=" "
-    ACTIONS[arm-linux-gnueabihf-gcc]=" "
-    ACTIONS[arm-linux-gnueabihf-g++]=" "
-    ACTIONS[aarch64-linux-gnu-gcc]=" "
-    ACTIONS[cmake]=" "
-    ACTIONS[gcc]=" "
-    ACTIONS[g++]=" "
-    ACTIONS[gnome]=" "
-    ACTIONS[ubuntu]=" "
-    ACTIONS[swap]+="gcc g++ arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
-    ACTIONS[swap]+="aarch64-linux-gnu-gcc "
-
+    check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
+    check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
+    check_list+="cmake gcc g++ gnome ubuntu "
+    ACTIONS[check]="$check_list "
+    for i in $check_list ; do
+        ACTIONS[$i]=" "
+    done
+    swap_list+="gcc g++ arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
+    swap_list+="aarch64-linux-gnu-gcc "
+    ACTIONS[swap]="$swap_list "
+    for i in $swap_list ; do
+        ACTIONS[$i]=" "
+    done
     
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

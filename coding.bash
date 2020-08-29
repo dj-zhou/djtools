@@ -66,7 +66,7 @@ function coding()
     
     if [ $# = 0 ] ; then
         _coding_help
-    elif [ $1 = '-help' ] ; then
+    elif [ $1 = 'help' ] ; then
         _coding_help
     elif [ $1 = 'replace' ] && [ $# = 4 ] ; then
         if [ $4 = '.' ] ; then
@@ -76,7 +76,7 @@ function coding()
             echo $4" is a file "
             sed -i "s/"$2"/"$3"/g" $4
         else
-            echo " coding: not supported!"
+            echo -e "\n ${PRP}coding${NOC}: not supported!"
         fi
     elif [ $1 = 'clang-format' ] ; then
         if [ $# = 1 ] ; then
@@ -127,9 +127,11 @@ function _coding()
     ACTIONS[replace]+="help "
     ACTIONS[help]+=" "
     ACTIONS[clang-format]+="implement show enable disable "
-    ACTIONS[implement]+="dj bg "
-    ACTIONS[dj]+=" "
-    ACTIONS[bg]+=" "
+    format_style+="dj bg "
+    ACTIONS[implement]+="$format_style "
+    for i in $format_style ; do
+        ACTIONS[$i]=" "
+    done
     ACTIONS[show]+=" "
     ACTIONS[enable]+=" "
     ACTIONS[disable]+=" "

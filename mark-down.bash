@@ -3,11 +3,11 @@
 # =============================================================================
 function _mark-down_help()
 {
-    echo -e "\n-------------------- mark-down -----------------------"
-    echo " Author      : Dingjiang Zhou"
-    echo " Email       : zhoudingjiang@gmail.com "
-    echo " Create Date : June 8th, 2020 "
-    echo -e "-----------------------------------------------------\n"
+    echo -e "\n -------------------- mark-down -----------------------"
+    echo "  Author      : Dingjiang Zhou"
+    echo "  Email       : zhoudingjiang@gmail.com "
+    echo "  Create Date : June 8th, 2020 "
+    echo -e " -----------------------------------------------------\n"
     echo -e " TODO\n"
 }
 
