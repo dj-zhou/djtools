@@ -10,12 +10,15 @@ function _yocto_help()
    Email       : zhoudingjiang@gmail.com
    Create Date : June 8th, 2020
 -------------------------------------------------------------------------------
+  The yocto toolset is to make the Yocto related commands simpler.
 
-  The yocto toolset is to make the Yocto related commands simpler, supported
-  commands:
+  supported first level commands:
+     build   -- to build the plain SDK, or build applications using the SDK, etc
      clone   -- to clone some common used repos
+     find    -- to find distro-conf/image-bb/machine-conf/package-recipe-bb files
      flash   -- to flash the image into SD card
-     install -- to install Yocto related software
+     install -- to install dependencies, plain SDK, etc
+     list    -- to list machines, images, or resources
 
 EOM
 }
@@ -110,7 +113,7 @@ function _yocto_find_image_name()
         return
     fi
     # find tmp/ folder ---------------
-    TMPDIR=$(_yocto_find_tmp_folder)
+    TMPDIR=$(_yocto_find_TMPDIR)
     if [ -z $TMPDIR ] ; then
         if [ -d "tmp" ] ; then
             TMPDIR="tmp"
@@ -147,7 +150,7 @@ function _yocto_install_sdk_plain()
         return
     fi
     # find tmp/ folder ---------------
-    TMPDIR=$(_yocto_find_tmp_folder)
+    TMPDIR=$(_yocto_find_TMPDIR)
     if [ -z $TMPDIR ] ; then
         if [ -d "tmp" ] ; then
             TMPDIR="tmp"
@@ -170,7 +173,15 @@ function _yocto_install_sdk_plain()
     # find the image name and MACHINE ---------
     image_name=$(_yocto_find_image_name)
     machine=$(_yocto_find_MACHINE)
-    sdk_folder=$HOME/.$image_name-$machine-oesdk/
+    distro=$(_yocto_find_DISTRO)
+    distro_v=$(_yocto_find_DISTRO_VERSION)
+    echo "distro_v = $distro_v"
+    if [ -z $distro_v ] ; then
+        echo -e '\n Please enter Distro Version No.'
+        read answer
+        distro_v=$answer
+    fi
+    sdk_folder=$HOME/.$image_name-$machine-$distro-$distro_v-oesdk
 
     # remove the existing sdk folder ---------
     if [ -d $sdk_folder ] ; then
@@ -181,14 +192,7 @@ function _yocto_install_sdk_plain()
 }
 
 # =============================================================================
-# note: the arguments imx7 or raspberry-pi-4 are not serious names of the machines
-# original scripts for imx7-cl-som:
-# sudo umount /dev/sda1
-# sudo umount /dev/sda2
-# sudo chmod 666 /dev/sda
-# cd ~/yocto-cl-com-imx7/build/
-# oe-run-native bmap-tools-native bmaptool copy tmp/deploy/images/imx7-cl-som/flexbot2-image-imx7-cl-som.wic.gz /dev/sda
-# the above works only for the case when a USB-SD card reader is used:
+# lsblk output examples
 # sda           8:0    1   3.6G  0 disk 
 # ├─sda1        8:1    1  24.2M  0 part /media/robot/boot
 # └─sda2        8:2    1 573.8M  0 part /media/robot/root
@@ -200,7 +204,6 @@ function _yocto_install_sdk_plain()
 # =============================================================================
 function _yocto_check_is_a_build_directory()
 {
-    # this only check the current directory/path
     if [ ! -d "conf" ] ; then
         echo "false"
         return
@@ -213,116 +216,188 @@ function _yocto_check_is_a_build_directory()
         echo "false"
         return
     fi
-    if [ ! -d "tmp" ] ; then
-        echo "false"
-        return
-    fi
-    if [ ! -d "tmp/deploy/images" ] ; then
-        echo "false"
-        return
-    fi
     echo "true"
-    return
 }
 
 # =============================================================================
-# it can also be MACHINE ??= "xxxx", MACHINE ??= 'xxxx'
-# it can also be MACHINE ?= "xxxx", MACHINE ?= 'xxxx'
+# the variable MACHINE defined in conf/local.conf, can be any of the forms:
+# MACHINE = "xxxx", MACHINE = 'xxxx'
+# MACHINE ?= "xxxx", MACHINE ?= 'xxxx'
+# MACHINE ??= "xxxx", MACHINE ??= 'xxxx'
+function _yocto_find_variable_in_file() # $variable $file
+{
+    variable=$1
+    file=$2
+    value=$(grep "^$variable = " $file | awk '{print $3 }' | \
+              sed 's/"//g' | sed "s/'//g")
+    if [ ! -z $value ] ; then
+        echo $value
+        return
+    fi
+    value=$(grep "^$variable ?= " $file | awk '{print $3 }' | \
+              sed 's/"//g' | sed "s/'//g")
+    if [ ! -z $value ] ; then
+        echo $value
+        return
+    fi
+    value=$(grep "^$variable ??= " $file | awk '{print $3 }' | \
+              sed 's/"//g' | sed "s/'//g")
+    if [ ! -z $value ] ; then
+        echo $value
+        return
+    fi
+    echo " " # not found
+}
+# =============================================================================
 function _yocto_find_MACHINE()
 {
-    MACHINE=$(grep '^MACHINE = ' conf/local.conf | awk '{print $3 }' | sed 's/"//g' | sed "s/'//g")
-    if [ ! -z $MACHINE ] ; then
+    if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+        MACHINE=$(_yocto_find_variable_in_file "MACHINE" conf/local.conf)
         echo $MACHINE
-        return
+    else
+        echo " " # not found
     fi
-    MACHINE=$(grep '^MACHINE ?= ' conf/local.conf | awk '{print $3 }' | sed 's/"//g' | sed "s/'//g")
-    if [ ! -z $MACHINE ] ; then
-        echo $MACHINE
-        return
-    fi
-    MACHINE=$(grep '^MACHINE ??= ' conf/local.conf | awk '{print $3 }' | sed 's/"//g' | sed "s/'//g")
-    if [ ! -z $MACHINE ] ; then
-        echo $MACHINE
-        return
-    fi
-    echo " " # not found
-    return
 }
 
 # =============================================================================
-function _yocto_find_tmp_folder()
+function _yocto_find_TMPDIR()
 {
-    TMPDIR=$(grep '^TMPDIR =' conf/local.conf | awk '{ print $3 }' | sed 's/"//g' | sed "s/'//g")
-    if [ ! -z $TMPDIR ] ; then
+    if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+        TMPDIR=$(_yocto_find_variable_in_file "TMPDIR" conf/local.conf)
         echo $TMPDIR
-        return
+    else
+        echo " " # not found
     fi
-    TMPDIR=$(grep '^TMPDIR ?=' conf/local.conf | awk '{ print $3 }' | sed 's/"//g' | sed "s/'//g")
-    if [ ! -z $TMPDIR ] ; then
-        echo $TMPDIR
-        return
-    fi
-    TMPDIR=$(grep '^TMPDIR ??=' conf/local.conf | awk '{ print $3 }' | sed 's/"//g' | sed "s/'//g")
-    if [ ! -z $TMPDIR ] ; then
-        echo $TMPDIR
-        return
-    fi
-    echo " " # not found
-    return
 }
 
 # =============================================================================
-function _yocto_find_block_device()
+function _yocto_find_DISTRO()
 {
-    dev_to_check=$1
-    # echo "dev_to_check = "$dev_to_check
-    if [ -b $dev_to_check ] ; then
-        echo $dev_to_check
-        return
+    if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+        DISTRO=$(_yocto_find_variable_in_file "DISTRO" conf/local.conf)
+        echo $DISTRO
+    else
+        echo " " # not found
     fi
-    if [ -b /dev/${dev_to_check} ] ; then
-        echo "/dev/${dev_to_check}"
-        return
-    fi
-    echo " " # not found
 }
 
 # =============================================================================
-function _yocto_prepare_sd_card()
+function _yocto_find_DISTRO_VERSION()
 {
-    sd_card=$1
+    DISTRO=$(_yocto_find_DISTRO)
+    if [ -z $DISTRO ] ; then
+        echo " "
+    fi
 
-    # umount all partitions: /dev/sda1; /dev/sda2; /dev/sda3; etc
-    for i in {1..9} ; do
-        partition=$sd_card"${i}"
-        if [ -b $partition ] ; then
-            # check if mounted
-            sudo mount | grep '^/' | grep -q $partition
-            if [ $? -ne 1 ] ; then # is mounted
-                echo -e " umount partition:" ${GRN}$partition${NOC}
-                sleep 1 # just make it noticable
-                sudo umount $partition
-            else
-                echo -e "        partition: ${GRN}$partition${NOC} not mounted"
+    # then find $DISTRO.conf, in which, to find something like 'DISTRO_VERSION = "2.6.4"'
+    # however, this file can require some other find, then ... it can be too hard
+    current_folder=${PWD}
+    cd ..
+
+    for item in ./*; do
+        cd $current_folder
+        cd ..
+        if [[ -d $item ]] ; then
+            # echo $item
+            cd $item
+            folder_name=$(basename $item)
+            if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+                # echo "a build directory"
+                continue
+            fi
+            file_path=$(find . -name $DISTRO.conf)
+            if [ ! -z "$file_path" ] ; then
+                file_full_path=$current_folder/../$folder_name/$file_path
+                # find something like 'DISTRO_VERSION = "2.6.4"' in this file
+                DISTRO_V=$(_yocto_find_variable_in_file "DISTRO_VERSION" $file_full_path)
+                if [ ! -z $DISTRO_V ] ; then
+                    echo $DISTRO_V
+                    cd $current_folder
+                    return
+                # else
+                    # if contains "requre ...", check that file
+                    # ...
+                fi
             fi
         fi
     done
-    # umount all partitions: /dev/mmcblk0p1; /dev/mmcblk0p2; etc
-    for i in {1..9} ; do
-        partition=$sd_card"p${i}"
-        if [ -b $partition ] ; then
-            # check if mounted
-            sudo mount | grep '^/' | grep -q $partition
-            if [ $? -ne 1 ] ; then # is mounted
-                echo -e " umount partition:" ${GRN}$partition${NOC}
-                sleep 1 # just make it noticable
-                sudo umount $partition
-            else
-                echo -e "        partition: ${GRN}$partition${NOC} not mounted"
+    cd $current_folder
+}
+
+# =============================================================================
+function _yocto_find_a_file() # $file_full_name
+{
+    file_full_name=$1
+    current_folder=${PWD}
+    for item in ./*; do
+        cd $current_folder
+        if [[ -d $item ]] ; then
+            cd $item
+            folder_name=$(basename $item)
+            if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+                continue
+            fi
+            find_file=$(find -name "*$file_full_name")
+            if [ ! -z "$find_file" ] ; then
+                echo -e "\n ${GRN}---------------------------------------"
+                echo -e " $folder_name${NOC}"
+                echo "$find_file"
             fi
         fi
     done
-    sudo chmod 666 $sd_card
+    echo -e "\n"
+    cd $current_folder
+}
+
+# =============================================================================
+function _yocto_find_conf()
+{
+    if [ $(_yocto_check_is_a_build_directory) = 'true' ] ;then
+        echo -e "\n this is a build directory, stop search, exit!!\n"
+        return
+    fi
+
+    conf_name=$1
+    exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
+
+    if [ "$exact_vague" = "exact" ] ; then
+        conf_full_name="$conf_name.conf"
+    else
+        conf_full_name="$conf_name*.conf"
+    fi
+    
+    _yocto_find_a_file $conf_full_name
+}
+
+# =============================================================================
+function _yocto_find_bb()
+{
+    if [ $(_yocto_check_is_a_build_directory) = 'true' ] ;then
+        echo -e "\n this is a build directory, stop search, exit!!\n"
+        return
+    fi
+
+    bb_name=$1
+    exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
+    if [ "$exact_vague" = "exact" ] ; then
+        bb_full_name="$bb_name.bb"
+    else
+        bb_full_name="$bb_name*.bb"
+    fi
+    
+    _yocto_find_a_file $bb_full_name
+}
+
+
+# =============================================================================
+# this function does not support exact search
+function _yocto_find_package_recipe_bb()
+{
+    exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
+    if [ "$exact_vague" = "exact" ] ; then
+        echo -e "\n only support vague search \n"
+    fi
+    _yocto_find_bb $1 -e vague
 }
 
 # =============================================================================
@@ -343,22 +418,22 @@ function _yocto_flash_wic_gz() # $machine $DEV $wic_gz_file
     bmap_file=$(echo $wic_gz_file | sed "s/wic.gz/wic.bmap/g" )
     # prepare the SD card, umount, chmod 666, etc ------------
     _display_section
-    _yocto_prepare_sd_card $DEV
+    _prepare_sd_card_for_flash $DEV
 
     _display_section
-    TMPDIR=$(_yocto_find_tmp_folder)
+    TMPDIR=$(_yocto_find_TMPDIR)
     if [ -z $TMPDIR ] ; then
         if [ -d "tmp" ] ; then
             TMPDIR="tmp"
         fi
     fi
-    # machine=$(_yocto_find_MACHINE)
+    
     wic_gz_file_name=$(echo $wic_gz_file | sed "s|${PWD}||g" )
     wic_gz_file_name=$(echo $wic_gz_file_name | sed "s|/${TMPDIR}/deploy/images/${machine}/||g" )
     echo -e "       image file: ${GRN}$wic_gz_file_name${NOC}"
     file_size=$(stat -c %s $wic_gz_file)
     echo -e "       image size: ${GRN}$(_size_calculate $file_size false)${NOC}"
-    # stat -c %y djtools.bash
+    
     build_time=$(stat -c %y $wic_gz_file)
     build_time=${build_time%"."*}
     echo -e "       build time: ${GRN}$build_time${NOC}"
@@ -381,7 +456,7 @@ function _yocto_flash_wic_gz() # $machine $DEV $wic_gz_file
 
 # =============================================================================
 # $1 must be the machine
-# $2 mut be the device
+# $2 must be the device
 # $3 to all others, can be -f and other options
 function _yocto_flash()
 {
@@ -399,7 +474,7 @@ function _yocto_flash()
 
     # check the block device  ---------
     _display_section
-    DEV=$(_yocto_find_block_device $dev_str)
+    DEV=$(_find_block_device $dev_str)
     if [ -z $DEV ] ; then
         echo -e "\n block device $dev_str not found, exit!!"
         echo -e " you can use command \"lsblk\" to find it.\n"
@@ -432,7 +507,7 @@ function _yocto_flash()
     echo -e "          MACHINE: ${GRN}$MACHINE${NOC}"
 
     # find tmp/ folder ---------------
-    TMPDIR=$(_yocto_find_tmp_folder)
+    TMPDIR=$(_yocto_find_TMPDIR)
     if [ -z $TMPDIR ] ; then
         if [ -d "tmp" ] ; then
             TMPDIR="tmp"
@@ -462,23 +537,132 @@ function _yocto_flash()
 }
 
 # =============================================================================
-function _yocto_list_machines()
+function _yocto_list_distros()
 {
-    echo -e "\nls */conf/machine/*.conf\n"
-    ls -l */conf/machine/*.conf 2>/dev/null
-    ls -l */*/conf/machine/*.conf 2>/dev/null
-    ls -l */*/*/conf/machine/*.conf 2>/dev/null
-    ls -l */*/*/*/conf/machine/*.conf 2>/dev/null
+    current_folder=${PWD}
+
+    echo -e "\n${PRP}yocto list distros ${NOC}"
+    for item in ./*; do
+        cd $current_folder
+        if [[ -d $item ]] ; then
+            # echo $item
+            cd $item
+            folder_name=$(basename $item)
+            if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+                # echo "a build directory"
+                continue
+            fi
+            find_1=$(ls  ./conf/distro/*.conf 2>/dev/null)
+            find_2=$(ls  ./*/conf/distro/*.conf 2>/dev/null)
+            find_3=$(ls  ./*/*/conf/distro/*.conf 2>/dev/null)
+            find_4=$(ls  ./*/*/*/conf/distro/*.conf 2>/dev/null)
+            if [ ! -z "$find_1" ] || [ ! -z "$find_2" ] || \
+               [ ! -z "$find_3" ] || [ ! -z "$find_4" ] ; then
+                echo -e "\n ${GRN}---------------------------------------"
+                echo -e " $folder_name${NOC}"
+            fi
+            if [ ! -z "$find_1" ] ; then
+                echo "$find_1"
+            fi
+            if [ ! -z "$find_2" ] ; then
+                echo "$find_2"
+            fi
+            if [ ! -z "$find_3" ] ; then
+                echo "$find_3"
+            fi
+            if [ ! -z "$find_4" ] ; then
+                echo "$find_4"
+            fi
+        fi
+    done
+    echo -e "\n"
+    cd $current_folder
 }
 
 # =============================================================================
-function _yocto_list_images
+function _yocto_list_images()
 {
-    echo -e "\n ls */recipes*/images*/*.bb\n"
-    ls -l */recipes*/images*/*.bb 2>/dev/null
-    ls -l */*/recipes*/images*/*.bb 2>/dev/null
-    ls -l */*/*/recipes*/images*/*.bb 2>/dev/null
-    ls -l */*/*/*/recipes*/images*/*.bb  2>/dev/null
+    current_folder=${PWD}
+
+    echo -e "\n${PRP}yocto list images ${NOC}"
+    for item in ./*; do
+        cd $current_folder
+        if [[ -d $item ]] ; then
+            # echo $item
+            cd $item
+            folder_name=$(basename $item)
+            if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+                # echo "a build directory"
+                continue
+            fi
+            find_1=$(ls  ./recipes*/images*/*.bb 2>/dev/null)
+            find_2=$(ls  ./*/recipes*/images*/*.bb 2>/dev/null)
+            find_3=$(ls  ./*/*/recipes*/images*/*.bb 2>/dev/null)
+            find_4=$(ls  ./*/*/*/recipes*/images*/*.bb 2>/dev/null)
+            if [ ! -z "$find_1" ] || [ ! -z "$find_2" ] || \
+               [ ! -z "$find_3" ] || [ ! -z "$find_4" ] ; then
+                echo -e "\n ${GRN}---------------------------------------"
+                echo -e " $folder_name${NOC}"
+            fi
+            if [ ! -z "$find_1" ] ; then
+                echo "$find_1"
+            fi
+            if [ ! -z "$find_2" ] ; then
+                echo "$find_2"
+            fi
+            if [ ! -z "$find_3" ] ; then
+                echo "$find_3"
+            fi
+            if [ ! -z "$find_4" ] ; then
+                echo "$find_4"
+            fi
+        fi
+    done
+    echo -e "\n"
+    cd $current_folder
+}
+
+# =============================================================================
+function _yocto_list_machines()
+{
+    current_folder=${PWD}
+
+    echo -e "\n${PRP}yocto list machines ${NOC}"
+    for item in ./*; do
+        cd $current_folder
+        if [[ -d $item ]] ; then
+            # echo $item
+            cd $item
+            folder_name=$(basename $item)
+            if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+                # echo "a build directory"
+                continue
+            fi
+            find_1=$(ls  ./conf/machine/*.conf 2>/dev/null)
+            find_2=$(ls  ./*/conf/machine/*.conf 2>/dev/null)
+            find_3=$(ls  ./*/*/conf/machine/*.conf 2>/dev/null)
+            find_4=$(ls  ./*/*/*/conf/machine/*.conf 2>/dev/null)
+            if [ ! -z "$find_1" ] || [ ! -z "$find_2" ] || \
+               [ ! -z "$find_3" ] || [ ! -z "$find_4" ] ; then
+                echo -e "\n ${GRN}---------------------------------------"
+                echo -e " $folder_name${NOC}"
+            fi
+            if [ ! -z "$find_1" ] ; then
+                echo "$find_1"
+            fi
+            if [ ! -z "$find_2" ] ; then
+                echo "$find_2"
+            fi
+            if [ ! -z "$find_3" ] ; then
+                echo "$find_3"
+            fi
+            if [ ! -z "$find_4" ] ; then
+                echo "$find_4"
+            fi
+        fi
+    done
+    echo -e "\n"
+    cd $current_folder
 }
 
 # =============================================================================
@@ -541,152 +725,60 @@ function _yocto_reset_env_variables()
 }
 
 # =============================================================================
-function _yocto_build_use_sdk() # sdk_folder
+# to use bitbake command to build the SDK (plain)
+function _yocto_build_sdk_plain()
 {
-    current_folder=${PWD}
-
-    sdk_path="${HOME}/$1-oesdk"
-    sdk_env_set=$(ls $sdk_path | grep environment)
-
-    if [ -n "$2" ] && [ $2 = '--conti' ] ; then
-        # contains _bsdk folder
-        if [ -d _bsdk ] ; then
-            cd _bsdk
-            unset LD_LIBRARY_PATH
-            source $sdk_path/$sdk_env_set
-            ninja
-            echo -e "\n ${PRP}yocto build -use-sdk${NOC}"
-            echo -e "    with \"--conti\" option: contains _bsdk/ folder"
-            echo -e "    sdk location:$sdk_path\n"
-            cd $current_folder
-            _yocto_reset_env_variables
-            return
-        fi
-
-        # just in the _bsdk/ folder
-        folder_name=`basename "${PWD}"`
-        if [ $folder_name = "_bsdk" ] ; then
-            unset LD_LIBRARY_PATH
-            source $sdk_path/$sdk_env_set
-            ninja
-            echo -e "\n ${PRP}yocto build -use-sdk${NOC}"
-            echo -e "    with \"--conti\" option: in _bsdk/ folder"
-            echo -e "    sdk location:$sdk_path\n"
-            _yocto_reset_env_variables
-            return
-        fi
-        
-        # if the current path is ~/xx/_bsdk/yy/zz --------
-        if [[ "$current_folder" = *"_bsdk"* ]] ; then
-            sdk_build_path=${current_folder%"_bsdk"*}
-            sdk_build_path=$sdk_build_path"_bsdk"
-            cd $sdk_build_path
-            unset LD_LIBRARY_PATH
-            source $sdk_path/$sdk_env_set
-            ninja
-            cd $current_folder
-            echo -e "\n ${PRP}yocto build -use-sdk${NOC}"
-            echo -e "    with \"--conti\" option: in _bsdk/ sub-folder"
-            echo -e "    sdk location:$sdk_path\n"
-            _yocto_reset_env_variables
-            return
-        fi
-        echo -e "\n ${PRP}yocto build -use-sdk${NOC}"
-        echo -e "    not in _bsdk/ or its sub folder, no build, exit!!\n"
-        _yocto_reset_env_variables
+    # must be in a build directory ---------------
+    if [ $(_yocto_check_is_a_build_directory) = 'false' ] ; then
+        # echo -e "\n ${PRP}_yocto_find_image_name${NOC}:"
+        # echo -e "    not in a valid bitbake build directory, exit!!\n"
         return
     fi
 
-    # ------------------------------------------------------------------
-    # ------------------------------------------------------------------
-    # fresh build starts below
-
-    # source the environment variables --------------------
-    unset LD_LIBRARY_PATH
-    source $sdk_path/$sdk_env_set
-
-    folder_name=`basename "${PWD}"`
-
-    # if the curent folder contains the _bsdk folder, then
-    # rm _bsdk -r 
-    # meson build && cd build && ninja
-    if [ -d _bsdk ] ; then
-        echo "containes a _bsdk folder"
-        rm _bsdk/ -rf
-        meson . _bsdk -Db_sanitize=none
-        cd _bsdk
-        ninja
-        echo -e "\n ${PRP}yocto build -use-sdk${NOC}"
-        echo -e "    fresh build, contains _bsdk/ folder."
-        echo -e "    sdk location:$sdk_path\n"
-        cd $current_folder
-    
-    # if the curent folder is $fb2_sdk_build_folder/, then
-    elif [ $folder_name = "_bsdk" ] ; then
-        echo "inside a _bsdk folder"
-        cd ../
-        rm _bsdk/ -rf
-        meson . _bsdk -Db_sanitize=none
-        cd _bsdk
-        ninja
-        echo -e "\n ${PRP}yocto build -use-sdk${NOC}"
-        echo -e "    fresh build, in _bsdk/ folder."
-        echo -e "    sdk location:$sdk_path\n"
-
-    # if in a subfolder of _bsdk/
-    elif [[ "$current_folder" = *"_bsdk"* ]] ; then
-        sdk_build_parent_path=${current_folder%"_bsdk"*}
-        cd $sdk_build_parent_path
-        rm _bsdk/ -rf
-        meson . _bsdk -Db_sanitize=none
-        cd _bsdk
-        ninja
-        echo -e "\n ${PRP}yocto build -use-sdk${NOC}"
-        echo -e "    fresh build, in _bsdk/ sub-folder."
-        echo -e "    sdk location:$sdk_path\n"
-        cd $current_folder
-
-    # if the current folder does not contain a _bsdk/ folder,then
-    # check if there is a meson.build file, then build
-    elif [ -f meson.build ] ; then
-        meson . _bsdk -Db_sanitize=none
-        cd _bsdk
-        ninja
-        echo -e "\n ${PRP}yocto build -use-sdk${NOC}"
-        echo -e "    fresh build, have created the _bsdk/ folder"
-        echo -e "    sdk location:$sdk_path\n"
-        cd $current_folder
-    else
-        echo -e "\n ${PRP}yocto build -use-sdk${NOC}"
-        echo -e "    fresh build, but no meson.build file found, no build, exit!! \n"
+    # find tmp/ folder ---------------
+    TMPDIR=$(_yocto_find_TMPDIR)
+    if [ -z $TMPDIR ] ; then
+        if [ -d "tmp" ] ; then
+            TMPDIR="tmp"
+        fi
     fi
-    _yocto_reset_env_variables
+    image_name=$(_yocto_find_image_name)
+    # echo $image_name
+    echo -e "\n is going to build the SDK with the command:"
+    echo -e "   ${PRP}bitbake -c populate_sdk $image_name${NOC}\n"
+    _press_enter_or_wait_s_continue 10
+
+    bitbake -c populate_sdk $image_name
 }
 
 # =============================================================================
-function _yocto_list_resources
+function _yocto_list_resources()
 {
     # current folder -------------
     if [ -d .git ] ; then
-        echo -e "\n${CYN}-------------------------------${NOC}"
+        echo -e "\n${GRN} ----------------------------------------------${NOC}"
         folder_name=`basename $PWD`
-        echo -e " root: ${GRN}$folder_name${NOC}"
+        echo -e " ${GRN}$folder_name${NOC} (root)"
         branch_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
         echo " remote: $(git remote -v | grep fetch | awk '{print $2}')"
         echo " branch: $branch_name"
         git log --decorate=short --pretty=oneline -n1
     fi
-    # iterate all folders ----------
 
+    # iterate all folders ----------
     current_folder=${PWD}
     
-    # this does not support git submodules ...
     for item in ./*; do
-        if [[ -d $item ]] && [[ -d $item/.git ]] ; then
-            echo -e "\n${CYN}-------------------------------${NOC}"
+        if [[ -d $item ]] && ( [[ -d $item/.git ]] || [[ -f $item/.git ]] ) ; then
+            echo -e "\n${GRN} ----------------------------------------------${NOC}"
             cd $item
             folder_name=`basename "$item"`
-            echo -e "${GRN}$folder_name${NOC}"
+            printf "${GRN}$folder_name${NOC}"
+            if [[ -d .git ]] ; then
+                printf " (git repo)\n"
+            elif [[ -f .git ]] ; then
+                printf " (git submodule)\n"
+            fi
             branch_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
             echo " remote: $(git remote -v | grep fetch | awk '{print $2}')"
             echo " branch: $branch_name"
@@ -706,10 +798,53 @@ function yocto()
         _yocto_help
         return
     fi
+    # ------------------------------
+    if [ $1 = 'build' ] ; then
+        if [ $# = 1 ] ; then
+            _yocto_help
+            return
+        fi
+        if [ $2 = 'sdk-plain' ] ; then
+            _yocto_build_sdk_plain $3 $4 $5 $6 $7
+            return
+        fi
 
+        echo -e "\n ${PRP}yocto build${NOC}: argument ${RED}$2${NOC} not supported\n"
+        return
+    fi
     # ------------------------------
     if [ $1 = 'clone' ] ; then
         dj clone github $2 $3 $4 $5 $6 $7 $8
+        return
+    fi
+    # ------------------------------
+    # distro-conf image-bb machine-conf package-recipe-bb
+    if [ $1 = 'find' ] ; then
+        if [ $# = 1 ] ; then
+            _yocto_help
+            return
+        fi
+        if [ $2 = 'distro-conf' ] ; then
+            # _yocto_find_distro_conf $3 $4 $5 $6 $7 $8 $9
+            _yocto_find_conf $3 $4 $5 $6 $7 $8 $9
+            return
+        fi
+        if [ $2 = 'image-bb' ] ; then
+            _yocto_find_bb $3 $4 $5 $6 $7 $8 $9
+            return
+        fi
+        if [ $2 = 'machine-conf' ] ; then
+            _yocto_find_conf $3 $4 $5 $6 $7 $8 $9
+            return
+        fi
+        if [ $2 = 'package-recipe-bb' ] ; then
+            exact_vague=$(_find_argument_after_option -e $3 $4 $5 $6 $7 $8)
+            if [ "$exact_vague" = "exact" ] ; then
+                echo -e "\n only support vague search \n"
+            fi
+            _yocto_find_bb $3 -e vague
+            return
+        fi
         return
     fi
     # ------------------------------
@@ -731,7 +866,7 @@ function yocto()
             _yocto_install_sdk_plain $3 $4 $5 $6 $7
             return
         fi
-        echo -e "\n ${PRP}yocto install${NOC}: $2 command not supported\n"
+        echo -e "\n ${PRP}yocto install${NOC}: argument ${RED}$2${NOC} not supported\n"
         return
     fi
     # ------------------------------
@@ -740,36 +875,27 @@ function yocto()
             _yocto_help
             return
         fi
-        if [ $2 = 'machines' ] ; then
-            _yocto_list_machines
+        if [ $2 = 'distros' ] ; then
+            _yocto_list_distros
             return
         fi
         if [ $2 = 'images' ] ; then
             _yocto_list_images
             return
         fi
+        if [ $2 = 'machines' ] ; then
+            _yocto_list_machines
+            return
+        fi
         if [ $2 = 'resources' ] ; then
             _yocto_list_resources
             return
         fi
-        echo -e "\n ${PRP}yocto list${NOC}: $2 command not supported\n"
+        echo -e "\n ${PRP}yocto list${NOC}: argument ${RED}$2${NOC} not supported\n"
         return
     fi
     # ------------------------------
-    if [ $1 = 'build' ] ; then
-        if [ $# = 1 ] ; then
-            _yocto_help
-            return
-        fi
-        if [ $2 = '-use-sdk' ] ; then
-            _yocto_build_use_sdk $3 $4 $5 $6 $7
-            return
-        fi
-        echo -e "\n ${PRP}yocto sdk${NOC}: $2 command not supported\n"
-        return
-    fi
-    # ------------------------------
-    echo -e "\n ${PRP}yocto${NOC}: \"$1 \"command not supported\n"
+    echo -e "\n ${PRP}yocto${NOC}: argument ${RED}$1${NOC} not supported\n"
     _yocto_help
 
     # ------------------------------
@@ -786,6 +912,7 @@ function _yocto()
     local SERVICES=("
         build
         clone
+        find
         flash
         install
         list
@@ -800,6 +927,15 @@ function _yocto()
     for i in $clone_list ; do
         ACTIONS[$i]=" "
     done
+    # -----------------------------------------------------
+    find_list="distro-conf image-bb machine-conf package-recipe-bb "
+    ACTIONS[find]+="$find_list "
+    for i in $find_list ; do
+        ACTIONS[$i]=" "
+    done
+    ACTIONS[-e]="exact vague "
+    ACTIONS[exact]=" "
+    ACTIONS[vague]=" "
     # -----------------------------------------------------
     flash_list="imx7-cl-som imx6ullevk raspberry-pi-4 wandboard "
     ACTIONS[flash]="$flash_list "
@@ -817,7 +953,7 @@ function _yocto()
     ACTIONS[sdk-plain]=" "
 
     # -----------------------------------------------------
-    list_item="machines images resources "
+    list_item="distros images machines resources "
     ACTIONS[list]+="$list_item "
     for i in $list_item ; do
         ACTIONS[$i]=" "
@@ -831,15 +967,8 @@ function _yocto()
     done
     
     # -----------------------------------------------------
-    ACTIONS[build]="-use-sdk -native "
-    sdk_list="$(ls -a ${HOME}/ | grep oesdk | sed 's/-oesdk//g') "
-    ACTIONS[-use-sdk]="$sdk_list "
-    for i in $sdk_list ; do
-        ACTIONS[$i]="--conti --fresh "
-    done
-    ACTIONS[--conti]=" "
-    ACTIONS[--fresh]=" "
-    ACTIONS[-native]=" "
+    ACTIONS[build]="sdk-plain "
+    ACTIONS[sdk-plain]=" "
 
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

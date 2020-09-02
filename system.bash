@@ -64,7 +64,6 @@ function _system_check_cpu_memory()
     final_pid=$(echo $pre_pid | awk '{print $1}')
     echo -e "[$LRED"$final_pid"$NOC] "$cmd
     ps -p $final_pid -o %cpu,%mem
-    
 }
 
 # =============================================================================

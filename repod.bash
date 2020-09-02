@@ -178,10 +178,65 @@ function _repod_update_repos_all_folders()
 }
 
 # =============================================================================
-function repod()
+# the remote url can be:
+# 1. https://dj-zhou@github.com/dj-zhou/yocto-conf-template
+# 2. https://dj-zhou@github.com/dj-zhou/yocto-conf-template.git
+# 3. git@github.com:berkshiregrey/meta-bg
+# 4. git@github.com:berkshiregrey/meta-bg.git
+function _repod_switch_to()
 {
     current_folder=${PWD}
 
+    target_host=$1
+    repo_name=$(basename $(git remote show -n origin | grep Fetch | cut -d: -f2-))
+
+    _display_section
+    echo ' remote url before switching:'
+    remote_v=$(git remote get-url origin)
+    echo " $remote_v"
+    _display_section
+        
+    echo -e "\n switch to ${GRN}$target_host${NOC}\n"
+    if [[ $target_host = 'bitbucket' ]] ; then
+        if [[ "$remote_v" = *"https"* ]] ; then
+            git remote set-url origin \
+                https://$bitbucket_username@bitbucket.org/$bitbucket_username/$repo_name
+        else
+            git remote set-url origin \
+                git@bitbucket.org:$bitbucket_username/$repo_name
+        fi
+    fi
+    if [[ $target_host = 'github' ]] ; then
+        if [[ "$remote_v" = *"https"* ]] ; then
+            git remote set-url origin \
+                https://$github_username@github.com/$github_username/$repo_name
+        else
+            git remote set-url origin \
+                git@github.com:$github_username/$repo_name
+        fi
+    fi
+    if [[ $target_host = 'gitee' ]] ; then
+        if [[ "$remote_v" = *"https"* ]] ; then
+            git remote set-url origin \
+                https://$gitee_username@gitee.com/$gitee_username/$repo_name
+        else
+            git remote set-url origin \
+                git@gitee.com:$gitee_username/$repo_name
+        fi
+    fi
+
+    _display_section
+    echo ' remote url after switching:'
+    remote_v=$(git remote get-url origin)
+    echo " $remote_v"
+   _display_section
+
+    current_folder=${PWD}
+}
+
+# =============================================================================
+function repod()
+{
     # ------------------------------
     if [ $# -eq 0 ] ; then
         _repod_help
@@ -210,35 +265,7 @@ function repod()
             _repod_help
             return
         fi
-        repo=`basename "$current_folder"`
-
-        _display_section
-        echo 'remote url before switching:'
-        git remote get-url origin
-        _display_section
-        echo -e "\n"
-
-        if [ $2 = 'bitbucket' ] ; then
-            echo " switch to bitbucket"
-            git remote set-url origin \
-                https://$bitbucket_username@bitbucket.org/$bitbucket_username/$repo.git
-        fi
-        if [ $2 = 'github' ] ; then
-            echo " switch to github"
-            git remote set-url origin \
-                https://$github_username@github.com/$github_username/$repo.git
-        fi
-        if [ $2 = 'gitee' ] ; then
-            git remote set-url origin \
-                https://$gitee_username@gitee.com/$gitee_username/$repo.git
-            echo " switch to gitee"
-        fi
-
-        echo -e "\n"
-        _display_section
-        echo 'remote url after switching:'
-        git remote get-url origin
-        _display_section
+        _repod_switch_to $2 $3 $4
         return
     fi
 
@@ -291,9 +318,6 @@ function repod()
     
     echo -e '\r\n repod : "'$1 '"command not supported\r\n'
     _repod_help
-    # ------------------------------
-    cd $current_folder
-    unset current_folder
 }
 
 # =============================================================================

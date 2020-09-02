@@ -482,9 +482,9 @@ function _dj_setup_google_repo()
 {
     cwd_before_running=$PWD
 
-    if [ -f tools/repo ] ; then
+    if [ -f $djtools_path/tools/repo ] ; then
         echo -e "\n use repo from tools/ \n"
-        sudo cp tools/repo /bin/
+        sudo cp  $djtools_path/tools/repo /bin/
         chmod a+x /bin/repo
     else
         echo -e "\n fetch from google \n"
@@ -570,7 +570,7 @@ function _dj_setup_gpp_10()
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
     sudo apt-get update
     sudo apt install -y gcc-10 g++-10
-    echo -e "\n do you want to set up the default gcc/g++?? [Yes/No]"
+    echo -e "\n do you want to set up the gcc/g++ priorities? [Yes/No]"
     read anw
     if [[ ($anw = 'n') || ($anw = 'N') || ($anw = 'NO') \
       || ($anw = 'No') || ($anw = 'no') ]] ; then
@@ -1128,8 +1128,8 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'gitg-kdiff3' ] ; then
-            _dj_setup_gitg_kdiff3
+        if [ $2 = 'gitg-gitk-kdiff3' ] ; then
+            _dj_setup_gitg_gitk_kdiff3
             return
         fi
         # --------------------------
@@ -1345,7 +1345,7 @@ function _dj()
     setup_tools+="baidu-netdisk clang-9.0.0 computer container dj-gadgets "
     setup_tools+="dropbox eigen foxit gcc-arm-embedded gcc-arm-linux-gnueabi "
     setup_tools+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-    setup_tools+="gitg-kdiff3 glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
+    setup_tools+="gitg-gitk-kdiff3 glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
     setup_tools+="g++-10 i219-v libev-4.33 lib-serialport mathpix matplotlib-cpp "
     setup_tools+="opencv-2.4.13 opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 "
     setup_tools+="ros-melodic ros2-foxy spdlog slack stm32-tools sublime typora "

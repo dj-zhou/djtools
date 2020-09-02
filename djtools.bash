@@ -34,6 +34,7 @@ djtools_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ubuntu_v=$(lsb_release -a)
 
 # =============================================================================
+source $djtools_path/build.bash
 source $djtools_path/block-device.bash
 source $djtools_path/code-name.bash
 source $djtools_path/coding.bash

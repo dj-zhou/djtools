@@ -7,46 +7,46 @@ function _dj_setup_help()
     cat << EOM
   ------------------------------- dj setup --------------------------------
     second level commands:"
-      baidu-netdisk  - to install the baidu netdisk tool
-      clang-9.0.0    - to install clang v9.0.0 for use of vscode
-      computer       - to install lots of necessary software packages
-      dj-gadgets     - to install small gadget tools
-      dropbox        - to install dropbox
-      eigen          - to install eigen library
-      foxit          - to install foxit pdf reader
-      g++10          - to install compile g++ of version 10, then ask to 
-                       choose version
-      gitg-kdiff3    - to install gitg and kdiff3
-      git-lfs        - to install large file storage of git
-      glfw3          - to install glfw3"
-      gnome          - to install Gnome, for Ubuntu 20.04, etc
-      google-repo    - to install the repo utility developed by Google
-      grpc-1.29.1    - to install the gRPC, v1.29.1
-      gtest-glog     - to install gtest/glog
-      i219-v         - to install Intel I219-V WiFi chipset driver
-      libev-4.33     - to install libev, v4.33
-      lib-serialport - to install libserialport
-      lib-yamlcpp    - to install yaml-cpp
-      mathpix        - to install math latex equation tool mathpix
-      matplotlib-cpp - to install the matplotlib, a cpp version
-      opencv-2.4.13  - to install OpenCV version 2.4.13
-      opencv-4.1.1   - to install OpenCV version 4.1.1
-      pangolin       - to install openGL based visualization package
-      pip            - to install python software pip
-      qemu           - to install the emulation tool qemu
-      qt-5.13.1      - to install Qt version 5.13.1
-      qt-5.14.2      - to install Qt version 5.14.2
-      ros2-foxy      - to install ROS2 Foxy, with deb package, or from source
-      ros-melodic    - to install ROS Melodic with deb package on Ubuntu 18.04
-      slack          - to install Slack
-      spdlog         - to install spdlog
-      stm32tools     - to install stm32 tool
-      sublime        - to install sublime-text-3
-      typora         - to install Markdown editor typora
-      vscode         - to install VS Code
-      vtk-8.2.0      - to install visualization tool vtk-8.2.0
-      wubi           - to install Chinese wubi input method
-      YouCompleteMe  - to install a Vim plugin: YouCompleteMe
+      baidu-netdisk    - to install the baidu netdisk tool
+      clang-9.0.0      - to install clang v9.0.0 for use of vscode
+      computer         - to install lots of necessary software packages
+      dj-gadgets       - to install small gadget tools
+      dropbox          - to install dropbox
+      eigen            - to install eigen library
+      foxit            - to install foxit pdf reader
+      g++10            - to install compile g++ of version 10, then ask to 
+                         choose version
+      gitg-gitk-kdiff3 - to install gitg, gitk and kdiff3
+      git-lfs          - to install large file storage of git
+      glfw3            - to install glfw3"
+      gnome            - to install Gnome, for Ubuntu 20.04, etc
+      google-repo      - to install the repo utility developed by Google
+      grpc-1.29.1      - to install the gRPC, v1.29.1
+      gtest-glog       - to install gtest/glog
+      i219-v           - to install Intel I219-V WiFi chipset driver
+      libev-4.33       - to install libev, v4.33
+      lib-serialport   - to install libserialport
+      lib-yamlcpp      - to install yaml-cpp
+      mathpix          - to install math latex equation tool mathpix
+      matplotlib-cpp   - to install the matplotlib, a cpp version
+      opencv-2.4.13    - to install OpenCV version 2.4.13
+      opencv-4.1.1     - to install OpenCV version 4.1.1
+      pangolin         - to install openGL based visualization package
+      pip              - to install python software pip
+      qemu             - to install the emulation tool qemu
+      qt-5.13.1        - to install Qt version 5.13.1
+      qt-5.14.2        - to install Qt version 5.14.2
+      ros2-foxy        - to install ROS2 Foxy, with deb package, or from source
+      ros-melodic      - to install ROS Melodic with deb package on Ubuntu 18.04
+      slack            - to install Slack
+      spdlog           - to install spdlog
+      stm32tools       - to install stm32 tool
+      sublime          - to install sublime-text-3
+      typora           - to install Markdown editor typora
+      vscode           - to install VS Code
+      vtk-8.2.0        - to install visualization tool vtk-8.2.0
+      wubi             - to install Chinese wubi input method
+      YouCompleteMe    - to install a Vim plugin: YouCompleteMe
 
       gcc-aarch64-linux-gnu   - to install the 64-bit arm compiler
       gcc-arm-embedded        - to install micro controller development tool
@@ -411,13 +411,13 @@ function _dj_setup_git_lfs()
 }
 
 # =============================================================================
-function _dj_setup_gitg_kdiff3()
+function _dj_setup_gitg_gitk_kdiff3()
 {
     current_folder=${PWD}
 
-    echo -e "\n install gitg and KDiff3 ...\n"
+    echo -e "\n install gitg, gitk and KDiff3 ...\n"
     _press_enter_or_wait_s_continue 10 # to check the key pressed TODO
-    sudo apt-get install gitg kdiff3 -y
+    sudo apt-get install gitg gitk kdiff3 -y
     git config --global credential.helper store
     # git config --global credential.helper 'cache --timeout=36000'  
     git config --global --add merge.tool kdiff3
@@ -432,14 +432,14 @@ function _dj_setup_i219_v()
 {
     current_folder=${PWD}
 
-    cd ~
+    cd ~ && mkdir -p soft/ &&  cd soft/
     
     git clone https://dj-zhou@github.com/dj-zhou/i219-v.git
-    cd $1/src/
+    cd i219-v/$1/src/
     sudo make install
 
-    cd ~
-    _ask_to_remove_a_folder ~/i219-v
+    cd ~/soft/
+    _ask_to_remove_a_folder i219-v
 
     _ask_to_execute_cmd "sudo reboot"
 
@@ -774,17 +774,24 @@ function _dj_setup_yaml_cpp()
     git clone https://dj-zhou@github.com/dj-zhou/yaml-cpp.git
     cd yaml-cpp
     sudo rm -rf build/ && mkdir build && cd build
-    if [ $static_or_shared = 'static' ] ; then
-        cmake .. -DYAML_BUILD_SHARED_LIBS="off"
-    elif [ $static_or_shared = 'shared' ] ; then
-        cmake .. -DYAML_BUILD_SHARED_LIBS="on"
+    
+    # static build need to be specific
+    # if no option found, "shared" is default
+    if [ "$static_or_shared" = 'static' ] ; then
+        cmake .. -DBUILD_SHARED_LIBS=OFF
+    else
+        echo "shared"
+        cmake .. -DBUILD_SHARED_LIBS=ON
     fi
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
-    echo -e "\n libyaml-cpp.a is installed in /usr/local/lib/"
+    if [ "$static_or_shared" = 'static' ] ; then
+        echo -e "\n libyaml-cpp.a is installed in /usr/local/lib/"
+    else
+        echo -e "\n libyaml-cpp.so is installed in /usr/local/lib/"
+    fi
     echo -e " header files are installed in /usr/local/include/yaml-cpp/\n"
-
     _ask_to_remove_a_folder yaml-cpp/
 
     # ---------------------------------------------

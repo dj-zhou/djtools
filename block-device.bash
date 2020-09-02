@@ -55,6 +55,61 @@ function _disk_size()
         disk_device=/dev/$1
     fi
     find_fz_byte=$(sudo fdisk -l $disk_device | grep "$disk_device")
-    fz_byte=$(echo $find_fz_byte | cut -d' ' -f5 | grep -o -E '[0-9]+' | awk 'NR==1 {print $1}')
+    fz_byte=$(echo $find_fz_byte | cut -d' ' -f5 | grep -o -E '[0-9]+' | \
+              awk 'NR==1 {print $1}')
     _size_calculate $fz_byte $2
+}
+
+# =============================================================================
+function _find_block_device()
+{
+    dev_to_check=$1
+    # echo "dev_to_check = "$dev_to_check
+    if [ -b $dev_to_check ] ; then
+        echo $dev_to_check
+        return
+    fi
+    if [ -b /dev/${dev_to_check} ] ; then
+        echo "/dev/${dev_to_check}"
+        return
+    fi
+    echo " " # not found
+}
+
+# =============================================================================
+function _prepare_sd_card_for_flash()
+{
+    sd_card=$1
+
+    # umount all partitions: /dev/sda1; /dev/sda2; /dev/sda3; etc
+    for i in {1..9} ; do
+        partition=$sd_card"${i}"
+        if [ -b $partition ] ; then
+            # check if mounted
+            sudo mount | grep '^/' | grep -q $partition
+            if [ $? -ne 1 ] ; then # is mounted
+                echo -e " umount partition:" ${GRN}$partition${NOC}
+                sleep 1 # just make it noticable
+                sudo umount $partition
+            else
+                echo -e "        partition: ${GRN}$partition${NOC} not mounted"
+            fi
+        fi
+    done
+    # umount all partitions: /dev/mmcblk0p1; /dev/mmcblk0p2; etc
+    for i in {1..9} ; do
+        partition=$sd_card"p${i}"
+        if [ -b $partition ] ; then
+            # check if mounted
+            sudo mount | grep '^/' | grep -q $partition
+            if [ $? -ne 1 ] ; then # is mounted
+                echo -e " umount partition:" ${GRN}$partition${NOC}
+                sleep 1 # just make it noticable
+                sudo umount $partition
+            else
+                echo -e "        partition: ${GRN}$partition${NOC} not mounted"
+            fi
+        fi
+    done
+    sudo chmod 666 $sd_card
 }
