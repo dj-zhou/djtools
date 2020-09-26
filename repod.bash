@@ -30,7 +30,7 @@ function _backup_to_github()
     current_folder=${PWD}
 
     # -------------------------------------------------
-    repo=`basename "$current_folder"`
+    repo=$(basename "$current_folder")
     echo $repo
 
     # -------------------------------------------------
@@ -39,7 +39,7 @@ function _backup_to_github()
         return
     fi
 
-    git_original_remote_url=`git remote get-url origin`
+    git_original_remote_url=$(git remote get-url origin)
     
     if [[ $git_original_remote_url = *"github"* ]] ; then
         echo " already a GitHub repo, no need to backup"
@@ -76,7 +76,7 @@ function _backup_to_gitee()
     current_folder=${PWD}
 
     # -------------------------------------------------
-    repo=`basename "$current_folder"`
+    repo=$(basename "$current_folder")
     echo $repo
 
     # -------------------------------------------------
@@ -85,7 +85,7 @@ function _backup_to_gitee()
         return
     fi
 
-    git_original_remote_url=`git remote get-url origin`
+    git_original_remote_url=$(git remote get-url origin)
     
     if [[ $git_original_remote_url = *"gitee"* ]] ; then
         echo " already a GiTee repo, no need to backup"
@@ -152,7 +152,7 @@ function _repod_update_repos_all_folders()
     for folder in ./* ; do
         if [ -d $folder ] ; then
             echo -e "${CYN}\r\n----------------------------"
-            printf `basename "$folder"${NOC}`
+            printf $(basename "$folder"${NOC})
             cd $folder
             if [ -d ".git/" ] ; then
                 git_status=$(git status)
@@ -364,3 +364,17 @@ function _repod()
 
 # =============================================================================
 complete -F _repod repod
+
+# to checkout all branches
+# all_branch=$(git branch -a)
+# for i in $all_branch; do
+#     if [[ "$i" = *"origin"* ]] || [[ "$i" = *"->"* ]] ; then
+#         echo " " > /dev/null
+#     else
+#         if [ ! -d $i ] && [ ! -f $i ] ; then
+#             echo -e "----------\n$i"
+#             checkout_result=$(git checkout $i)
+#             git status
+#         fi
+#     fi
+# done

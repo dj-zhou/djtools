@@ -49,9 +49,9 @@ function _disk_size()
         _disk_size_help
         return
     fi
-    if [ -b $1 ] ; then
+    if [ -b "$1" ] ; then
         disk_device=$1
-    elif [ -b /dev/$1 ] ; then
+    elif [ -b "/dev/$1" ] ; then
         disk_device=/dev/$1
     fi
     find_fz_byte=$(sudo fdisk -l $disk_device | grep "$disk_device")
@@ -65,11 +65,11 @@ function _find_block_device()
 {
     dev_to_check=$1
     # echo "dev_to_check = "$dev_to_check
-    if [ -b $dev_to_check ] ; then
+    if [ -b "$dev_to_check" ] ; then
         echo $dev_to_check
         return
     fi
-    if [ -b /dev/${dev_to_check} ] ; then
+    if [ -b "/dev/${dev_to_check}" ] ; then
         echo "/dev/${dev_to_check}"
         return
     fi
@@ -84,10 +84,10 @@ function _prepare_sd_card_for_flash()
     # umount all partitions: /dev/sda1; /dev/sda2; /dev/sda3; etc
     for i in {1..9} ; do
         partition=$sd_card"${i}"
-        if [ -b $partition ] ; then
+        if [ -b "$partition" ] ; then
             # check if mounted
             sudo mount | grep '^/' | grep -q $partition
-            if [ $? -ne 1 ] ; then # is mounted
+            if [ "$?" -ne 1 ] ; then # is mounted
                 echo -e " umount partition:" ${GRN}$partition${NOC}
                 sleep 1 # just make it noticable
                 sudo umount $partition
@@ -99,7 +99,7 @@ function _prepare_sd_card_for_flash()
     # umount all partitions: /dev/mmcblk0p1; /dev/mmcblk0p2; etc
     for i in {1..9} ; do
         partition=$sd_card"p${i}"
-        if [ -b $partition ] ; then
+        if [ -b "$partition" ] ; then
             # check if mounted
             sudo mount | grep '^/' | grep -q $partition
             if [ $? -ne 1 ] ; then # is mounted

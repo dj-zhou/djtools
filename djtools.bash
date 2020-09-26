@@ -1,36 +1,28 @@
 #!/bin/bash
 
 # =============================================================================
-# Black        0;30     Dark Gray     1;30
-# Red          0;31     Light Red     1;31
-# Green        0;32     Light Green   1;32
-# Brown/Orange 0;33     Yellow        1;33
-# Blue         0;34     Light Blue    1;34
-# Purple       0;35     Light Purple  1;35
-# Cyan         0;36     Light Cyan    1;36
-# Light Gray   0;37     White         1;37
-
-# color definition
 NOC='\033[0m'
+GRY='\033[0;30m'
 RED='\033[0;31m'
 GRN='\033[0;32m'
-BRN='\033[0;33m'
+YLW='\033[0;33m'
 BLU='\033[0;34m'
 PRP='\033[0;35m'
 CYN='\033[0;36m'
-LGRY='\033[0;37m'
-DGRY='\033[1;30m'
-LRED='\033[1;31m'
-LGRN='\033[1;32m'
-YLW='\033[1;33m'
-LBLU='\033[1;34m'
-LPRP='\033[1;35m'
-LCYN='\033[1;36m'
-WHT='\033[1;37m'
+WHT='\033[0;37m'
+HGRY='\033[1;30m'
+HRED='\033[1;31m'
+HGRN='\033[1;32m'
+HYLW='\033[1;33m'
+HBLU='\033[1;34m'
+HPRP='\033[1;35m'
+HCYN='\033[1;36m'
+HWHT='\033[1;37m'
 
 # =============================================================================
 # by doing so, the system can find the whole tooklit
 djtools_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+# add some global variables
 ubuntu_v=$(lsb_release -a)
 
 # =============================================================================
@@ -49,8 +41,9 @@ source $djtools_path/system.bash
 source $djtools_path/terminal-format.bash
 source $djtools_path/touchpad.bash
 source $djtools_path/version.bash
+source $djtools_path/unpack.bash
 source $djtools_path/work-check.bash
-source $djtools_path/yocto.bash
+source $djtools_path/yocto/yocto.bash
 source $djtools_path/zephyr.bash
 
 # =============================================================================

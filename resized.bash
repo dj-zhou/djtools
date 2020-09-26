@@ -29,8 +29,6 @@ _resized_help()
     echo "   embedded   - to arrange terminator and vscode"
     echo "   gitg       - to arrange terminator and gitg"
     echo "   fullscreen - to make terminator full screen"
-    echo "   kdiff3     - to arrange kdiff3"
-    echo "   difftool   - the same as kdiff3"
     echo "   typora     - to arrange terminator, Typora"
     echo -e "   MORE IS COMMING\n"
     echo -e " All commands support tab completion\n"
@@ -239,50 +237,6 @@ _resize_fullscreen()
 }
 
 # =============================================================================
-_resize_kdiff3()
-{  
-    # ---------------------------------------------------------------
-    # get the real screen size
-    SCREENSIZE=$(xrandr |grep '*')
-
-    if [[ "$SCREENSIZE" = *"3840x2160"*"3840x2160"* ]]; then
-        echo "resized kdiff3: Double 3840x2160 screen"
-        #                   none, x,     y,   width,   height
-        wmctrl -r "/bin/bash" -e 0,3840,0,1200,2080
-        wmctrl -r "eclipse" -e 0,5370,0,2710,2150 
-        wmctrl -r "Sublime Text" -e 0,3860,0,1500,2150
-        wmctrl -r ${vs_code_window} -e 0,5040,0,2700,2080
-        wmctrl -r "KDiff3" -e 0,2000,0,1830,2160
-    elif [[ $SCREENSIZE = *"3840x2160"* ]]; then
-        echo "resized kdiff3: Single 3840x2160 screen"
-        #                   none, x,     y,   width,   height
-        wmctrl -r "/bin/bash" -e 0,10,0,1800,2030
-        wmctrl -r "eclipse" -e 0,1830,0,2000,2050
-        wmctrl -r "Sublime Text" -e 0,1830,0,2000,2050
-        wmctrl -r ${vs_code_window} -e 0,1830,0,2000,2030
-    elif [[ "$SCREENSIZE" = *"1920x1080"* ]]; then
-        echo "resized kdiff3: Single 1920x1080 screen"
-        #                   none, x,     y,   width,   height
-        wmctrl -r "/bin/bash" -e 0,10,0,800,1000
-        wmctrl -r "eclipse" -e 0,820,0,1200,1000
-        wmctrl -r "Sublime Text" -e 0,1030,0,1500,1000
-        wmctrl -r ${vs_code_window} -e 0,530,0,1000,800
-    elif [[ "$SCREENSIZE" = *"2560x1080"* ]]; then
-        echo "resized kdiff3: Single 2560x1080 screen"
-        #                   none, x,     y,   width,   height
-        wmctrl -r "/bin/bash" -e 0,10,0,1000,1020
-        wmctrl -r "eclipse" -e 0,1530,0,1200,1060
-        wmctrl -r "Sublime Text" -e 0,810,0,800,1040
-        wmctrl -r ${vs_code_window} -e 0,1020,0,1500,1020
-    elif [[ "$SCREENSIZE" = *"1366x768"* ]]; then
-        echo "resized kdiff3: Single 1366x768 screen"
-        #                   none, x,     y,   width,   height
-        wmctrl -r "/bin/bash" -e 0,10,0,600,700
-        wmctrl -r ${vs_code_window} -e 0,620,0,800,700
-    fi
-    clear
-}
-# =============================================================================
 _resize_typora()
 {  
     # ---------------------------------------------------------------
@@ -345,10 +299,6 @@ function resized()
         _resize_typora
         return
     fi
-    if [ $1 = 'kdiff3' ] || [ $1 = 'difftool' ] ; then
-        _resize_kdiff3
-        return
-    fi
     _resized_help
 }
 
@@ -363,7 +313,6 @@ function _resized()
         "embedded"
         "gitg"
         "fullscreen"
-        "kdiff3"
         "difftool"
         "typora"
     )
@@ -374,7 +323,6 @@ function _resized()
     ACTIONS[embedded]="left right "
     ACTIONS[gitg]=" "
     ACTIONS[fullscreen]=" "
-    ACTIONS[kdiff3]=" "
     ACTIONS[difftool]=" "
     ACTIONS[typora]=" "
     ACTIONS[left]=" "

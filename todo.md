@@ -11,3 +11,4 @@ Install ROS 2 from source code in Ubuntu 18.04
 * if remote branches are deleted (use `git fetch -p` to see), delete the local branches;
 
 yocto build sdk
+yocto support `source` folder, like that in `fsl-community-bsp`

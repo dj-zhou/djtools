@@ -16,7 +16,7 @@ function _dj_setup_help()
       foxit            - to install foxit pdf reader
       g++10            - to install compile g++ of version 10, then ask to 
                          choose version
-      gitg-gitk-kdiff3 - to install gitg, gitk and kdiff3
+      gitg-gitk        - to install gitg, gitk
       git-lfs          - to install large file storage of git
       glfw3            - to install glfw3"
       gnome            - to install Gnome, for Ubuntu 20.04, etc
@@ -65,7 +65,7 @@ function _dj_setup_baidu_netdisk()
 {
     current_folder=${PWD}
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
 
     file="baidunetdisk_linux_3.0.1.2.deb"
     curl -L http://wppkg.baidupcs.com/issue/netdisk/LinuxGuanjia/3.0.1/$file > $file
@@ -118,7 +118,7 @@ EOM
     # -----------------------------------
     echo -e "\n going to install Google Chrome\n"
     _press_enter_or_wait_s_continue 10
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     sudo dpkg -i google-chrome*
 
@@ -144,7 +144,7 @@ EOM
     echo -e "\n going to setup simplified Chinese support\n"
     _press_enter_or_wait_s_continue 10
     gnome_version=$(version check gnome)
-    if [ ! $gnome_version = ' ' ] ; then
+    if [ ! "$gnome_version" = ' ' ] ; then
         gsettings set org.gnome.gedit.preferences.encodings \
             auto-detected "['CURRENT','GB18030','GBK','GB2312','UTF-8','UTF-16']"
     fi
@@ -152,14 +152,14 @@ EOM
     # to disable the fixed dock (in dock setting, it is Auto-hide the Dock option)
     echo -e "\n hide the Dock when any windows overlap with it\n"
     _press_enter_or_wait_s_continue 10
-    if [ ! $gnome_version = ' ' ] ; then
+    if [ ! "$gnome_version" = ' ' ] ; then
         gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     fi
     # -----------------------------------
     # to lock the screen from commands
     echo -e "\n going to setup lock screen command\n"
     _press_enter_or_wait_s_continue 10
-    if [ ! $gnome_version = ' ' ] ; then
+    if [ ! "$gnome_version" = ' ' ] ; then
         sudo apt-get install gnome-screensaver -y
     fi
     # -----------------------------------
@@ -179,7 +179,7 @@ function _dj_setup_dropbox()
     sudo apt-get install curl -y
     # how to deal with version?
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
 
     curl -L \
     https://linux.dropbox.com/packages/ubuntu/dropbox_2020.03.04_amd64.deb \
@@ -217,7 +217,7 @@ function _dj_setup_foxit_reader()
     echo -e "  recommended location: /opt/foxitsoftware/foxitreader\n"
     _press_enter_or_wait_s_continue 10
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
 
     # no way to get the latest version?
     file=FoxitReader.enu.setup.2.4.4.0911.x64.run
@@ -229,7 +229,7 @@ function _dj_setup_foxit_reader()
     # create a symbolic link
     foxitreader_location=$(sudo find /opt -name "FoxitReader")
     echo $foxitreader_location
-    if [ ! -z $foxitreader_location ] ; then
+    if [ ! -z "$foxitreader_location" ] ; then
         echo 'a symbolic link "foxit" is generated in /usr/bin'
         sudo ln -sf $foxitreader_location /usr/bin/foxit
     else
@@ -247,20 +247,30 @@ function _dj_setup_gcc_aarch64_linux()
 
     echo -e "\n install gcc-aarch64-linux-gnu ...\n"
     _press_enter_or_wait_s_continue 10
-    sudo apt-get install -y gcc-aarch64-linux-gnu gcc-5-aarch64-linux-gnu
+    # common
     sudo apt-get install -y libssl-dev # needed for compiling the Linux Kernel for ARMv8
+    sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
+        sudo apt-get install -y gcc-5-aarch64-linux-gnu
+        sudo apt-get install -y gcc-5-aarch64-linux-gnu
+    else
+        echo "do nothing at this moment"
+    fi
+        
 
     # update-alternatives configuration
-    sudo update-alternatives --install \
-        /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc \
-        /usr/bin/aarch64-linux-gnu-gcc-5 5
-    sudo update-alternatives --install \
-        /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc \
-        /usr/bin/aarch64-linux-gnu-gcc-7 7
+    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
+        sudo update-alternatives --install \
+            /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc \
+            /usr/bin/aarch64-linux-gnu-gcc-5 5
+        sudo update-alternatives --install \
+            /usr/bin/aarch64-linux-gnu-gcc aarch64-linux-gnu-gcc \
+            /usr/bin/aarch64-linux-gnu-gcc-7 7
 
-    echo -e "\n-------------------\n"
-    sudo update-alternatives --config aarch64-linux-gnu-gcc
-
+        echo -e "\n-------------------\n"
+        sudo update-alternatives --config aarch64-linux-gnu-gcc
+    fi
     cd $current_folder
     unset current_folder
 }
@@ -268,28 +278,28 @@ function _dj_setup_gcc_aarch64_linux()
 # =============================================================================
 # for Ubuntu 20.04:
 # https://askubuntu.com/questions/1243252/how-to-install-arm-none-eabi-gdb-on-ubuntu-20-04-lts-focal-fossa
-function _dj_setup_gcc_arm_embedded()
+function _dj_setup_gcc_arm_stm32()
 {
     current_folder=${PWD}
 
-    echo -e "\n remove gcc-arm-none-eabi, and install gcc-arm-embedded ...\n"
+    echo -e "\n remove ${RED}gcc-arm-none-eabi${NOC}, and install ${GRN}gcc-arm-embedded${NOC} ...\n"
     _press_enter_or_wait_s_continue 10
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
 
     sudo apt-get install -y build-essential git flex bison libgmp3-dev libmpfr-dev 
     sudo apt-get install -y libncurses5-dev libmpc-dev autoconf texinfo libtool
     sudo apt-get install -y libftdi-dev libusb-1.0-0-dev zlib1g zlib1g-dev python-yaml
     sudo apt-get install -y libncurses-dev
 
-    if [[ ${ubuntu_v} = *'18.04'* ]] ; then
+    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
         sudo echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" \
         | sudo tee -a /etc/apt/sources.list
-    elif  [[ ${ubuntu_v} = *'16.04'* ]] ; then
+    elif  [[ "${ubuntu_v}" = *'16.04'* ]] ; then
         echo "just do nothing"
     fi
-    if [[ ${ubuntu_v} = *'18.04'* || \
-          ${ubuntu_v} = *'16.04'* ]] ; then
+    if [[ "${ubuntu_v}" = *'18.04'* || \
+          "${ubuntu_v}" = *'16.04'* ]] ; then
         sudo apt-get remove gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
         sudo apt-add-repository ppa:team-gcc-arm-embedded/ppa
         sudo apt-get update
@@ -299,7 +309,7 @@ function _dj_setup_gcc_arm_embedded()
         echo " (just maybe) gcc-arm-embedded is installed in /usr/share/gcc-arm-embedded/"
         echo " (question) Is there still an arm-none-eabi? "
         echo -e "\n"
-    elif [[ ${ubuntu_v} = *'20.04'* ]] ;then
+    elif [[ "${ubuntu_v}" = *'20.04'* ]] ; then
         sudo apt remove gcc-arm-none-eabi
         compiler_date="9-2020"
         compiler_q="q2"
@@ -308,8 +318,8 @@ function _dj_setup_gcc_arm_embedded()
         filename="${file}-x86_64-linux.tar.bz2"
         # check if the file exists --------------------
         unset md5checksum
-        if [[ -f $filename ]] ; then
-            md5checksum=`md5sum $filename`
+        if [[ -f "$filename" ]] ; then
+            md5checksum=$(md5sum $filename)
             echo "md5checksum = "$md5checksum
         fi
         if [[ "$md5checksum" = *"2b9eeccc33470f9d3cda26983b9d2dc6"* ]] ; then
@@ -343,27 +353,37 @@ function _dj_setup_gcc_arm_linux_gnueabi()
     echo -e "\n install gcc-arm-linux-gnueabi ...\n"
     _press_enter_or_wait_s_continue 10
     sudo apt-get install -y libncurses5-dev build-essential
-    sudo apt-get install -y gcc-arm-linux-gnueabi gcc-5-arm-linux-gnueabi
-    sudo apt-get install -y g++-arm-linux-gnueabi g++-5-arm-linux-gnueabi
-
+    # commonly available
+    # on Ubuntu 18.04, they are of 7.3.0 version (probably)
+    # on Ubuntu 20.04, they are of 9.3.0 version
+    sudo apt-get install -y gcc-arm-linux-gnueabi
+    sudo apt-get install -y g++-arm-linux-gnueabi
+    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
+        sudo apt-get install -y gcc-5-arm-linux-gnueabi
+        sudo apt-get install -y g++-5-arm-linux-gnueabi
+    else
+        echo "do nothing at this moment"
+    fi
     # update-alternatives configuration
-    sudo update-alternatives --install \
-        /usr/bin/arm-linux-gnueabi-gcc arm-linux-gnueabi-gcc \
-        /usr/bin/arm-linux-gnueabi-gcc-5 5
-    sudo update-alternatives --install \
-        /usr/bin/arm-linux-gnueabi-gcc arm-linux-gnueabi-gcc \
-        /usr/bin/arm-linux-gnueabi-gcc-7 7
-    sudo update-alternatives --install \
-        /usr/bin/arm-linux-gnueabi-g++ arm-linux-gnueabi-g++ \
-        /usr/bin/arm-linux-gnueabi-g++-5 5
-    sudo update-alternatives --install \
-        /usr/bin/arm-linux-gnueabi-g++ arm-linux-gnueabi-g++ \
-        /usr/bin/arm-linux-gnueabi-g++-7 7
 
-    echo -e "\n-------------------\n"
-    sudo update-alternatives --config arm-linux-gnueabi-gcc
-    sudo update-alternatives --config arm-linux-gnueabi-g++
+    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
+        sudo update-alternatives --install \
+            /usr/bin/arm-linux-gnueabi-gcc arm-linux-gnueabi-gcc \
+            /usr/bin/arm-linux-gnueabi-gcc-5 5
+        sudo update-alternatives --install \
+            /usr/bin/arm-linux-gnueabi-gcc arm-linux-gnueabi-gcc \
+            /usr/bin/arm-linux-gnueabi-gcc-7 7
+        sudo update-alternatives --install \
+            /usr/bin/arm-linux-gnueabi-g++ arm-linux-gnueabi-g++ \
+            /usr/bin/arm-linux-gnueabi-g++-5 5
+        sudo update-alternatives --install \
+            /usr/bin/arm-linux-gnueabi-g++ arm-linux-gnueabi-g++ \
+            /usr/bin/arm-linux-gnueabi-g++-7 7
 
+        echo -e "\n-------------------\n"
+        sudo update-alternatives --config arm-linux-gnueabi-gcc
+        sudo update-alternatives --config arm-linux-gnueabi-g++
+    fi
     cd $current_folder
     unset current_folder
 }
@@ -376,26 +396,35 @@ function _dj_setup_gcc_arm_linux_gnueabihf()
     echo -e "\n install gcc-arm-linux-gnueabihf ...\n"
     _press_enter_or_wait_s_continue 10
     sudo apt-get install -y libncurses5-dev build-essential
-    sudo apt-get install -y gcc-arm-linux-gnueabihf gcc-5-arm-linux-gnueabihf
-    sudo apt-get install -y g++-arm-linux-gnueabihf g++-5-arm-linux-gnueabihf
 
+    # commom ones
+    sudo apt-get install -y gcc-arm-linux-gnueabihf
+    sudo apt-get install -y g++-arm-linux-gnueabihf
+    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
+        sudo apt-get install -y gcc-5-arm-linux-gnueabihf
+        sudo apt-get install -y  g++-5-arm-linux-gnueabihf
+    else
+        echo "do nothing at this moment"
+    fi
     # update-alternatives configuration
-    sudo update-alternatives --install \
-        /usr/bin/arm-linux-gnueabihf-gcc arm-linux-gnueabihf-gcc \
-        /usr/bin/arm-linux-gnueabihf-gcc-5 5
-    sudo update-alternatives --install \
-        /usr/bin/arm-linux-gnueabihf-gcc arm-linux-gnueabihf-gcc \
-        /usr/bin/arm-linux-gnueabihf-gcc-7 7
-    sudo update-alternatives --install \
-        /usr/bin/arm-linux-gnueabihf-g++ arm-linux-gnueabihf-g++ \
-        /usr/bin/arm-linux-gnueabihf-g++-5 5
-    sudo update-alternatives --install \
-        /usr/bin/arm-linux-gnueabihf-g++ arm-linux-gnueabihf-g++ \
-        /usr/bin/arm-linux-gnueabihf-g++-7 7
+    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
+        sudo update-alternatives --install \
+            /usr/bin/arm-linux-gnueabihf-gcc arm-linux-gnueabihf-gcc \
+            /usr/bin/arm-linux-gnueabihf-gcc-5 5
+        sudo update-alternatives --install \
+            /usr/bin/arm-linux-gnueabihf-gcc arm-linux-gnueabihf-gcc \
+            /usr/bin/arm-linux-gnueabihf-gcc-7 7
+        sudo update-alternatives --install \
+            /usr/bin/arm-linux-gnueabihf-g++ arm-linux-gnueabihf-g++ \
+            /usr/bin/arm-linux-gnueabihf-g++-5 5
+        sudo update-alternatives --install \
+            /usr/bin/arm-linux-gnueabihf-g++ arm-linux-gnueabihf-g++ \
+            /usr/bin/arm-linux-gnueabihf-g++-7 7
 
-    echo -e "\n-------------------\n"
-    sudo update-alternatives --config arm-linux-gnueabihf-gcc
-    sudo update-alternatives --config arm-linux-gnueabihf-g++
+        echo -e "\n-------------------\n"
+        sudo update-alternatives --config arm-linux-gnueabihf-gcc
+        sudo update-alternatives --config arm-linux-gnueabihf-g++
+    fi
 
     cd $current_folder
     unset current_folder
@@ -411,13 +440,13 @@ function _dj_setup_git_lfs()
 }
 
 # =============================================================================
-function _dj_setup_gitg_gitk_kdiff3()
+function _dj_setup_gitg_gitk()
 {
     current_folder=${PWD}
 
     echo -e "\n install gitg, gitk and KDiff3 ...\n"
     _press_enter_or_wait_s_continue 10 # to check the key pressed TODO
-    sudo apt-get install gitg gitk kdiff3 -y
+    sudo apt-get install gitg gitk -y
     git config --global credential.helper store
     # git config --global credential.helper 'cache --timeout=36000'  
     git config --global --add merge.tool kdiff3
@@ -432,7 +461,7 @@ function _dj_setup_i219_v()
 {
     current_folder=${PWD}
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
     
     git clone https://dj-zhou@github.com/dj-zhou/i219-v.git
     cd i219-v/$1/src/
@@ -459,7 +488,7 @@ function _dj_setup_libev_4_33()
 {
     current_folder=${PWD}
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
 
     file="libev-4.33"
     wget http://dist.schmorp.de/libev/$file.tar.gz
@@ -487,13 +516,51 @@ function _dj_setup_libev_4_33()
 }
 
 # =============================================================================
+function _dj_setup_libiio()
+{
+    current_folder=${PWD}
+
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm -rf libiio
+    git clone https://github.com/analogdevicesinc/libiio.git
+    cd libiio
+    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
+        git checkout 0.21
+    else
+        echo -e "\n${YLW}TO BE IMPLEMENTED${NOC}"
+        return
+    fi
+    mkdir build && cd build && cmake ..
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    sudo make install
+    cd ~/soft
+    _ask_to_remove_a_folder libiio
+    
+    cat << EOM
+
+    --------------------------------------------
+    libiio is installed to:
+        /usr/lib/x86_64-linux-gnu/libiio.so.0.21
+        /lib/udev/rules.d/90-libiio.rules
+        /usr/bin/iio_info
+        ...
+        /usr/sbin/iiod
+    
+    header file:
+        /usr/include/iio.h
+
+EOM
+    cd $current_folder
+}
+
+# =============================================================================
 function _dj_setup_libserialport()
 {
     current_folder=${PWD}
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
 
-    sudo rm -rf libserialport/
+    rm -rf libserialport/
     git clone git://sigrok.org/libserialport.git
     
     cd libserialport
@@ -534,13 +601,14 @@ function _dj_setup_matplotlib_cpp()
 {
     current_folder=${PWD}
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
 
     git clone https://github.com/dj-zhou/matplotlib-cpp.git
     cd matplotlib-cpp
     git checkout install-zdj
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    m
     sudo make install
+
     cd ~/soft
     _ask_to_remove_a_folder matplotlib-cpp
 
@@ -557,13 +625,13 @@ function _dj_setup_qt_5_13_1()
     # install serialport module
     sudo apt-get install libqt5serialport5-dev -y
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
     filename="qt-opensource-linux-x64-5.13.1.run"
 
     # check if the file exists --------------------
     unset md5checksum
     if [[ -f $filename ]] ; then
-        md5checksum=`md5sum $filename`
+        md5checksum=$(md5sum $filename)
         echo "md5checksum = "$md5checksum
     fi
     if [[ "$md5checksum" = *"21c3b16f851697fa8da8009f73694373"* ]] ; then
@@ -604,14 +672,14 @@ function _dj_setup_qt_5_14_2()
     # install serialport module
     sudo apt-get install libqt5serialport5-dev -y
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
     http://qt.mirror.constant.com/archive/qt/5.14/5.14.2/qt-opensource-linux-x64-5.14.2.run
     filename="qt-opensource-linux-x64-5.14.2.run"
 
     # check if the file exists --------------------
     unset md5checksum
-    if [[ -f $filename ]] ; then
-        md5checksum=`md5sum $filename`
+    if [[ -f "$filename" ]] ; then
+        md5checksum=$(md5sum $filename)
         echo "md5checksum = "$md5checksum
     fi
     if [[ "$md5checksum" = *"dce0588874fd369ce493ea5bc2a21d99"* ]] ; then
@@ -656,34 +724,75 @@ function _dj_setup_slack()
 }
 
 # =============================================================================
-function _dj_setup_spdlog()
+function _dj_setup_spdlog() # static/shared
 {
-    static_shared=$1
+    static_shared=$1 # if empty, treat as dynamic
+    # version=$2
+    # if [ -z "$version" ] ; then
+    #     version="v1.7.0"
+    # fi
+    # if [ ! "$version" == "v1.7.0" ] && \
+    #    [ ! "$version" == "v1.8.0" ] \
+    #     ; then
+    #     echo -e "\n supported version: v1.7.0, v1.8.0\n"
+    #     return
+    # fi
+    # choose a place to install ---------------------------------
+    echo -e "\n ------------------------------"
+    echo -e " ${GRN}which version are you going to install?${NOC}"
+    echo -e " 1: v1.6.0"
+    echo -e " 2: v1.6.1"
+    echo -e " 3: v1.7.0 (default)"
+    echo -e " 4: v1.8.0"
+
+    echo -e "${GRN} please enter a number from 1 to 4:${NOC}"
+    read asw
+    case "$asw" in
+        "1")
+        version="v1.6.0"
+        ;;
+        "2")
+        version="v1.6.1"
+        ;;
+        "3")
+        version="v1.7.0"
+        ;;
+        "4")
+        version="v1.8.0"
+        ;;
+        *)
+        echo -e "\n ${YLW}wrong input, set to v1.7.0.${NOC}"
+        version="v1.7.0"
+    esac
+    echo "version = $version"
     cwd_before_running=$PWD
     
     cd ~ && mkdir -p soft && cd soft/
-    sudo rm -rf spdlog
-
-    git clone https://github.com/gabime/spdlog.git
+    rm spdlog -rf
+        
+    git clone https://github.com/gabime/spdlog.git -b $version
     cd spdlog && mkdir build && cd build
-    if [ $static_shared = 'static' ] ; then
+
+    # static build need to be specific
+    # if no option found, "shared" is default
+    if [ "$static_shared" = 'static' ] ; then
         cmake .. -DSPDLOG_BUILD_SHARED="off"
-    elif [ $static_shared = 'shared' ] ; then
+    else
         cmake .. -DSPDLOG_BUILD_SHARED="on"
     fi
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
     
-    if [ $static_shared = 'static' ] ; then
-        echo -e "\n ---------------------------------------\n"
+    echo -e "\n ---------------------------------------\n"
+    if [ "$static_shared" = 'static' ] ; then
         echo    " spdlog is installed statically: "
         echo -e "     /usr/local/lib/libspdlog.a\n"
-    elif [ $static_shared = 'shared' ] ; then
-        echo -e "\n ---------------------------------------\n"
+    else
         echo    " spdlog is installed sharedally: "
         echo -e "     /usr/local/lib/libspdlog.so\n"
         echo -e " you can run \"sudo ldconfig\" before running programs\n"
     fi
+    echo -e "\n ---------------------------------------\n"
     _ask_to_remove_a_folder spdlog
 
     cd ${cwd_before_running}
@@ -724,7 +833,7 @@ function _dj_setup_vscode()
 {
     current_folder=${PWD}
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
     
     # install dependency
     sudo apt-get install -y curl
@@ -769,7 +878,7 @@ function _dj_setup_yaml_cpp()
     static_or_shared=$1
     cwd_before_running=$PWD
 
-    cd ~ && mkdir -p soft/ &&  cd soft/
+    cd ~ && mkdir -p soft/ && cd soft/
     sudo rm yaml-cpp -rf
     git clone https://dj-zhou@github.com/dj-zhou/yaml-cpp.git
     cd yaml-cpp

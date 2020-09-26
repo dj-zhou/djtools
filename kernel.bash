@@ -20,13 +20,13 @@ function _kernel_find_version()
     makefile=$1
     while IFS='' read -r line || [[ -n "$line" ]] ; do
         if [[ $line == *"VERSION ="* ]] ; then
-            VERSION=`echo $line | awk '{ print $3 }'`
+            VERSION=$(echo $line | awk '{ print $3 }')
         fi
         if [[ $line == *"PATCHLEVEL ="* ]] ; then
-            PATCHLEVEL=`echo $line | awk '{ print $3 }'`
+            PATCHLEVEL=$(echo $line | awk '{ print $3 }')
         fi
         if [[ $line == *"SUBLEVEL ="* ]] ; then
-            SUBLEVEL=`echo $line | awk '{ print $3 }'`
+            SUBLEVEL=$(echo $line | awk '{ print $3 }')
             break
         fi
     done < $makefile

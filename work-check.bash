@@ -49,7 +49,7 @@ function _work_check()
     workspace_path=$(pwd)
     # echo $workspace_path
 
-    CURRENT_DATE_TIME=`date +"%Y%m%d-%I%M%S"`
+    CURRENT_DATE_TIME=$(date +"%Y%m%d-%I%M%S")
     OUTPUT_FILE="${HOME}/work-check-${HOSTNAME}-${CURRENT_DATE_TIME}.txt"
     echo -e '\c' > $OUTPUT_FILE
     echo -ne "--------------------------------------------------------------------------------------------\n" >> $OUTPUT_FILE
@@ -75,7 +75,7 @@ function _work_check()
     
     for folder in $workspace_path/*; do
         if [[ -d $folder ]] ; then
-            repo=`basename "$folder"`
+            repo=$(basename "$folder")
             printf $repo
             path=$workspace_path/$repo
             if [ -x "$path" ]; then
@@ -84,12 +84,12 @@ function _work_check()
                 git_source=$(_work_check_git_source)
                 # --------------------------------------------------------
                 if [[ $git_source != "----" ]] ; then
-                    b_name=`git branch | sed -n -e 's/^\* \(.*\)/\1/p'`
-                    t_name=`git describe --abbrev=7 --dirty --always --tags`
-                    branch_commit=`git log --pretty=oneline | awk 'NR==1'`
+                    b_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+                    t_name=$(git describe --abbrev=7 --dirty --always --tags)
+                    branch_commit=$(git log --pretty=oneline | awk 'NR==1')
                     branch_commit_len=${#branch_commit}
                     branch_commit_value=${branch_commit:0:10}"     "
-                    date_time=`git log -1 --format=%ai`
+                    date_time=$(git log -1 --format=%ai)
                     date_time=${date_time:0:19}"     "
                     # --------------------------------------------------------
                     commit_str=${branch_commit:41:$branch_commit_len-41}
@@ -157,11 +157,11 @@ function _work_check()
             cd $folder/
             git_source=$(_work_check_git_source)
             if [[ $git_source != "----" ]] ; then
-                repo=`basename "$folder"`
+                repo=$(basename "$folder")
                 # echo $repo
                 if [ -x "$path" ] ; then
                     cd $workspace_path/$repo
-                    branch_diff=`git diff | awk 'NR==1'`
+                    branch_diff=$(git diff | awk 'NR==1')
                     echo -ne "\n+------ $repo ------+\n" >> $OUTPUT_FILE
                     echo -ne "$branch_diff\n" >> $OUTPUT_FILE
                 else
@@ -190,11 +190,11 @@ function _work_check()
             cd $folder
             git_source=$(_work_check_git_source)
             if [[ $git_source != "----" ]] ; then
-                repo=`basename "$folder"`
+                repo=$(basename "$folder")
                 # echo $repo
                 if [ -x "$path" ]; then
                     cd $workspace_path/$repo
-                    branch_diff=`git diff`
+                    branch_diff=$(git diff)
                     echo -ne "\n+------ $repo ------+\n" >> $OUTPUT_FILE
                     echo -ne "$branch_diff\n" >> $OUTPUT_FILE
                 else

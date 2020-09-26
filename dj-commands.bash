@@ -79,23 +79,11 @@ function _clang_write_to_file_part1() {
 }
 
 function _clang_write_to_file_part2_clang_version() {
-    # echo "hello world"
     file=$1
-    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
-        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04/bin"
-    fi
-    if [[ ${ubuntu_v} = *'18.04'* ]] ; then
-        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04/bin"
-    fi
-    if [[ ${ubuntu_v} = *'20.04'* ]] ; then
-        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04/bin"
-    fi
+    clang_file_path="/usr/bin"
+    
     string1="\"C_Cpp.clang_format_path\": \"${clang_file_path}/clang-format\""
-    string2="\"clang.executable\": \"${clang_file_path}/clang\""
-    # echo "$string1"
-    # echo "$string2"
     echo "    $string1," >> ${file}
-    echo "    $string2," >> ${file}
 }
 
 function _clang_write_to_file_part3_format_on_save() {
@@ -134,55 +122,11 @@ function _clang_vscode_setting_json_format_on_save()
 }
 
 # =============================================================================
-function _dj_setup_clang_9_0_0()
+function _dj_setup_clang_format()
 {
     current_folder=${PWD}
 
-    echo -e "\n"
-    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
-        echo "  Install clang for Ubuntu 16.04 ..."
-    elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
-        echo "  Install clang for Ubuntu 18.04 ..."
-    elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
-        echo " Install clang for Ubuntu 20.04 ..."
-    fi
-    echo -e "\n"
-    _press_enter_or_wait_s_continue 20
-
-    cd ~ && mkdir -p soft/ && cd soft/
-    
-    # how to choose a version?
-    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
-        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04"
-    elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
-        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
-    elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
-        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
-    fi
-    echo "clang_file = "$clang_file
-    # check if the file exists --------------------
-    unset md5checksum
-    if [[ -f $clang_file.tar.xz ]] ; then
-        md5checksum=`md5sum $clang_file.tar.xz`
-        echo "md5checksum = "$md5checksum
-    fi
-    if [[ ( ( ${ubuntu_v} = *'18.04'* ) && \
-        ( "$md5checksum" = *"9d8044379e151029bb1df3663c2fb2c1"* ) ) \
-      || ( ( ${ubuntu_v} = *'16.04'* ) && \
-        ( "$md5checksum" = *"b3c5618fb3a5d268c371539e9f6a4b1f"* ) ) ]] ; then
-        echo "file exists, no need to download again."
-    else
-        wget http://releases.llvm.org/9.0.0/${clang_file}.tar.xz
-    fi
-    echo "untar the clang file ..."
-    tar xf ${clang_file}.tar.xz
-    sudo rm -rf /opt/clang+llvm*
-
-    echo "copy the clang file into /opt/ ..."
-    sudo mv ${clang_file}/ /opt/
-    _ask_to_remove_a_file ${clang_file}.tar.xz
-
-    mkdir -p ~/.config/Code/User
+    sudo apt-get install -y clang-format
 
     cd $djtools_path
 
@@ -206,6 +150,24 @@ function _dj_setup_clang_9_0_0()
 }
 
 # =============================================================================
+function _dj_setup_kdiff3_meld()
+{
+    sudo apt-get install -y meld kdiff3
+    
+    all_config=$(git config --list)
+    if [[ "$all_config" = *"merge.tool"* ]] ; then
+        git config --global --replace-all merge.tool kdiff3
+    else
+        git config --global --add merge.tool kdiff3
+    fi
+    if [[ "$all_config" = *"diff.guitool"* ]] ; then
+        git config --global --replace-all diff.guitool meld
+    else
+        git config --global --add diff.guitool meld
+    fi
+}
+
+# =============================================================================
 function _dj_setup_dj_gadgets()
 {
     current_folder=${PWD}
@@ -223,6 +185,13 @@ function _dj_setup_dj_gadgets()
     _ask_to_remove_a_folder dj-gadgets
     
     cd $current_folder
+}
+
+# =============================================================================
+# todo: for each package, yes (default) to intall, no to skip
+function _dj_setup_devtools()
+{
+    sudo apt-get install -y libncurses5-dev
 }
 
 # =============================================================================
@@ -315,38 +284,31 @@ function _dj_setup_pangolin()
     # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
     
     cd ~ && mkdir -p soft/ &&  cd soft/
-    git clone https://dj-zhou@github.com/dj-zhou/pangolin.git
-    cd pangolin
-    git checkout add-eigen3-include
-    git pull
-    sudo rm -rf build/ && mkdir build && cd build
+    rm -rf Pangolin/
+    git clone https://github.com/stevenlovegrove/Pangolin.git
+    cd Pangolin
+    # this following commit tis tested on Ubuntu 20.04, on Sept. 25th, 2020
+    git checkout 86eb4975fc4fc8b5d92148c2e370045ae9bf9f5d # it is on master
+    rm -rf build/ && mkdir build && cd build
     cmake ..
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
-    _ask_to_remove_a_folder pangolin
-
-    echo -e '\n' >> ~/.bashrc
-    echo '# ===========================================================' >> ~/.bashrc
-    echo '# Pangolin setup (djtools)' >> ~/.bashrc
-    echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
-    echo -e "\n LD_LIBRARY_PATH is set in ~/.bashrc.\n"
+    cd ~/soft/
+    _ask_to_remove_a_folder Pangolin
 
     _press_enter_or_wait_s_continue 10
 
-    echo -e "\n"
-    echo "libpangolin.so is in path: /usr/local/lib/"
-    echo "header files (i.e., pangolin/pangolin.h) are in path: /usr/local/include/"
-    echo -e "\n"
+    echo -e "\n libpangolin.so is in path: ${GRN}/usr/local/lib/${NOC}"
+    echo -e " header files are in path: ${GRN}/usr/local/include/pangolin/${NOC}\n"
     
     _press_enter_or_wait_s_continue 10
 
-    echo "If you see error like this:"
-    echo "   Could not find GLEW"
-    echo " you should run the following commands first:"
-    echo "   dj setup glfw3"
-    echo "   dj setup gtest-glog"
-    echo -e "\n"
+    echo -e "\n If you see error like this:"
+    echo    "   Could not find GLEW"
+    echo    " you should run the following commands first:"
+    echo    "   dj setup glfw3"
+    echo -e "   dj setup gtest-glog\n"
     
     cd $current_folder
 }
@@ -396,32 +358,42 @@ function _dj_setup_qemu()
 }
 
 # =============================================================================
-# v1.6.1 can be installed on Ubuntu 20.04
+# I experienced lots of problems with the stlink-v2 software, so I hard coded
+# the version in the scripts
+# some test result must be list here
+# stlink-v2 software from https://github.com/stlink-org/stlink
+# Ubuntu 18.04: v1.6.1 works (test with projects to download binaries)
+# Ubuntu 20.04: v1.6.1 works
 function _dj_setup_stm32_tools()
 {
     cwd_before_running=$PWD
 
     echo -e "\n install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
-    echo -e "\n${RED} stlink may not compile, use it with caution${NOC}\n"
-    _press_enter_or_wait_s_continue 20
-    v=$1
-    if [ -z $v ] ; then
-        v="1.3.1"
-    fi
+    _press_enter_or_wait_s_continue 10
     
-    mkdir -p ~/workspace && cd ~/workspace
-
     # install dependencies and some software ----------------
     sudo apt-get install -y libusb-1.0.0-dev gtk+-3.0
     sudo apt-get install -y cu cutecom putty screen
-
-    sudo rm stm32-tools -rf
-    git clone https://github.com/dj-zhou/stm32-tools.git
+    sudo apt-get install -y cmake
 
     # install stlink ----------------
-    echo -e "\n install  stlink-v$v \n"
+    echo -e "\n install ${GRN}stlink${NOC}\n"
     _press_enter_or_wait_s_continue 10
-    cd stm32-tools/stlink-v$v
+
+    mkdir -p ~/workspace && cd ~/workspace
+    rm stlink -rf
+    git clone https://github.com/stlink-org/stlink
+
+    cd stlink
+    if [[ ${ubuntu_v} = *'18.04'* ]] ; then
+        git checkout v1.6.1
+    elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
+        git checkout v1.6.1
+    else
+        echo "${RED} NOT IMPLEMENTED YET${NOC}"
+    fi
+    echo "sudo rm -rf /usr/local/bin/st-*"
+    sudo rm -rf /usr/local/bin/st-*
     make release -j$(cat /proc/cpuinfo | grep processor | wc -l)
     cd build/Release/
     sudo make install
@@ -430,9 +402,13 @@ function _dj_setup_stm32_tools()
     # install stm32flash ----------------
     echo -e "\n install  stm32flash\n"
     _press_enter_or_wait_s_continue 10
-    cd ~/workspace/stm32-tools/stm32flash
+    cd ~/workspace/
+    rm stm32-tools -rf
+    git clone https://github.com/dj-zhou/stm32-tools.git
+    cd stm32-tools/stm32flash
     make clean
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    sudo rm /usr/local/bin/stm32flash
     sudo make install
 
     # udev rule ----------------
@@ -448,7 +424,7 @@ function _dj_setup_stm32_tools()
     echo -e "\n"
     cd ~/workspace
     _ask_to_remove_a_folder stm32-tools
-
+    _ask_to_remove_a_folder stlink
     cd ${cwd_before_running}
 }
 
@@ -562,9 +538,12 @@ function _dj_setup_grpc_1_29_1()
 }
 
 # =============================================================================
+# default compiles:
+# Ubuntu 18.04: g++-7
+# Ubuntu 20.04: g++-9
 function _dj_setup_gpp_10()
 {
-    echo -e "\n instal gcc-10, g++-10"
+    echo -e "\n instal ${GRN}gcc-10${NOC} and ${GRN}g++-10${NOC} \n"
     _press_enter_or_wait_s_continue 20
 
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -579,9 +558,14 @@ function _dj_setup_gpp_10()
        || ($anw = 'Yes') || ($anw = 'yes') ]] ; then
         echo -e '\n gcc/g++ are set to use gcc-10/g++-10\n'
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  7
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7  7
+        if [[ ${ubuntu_v} = *'18.04'* ]] ; then
+            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  7
+            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7  7
+        elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
+            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9  9
+            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9  9
+        fi
         echo -e "\n-------------------\n"
         sudo update-alternatives --config gcc
         echo -e "\n-------------------\n"
@@ -765,7 +749,7 @@ function _dj_work_check()
 # =============================================================================
 function _dj_meson_build()
 {
-    folder_name=`basename "$current_folder"`
+    folder_name=$(basename "$current_folder")
     
     # if the curent folder is build, then
     # cd ../ && rm build -r 
@@ -795,6 +779,28 @@ function _dj_meson_build()
     else
         echo -e '\nmeson: not in a meson folder\n'
     fi
+}
+
+# =============================================================================
+# to find something in a meson file
+# only works in . directory
+function _dj_meson_find() # term
+{
+    term=$1
+    if [ -z "$term" ] ; then
+        echo -e "\n usage:"
+        echo -e "   dj meson find <something>\n"
+        return
+    fi
+    all_meson_build=$(find . -name meson.build)
+    for file in $all_meson_build ; do
+        find_term=$(grep -rn $term $file)
+        if [ ! -z "$find_term" ] ; then
+            echo -e "\n${GRN} ---------------------------------------"
+            echo -e "$file${NOC}"
+            echo "$find_term"
+        fi
+    done
 }
 
 # =============================================================================
@@ -1041,6 +1047,10 @@ function dj()
             _dj_meson_build $3 $4 $5 $6
             return
         fi
+        if [ $# -ge 2 ] && [ $2 = 'find' ] ; then
+            _dj_meson_find $3 $4 $5 $6
+            return
+        fi
         echo 'arguments wrong, exit'
         return
     fi
@@ -1057,8 +1067,8 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'clang-9.0.0' ] ; then
-            _dj_setup_clang_9_0_0
+        if [ $2 = 'clang-format' ] ; then
+            _dj_setup_clang_format
             return
         fi
         # --------------------------
@@ -1083,8 +1093,18 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'kdiff3-meld' ] ; then
+            _dj_setup_kdiff3_meld
+            return
+        fi
+        # --------------------------
         if [ $2 = 'dj-gadgets' ] ; then
             _dj_setup_dj_gadgets
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'devtools' ] ; then
+            _dj_setup_devtools
             return
         fi
         # --------------------------
@@ -1103,8 +1123,8 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'gcc-arm-embedded' ] ; then
-            _dj_setup_gcc_arm_embedded
+        if [ $2 = 'gcc-arm-stm32' ] ; then
+            _dj_setup_gcc_arm_stm32
             return
         fi
         # --------------------------
@@ -1128,8 +1148,8 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'gitg-gitk-kdiff3' ] ; then
-            _dj_setup_gitg_gitk_kdiff3
+        if [ $2 = 'gitg-gitk' ] ; then
+            _dj_setup_gitg_gitk
             return
         fi
         # --------------------------
@@ -1170,6 +1190,11 @@ function dj()
         # --------------------------
         if [ $2 = 'libev-4.33' ] ; then
             _dj_setup_libev_4_33
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'libiio' ] ; then
+            _dj_setup_libiio
             return
         fi
         # --------------------------
@@ -1342,11 +1367,11 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    setup_tools+="baidu-netdisk clang-9.0.0 computer container dj-gadgets "
-    setup_tools+="dropbox eigen foxit gcc-arm-embedded gcc-arm-linux-gnueabi "
+    setup_tools+="baidu-netdisk clang-format computer container kdiff3-meld dj-gadgets "
+    setup_tools+="devtools dropbox eigen foxit gcc-arm-stm32 gcc-arm-linux-gnueabi "
     setup_tools+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-    setup_tools+="gitg-gitk-kdiff3 glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
-    setup_tools+="g++-10 i219-v libev-4.33 lib-serialport mathpix matplotlib-cpp "
+    setup_tools+="gitg-gitk glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
+    setup_tools+="g++-10 i219-v libev-4.33 libiio lib-serialport mathpix matplotlib-cpp "
     setup_tools+="opencv-2.4.13 opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 "
     setup_tools+="ros-melodic ros2-foxy spdlog slack stm32-tools sublime typora "
     setup_tools+="vim-env vscode vtk-8.2.0 wubi lib-yamlcpp "
@@ -1441,8 +1466,11 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    ACTIONS[meson]="build "
-    ACTIONS[build]="  "
+    meson_list="build find "
+    ACTIONS[meson]="$meson_list "
+    for i in $meson_list ; do
+        ACTIONS[$i]=" "
+    done
     
     # --------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

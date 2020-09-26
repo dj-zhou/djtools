@@ -62,19 +62,30 @@ function _system_check_cpu_memory()
     cmd=$1
     pre_pid=$(ps aux | grep "$cmd" | awk '{print $2}') 
     final_pid=$(echo $pre_pid | awk '{print $1}')
-    echo -e "[$LRED"$final_pid"$NOC] "$cmd
+    echo -e "[$RED"$final_pid"$NOC] "$cmd
     ps -p $final_pid -o %cpu,%mem
 }
 
 # =============================================================================
 function _system_check_temperature()
 {
+    if [[ "$ubuntu_v" = *"18.04"* ]] ; then
+        ## cat /sys/class/thermal/thermal_zone*/temp
+        zones=$(ls /sys/class/thermal/ | grep thermal_zone)
+        echo "temperature X 1000: "
+        for i in $zones ; do
+            temp_x1000=$(cat /sys/class/thermal/$i/temp)
+            echo -e "$i\t $temp_x1000" # how to convert string to float?
+        done
+        return
+    fi
     result=$(sensors)
     # echo $result
     if [[ "$result" = *"not found"* ]] ; then
         sudo apt-get install lm-sensors
     fi
     sensors
+    
 }
 
 # =============================================================================
