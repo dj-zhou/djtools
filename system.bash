@@ -51,6 +51,24 @@ function _system_disable_program_problem_detected()
 }
 
 # =============================================================================
+function _system_disable_apt_dpkg_locks()
+{
+    echo -e "\n${RED} running this command with caution!!${NOC}\n"
+    
+    echo "sudo rm -f /var/lib/dpkg/lock-frontend"
+    sudo rm -f /var/lib/dpkg/lock-frontend
+    _press_enter_to_continue
+
+    echo "sudo rm -f /var/lib/dpkg/lock"
+    sudo rm -f /var/lib/dpkg/lock
+    _press_enter_to_continue
+
+    echo "sufo rm -f /var/lib/apt/lock"
+    sufo rm -f /var/lib/apt/lock
+    _press_enter_to_continue
+}
+
+# =============================================================================
 function _system_check_cpu_memory()
 {
     if [ $# = 0 ] ; then
@@ -69,7 +87,8 @@ function _system_check_cpu_memory()
 # =============================================================================
 function _system_check_temperature()
 {
-    if [[ "$ubuntu_v" = *"18.04"* ]] ; then
+    if [[ "$ubuntu_v" = *"18.04"* ]] || \
+       [[ "$ubuntu_v" = *"20.04"* ]] ; then
         ## cat /sys/class/thermal/thermal_zone*/temp
         zones=$(ls /sys/class/thermal/ | grep thermal_zone)
         echo "temperature X 1000: "
@@ -171,6 +190,11 @@ function system()
             _system_disable_program_problem_detected $3 $4 $5 $6 $7
             return
         fi
+        # --------------------------
+        if [ $2 = 'apt-dpkg-locks' ] ; then
+            _system_disable_apt_dpkg_locks $3 $4 $5 $6 $7
+            return
+        fi
     fi
     # ------------------------------
     if [ $1 = 'check' ] ; then
@@ -247,8 +271,11 @@ function _system()
 
     # no space in front or after "="
     ACTIONS[enable]+=" "
-    ACTIONS[disable]+="program-problem-detected "
-    ACTIONS[program-problem-detected]=" "
+    disable_list="program-problem-detected apt-dpkg-locks "
+    ACTIONS[disable]+="$disable_list "
+    for i in $disable_list ; do
+        ACTIONS[i]=" "
+    done
     ACTIONS[check]+="cpu-memory temperature nvidia-driver udev-rules "
     ACTIONS[cpu-memory]+=" "
     ACTIONS[temperature]+=" "

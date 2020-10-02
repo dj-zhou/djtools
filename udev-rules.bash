@@ -24,19 +24,57 @@ function _dj_udev_dialout()
     echo -e "udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo 'KERNEL=="ttyUSB[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
-    echo 'KERNEL=="ttyACM[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
+    echo 'KERNEL=="ttyUSB[0-99]*",MODE="0666"' \
+    | sudo tee -a /etc/udev/rules.d/$rule_file
+    echo 'KERNEL=="ttyACM[0-99]*",MODE="0666"' \
+    | sudo tee -a /etc/udev/rules.d/$rule_file
+
     sudo service udev restart
-    echo -e "\n You can plug off the USB-serial doggle and plug it in to use it\n"
 }
 
 # =============================================================================
 function _dj_udev_uvc_video_capture()
 {
     rule_file=uvc-video-capture.rules
-    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
-    
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo 'SUBSYSTEMS=="usb", KERNEL=="video[0-99]*", ACTION=="add", ATTRS{idVendor}=="18ec", ATTRS{idProduct}=="5555", ATTRS{product}=="USB2.0 PC CAMERA", MODE="666", SYMLINK+="uvc/videoCapture", GROUP="dialout"' | sudo tee -a /etc/udev/rules.d/$rule_file
+    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+
+    # finally ----------------
+    string="SUBSYSTEMS==\"usb\", "
+    string="${string}KERNEL==\"video[0-99]*\", "
+    string="${string}ACTION==\"add\", "
+    string="${string}ATTRS{idVendor}==\"18ec\", "
+    string="${string}ATTRS{idProduct}==\"5555\", "
+    # string="${string}ATTRS{manufacturer}==\"One Third Tech.\", " # do not delete
+    string="${string}ATTRS{product}==\"USB2.0 PC CAMERA\", "
+    string="${string}MODE=\"666\", "
+    string="${string}SYMLINK+=\"uvc/video-cap\", "
+    string="${string}GROUP=\"dialout\""
+    echo "${string}" | sudo tee -a /etc/udev/rules.d/$rule_file
+
+    sudo service udev restart
+}
+
+# =============================================================================
+# the One Third Debugger contains a USB to serial port chip: FT232RL
+function _dj_udev_one_third_console()
+{
+    rule_file=one-third-debugger.rules
+    sudo rm -f /etc/udev/rules.d/$rule_file
+    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+
+    # finally ----------------
+    string="SUBSYSTEMS==\"usb\", "
+    string="${string}KERNEL==\"ttyUSB[0-99]*\", "
+    string="${string}ACTION==\"add\", "
+    string="${string}ATTRS{idVendor}==\"0403\", "
+    string="${string}ATTRS{idProduct}==\"6001\", "
+    string="${string}ATTRS{manufacturer}==\"One Third Technologies\", "
+    string="${string}ATTRS{product}==\"Console\", "
+    string="${string}MODE=\"666\", "
+    string="${string}SYMLINK+=\"one-third/console\", "
+    string="${string}GROUP=\"dialout\""
+    echo "${string}" | sudo tee -a /etc/udev/rules.d/$rule_file
+
     sudo service udev restart
 }

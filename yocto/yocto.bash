@@ -307,7 +307,7 @@ function _yocto_flash()
                     wic_file=$TMPDIR/deploy/images/$MACHINE/$potential_images
                 fi
             fi
-            echo "         wic_file: $wic_file"
+            echo "         wic file: ${GRN}$wic_file${NOC}"
             _yocto_flash_wic_file $machine $DEV $wic_file
             ;;
 

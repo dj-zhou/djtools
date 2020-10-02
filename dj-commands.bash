@@ -152,7 +152,7 @@ function _dj_setup_clang_format()
 # =============================================================================
 function _dj_setup_kdiff3_meld()
 {
-    sudo apt-get install -y meld kdiff3
+    sudo apt-get install -y kdiff3 meld
     
     all_config=$(git config --list)
     if [[ "$all_config" = *"merge.tool"* ]] ; then
@@ -458,10 +458,12 @@ function _dj_setup_google_repo()
 {
     cwd_before_running=$PWD
 
+    # it needs python
+
     if [ -f $djtools_path/tools/repo ] ; then
         echo -e "\n use repo from tools/ \n"
         sudo cp  $djtools_path/tools/repo /bin/
-        chmod a+x /bin/repo
+        sudo chmod a+x /bin/repo
     else
         echo -e "\n fetch from google \n"
         curl https://storage.googleapis.com/git-repo-downloads/repo > repo
@@ -1002,42 +1004,24 @@ function dj()
     # ------------------------------
     if [ $1 = 'clone' ] ; then
         # --------------------------
-        if [ $2 = 'bitbucket' ] ; then
-            _dj_clone_bitbucket $3 $4 $5 $6 $7
+        if [[ "$2" = 'bitbucket' ]] || \
+           [[ "$2" = 'github' ]] || \
+           [[ "$2" = 'gitee' ]] ; then
+            _dj_clone_from $2 $3 $4 $5 $6 $7
             return
         fi
-        # --------------------------
-        if [ $2 = 'github' ] ; then
-            _dj_clone_github $3 $4 $5 $6 $7
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'gitee' ] ; then
-            _dj_clone_gitee $3 $4 $5 $6 $7
-            return
-        fi
-        # --------------------------
         _dj_clone_help
         return
     fi
     # ------------------------------
     if [ $1 = 'clone-ssh' ] ; then
         # --------------------------
-        if [ $2 = 'bitbucket' ] ; then
-            _dj_clone_ssh_bitbucket $3 $4 $5 $6 $7
+        if [[ "$2" = 'bitbucket' ]] || \
+           [[ "$2" = 'github' ]] || \
+           [[ "$2" = 'gitee' ]] ; then
+            _dj_clone_ssh_from $2 $3 $4 $5 $6 $7
             return
         fi
-        # --------------------------
-        if [ $2 = 'github' ] ; then
-            _dj_clone_ssh_github $3 $4 $5 $6 $7
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'gitee' ] ; then
-            _dj_clone_ssh_gitee $3 $4 $5 $6 $7
-            return
-        fi
-        # --------------------------
         _dj_clone_help
         return
     fi
@@ -1113,8 +1097,8 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'eigen' ] ; then
-            _dj_setup_eigen
+        if [ $2 = 'eigen3' ] ; then
+            _dj_setup_eigen3
             return
         fi
         # --------------------------
@@ -1303,7 +1287,7 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'lib-yamlcpp' ] ; then
+        if [ $2 = 'libyaml-cpp' ] ; then
             _dj_setup_yaml_cpp $3
             return
         fi
@@ -1332,6 +1316,10 @@ function dj()
         fi
         if [ $2 = 'uvc-video-capture' ] ; then
             _dj_udev_uvc_video_capture $3 $4 $5
+            return
+        fi
+        if [ $2 = 'one-third-console' ] ; then
+            _dj_udev_one_third_console $3 $4 $5
             return
         fi
         return
@@ -1368,13 +1356,13 @@ function _dj()
     #---------------------------------------------------------
     #---------------------------------------------------------
     setup_tools+="baidu-netdisk clang-format computer container kdiff3-meld dj-gadgets "
-    setup_tools+="devtools dropbox eigen foxit gcc-arm-stm32 gcc-arm-linux-gnueabi "
+    setup_tools+="devtools dropbox eigen3 foxit gcc-arm-stm32 gcc-arm-linux-gnueabi "
     setup_tools+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
     setup_tools+="gitg-gitk glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
     setup_tools+="g++-10 i219-v libev-4.33 libiio lib-serialport mathpix matplotlib-cpp "
     setup_tools+="opencv-2.4.13 opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 "
     setup_tools+="ros-melodic ros2-foxy spdlog slack stm32-tools sublime typora "
-    setup_tools+="vim-env vscode vtk-8.2.0 wubi lib-yamlcpp "
+    setup_tools+="vim-env vscode vtk-8.2.0 wubi libyaml-cpp "
     setup_tools+="YouCompleteMe you-complete-me "
     ACTIONS[setup]="$setup_tools "
     for i in $setup_tools ; do
@@ -1404,49 +1392,34 @@ function _dj()
     ACTIONS[--from-source]=" "
     # ---------------------
     ACTIONS[spdlog]="static shared "
-    ACTIONS[lib-yamlcpp]="static shared "
-    ACTIONS[static]=" "
-    ACTIONS[shared]=" "
-    # ---------------------
-    stm32_tools_v="1.3.1 1.4.0 1.5.0 1.5.1 1.6.0 1.6.1 "
-    ACTIONS[stm32-tools]="$stm32_tools_v "
-    for i in $stm32_tools_v ; do
-        ACTIONS[$i]=" "
-    done
+    ACTIONS[libyaml-cpp]="-v "
+    ACTIONS[-v]="0.6.2 0.6.3 "
+    ACTIONS[0.6.2]=" "
+    ACTIONS[0.6.3]=" "
 
     #---------------------------------------------------------
     #---------------------------------------------------------
     ACTIONS[clone]="bitbucket github gitee "
     ACTIONS[clone-ssh]="bitbucket github gitee "
+    
     #---------------------------------------------------------
-    ACTIONS[bitbucket]+=" "
-    if [ -f $djtools_path/.bitbucket-repos ] ; then
-        ACTIONS[bitbucket]+=$(cat $djtools_path/.bitbucket-repos)
-    else
-        ACTIONS[bitbucket]+=" "
-    fi
+    bitbucket_repos="$(_dj_clone_repo_list BitBucket)"
+    ACTIONS[bitbucket]+="$bitbucket_repos "
+    for i in $bitbucket_repos ; do
+        ACTIONS[$i]=" "
+    done
     #---------------------------------------------------------
-    if [ -f $djtools_path/.github-repos ] ; then
-        github_repos="$(cat $djtools_path/.github-repos)"
-        ACTIONS[github]+="$github_repos "
-        # for loop on repos to attach space (" ") to them
-        for i in $github_repos ; do
-            ACTIONS[$i]=" "
-        done
-    else
-        ACTIONS[github]+=" "
-    fi
+    github_repos="$(_dj_clone_repo_list GitHub)"
+    ACTIONS[github]+="$github_repos "
+    for i in $github_repos ; do
+        ACTIONS[$i]=" "
+    done
     #---------------------------------------------------------
-    if [ -f $djtools_path/.gitee-repos ] ; then
-        gitee_repos="$(cat $djtools_path/.gitee-repos)"
-        ACTIONS[gitee]+="$gitee_repos "
-        # for loop on repos to attach space (" ") to them
-        for i in $gitee_repos ; do
-            ACTIONS[$i]=" "
-        done
-    else
-        ACTIONS[gitee]+=" "
-    fi
+    gitee_repos="$(_dj_clone_repo_list GiTee)"
+    ACTIONS[gitee]+="$gitee_repos "
+    for i in $gitee_repos ; do
+        ACTIONS[$i]=" "
+    done
 
     #---------------------------------------------------------
     #---------------------------------------------------------
@@ -1460,9 +1433,14 @@ function _dj()
     #---------------------------------------------------------
     #---------------------------------------------------------
     ACTIONS[work-check]=" "
-    ACTIONS[udev]="uvc-video-capture --dialout "
-    ACTIONS[uvc-video-capture]=" "
-    ACTIONS[--dialout]=" "
+    
+    #---------------------------------------------------------
+    #---------------------------------------------------------
+    udev_list="uvc-video-capture --dialout one-third-console "
+    ACTIONS[udev]="$udev_list "
+    for i in $udev_list ; do
+        ACTIONS[$i]=" "
+    done
 
     #---------------------------------------------------------
     #---------------------------------------------------------

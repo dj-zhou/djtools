@@ -8,11 +8,11 @@ function _dj_setup_help()
   ------------------------------- dj setup --------------------------------
     second level commands:"
       baidu-netdisk    - to install the baidu netdisk tool
-      clang-9.0.0      - to install clang v9.0.0 for use of vscode
+      clang-format     - to install clang-format for use of vscode
       computer         - to install lots of necessary software packages
       dj-gadgets       - to install small gadget tools
       dropbox          - to install dropbox
-      eigen            - to install eigen library
+      eigen3           - to install eigen3 library
       foxit            - to install foxit pdf reader
       g++10            - to install compile g++ of version 10, then ask to 
                          choose version
@@ -29,7 +29,6 @@ function _dj_setup_help()
       lib-yamlcpp      - to install yaml-cpp
       mathpix          - to install math latex equation tool mathpix
       matplotlib-cpp   - to install the matplotlib, a cpp version
-      opencv-2.4.13    - to install OpenCV version 2.4.13
       opencv-4.1.1     - to install OpenCV version 4.1.1
       pangolin         - to install openGL based visualization package
       pip              - to install python software pip
@@ -49,7 +48,7 @@ function _dj_setup_help()
       YouCompleteMe    - to install a Vim plugin: YouCompleteMe
 
       gcc-aarch64-linux-gnu   - to install the 64-bit arm compiler
-      gcc-arm-embedded        - to install micro controller development tool
+      gcc-arm-stm32           - to install micro controller development tool
       gcc-arm-linux-gnueabi   - to install the 32-bit arm compiler
       gcc-arm-linux-gnueabihf - to install the 32-bit arm compiler with hard
                                 float unit
@@ -112,7 +111,7 @@ EOM
     _press_enter_or_wait_s_continue 10
 
     sudo apt-get install -y ark cmake curl cutecom dconf-editor dconf-tools git
-    sudo apt-get install -y git-lfs g++ htop kate libgtk2.0-dev lsb-core putty
+    sudo apt-get install -y git-lfs g++ htop libgtk2.0-dev lsb-core putty
     sudo apt-get install -y screen scrot terminator tree vlc vim wmctrl xclip yasm
 
     # -----------------------------------
@@ -140,31 +139,31 @@ EOM
     sudo apt-get purge firefox -y; rm -Rf ~/.mozilla/firefox/;
 
     # -----------------------------------
+    gnome_v=$(version check gnome)
     # to display simplified Chinese: important, do not comment out!
-    echo -e "\n going to setup simplified Chinese support\n"
-    _press_enter_or_wait_s_continue 10
-    gnome_version=$(version check gnome)
-    if [ ! "$gnome_version" = ' ' ] ; then
+    if [ ! "$gnome_v" = ' ' ] ; then
+        echo -e "\n going to setup simplified Chinese support\n"
+        _press_enter_or_wait_s_continue 10
         gsettings set org.gnome.gedit.preferences.encodings \
             auto-detected "['CURRENT','GB18030','GBK','GB2312','UTF-8','UTF-16']"
     fi
     # -----------------------------------
     # to disable the fixed dock (in dock setting, it is Auto-hide the Dock option)
-    echo -e "\n hide the Dock when any windows overlap with it\n"
-    _press_enter_or_wait_s_continue 10
-    if [ ! "$gnome_version" = ' ' ] ; then
+    if [ ! "$gnome_v" = ' ' ] ; then
+        echo -e "\n hide the Dock when any windows overlap with it\n"
+        _press_enter_or_wait_s_continue 10
         gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     fi
     # -----------------------------------
     # to lock the screen from commands
-    echo -e "\n going to setup lock screen command\n"
-    _press_enter_or_wait_s_continue 10
-    if [ ! "$gnome_version" = ' ' ] ; then
+    if [ ! "$gnome_v" = ' ' ] ; then
+        echo -e "\n going to setup lock screen command\n"
+        _press_enter_or_wait_s_continue 10
         sudo apt-get install gnome-screensaver -y
     fi
     # -----------------------------------
     echo -e "\n time & date control: \n you need to run the code:\n"
-    echo -e "    timedatectl set-local-rtc 1   \n"    
+    echo -e "    timedatectl set-local-rtc 1\n"    
 
     cd $current_folder
 }
@@ -177,13 +176,12 @@ function _dj_setup_dropbox()
     sudo apt-get --fix-broken install
     sudo apt-get install libpango1.0-0 -y
     sudo apt-get install curl -y
-    # how to deal with version?
 
     cd ~ && mkdir -p soft/ && cd soft/
 
     curl -L \
     https://linux.dropbox.com/packages/ubuntu/dropbox_2020.03.04_amd64.deb \
-    > dropbox.deb
+        > dropbox.deb
     sudo dpkg -i dropbox.deb
     
     _ask_to_remove_a_file dropbox.deb
@@ -195,15 +193,17 @@ function _dj_setup_dropbox()
 }
 
 # =============================================================================
-function _dj_setup_eigen()
+function _dj_setup_eigen3()
 {
     current_folder=${PWD}
 
     sudo apt-get install libeigen3-dev -y
     echo -e "\n sudo updatedb\n this may take a few minutes\n"
     sudo updatedb
-    # locate eigen3
-    echo -e "\n eigen is installed in: /usr/include/eigen3\n"
+    
+    echo -e "\n eigen3 is installed in: /usr/include/eigen3\n"
+    echo " if see error \"fatal error: Eigen/Core: No such file or directory\""
+    echo -e " add \"-I/usr/include/eigen3\" to your Makefile\n"
 
     cd $current_folder
 }
@@ -434,7 +434,9 @@ function _dj_setup_gcc_arm_linux_gnueabihf()
 function _dj_setup_git_lfs()
 {
     current_folder=${PWD}
-    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+    curl -s \
+      https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh \
+      | sudo bash
     sudo apt-get install git-lfs
     cd $current_folder
 }
@@ -444,14 +446,11 @@ function _dj_setup_gitg_gitk()
 {
     current_folder=${PWD}
 
-    echo -e "\n install gitg, gitk and KDiff3 ...\n"
+    echo -e "\n install gitg and gitk ...\n"
     _press_enter_or_wait_s_continue 10 # to check the key pressed TODO
     sudo apt-get install gitg gitk -y
     git config --global credential.helper store
-    # git config --global credential.helper 'cache --timeout=36000'  
-    git config --global --add merge.tool kdiff3
-    git config --global --add diff.guitool kdiff3
-
+    # git config --global credential.helper 'cache --timeout=36000'
     cd $current_folder
 }
 
@@ -482,8 +481,8 @@ function _dj_setup_i219_v()
 #   /usr/lib/x86_64-linux-gnu/
 # install from the source, will have the libev installed into
 #  /usr/local/lib
-# this setup works only for the host computer, don't know how to do it for cross
-# compilers
+# this setup works only for the host computer, don't know how to do it for 
+# cross compilers
 function _dj_setup_libev_4_33()
 {
     current_folder=${PWD}
@@ -566,8 +565,7 @@ function _dj_setup_libserialport()
     cd libserialport
     ./autogen.sh
     ./configure
-    make
-    sudo make install
+    make && sudo make install
 
     cat << EOM
 
@@ -592,7 +590,7 @@ EOM
 # =============================================================================
 function _dj_setup_mathpix()
 {
-    sudo apt install snapd
+    sudo apt-get install -y snapd
     sudo snap install mathpix-snipping-tool
 }
 
@@ -606,7 +604,7 @@ function _dj_setup_matplotlib_cpp()
     git clone https://github.com/dj-zhou/matplotlib-cpp.git
     cd matplotlib-cpp
     git checkout install-zdj
-    m
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
     cd ~/soft
@@ -875,32 +873,32 @@ EOM
 # shared library build seems not working!
 function _dj_setup_yaml_cpp()
 {
-    static_or_shared=$1
-    cwd_before_running=$PWD
+    sudo rm /usr/local/lib/libyaml-cpp*
 
+    cwd_before_running=$PWD
+    yaml_v=$(_find_argument_after_option -v $1 $2 $3 $4 $5 $6 $7 $8)
+    if [ -z $yaml_v ] ; then
+        yaml_v="0.6.3"
+    fi
     cd ~ && mkdir -p soft/ && cd soft/
-    sudo rm yaml-cpp -rf
-    git clone https://dj-zhou@github.com/dj-zhou/yaml-cpp.git
+    rm yaml-cpp -rf
+
+    git clone https://github.com/jbeder/yaml-cpp.git
     cd yaml-cpp
-    sudo rm -rf build/ && mkdir build && cd build
-    
-    # static build need to be specific
-    # if no option found, "shared" is default
-    if [ "$static_or_shared" = 'static' ] ; then
-        cmake .. -DBUILD_SHARED_LIBS=OFF
-    else
-        echo "shared"
+    git checkout yaml-cpp-$yaml_v
+    rm -rf build/ && mkdir build && cd build
+
+    # use shared library as default
+    if [[ "$yaml_v" = "0.6.2" ]] ; then
         cmake .. -DBUILD_SHARED_LIBS=ON
+    elif [[ "$yaml_v" = "0.6.3" ]] ; then
+        cmake .. -DYAML_BUILD_SHARED_LIBS=ON
     fi
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
-    if [ "$static_or_shared" = 'static' ] ; then
-        echo -e "\n libyaml-cpp.a is installed in /usr/local/lib/"
-    else
-        echo -e "\n libyaml-cpp.so is installed in /usr/local/lib/"
-    fi
-    echo -e " header files are installed in /usr/local/include/yaml-cpp/\n"
+    echo -e "\n libyaml-cpp.so is installed in /usr/local/lib/"
+        echo -e " header files are installed in /usr/local/include/yaml-cpp/\n"
     _ask_to_remove_a_folder yaml-cpp/
 
     # ---------------------------------------------

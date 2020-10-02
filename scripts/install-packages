@@ -1,0 +1,8 @@
+#! /bin/bash
+APT_LOCKFILE="/var/lib/apt/lock"
+(
+	set -euf -o pipefail
+	flock -x 200
+	apt-get update &&
+	apt-get --no-install-recommends install -y "$@"
+) 200>"$APT_LOCKFILE"

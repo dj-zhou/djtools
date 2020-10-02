@@ -22,53 +22,29 @@ echo '# djtools setup' >> ~/.bashrc
 
 # =============================================================================
 # get bitbucket/github, etc, user name
+repo_source="GitHub GiTee BitBucket"
+for rs in $repo_source ; do
 # -----------------------------------------------------------------
-echo -e '\n Do you have a GitHub username? [Yes/No]'
-read anw
-username=""
-if [[ ("$anw" = 'n') || ("$anw" = 'N') || ("$anw" = 'NO') || \
-    ("$anw" = 'No') || ("$anw" = 'no') ]] ; then
-    echo 'GitHub username is not set.'
-elif [[ ("$anw" = 'y') || ("$anw" = 'Y') || ("$anw" = 'YES') || \
-    ("$anw" = 'Yes') || ("$anw" = 'yes') ]] ; then
-    echo " "
-    echo 'Please enter your GitHub username:'
-    read username
-    echo 'github_username='$username >> ~/.bashrc
-fi
+echo -e "\n Do you have a $rs username? [Yes/No]"
+    read anw
+    username=""
+    if [[ ("$anw" = 'n') || ("$anw" = 'N') || ("$anw" = 'NO') || \
+        ("$anw" = 'No') || ("$anw" = 'no') ]] ; then
+        echo "$rs username is not set."
+    elif [[ ("$anw" = 'y') || ("$anw" = 'Y') || ("$anw" = 'YES') || \
+        ("$anw" = 'Yes') || ("$anw" = 'yes') ]] ; then
+        echo " "
+        echo " Please enter your $rs username:"
+        read username
+        echo "${rs}_username="$username >> ~/.bashrc
+    fi
+    touch ~/.${rs}-repos-$username
+    echo -e "\n you can put repos in the ~/.GitHub-repos-$username to enable command \"dj clone\"\n"
+done
 
-# -----------------------------------------------------------------
-echo -e '\n Do you have a GiTee username? [Yes/No]'
-read anw
-unset username
-if [[ ("$anw" = 'n') || ("$anw" = 'N') || ("$anw" = 'NO') || \
-    ("$anw" = 'No') || ("$anw" = 'no') ]] ; then
-    echo 'GiTee username is not set.'
-elif [[ ("$anw" = 'y') || ("$anw" = 'Y') || ("$anw" = 'YES') || \
-    ("$anw" = 'Yes') || ("$anw" = 'yes') ]] ; then
-    echo " "
-    echo 'Please enter your GiTee username:'
-    read username
-    echo 'gitee_username='$username >> ~/.bashrc
-fi
-
-# -----------------------------------------------------------------
-echo -e '\n Do you have a BitBucket username? [Yes/No]'
-read anw
-unset username
-if [[ ("$anw" = 'n') || ("$anw" = 'N') || ("$anw" = 'NO') || \
-    ("$anw" = 'No') || ("$anw" = 'no') ]] ; then
-    echo 'BitBucket username is not set.'
-elif [[ ("$anw" = 'y') || ("$anw" = 'Y') || ("$anw" = 'YES') || \
-    ("$anw" = 'Yes') || ("$anw" = 'yes') ]] ; then
-    echo " "
-    echo 'Please enter your BitBucket username'
-    read username
-    echo 'bitbucket_username='$username >> ~/.bashrc
-fi
-
-
-echo -e '\n If bitbucket/github/gitee usernames set wrong, you can still edit them in ~/.bashrc\n'
+echo -e "\n If GitHub/GiTee/BitBucket usernames set wrong, you can still edit them in ~/.bashrc\n"
 echo "source $djtools_path/djtools.bash" >> ~/.bashrc
 echo -e "\n djtools installation finished.\n"
 echo -e "\n" >> ~/.bashrc
+
+

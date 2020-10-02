@@ -51,9 +51,9 @@ After the installation, you will get those (similar) lines in `~/.bashrc`:
 ```bash
 # ===========================================================
 # djtools setup
-bitbucket_username=sky-Hawk
-github_username=dj-zhou
-gitee_username=dj-zhou
+BitBucket_username=sky-Hawk
+GitHub_username=dj-zhou
+GiTee_username=dj-zhou
 source /home/robot/workspace/djtools/djtools.bash
 ```
 
@@ -61,9 +61,43 @@ source /home/robot/workspace/djtools/djtools.bash
 
 #### `dj clone`
 
-Used to clone the repositories from **bitbucket/github/gitee**. For **github**, it is able to clone a specific branch. 
+Used to clone the repositories from **BitBucket/GitHub/GiTee**. A specific branch can be cloned.
 
-The tab-completion feature requires to add the repo names into a hard-coded table. It is recommended to move to a repo-unrelated configuration file.  <span style="color:blue">Will do.</span>
+The tab-completion feature requires to add the repository names into a hard-coded file. For example, you can create a file `.github-repos-<github username>` in home directory, then the command:
+
+```bash
+dj clone github <tab> <tab>
+```
+
+will list the repository names for selection. Take my GitHub account for example, I have tab-completion after `github` as:
+
+```bash
+$ dj clone github 
+algorithm-note       dj-lib-cpp           one-third-demo       stl-practise
+avr-gcc              djtools              one-third-stm32      stm32-embedded-demo
+can-analyzer         embedded-debug-gui   opencv-4.1.1         stm32-lib
+cpp-practise         glfw3                pads-clear-up        stm32tools
+cv                   math-for-ml-note     pangolin             tutorials
+dj-gadgets           matplotlib-cpp       robotics-note        yaml-cpp
+```
+
+since I have those listed in the `~/.github-repos-dj-zhou`. If the file is not found, it will use the repository listed in `settings/github-repos` instead.
+
+The same rules applied to GiTee and BitBucket.
+
+#### `dj clone-ssh`
+
+A similar command to `dj clone`, with the difference that the repository is with ssh links. For example,
+
+```bash
+dj clone-ssh github robotics-note
+```
+
+is the same as
+
+```bash
+git clone git@github.com:dj-zhou/robotics-note.git
+```
 
 #### `dj setup`
 
