@@ -561,7 +561,10 @@ function _dj_setup_gpp_10()
         echo -e '\n gcc/g++ are set to use gcc-10/g++-10\n'
         sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
         sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
-        if [[ ${ubuntu_v} = *'18.04'* ]] ; then
+        if [[ ${ubuntu_v} = *'16.04'* ]] ; then
+            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5  5
+            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5  5
+        elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  7
             sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7  7
         elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
@@ -756,10 +759,10 @@ function _dj_meson_build()
     # if the curent folder is build, then
     # cd ../ && rm build -r 
     # meson build && cd build && ninja
-    if [ $folder_name = 'build' ] ; then
+    if [ "$folder_name" = 'build' ] ; then
         cd ../
         rm build/ -rf
-        meson build
+        meson . build
         cd build
         ninja
 
@@ -768,14 +771,14 @@ function _dj_meson_build()
     # meson build && cd build && ninja
     elif [ -d build ] ; then
         rm build/ -rf
-        meson build
+        meson . build
         cd build
         ninja
         
     # if the current folder does not contain a build/ folder,then
     # check if there is a meson.build file, then build
     elif [ -f meson.build ] ; then
-        meson build
+        meson . build
         cd build
         ninja
     else
@@ -1325,6 +1328,11 @@ function dj()
         return
     fi
     # ------------------------------
+    if [ $1 = 'udevadm' ] ; then
+        _dj_udevadm $2 $3
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'work-check' ] ; then
         _dj_work_check $2 $3 $4 $5
         return
@@ -1347,6 +1355,7 @@ function _dj()
         setup
         ssh
         udev
+        udevadm
         work-check
     ")
 
@@ -1439,6 +1448,14 @@ function _dj()
     udev_list="uvc-video-capture --dialout one-third-console "
     ACTIONS[udev]="$udev_list "
     for i in $udev_list ; do
+        ACTIONS[$i]=" "
+    done
+
+    #---------------------------------------------------------
+    #---------------------------------------------------------
+    udevadm_list="$(ls /dev/tty*) "
+    ACTIONS[udevadm]="$udevadm_list "
+    for i in $udevadm_list ; do
         ACTIONS[$i]=" "
     done
 

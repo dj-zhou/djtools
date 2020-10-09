@@ -518,15 +518,20 @@ function _dj_setup_libev_4_33()
 function _dj_setup_libiio()
 {
     current_folder=${PWD}
+    # install some software
+    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
+        sudo apt-get install libxml2-dev
+    fi
 
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf libiio
     git clone https://github.com/analogdevicesinc/libiio.git
     cd libiio
-    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
+    if [[ "${ubuntu_v}" = *'18.04'* || \
+          "${ubuntu_v}" = *'20.04'* ]] ; then
         git checkout 0.21
     else
-        echo -e "\n${YLW}TO BE IMPLEMENTED${NOC}"
+        echo -e "\n${YLW} TO BE IMPLEMENTED${NOC}\n"
         return
     fi
     mkdir build && cd build && cmake ..
@@ -547,6 +552,9 @@ function _dj_setup_libiio()
     
     header file:
         /usr/include/iio.h
+
+    pkg-config file:
+        /usr/lib/x86_64-linux-gnu/pkgconfig/libiio.pc
 
 EOM
     cd $current_folder

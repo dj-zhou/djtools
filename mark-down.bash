@@ -14,7 +14,10 @@ function _mark-down_help()
 # =============================================================================
 function _mark_down_help_insert_figure()
 {
-    echo -e '\n <img src="./figures/sample-figure.png" width="500px"> \n'
+    echo -e "\n method 1: "
+    echo -e '  <img src="./figures/sample-figure.png" width="500px">'
+    echo -e "\n method 2:"
+    echo -e "  ![image description](https://image-link.jpg)\n"
 }
 
 # =============================================================================

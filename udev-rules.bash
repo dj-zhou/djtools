@@ -77,4 +77,17 @@ function _dj_udev_one_third_console()
     echo "${string}" | sudo tee -a /etc/udev/rules.d/$rule_file
 
     sudo service udev restart
+
+    echo -e "\n if /dev/one-third/console can not be completed by tab,"
+    echo -e "   you can edit the file ${GRN}/usr/share/bash-completion/completions/screen${NOC}"
+    echo -e "     add the term \"/dev/one-third/* to the line"
+    echo -e "        /dev/serial/by-id/* /dev/ttyUSB* /dev/ttyACM* 2>/dev/null)\" \n"
+    echo -e "   or you can copy settings/screen-tab-completion as "
+    echo -e "      /usr/share/bash-completion/completions/screen\n"
+}
+
+# =============================================================================
+function _dj_udevadm()
+{
+    udevadm info -a -n $1
 }

@@ -53,13 +53,12 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 alias eixt="exit"
-alias m='make -j$(cat /proc/cpuinfo | grep processor | wc -l)'
-alias amke="m"
-alias maek="m"
-alias mkae="m"
-alias amke="m"
-alias maek="m"
-alias mc="make clean"
+alias amke="make"
+alias maek="make"
+alias mkae="make"
+alias amke="make"
+alias maek="make"
+# alias mc="make clean"
 alias d="djfile"
 alias ccc="clear"
 alias geidt="gedit"
@@ -68,3 +67,43 @@ alias lock="gnome-screensaver-command -l"
 
 # folder alias ----------------------------------------------
 alias cddj="cd "$djtools_path
+
+# =============================================================================
+# if Makefile exists, use Makefile
+# then if CMakeLists.txt exists, use cmake
+# then if meson.build exists, use meson
+# then if make.sh exist, use it
+function compile_make_build_etc()
+{
+    clean_tag=$1
+    current_dir=${PWD}
+
+    if [ -f "Makefile" ] ; then
+        make -j$(cat /proc/cpuinfo | grep processor | wc -l) $clean_tag
+        return
+    fi
+    if [ -f "CMakeLists.txt" ] ; then
+        echo "CMakeLists.txt: todo"
+        return
+    fi
+    if [ -f "meson.build" ] ; then
+        echo "meson.build: todo"
+        return
+    fi
+    if [ -f "make.sh" ] ; then
+        ./make.sh $clean_tag
+        return
+    fi
+    echo "djtools: compile_make_build_etc: not defined"
+    cd $current_dir
+}
+
+function m()
+{
+    compile_make_build_etc
+}
+
+function mc()
+{
+    compile_make_build_etc clean
+}

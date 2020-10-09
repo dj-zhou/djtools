@@ -221,7 +221,7 @@ function _yocto_find_conf()
 }
 
 # =============================================================================
-function _yocto_find_bb()
+function _yocto_find_bb_inc()
 {
     if [ $(_yocto_check_is_a_build_directory) = 'true' ] ;then
         echo -e "\n this is a build directory, stop search, exit!!\n"
@@ -230,24 +230,16 @@ function _yocto_find_bb()
 
     bb_name=$1
     exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
-    if [ "$exact_vague" = "exact" ] ; then
-        bb_full_name="$bb_name.bb"
-    else
-        bb_full_name="$bb_name*.bb"
-    fi
-    
-    _yocto_find_a_file $bb_full_name
-}
-
-# =============================================================================
-# this function does not support exact search
-function _yocto_find_package_recipe_bb()
-{
-    exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
-    if [ "$exact_vague" = "exact" ] ; then
-        echo -e "\n only support vague search \n"
-    fi
-    _yocto_find_bb $1 -e vague
+    echo "exact_vague = $exact_vague"
+    # find bb file ---------------
+    for file_suf in "bb" "inc" ; do
+        if [ "$exact_vague" = "exact" ] ; then
+            bb_full_name="$bb_name.$file_suf"
+        else
+            bb_full_name="$bb_name*.$file_suf"
+        fi
+        _yocto_find_a_file $bb_full_name
+    done
 }
 
 # =============================================================================

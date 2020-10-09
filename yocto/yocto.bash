@@ -307,7 +307,7 @@ function _yocto_flash()
                     wic_file=$TMPDIR/deploy/images/$MACHINE/$potential_images
                 fi
             fi
-            echo "         wic file: ${GRN}$wic_file${NOC}"
+            echo -e "         wic file: ${GRN}$wic_file${NOC}"
             _yocto_flash_wic_file $machine $DEV $wic_file
             ;;
 
@@ -492,7 +492,7 @@ function yocto()
             return
         fi
         if [ $2 = 'image-bb' ] ; then
-            _yocto_find_bb $3 $4 $5 $6 $7 $8 $9
+            _yocto_find_bb_inc $3 $4 $5 $6 $7 $8 $9
             return
         fi
         if [ $2 = 'machine-conf' ] ; then
@@ -504,7 +504,8 @@ function yocto()
             if [ "$exact_vague" = "exact" ] ; then
                 echo -e "\n only support vague search \n"
             fi
-            _yocto_find_bb $3 -e vague
+            echo "3 = $3"
+            _yocto_find_bb_inc $3 -e vague
             return
         fi
         return

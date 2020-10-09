@@ -63,8 +63,12 @@ function _system_disable_apt_dpkg_locks()
     sudo rm -f /var/lib/dpkg/lock
     _press_enter_to_continue
 
-    echo "sufo rm -f /var/lib/apt/lock"
-    sufo rm -f /var/lib/apt/lock
+    echo "sudo rm -f /var/lib/apt/lock"
+    sudo rm -f /var/lib/apt/lock
+    _press_enter_to_continue
+
+    echo "sudo rm -f /var/lib/apt/lists/lock"
+    sudo rm -f /var/lib/apt/lists/lock
     _press_enter_to_continue
 }
 
