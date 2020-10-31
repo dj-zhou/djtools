@@ -42,14 +42,7 @@ function _zephyr_setup_sdk_0_11_4()
         make gcc gcc-multilib g++-multilib libsdl2-dev
 
     # install latest CMake ---------------------
-    # 3.17.3 (Ubuntu 18.04.4 LTS)
-    # 3.18.2 (Ubuntu 20.04.1 LTS)
-    echo -e "\n ${GRN} install latest CMake ${NOC}"
-    _press_enter_or_wait_s_continue 5
-    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
-    sudo sh -c 'echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" >> /etc/apt/sources.list.d/kitware-latest.list'
-    sudo apt-get -y update
-    sudo apt-get -y install cmake
+    dj setup cmake
 
     # install west ---------------------
     echo -e "\n ${GRN} install ${YLW}west ${NOC}"

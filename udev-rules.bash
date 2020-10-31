@@ -59,7 +59,7 @@ function _dj_udev_uvc_video_capture()
 # the One Third Debugger contains a USB to serial port chip: FT232RL
 function _dj_udev_one_third_console()
 {
-    rule_file=one-third-debugger.rules
+    rule_file=one-third-console.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
@@ -79,6 +79,36 @@ function _dj_udev_one_third_console()
     sudo service udev restart
 
     echo -e "\n if /dev/one-third/console can not be completed by tab,"
+    echo -e "   you can edit the file ${GRN}/usr/share/bash-completion/completions/screen${NOC}"
+    echo -e "     add the term \"/dev/one-third/* to the line"
+    echo -e "        /dev/serial/by-id/* /dev/ttyUSB* /dev/ttyACM* 2>/dev/null)\" \n"
+    echo -e "   or you can copy settings/screen-tab-completion as "
+    echo -e "      /usr/share/bash-completion/completions/screen\n"
+}
+
+# =============================================================================
+function _dj_udev_stlink_v2_1()
+{
+    rule_file=st-link-v2-1.rules
+    sudo rm -f /etc/udev/rules.d/$rule_file
+    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+
+    # finally ----------------
+    string="SUBSYSTEMS==\"usb\", "
+    string="${string}KERNEL==\"ttyACM[0-99]*\", "
+    string="${string}ACTION==\"add\", "
+    string="${string}ATTRS{idVendor}==\"0483\", "
+    string="${string}ATTRS{idProduct}==\"3752\", "
+    string="${string}ATTRS{manufacturer}==\"STMicroelectronics\", "
+    string="${string}ATTRS{product}==\"STM32 STLink\", "
+    string="${string}MODE=\"666\", "
+    string="${string}SYMLINK+=\"st-link/vcp\", "
+    string="${string}GROUP=\"dialout\""
+    echo "${string}" | sudo tee -a /etc/udev/rules.d/$rule_file
+
+    sudo service udev restart
+
+    echo -e "\n if /dev/st-link/vcp can not be completed by tab,"
     echo -e "   you can edit the file ${GRN}/usr/share/bash-completion/completions/screen${NOC}"
     echo -e "     add the term \"/dev/one-third/* to the line"
     echo -e "        /dev/serial/by-id/* /dev/ttyUSB* /dev/ttyACM* 2>/dev/null)\" \n"

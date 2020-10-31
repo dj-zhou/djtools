@@ -14,7 +14,7 @@ function _dj_setup_help()
       dropbox          - to install dropbox
       eigen3           - to install eigen3 library
       foxit            - to install foxit pdf reader
-      g++10            - to install compile g++ of version 10, then ask to 
+      g++-10           - to install compile g++ of version 10, then ask to 
                          choose version
       gitg-gitk        - to install gitg, gitk
       git-lfs          - to install large file storage of git
@@ -28,7 +28,7 @@ function _dj_setup_help()
       lib-serialport   - to install libserialport
       lib-yamlcpp      - to install yaml-cpp
       mathpix          - to install math latex equation tool mathpix
-      matplotlib-cpp   - to install the matplotlib, a cpp version
+      matplot++        - to install the matplotplusplus, a cpp graph plot library
       opencv-4.1.1     - to install OpenCV version 4.1.1
       pangolin         - to install openGL based visualization package
       pip              - to install python software pip
@@ -515,14 +515,64 @@ function _dj_setup_libev_4_33()
 }
 
 # =============================================================================
+function _dj_setup_libgpiod()
+{
+    current_folder=${PWD}
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm -rf libgpiod*
+    if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
+        libgpiod_v="1.4"
+    elif [[ "${ubuntu_v}" = *'20.04'* ]] ; then
+        libgpiod_v="1.6"
+    else
+        echo "_dj_setup_libgpiod: todo"
+        return
+    fi
+    file_name=libgpiod-$libgpiod_v
+    link="https://mirrors.edge.kernel.org/pub/software/"
+    link="${link}libs/libgpiod/$file_name.tar.xz"
+    wget $link
+    tar -xvf $file_name.tar.xz
+
+    # install -------------
+    cd $file_name
+    ./configure
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    sudo make install
+    cd ~/soft
+    _ask_to_remove_a_folder $file_name
+    
+    cat << EOM
+
+    --------------------------------------------
+    libgpiod is installed to:
+        /usr/lib/x86_64-linux-gnu/libgpiod.a
+        /usr/lib/x86_64-linux-gnu/libgpiod.so
+        /usr/lib/x86_64-linux-gnu/libgpiod.so.1
+        /usr/lib/x86_64-linux-gnu/libgpiod.so.1.0.0
+    
+    header file:
+        /usr/include/gpiod.h
+
+    pkg-config file:
+        /usr/lib/x86_64-linux-gnu/pkgconfig/libgpiod.pc
+
+EOM
+
+    cd $current_folder
+}
+
+# =============================================================================
 function _dj_setup_libiio()
 {
     current_folder=${PWD}
     # install some software
     if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
-        sudo apt-get install libxml2-dev
+        sudo apt-get install -y libxml2-dev
     fi
-
+    if [[ "${ubuntu_v}" = *'20.04'* ]] ; then
+        sudo apt-get install -y bison flex libxml2-dev
+    fi
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf libiio
     git clone https://github.com/analogdevicesinc/libiio.git
@@ -603,20 +653,71 @@ function _dj_setup_mathpix()
 }
 
 # =============================================================================
-function _dj_setup_matplotlib_cpp()
+function _dj_setup_matplot_xx()
 {
+    static_shared=$1
     current_folder=${PWD}
+    # dependency ------
+    sudo apt-get install gnuplot -y
+
+    # removed pre-installed files ------
+    sudo rm -f /usr/local/lib/Matplot++/libnodesoup.a
+    sudo rm -f /usr/local/lib/libmatplot.a
+    sudo rm -f /usr/local/lib/libmatplot.so
+    sudo rm -rf /usr/local/include/matplot
+    sudo rm -rf /usr/local/lib/cmake/Matplot++
 
     cd ~ && mkdir -p soft/ && cd soft/
+    rm -rf matplotplusplus
+    git clone https://github.com/alandefreitas/matplotplusplus.git
+    cd matplotplusplus
+    # used a fixed commit, revise later ------
+    git checkout d83e3f1010fce3a09578efff4a20b4509ae8fa35
 
-    git clone https://github.com/dj-zhou/matplotlib-cpp.git
-    cd matplotlib-cpp
-    git checkout install-zdj
+    # compile and install ------
+    mkdir build && cd build
+    if [ "$static_shared" = 'static' ] ; then
+        cmake .. -DBUILD_SHARED_LIBS="off"
+    else
+        cmake .. -DBUILD_SHARED_LIBS="on"
+    fi
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
+    sudo ldconfig
+    if [ "$static_shared" = 'static' ] ; then
+    cat << EOM
 
-    cd ~/soft
-    _ask_to_remove_a_folder matplotlib-cpp
+    --------------------------------------------
+    matplotplusplus is installed to:
+        /usr/local/lib/Matplot++/libnodesoup.a
+        /usr/local/lib/libmatplot.a
+
+    header file:
+        /usr/local/include/matplot/matplot.h
+        etc.
+
+    pkg-config file:
+        none
+    --------------------------------------------
+
+EOM
+    else
+    cat << EOM
+
+    --------------------------------------------
+    matplotplusplus is installed to:
+        /usr/local/lib/libmatplot.so
+
+    header file:
+        /usr/local/include/matplot/matplot.h
+        etc.
+
+    pkg-config file:
+        none
+    --------------------------------------------
+
+EOM
+    fi
 
     cd $current_folder
 }
@@ -849,26 +950,6 @@ function _dj_setup_vscode()
     sudo dpkg -i vscode.deb
     sudo rm vscode.deb
 
-    cat << EOM
-
--------------------------------------------------------------------------------
-    recommended vscode plugins:
-             bitbake: BitBake recipe language support in Visual Studio Code
-         CMake Tools: Extended CMake support in Visual Studio Code
-          DeviceTree: DeviceTree Language Support for Visual Studio Code
-             GitLens: Supercharge the Git capabilities built into Visual
-                      Studio Code — Visualize code authorship at a glance
-                      via Git blame annotations and ...
-      LaTeX Workshop: Boost LaTeX typesetting efficiency with preview,
-                      compile, autocomplete, colorize, and more.
-              Python: Linting, Debugging (multi-threaded, remote),
-                      Intellisense, Jupyter Notebooks, code formatting,
-                      refactoring, unit tests, snippets, and more.
-               C/C++: C/C++ IntelliSense, debugging, and code browsing.
-          Bash Debug: A debugger extension for bash scripts (using bashdb).
--------------------------------------------------------------------------------
-
-EOM
     cd $current_folder
 }
 
@@ -881,9 +962,11 @@ EOM
 # shared library build seems not working!
 function _dj_setup_yaml_cpp()
 {
-    sudo rm /usr/local/lib/libyaml-cpp*
-
     cwd_before_running=$PWD
+
+    dj setup cmake
+    sudo rm -rf /usr/local/lib/libyaml-cpp*
+
     yaml_v=$(_find_argument_after_option -v $1 $2 $3 $4 $5 $6 $7 $8)
     if [ -z $yaml_v ] ; then
         yaml_v="0.6.3"

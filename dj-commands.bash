@@ -17,7 +17,8 @@ function _dj_help()
     echo -e "\n"
     echo " First level commands:"
     echo "   setup         - to install some software"
-    echo "   clone         - clone a repo from bitbucket/github"
+    echo "   clone         - clone a repo from github/gitee/bitbucket"
+    echo "   clone-ssh     - use ssh protocol to clone a repo from github/gitee/bitbucket"
     echo "   udev          - udev rule setup for usb devices"
     echo "   work-check    - check work status of all repos in a folder"
     echo -e "\n"
@@ -34,6 +35,7 @@ function _clang_write_to_file_part1() {
     echo '    "editor.tabSize": 4,'                     >> ${file}
     echo '    "workbench.editor.enablePreview": false,' >> ${file}
     echo '    "C_Cpp.updateChannel": "Insiders",'       >> ${file}
+    echo '    "C_Cpp.default.cppStandard": "c++17",'    >> ${file}
     echo '    "editor.detectIndentation": false,'       >> ${file}
     echo '    "files.autoSave": "afterDelay",'          >> ${file}
     echo '    "workbench.iconTheme": "vscode-icons",'   >> ${file}
@@ -78,6 +80,7 @@ function _clang_write_to_file_part1() {
     echo '    "clang-format.assumeFilename": "~/.config/Code/User/.clang-format",' >> ${file}
 }
 
+# =============================================================================
 function _clang_write_to_file_part2_clang_version() {
     file=$1
     clang_file_path="/usr/bin"
@@ -86,6 +89,7 @@ function _clang_write_to_file_part2_clang_version() {
     echo "    $string1," >> ${file}
 }
 
+# =============================================================================
 function _clang_write_to_file_part3_format_on_save() {
     file=$1
     save_or_not=$2
@@ -96,6 +100,7 @@ function _clang_write_to_file_part3_format_on_save() {
     fi
 }
 
+# =============================================================================
 function _clang_write_to_file_partN() {
     file=$1
     echo '}' >> ${file}
@@ -106,8 +111,7 @@ function _clang_vscode_setting_json_format_on_save()
 {
     format_on_save=$1
     current_folder_json=${PWD}
-    # cd $djtools_path # otherwise there will be no copy
-    # pwd
+
     folder="/home/$USER/.config/Code/User"
     mkdir -p $folder
 
@@ -118,6 +122,8 @@ function _clang_vscode_setting_json_format_on_save()
     _clang_write_to_file_part3_format_on_save $target_file "$format_on_save"
     _clang_write_to_file_partN $target_file
 
+    echo -e "\n the default settings is in $folder/settings.json\n"
+    echo -e " you can revise it manually"
     cd $current_folder_json
 }
 
@@ -144,9 +150,22 @@ function _dj_setup_clang_format()
         echo "You can edit ~/.config/Code/User/settings.json manually."
     fi
 
-    echo ' '
+    echo -e "\n"
 
     cd $current_folder
+}
+
+# =============================================================================
+function _dj_setup_cmake()
+{
+    echo -e "\n ${GRN} install latest CMake ${NOC}"
+    _press_enter_or_wait_s_continue 5
+    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
+            2>/dev/null | sudo apt-key add -
+    sudo sh -c 'echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
+            >> /etc/apt/sources.list.d/kitware-latest.list'
+    sudo apt-get -y update
+    sudo apt-get -y install cmake
 }
 
 # =============================================================================
@@ -355,6 +374,23 @@ function _dj_setup_qemu()
     fi
 
     cd ${cwd_before_running}
+}
+
+# =============================================================================
+function _dj_setup_stm32_cubemx()
+{
+    cwd_before_running=$PWD
+
+    cd ~ && mkdir -p soft && cd soft/
+
+    git clone https://gitee.com/d-zhou/stm32-cube-mx-v6.0.1.git
+    cd stm32-cube-mx-v6.0.1/
+    cat archive.tar.* | tar -xzvf -
+    # rm archive.tar.*
+    chmod +x SetupSTM32CubeMX-6.0.1.linux
+    ./SetupSTM32CubeMX-6.0.1.linux
+
+    cd $cwd_before_running
 }
 
 # =============================================================================
@@ -752,6 +788,25 @@ function _dj_work_check()
 }
 
 # =============================================================================
+# to find a library use: ldconfig -p | grep xxxx
+# once this command get extended, we add sub command to "dj find"
+function _dj_find()
+{
+    cwd_before_running=$PWD
+    
+    lib_to_find=$1
+    echo -e "\n run command:$GRN ldconfig -p | grep $lib_to_find$NOC\n"
+
+    ldconfig -p | grep $lib_to_find
+    
+    echo -e "\n cd /usr/lib/x86_64-linux-gnu/pkgconfig"
+    cd /usr/lib/x86_64-linux-gnu/pkgconfig
+    echo -e " ls | grep $lib_to_find\n"
+    ls | grep $lib_to_find
+    cd $cwd_before_running
+}
+
+# =============================================================================
 function _dj_meson_build()
 {
     folder_name=$(basename "$current_folder")
@@ -1029,6 +1084,15 @@ function dj()
         return
     fi
     # ------------------------------
+    if [ $1 = 'find' ] ; then
+        if [[ $# = 2 ]] ; then
+            _dj_find $2
+            return
+        fi
+        echo 'arguments wrong, exit'
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'meson' ] ; then
         if [ $# -ge 2 ] && [ $2 = 'build' ] ; then
             _dj_meson_build $3 $4 $5 $6
@@ -1056,6 +1120,11 @@ function dj()
         # --------------------------
         if [ $2 = 'clang-format' ] ; then
             _dj_setup_clang_format
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'cmake' ] ; then
+            _dj_setup_cmake
             return
         fi
         # --------------------------
@@ -1180,6 +1249,12 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'libgpiod' ] ; then
+            _dj_setup_libgpiod
+            return
+        fi
+        # -----
+        # --------------------------
         if [ $2 = 'libiio' ] ; then
             _dj_setup_libiio
             return
@@ -1195,8 +1270,8 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'matplotlib-cpp' ] ; then
-            _dj_setup_matplotlib_cpp
+        if [ $2 = 'matplot++' ] ; then
+            _dj_setup_matplot_xx
             return
         fi
         # --------------------------
@@ -1252,6 +1327,11 @@ function dj()
         # --------------------------
         if [ $2 = 'spdlog' ] ; then
             _dj_setup_spdlog $3
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'stm32-cubeMX' ] ; then
+            _dj_setup_stm32_cubemx $3 $4
             return
         fi
         # --------------------------
@@ -1325,6 +1405,10 @@ function dj()
             _dj_udev_one_third_console $3 $4 $5
             return
         fi
+        if [ $2 = 'stlink-v2.1' ] ; then
+            _dj_udev_stlink_v2_1 $3 $4 $5
+            return
+        fi
         return
     fi
     # ------------------------------
@@ -1350,6 +1434,7 @@ function _dj()
     local SERVICES=("
         clone
         clone-ssh
+        find
         meson
         open
         setup
@@ -1364,14 +1449,14 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    setup_tools+="baidu-netdisk clang-format computer container kdiff3-meld dj-gadgets "
-    setup_tools+="devtools dropbox eigen3 foxit gcc-arm-stm32 gcc-arm-linux-gnueabi "
-    setup_tools+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-    setup_tools+="gitg-gitk glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
-    setup_tools+="g++-10 i219-v libev-4.33 libiio lib-serialport mathpix matplotlib-cpp "
-    setup_tools+="opencv-2.4.13 opencv-4.1.1 pangolin pip qemu qt-5.13.1 qt-5.14.2 "
-    setup_tools+="ros-melodic ros2-foxy spdlog slack stm32-tools sublime typora "
-    setup_tools+="vim-env vscode vtk-8.2.0 wubi libyaml-cpp "
+    setup_tools+="baidu-netdisk clang-format cmake computer container kdiff3-meld "
+    setup_tools+="dj-gadgets devtools dropbox eigen3 foxit gcc-arm-stm32 "
+    setup_tools+="gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu "
+    setup_tools+="git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
+    setup_tools+="g++-10 i219-v libev-4.33 libgpiod libiio lib-serialport mathpix "
+    setup_tools+="matplot++ opencv-2.4.13 opencv-4.1.1 pangolin pip qemu "
+    setup_tools+="qt-5.13.1 qt-5.14.2 ros-melodic ros2-foxy spdlog slack stm32-cubeMX "
+    setup_tools+="stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi libyaml-cpp "
     setup_tools+="YouCompleteMe you-complete-me "
     ACTIONS[setup]="$setup_tools "
     for i in $setup_tools ; do
@@ -1446,6 +1531,7 @@ function _dj()
     #---------------------------------------------------------
     #---------------------------------------------------------
     udev_list="uvc-video-capture --dialout one-third-console "
+    udev_list+="stlink-v2.1 "
     ACTIONS[udev]="$udev_list "
     for i in $udev_list ; do
         ACTIONS[$i]=" "
@@ -1456,6 +1542,14 @@ function _dj()
     udevadm_list="$(ls /dev/tty*) "
     ACTIONS[udevadm]="$udevadm_list "
     for i in $udevadm_list ; do
+        ACTIONS[$i]=" "
+    done
+
+    #---------------------------------------------------------
+    #---------------------------------------------------------
+    find_list=" "
+    ACTIONS[find]="$find_list "
+    for i in $find_list ; do
         ACTIONS[$i]=" "
     done
 
