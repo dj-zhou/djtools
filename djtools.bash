@@ -48,7 +48,7 @@ source $djtools_path/zephyr.bash
 
 # =============================================================================
 # alias ----------------------------------------------
-alias lc="ls -l --color=always"
+alias lc="ls -lh --color=always"
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'

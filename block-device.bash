@@ -82,7 +82,7 @@ function _prepare_sd_card_for_flash()
     sd_card=$1
 
     # umount all partitions: /dev/sda1; /dev/sda2; /dev/sda3; etc
-    for i in {1..9} ; do
+    for i in {1..100} ; do
         partition=$sd_card"${i}"
         if [ -b "$partition" ] ; then
             # check if mounted

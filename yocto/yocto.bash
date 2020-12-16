@@ -140,7 +140,7 @@ function _yocto_install_sdk_plain()
     distro=$(_yocto_find_DISTRO)
     distro_v=$(_yocto_find_DISTRO_VERSION)
     if [ -z $distro_v ] ; then
-        echo -e '\n Please enter Distro Version No.'
+        echo -e '\n Please enter Distro Version No.:'
         read answer
         distro_v=$answer
     fi
@@ -205,18 +205,23 @@ function _yocto_flash_wic_file() # $machine $DEV $wic_file
     build_time=${build_time%"."*}
     echo -e "       build time: ${GRN}$build_time${NOC}"
 
+    # try always run this before flashing ------------------
+    echo -e " run ${PRP}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
+    _press_enter_or_wait_s_continue 2
+    bitbake bmap-tools-native -caddto_recipe_sysroot
+
     # finally, flash to the SD card ------------------
     if [[ -f "$bmap_file" ]] ; then
         # the following command need to use a *.wic.bmap file in the same path
         # of the wic.gz file
         echo -e "\n bmap file found, run command:"
         echo -e " ${PRP}oe-run-native bmap-tools-native bmaptool copy <image> $DEV${NOC}\n"
-        _press_enter_or_wait_s_continue 10
+        _press_enter_or_wait_s_continue 4
         oe-run-native bmap-tools-native bmaptool copy $wic_file $DEV
     else
         echo -e "\n bmap file ${YLW}NOT${NOC} found, run command:"
         echo  -e " sudo bmaptool copy -nobmap $wic_file $DEV\n"
-        _press_enter_or_wait_s_continue 10
+        _press_enter_or_wait_s_continue 4
         sudo bmaptool copy --nobmap $wic_file $DEV
     fi
 }

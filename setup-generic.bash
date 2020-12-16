@@ -60,6 +60,44 @@ EOM
 }
 
 # =============================================================================
+function _dj_setup_adobe_pdf_reader()
+{
+    current_folder=${PWD}
+
+    cd ~ && mkdir -p soft/ && cd soft/
+
+    # install i386 related dependencies --------------------
+    sudo dpkg --add-architecture i386
+    sudo apt-get -y update
+    sudo apt-get -y install libxml2:i386
+    sudo apt-get -y install libcanberra-gtk-module:i386
+    sudo apt-get -y install gtk2-engines-murrine:i386
+    sudo apt-get -y install libatk-adaptor:i386
+
+    link="ftp://ftp.adobe.com/pub/adobe/reader/unix/9.x"
+    file="AdbeRdr9.5.5-1_i386linux_enu.deb"
+    wget -O adobe.deb ${link}/9.5.5/enu/$file
+    sudo dpkg -i adobe.deb
+
+    cd $current_folder && unset current_folder
+}
+
+# =============================================================================
+function _dj_setup_arduino_1_8_13()
+{
+    current_folder=${PWD}
+
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm arduino* -rf
+
+    wget https://downloads.arduino.cc/arduino-1.8.13-linux64.tar.xz
+    tar -xvf arduino-1.8.13-linux64.tar.xz
+    sudo ln -sf ${HOME}/soft/arduino-1.8.13/arduino /usr/bin/arduino
+
+    cd $current_folder && unset current_folder
+}
+
+# =============================================================================
 function _dj_setup_baidu_netdisk()
 {
     current_folder=${PWD}
@@ -71,8 +109,7 @@ function _dj_setup_baidu_netdisk()
 
     sudo dpkg -i $file
     
-    cd $current_folder
-    unset current_folder
+    cd $current_folder && unset current_folder
 }
 
 # =============================================================================
@@ -196,7 +233,7 @@ function _dj_setup_dropbox()
 function _dj_setup_eigen3()
 {
     current_folder=${PWD}
-
+    sudo apt-get install mlocate -y # updatedb is in this package
     sudo apt-get install libeigen3-dev -y
     echo -e "\n sudo updatedb\n this may take a few minutes\n"
     sudo updatedb
@@ -963,6 +1000,10 @@ function _dj_setup_vscode()
 function _dj_setup_yaml_cpp()
 {
     cwd_before_running=$PWD
+
+    # dependencies to install --------------
+    sudo apt-get -y update
+    sudo apt-get -y install build-essential
 
     dj setup cmake
     sudo rm -rf /usr/local/lib/libyaml-cpp*

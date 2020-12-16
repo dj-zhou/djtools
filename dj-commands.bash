@@ -400,6 +400,9 @@ function _dj_setup_stm32_cubemx()
 # stlink-v2 software from https://github.com/stlink-org/stlink
 # Ubuntu 18.04: v1.6.1 works (test with projects to download binaries)
 # Ubuntu 20.04: v1.6.1 works
+#
+# stlink tests on Ubuntu 18.04
+# v1.6.0 failed
 function _dj_setup_stm32_tools()
 {
     cwd_before_running=$PWD
@@ -1113,6 +1116,16 @@ function dj()
     # ------------------------------
     if [ $1 = 'setup' ] ; then
         # --------------------------
+        if [ $2 = 'adobe-pdf-reader' ] ; then
+            _dj_setup_adobe_pdf_reader
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'arduino-1.8.13' ] ; then
+            _dj_setup_arduino_1_8_13
+            return
+        fi
+        # --------------------------
         if [ $2 = 'baidu-netdisk' ] ; then
             _dj_setup_baidu_netdisk
             return
@@ -1174,7 +1187,7 @@ function dj()
             return
         fi
         # --------------------------
-        if [ $2 = 'foxit' ] ; then
+        if [ $2 = 'foxit-pdf-reader' ] ; then
             _dj_setup_foxit_reader
             return
         fi
@@ -1449,12 +1462,12 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    setup_tools+="baidu-netdisk clang-format cmake computer container kdiff3-meld "
-    setup_tools+="dj-gadgets devtools dropbox eigen3 foxit gcc-arm-stm32 "
-    setup_tools+="gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu "
-    setup_tools+="git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome grpc-1.29.1 "
-    setup_tools+="g++-10 i219-v libev-4.33 libgpiod libiio lib-serialport mathpix "
-    setup_tools+="matplot++ opencv-2.4.13 opencv-4.1.1 pangolin pip qemu "
+    setup_tools+="adobe-pdf-reader arduino-1.8.13 baidu-netdisk clang-format cmake computer "
+    setup_tools+="container kdiff3-meld dj-gadgets devtools dropbox eigen3 foxit-pdf-reader "
+    setup_tools+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
+    setup_tools+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
+    setup_tools+="grpc-1.29.1 g++-10 i219-v libev-4.33 libgpiod libiio lib-serialport "
+    setup_tools+="mathpix matplot++ opencv-2.4.13 opencv-4.1.1 pangolin pip qemu "
     setup_tools+="qt-5.13.1 qt-5.14.2 ros-melodic ros2-foxy spdlog slack stm32-cubeMX "
     setup_tools+="stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi libyaml-cpp "
     setup_tools+="YouCompleteMe you-complete-me "
