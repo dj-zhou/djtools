@@ -105,7 +105,7 @@ function _dj_clone_ssh_from()
     fi
     uname=$(_dj_clone_find_username $platform)
     link=$(_dj_clone_find_link $platform)
-    source_link=git@$link/$uname/$repo_name.git
+    source_link=git@$link:$uname/$repo_name.git
     echo -e "\n dj clone-ssh: ${GRN}$source_link${NOC}\n"
 
     b_name=$(_find_argument_after_option -b $3 $4 $5 $6 $7 $8)

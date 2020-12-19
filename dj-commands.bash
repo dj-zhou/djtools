@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source $djtools_path/clone.bash
+source $djtools_path/help.bash
 source $djtools_path/setup-generic.bash
 source $djtools_path/setup-ros.bash
 source $djtools_path/udev-rules.bash
@@ -1096,6 +1097,15 @@ function dj()
         return
     fi
     # ------------------------------
+    if [ $1 = 'help' ] ; then
+        if [ $# -ge 2 ] && [ $2 = 'auto-mount' ] ; then
+            _dj_help_auto_mount
+            return
+        fi
+        echo 'arguments wrong, exit'
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'meson' ] ; then
         if [ $# -ge 2 ] && [ $2 = 'build' ] ; then
             _dj_meson_build $3 $4 $5 $6
@@ -1288,6 +1298,11 @@ function dj()
             return
         fi
         # --------------------------
+        if [ $2 = 'mongodb' ] ; then
+            _dj_setup_mongodb
+            return
+        fi
+        # --------------------------
         if [ $2 = 'opencv-2.4.13' ] ; then
             _dj_setup_opencv_2_4_13 $3 $4 $5 $6
             return
@@ -1448,6 +1463,7 @@ function _dj()
         clone
         clone-ssh
         find
+        help
         meson
         open
         setup
@@ -1467,7 +1483,7 @@ function _dj()
     setup_tools+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_tools+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
     setup_tools+="grpc-1.29.1 g++-10 i219-v libev-4.33 libgpiod libiio lib-serialport "
-    setup_tools+="mathpix matplot++ opencv-2.4.13 opencv-4.1.1 pangolin pip qemu "
+    setup_tools+="mathpix matplot++ mongodb opencv-2.4.13 opencv-4.1.1 pangolin pip qemu "
     setup_tools+="qt-5.13.1 qt-5.14.2 ros-melodic ros2-foxy spdlog slack stm32-cubeMX "
     setup_tools+="stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi libyaml-cpp "
     setup_tools+="YouCompleteMe you-complete-me "
@@ -1571,6 +1587,14 @@ function _dj()
     meson_list="build find "
     ACTIONS[meson]="$meson_list "
     for i in $meson_list ; do
+        ACTIONS[$i]=" "
+    done
+
+    #---------------------------------------------------------
+    #---------------------------------------------------------
+    help_list="auto-mount "
+    ACTIONS[help]="$help_list "
+    for i in $help_list ; do
         ACTIONS[$i]=" "
     done
     

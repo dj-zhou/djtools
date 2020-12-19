@@ -760,6 +760,61 @@ EOM
 }
 
 # =============================================================================
+# reference: https://linux.ci/217.html
+# problem: if libyaml-cpp is installed first (0.6.3), then it cannot install
+# mongodb, don't know why
+function _dj_setup_mongodb()
+{
+    sudo apt-get update -y
+    uname_a=$(uname -a)
+    if [[ "${ubuntu_v}" = *'20.04'* ]] ; then
+        sudo apt-get -y install dirmngr
+        sudo apt-get -y install gnupg
+        sudo apt-get -y install apt-transport-https
+        sudo apt-get -y install ca-certificates
+        sudo apt-get -y install software-properties-common
+
+        if [[ "${uname_a}" = *'aarch64'* ]] ; then # not sure if it works on other platform
+            # unable to install v4.4 on raspberry Ubuntu  Server 20.04, so, install v4.2
+            curl -s https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
+            echo "deb [ arch=arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+        elif [[ "${uname_a}" = *'x86_64'* ]] ; then
+            # unable to install v4.2 on laptop Ubuntu 20.04, so, install v4.4
+            wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse"
+        fi
+
+        # install
+        sudo apt-get -y update
+        sudo apt-get -y install mongodb-org
+
+        cat << EOM
+
+    --------------------------------------------
+    MongoDB istall:
+        mongodb-org-server - mongodb守护程序以及相应的初始化脚本和配置
+        mongodb-org-mongos - mongos守护程序
+        mongodb-org-shell  - mongo shell，它是MongoDB的交互式JavaScript接口。
+                             它用于执行命令行中的管理任务。
+        mongodb-org-tools  - 包含几个用于导入和导出数据，统计信息以及其他实用程序的MongoDB工具
+
+    Enable and start MongoDB Deamon program:
+        $ sudo systemctl enable --now mongod
+        $ sudo systemctl start mongod
+    
+    Check if MongoDB is installed:
+        $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+    --------------------------------------------
+
+EOM
+    else
+        echo -e "\n${YLW} TO BE IMPLEMENTED${NOC}\n"
+        return
+    fi
+    
+}
+
+# =============================================================================
 function _dj_setup_qt_5_13_1()
 {
     cwd_before_running=$PWD
