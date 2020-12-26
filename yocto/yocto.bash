@@ -454,7 +454,6 @@ function _yocto_build_sdk_plain()
     bitbake -c populate_sdk $image_name
 }
 
-
 # =============================================================================
 function yocto()
 {

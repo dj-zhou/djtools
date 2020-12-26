@@ -82,12 +82,32 @@ function _clang_write_to_file_part1() {
 }
 
 # =============================================================================
-function _clang_write_to_file_part2_clang_version() {
+function _clang_write_to_file_part2_clang_version_clang_format() {
     file=$1
     clang_file_path="/usr/bin"
     
     string1="\"C_Cpp.clang_format_path\": \"${clang_file_path}/clang-format\""
     echo "    $string1," >> ${file}
+}
+
+# =============================================================================
+function _clang_write_to_file_part2_clang_version_clang_llvm() {
+    file=$1
+    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
+        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04/bin"
+    fi
+    if [[ ${ubuntu_v} = *'18.04'* ]] ; then
+        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04/bin"
+    fi
+    if [[ ${ubuntu_v} = *'20.04'* ]] ; then
+        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04/bin"
+    fi
+    string1="\"C_Cpp.clang_format_path\": \"${clang_file_path}/clang-format\""
+    string2="\"clang.executable\": \"${clang_file_path}/clang\""
+    # echo "$string1"
+    # echo "$string2"
+    echo "    $string1," >> ${file}
+    echo "    $string2," >> ${file}
 }
 
 # =============================================================================
@@ -108,7 +128,7 @@ function _clang_write_to_file_partN() {
 }
 
 # =============================================================================
-function _clang_vscode_setting_json_format_on_save()
+function _clang_format_vscode_setting_json()
 {
     format_on_save=$1
     current_folder_json=${PWD}
@@ -119,7 +139,29 @@ function _clang_vscode_setting_json_format_on_save()
     target_file=$folder/settings.json
     sudo rm -f $target_file
     _clang_write_to_file_part1 $target_file
-    _clang_write_to_file_part2_clang_version $target_file
+    _clang_write_to_file_part2_clang_version_clang_format $target_file
+    _clang_write_to_file_part3_format_on_save $target_file "$format_on_save"
+    _clang_write_to_file_partN $target_file
+
+    echo -e "\n the default settings is in $folder/settings.json\n"
+    echo -e " you can revise it manually"
+    cd $current_folder_json
+}
+
+
+# =============================================================================
+function _clang_llvm_vscode_setting_json()
+{
+    format_on_save=$1
+    current_folder_json=${PWD}
+
+    folder="/home/$USER/.config/Code/User"
+    mkdir -p $folder
+
+    target_file=$folder/settings.json
+    sudo rm -f $target_file
+    _clang_write_to_file_part1 $target_file
+    _clang_write_to_file_part2_clang_version_clang_llvm $target_file
     _clang_write_to_file_part3_format_on_save $target_file "$format_on_save"
     _clang_write_to_file_partN $target_file
 
@@ -145,7 +187,7 @@ function _dj_setup_clang_format()
         echo "You can edit ~/.config/Code/User/settings.json manually."
     elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') \
        || ($asw = 'Yes') || ($asw = 'yes') ]] ; then
-        _clang_vscode_setting_json_format_on_save "true"
+        _clang_format_vscode_setting_json "true"
     else
         echo "wrong answer, not setting applied!"
         echo "You can edit ~/.config/Code/User/settings.json manually."
@@ -157,14 +199,88 @@ function _dj_setup_clang_format()
 }
 
 # =============================================================================
+function _dj_setup_clang_llvm()
+{
+    current_folder=${PWD}
+
+    echo -e "\n"
+    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
+        echo " Install clang+llvm for Ubuntu 16.04 ..."
+    elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
+        echo " Install clang+llvm for Ubuntu 18.04 ..."
+    elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
+        echo " Install clang+llvm for Ubuntu 20.04 ..."
+    fi
+    echo -e "\n"
+    _press_enter_to_continue
+
+    cd ~ && mkdir -p soft/ && cd soft/
+    
+    # how to choose a version?
+    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
+        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04"
+    elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
+        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
+    elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
+        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
+    fi
+    echo "clang_file = "$clang_file
+    # check if the file exists --------------------
+    unset md5checksum
+    if [[ -f $clang_file.tar.xz ]] ; then
+        md5checksum=`md5sum $clang_file.tar.xz`
+        echo "md5checksum = "$md5checksum
+    fi
+    if [[ ( ( ${ubuntu_v} = *'18.04'* ) && \
+        ( "$md5checksum" = *"9d8044379e151029bb1df3663c2fb2c1"* ) ) \
+      || ( ( ${ubuntu_v} = *'16.04'* ) && \
+        ( "$md5checksum" = *"b3c5618fb3a5d268c371539e9f6a4b1f"* ) ) ]] ; then
+        echo "file exists, no need to download again."
+    else
+        wget http://releases.llvm.org/9.0.0/${clang_file}.tar.xz
+    fi
+    echo "untar the clang file ..."
+    tar xf ${clang_file}.tar.xz
+    sudo rm -rf /opt/clang+llvm*
+
+    echo "copy the clang file into /opt/ ..."
+    sudo mv ${clang_file}/ /opt/
+    _ask_to_remove_a_file ${clang_file}.tar.xz
+
+    mkdir -p ~/.config/Code/User
+
+    cd $djtools_path
+
+    echo -e "\nDo you want to apply the default vscode settings? [Yes/No]\n"
+    read asw
+    
+    if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') \
+      || ($asw = 'No') || ($asw = 'no') ]] ; then
+        echo "You can edit ~/.config/Code/User/settings.json manually."
+    elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') \
+       || ($asw = 'Yes') || ($asw = 'yes') ]] ; then
+        _clang_llvm_vscode_setting_json "true"
+    else
+        echo "wrong answer, not setting applied!"
+        echo "You can edit ~/.config/Code/User/settings.json manually."
+    fi
+
+    echo ' '
+
+    cd $current_folder
+}
+
+# =============================================================================
 function _dj_setup_cmake()
 {
     echo -e "\n ${GRN} install latest CMake ${NOC}"
     _press_enter_or_wait_s_continue 5
-    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
-            2>/dev/null | sudo apt-key add -
-    sudo sh -c 'echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
-            >> /etc/apt/sources.list.d/kitware-latest.list'
+    if [ ! -f /etc/apt/sources.list.d/kitware-latest.list ] ; then
+        wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
+                2>/dev/null | sudo apt-key add -
+        sudo sh -c 'echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
+                >> /etc/apt/sources.list.d/kitware-latest.list'
+    fi
     sudo apt-get -y update
     sudo apt-get -y install cmake
 }
@@ -1088,9 +1204,18 @@ function dj()
         return
     fi
     # ------------------------------
+    if [ $1 = 'format' ] ; then
+        if [[ $# -ge 2 ]] ; then
+            _dj_format $2 $3 $4 $5 $6 $7 $8
+            return
+        fi
+        echo 'arguments wrong, exit'
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'find' ] ; then
-        if [[ $# = 2 ]] ; then
-            _dj_find $2
+        if [[ $# -ge 2 ]] ; then
+            _dj_find $2 $3 $4 $5 $6 $7 $8
             return
         fi
         echo 'arguments wrong, exit'
@@ -1098,8 +1223,8 @@ function dj()
     fi
     # ------------------------------
     if [ $1 = 'help' ] ; then
-        if [ $# -ge 2 ] && [ $2 = 'auto-mount' ] ; then
-            _dj_help_auto_mount
+        if [ $# -ge 2 ] ; then
+            _dj_help_skill $2
             return
         fi
         echo 'arguments wrong, exit'
@@ -1124,291 +1249,21 @@ function dj()
         return
     fi
     # ------------------------------
+    if [ $1 = 'replace' ] ; then
+        if [[ $# -ge 2 ]] ; then
+            _dj_replace $2 $3 $4 $5 $6 $7 $8
+            return
+        fi
+        echo 'arguments wrong, exit'
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'setup' ] ; then
-        # --------------------------
-        if [ $2 = 'adobe-pdf-reader' ] ; then
-            _dj_setup_adobe_pdf_reader
+        if [ $# -ge 2 ] ; then
+            _dj_setup $2 $3 $4 $5 $6 $7
             return
         fi
-        # --------------------------
-        if [ $2 = 'arduino-1.8.13' ] ; then
-            _dj_setup_arduino_1_8_13
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'baidu-netdisk' ] ; then
-            _dj_setup_baidu_netdisk
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'clang-format' ] ; then
-            _dj_setup_clang_format
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'cmake' ] ; then
-            _dj_setup_cmake
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'computer' ] ; then
-            _dj_setup_computer
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'container' ] ; then
-            if [ $3 = 'docker' ] ; then
-                _dj_setup_container_docker
-                return
-            fi
-            if [ $3 = 'dive' ] ; then
-                _dj_setup_container_dive
-                return
-            fi
-            if [ $3 = 'lxd-4.0' ] ; then
-                _dj_setup_container_lxd_4_0
-                return
-            fi
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'kdiff3-meld' ] ; then
-            _dj_setup_kdiff3_meld
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'dj-gadgets' ] ; then
-            _dj_setup_dj_gadgets
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'devtools' ] ; then
-            _dj_setup_devtools
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'dropbox' ] ; then
-            _dj_setup_dropbox
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'eigen3' ] ; then
-            _dj_setup_eigen3
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'foxit-pdf-reader' ] ; then
-            _dj_setup_foxit_reader
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'gcc-arm-stm32' ] ; then
-            _dj_setup_gcc_arm_stm32
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'gcc-arm-linux-gnueabi' ] ; then
-            _dj_setup_gcc_arm_linux_gnueabi
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'gcc-arm-linux-gnueabihf' ] ; then
-            _dj_setup_gcc_arm_linux_gnueabihf
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'gcc-aarch64-linux-gnu' ] ; then
-            _dj_setup_gcc_aarch64_linux
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'git-lfs' ] ; then
-            _dj_setup_git_lfs
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'gitg-gitk' ] ; then
-            _dj_setup_gitg_gitk
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'glfw3' ] ; then
-            _dj_setup_glfw3
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'google-repo' ] ; then
-            _dj_setup_google_repo
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'gtest-glog' ] ; then
-            _dj_setup_gtest_glog
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'gnome' ] ; then
-            _dj_setup_gnome
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'grpc-1.29.1' ] ; then
-            _dj_setup_grpc_1_29_1
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'g++-10' ] ; then
-            _dj_setup_gpp_10
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'i219-v' ] ; then
-            _dj_setup_i219_v $3
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'libev-4.33' ] ; then
-            _dj_setup_libev_4_33
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'libgpiod' ] ; then
-            _dj_setup_libgpiod
-            return
-        fi
-        # -----
-        # --------------------------
-        if [ $2 = 'libiio' ] ; then
-            _dj_setup_libiio
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'lib-serialport' ] ; then
-            _dj_setup_libserialport
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'mathpix' ] ; then
-            _dj_setup_mathpix
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'matplot++' ] ; then
-            _dj_setup_matplot_xx
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'mongodb' ] ; then
-            _dj_setup_mongodb
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'opencv-2.4.13' ] ; then
-            _dj_setup_opencv_2_4_13 $3 $4 $5 $6
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'opencv-4.1.1' ] ; then
-            _dj_setup_opencv_4_1_1 $3 $4 $5 $6
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'pangolin' ] ; then
-            _dj_setup_pangolin
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'pip' ] ; then
-            _dj_setup_pip
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'qemu' ] ; then
-            _dj_setup_qemu $3 $4 $5 $6
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'qt-5.13.1' ] ; then
-            _dj_setup_qt_5_13_1
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'qt-5.14.2' ] ; then
-            _dj_setup_qt_5_14_2
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'ros-melodic' ] ; then
-            _dj_setup_ros_melodic $3 $4 $5
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'ros2-foxy' ] ; then
-            _dj_setup_ros2_foxy $3 $4 $5
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'slack' ] ; then
-            _dj_setup_slack
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'spdlog' ] ; then
-            _dj_setup_spdlog $3
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'stm32-cubeMX' ] ; then
-            _dj_setup_stm32_cubemx $3 $4
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'stm32-tools' ] ; then
-            _dj_setup_stm32_tools $3 $4
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'sublime' ] ; then
-            _dj_setup_sublime
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'typora' ] ; then
-            _dj_setup_typora
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'vim-env' ] ; then
-            _dj_setup_vim_env
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'vscode' ] ; then
-            _dj_setup_vscode
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'vtk-8.2.0' ] ; then
-            _dj_setup_vtk_8_2_0
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'wubi' ] ; then
-            _dj_setup_wubi
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'libyaml-cpp' ] ; then
-            _dj_setup_yaml_cpp $3
-            return
-        fi
-        # --------------------------
-        if [ $2 = 'YouCompleteMe' ] || [ $2 = 'you-complete-me' ] ; then
-            _dj_setup_you_complete_me
-            return
-        fi
-        # --------------------------
-        _dj_setup_help
+        echo 'arguments wrong, exit'
         return
     fi
     # ------------------------------
@@ -1419,24 +1274,14 @@ function dj()
         fi
         return
     fi
+
     # ------------------------------
     if [ $1 = 'udev' ] ; then
-        if [ $2 = '--dialout' ] ; then
-            _dj_udev_dialout $3 $4 $5
+        if [ $# -ge 2 ] ; then
+            _dj_udev $2 $3 $4 $5 $6 $7
             return
         fi
-        if [ $2 = 'uvc-video-capture' ] ; then
-            _dj_udev_uvc_video_capture $3 $4 $5
-            return
-        fi
-        if [ $2 = 'one-third-console' ] ; then
-            _dj_udev_one_third_console $3 $4 $5
-            return
-        fi
-        if [ $2 = 'stlink-v2.1' ] ; then
-            _dj_udev_stlink_v2_1 $3 $4 $5
-            return
-        fi
+        echo 'arguments wrong, exit'
         return
     fi
     # ------------------------------
@@ -1462,10 +1307,12 @@ function _dj()
     local SERVICES=("
         clone
         clone-ssh
+        format
         find
         help
         meson
         open
+        replace
         setup
         ssh
         udev
@@ -1478,13 +1325,13 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    setup_tools+="adobe-pdf-reader arduino-1.8.13 baidu-netdisk clang-format cmake computer "
-    setup_tools+="container kdiff3-meld dj-gadgets devtools dropbox eigen3 foxit-pdf-reader "
-    setup_tools+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
+    setup_tools+="adobe-pdf-reader arduino-1.8.13 baidu-netdisk clang-format clang-llvm cmake "
+    setup_tools+="computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
+    setup_tools+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_tools+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
-    setup_tools+="grpc-1.29.1 g++-10 i219-v libev-4.33 libgpiod libiio lib-serialport "
+    setup_tools+="grpc-1.29.1 g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport "
     setup_tools+="mathpix matplot++ mongodb opencv-2.4.13 opencv-4.1.1 pangolin pip qemu "
-    setup_tools+="qt-5.13.1 qt-5.14.2 ros-melodic ros2-foxy spdlog slack stm32-cubeMX "
+    setup_tools+="qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy spdlog slack stm32-cubeMX "
     setup_tools+="stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi libyaml-cpp "
     setup_tools+="YouCompleteMe you-complete-me "
     ACTIONS[setup]="$setup_tools "
@@ -1510,6 +1357,7 @@ function _dj()
     ACTIONS[4.2.0]=" "
     # ---------------------
     ACTIONS[ros-melodic]="--from-deb-package --from-source "
+    ACTIONS[ros-noetic]=" "
     ACTIONS[ros2-foxy]="--from-deb-package --from-source "
     ACTIONS[--from-deb-package]=" "
     ACTIONS[--from-source]=" "
@@ -1525,6 +1373,19 @@ function _dj()
     ACTIONS[clone]="bitbucket github gitee "
     ACTIONS[clone-ssh]="bitbucket github gitee "
     
+    #---------------------------------------------------------
+    format_list="brush enable disable show "
+    ACTIONS[format]="$format_list "
+    for i in $format_list ; do
+        ACTIONS[$i]=" "
+    done
+    ACTIONS[format]+="implement "
+    ACTIONS[brush]+="google file "
+    ACTIONS[implement]="dj bg "
+    
+    #---------------------------------------------------------
+    ACTIONS[replace]=" "
+
     #---------------------------------------------------------
     bitbucket_repos="$(_dj_clone_repo_list BitBucket)"
     ACTIONS[bitbucket]+="$bitbucket_repos "
@@ -1560,7 +1421,7 @@ function _dj()
     #---------------------------------------------------------
     #---------------------------------------------------------
     udev_list="uvc-video-capture --dialout one-third-console "
-    udev_list+="stlink-v2.1 "
+    udev_list+="stlink-v2.1 logitech-f710 "
     ACTIONS[udev]="$udev_list "
     for i in $udev_list ; do
         ACTIONS[$i]=" "
@@ -1592,7 +1453,7 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    help_list="auto-mount "
+    help_list="auto-mount ffmpeg "
     ACTIONS[help]="$help_list "
     for i in $help_list ; do
         ACTIONS[$i]=" "

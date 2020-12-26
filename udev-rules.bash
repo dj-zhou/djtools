@@ -56,6 +56,49 @@ function _dj_udev_uvc_video_capture()
 }
 
 # =============================================================================
+function _dj_udev_logitech_f710()
+{
+    rule_file=logitech-f710-x.rules # this is the X mode
+    sudo rm -f /etc/udev/rules.d/$rule_file
+    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+
+    # finally ----------------
+    string="SUBSYSTEMS==\"usb\", "
+    string="${string}KERNEL==\"js[0-99]*\", "
+    string="${string}ACTION==\"add\", "
+    string="${string}ATTRS{idVendor}==\"046d\", "
+    string="${string}ATTRS{idProduct}==\"c21f\", "
+    string="${string}ATTRS{manufacturer}==\"Logitech\", "
+    string="${string}ATTRS{product}==\"Wireless Gamepad F710\", "
+    string="${string}MODE=\"666\", "
+    string="${string}SYMLINK+=\"joy/f710\", "
+    string="${string}GROUP=\"dialout\""
+    echo "${string}" | sudo tee -a /etc/udev/rules.d/$rule_file
+
+    sudo service udev restart
+
+    # the joystick can change its property, don't know why
+    rule_file=logitech-f710-d.rules # this is the D mode
+    sudo rm -f /etc/udev/rules.d/$rule_file
+    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+
+    # finally ----------------
+    string="SUBSYSTEMS==\"usb\", "
+    string="${string}KERNEL==\"js[0-99]*\", "
+    string="${string}ACTION==\"add\", "
+    string="${string}ATTRS{idVendor}==\"046d\", "
+    string="${string}ATTRS{idProduct}==\"c219\", "
+    string="${string}ATTRS{manufacturer}==\"Logitech\", "
+    string="${string}ATTRS{product}==\"Logitech Cordless RumblePad 2\", "
+    string="${string}MODE=\"666\", "
+    string="${string}SYMLINK+=\"joy/f710\", "
+    string="${string}GROUP=\"dialout\""
+    echo "${string}" | sudo tee -a /etc/udev/rules.d/$rule_file
+
+    sudo service udev restart
+}
+
+# =============================================================================
 # the One Third Debugger contains a USB to serial port chip: FT232RL
 function _dj_udev_one_third_console()
 {
@@ -120,4 +163,30 @@ function _dj_udev_stlink_v2_1()
 function _dj_udevadm()
 {
     udevadm info -a -n $1
+}
+
+# =============================================================================
+function _dj_udev()
+{
+    if [ $1 = '--dialout' ] ; then
+        _dj_udev_dialout $2 $3 $4
+        return
+    fi
+    if [ $1 = 'logitech-f710' ] ; then
+        _dj_udev_logitech_f710 $2 $3 $4
+        return
+    fi
+    if [ $1 = 'one-third-console' ] ; then
+        _dj_udev_one_third_console $2 $3 $4
+        return
+    fi
+    if [ $1 = 'uvc-video-capture' ] ; then
+        _dj_udev_uvc_video_capture $2 $3 $4
+        return
+    fi
+    if [ $1 = 'stlink-v2.1' ] ; then
+        _dj_udev_stlink_v2_1 $2 $3 $4
+        return
+    fi
+    return
 }

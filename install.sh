@@ -46,5 +46,3 @@ echo -e "\n If GitHub/GiTee/BitBucket usernames set wrong, you can still edit th
 echo "source $djtools_path/djtools.bash" >> ~/.bashrc
 echo -e "\n djtools installation finished.\n"
 echo -e "\n" >> ~/.bashrc
-
-

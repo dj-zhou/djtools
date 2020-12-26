@@ -171,7 +171,7 @@ EOM
 
     # -----------------------------------
     # remove firefox
-    echo -e "\n going to remove firfox\n"
+    echo -e "\n going to remove firefox\n"
     _press_enter_or_wait_s_continue 10
     sudo apt-get purge firefox -y; rm -Rf ~/.mozilla/firefox/;
 
@@ -512,6 +512,45 @@ function _dj_setup_i219_v()
 }
 
 # =============================================================================
+function _dj_setup_lcm()
+{
+    if [[ ! "${ubuntu_v}" = *'20.04'* ]] && [[ ! "${ubuntu_v}" = *'18.04'* ]]; then
+        echo "lcm installation is only tested within Ubuntu 20.04/18.04"
+        return
+    fi
+    current_folder=${PWD}
+
+    sudo apt-get install -y default-jdk
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm -rf lcm
+    git clone https://github.com/lcm-proj/lcm.git 
+    cd lcm
+    git checkout 501bb446d42c9a57f9e5ddf3c41ba78f4735c9f2 # master on Dec. 1st, 2020
+    mkdir build && cd build 
+    cmake ..
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    sudo make install
+    sudo ldconfig
+    cat << EOM
+
+    --------------------------------------------
+    lcm is installed to:
+        /usr/local/lib/liblcm.so.1.4.0
+        /usr/local/lib/liblcm.so.1
+        /usr/local/lib/liblcm.so
+    
+    header file:
+        /usr/local/include/lcm/*.h
+
+    pkg-config file:
+        /usr/local/lib/pkgconfig/lcm.pc
+        /usr/local/lib/pkgconfig/lcm-java.pc
+
+EOM
+    cd $current_folder
+}
+
+# =============================================================================
 # libev can also be installed by 
 # $ sudo apt-get install -y libev-dev
 # however, it is the v4.22 to be installed, and the installation location is
@@ -811,7 +850,6 @@ EOM
         echo -e "\n${YLW} TO BE IMPLEMENTED${NOC}\n"
         return
     fi
-    
 }
 
 # =============================================================================
@@ -926,17 +964,6 @@ function _dj_setup_slack()
 function _dj_setup_spdlog() # static/shared
 {
     static_shared=$1 # if empty, treat as dynamic
-    # version=$2
-    # if [ -z "$version" ] ; then
-    #     version="v1.7.0"
-    # fi
-    # if [ ! "$version" == "v1.7.0" ] && \
-    #    [ ! "$version" == "v1.8.0" ] \
-    #     ; then
-    #     echo -e "\n supported version: v1.7.0, v1.8.0\n"
-    #     return
-    # fi
-    # choose a place to install ---------------------------------
     echo -e "\n ------------------------------"
     echo -e " ${GRN}which version are you going to install?${NOC}"
     echo -e " 1: v1.6.0"
@@ -1099,4 +1126,307 @@ function _dj_setup_yaml_cpp()
     # echo -e '\n if the version is NOT 0.5.2, it may have some problem.\n'
 
     cd ${cwd_before_running}
+}
+
+# =============================================================================
+function _dj_setup()
+{
+    if [ $1 = 'adobe-pdf-reader' ] ; then
+        _dj_setup_adobe_pdf_reader
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'arduino-1.8.13' ] ; then
+        _dj_setup_arduino_1_8_13
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'baidu-netdisk' ] ; then
+        _dj_setup_baidu_netdisk
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'clang-llvm' ] ; then
+        _dj_setup_clang_llvm
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'clang-format' ] ; then
+        _dj_setup_clang_format
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'cmake' ] ; then
+        _dj_setup_cmake
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'computer' ] ; then
+        _dj_setup_computer
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'container' ] ; then
+        if [ $2 = 'docker' ] ; then
+            _dj_setup_container_docker
+            return
+        fi
+        if [ $2 = 'dive' ] ; then
+            _dj_setup_container_dive
+            return
+        fi
+    if [ $2 = 'lxd-4.0' ] ; then
+            _dj_setup_container_lxd_4_0
+            return
+    fi
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'kdiff3-meld' ] ; then
+        _dj_setup_kdiff3_meld
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'dj-gadgets' ] ; then
+        _dj_setup_dj_gadgets
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'devtools' ] ; then
+        _dj_setup_devtools
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'dropbox' ] ; then
+        _dj_setup_dropbox
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'eigen3' ] ; then
+        _dj_setup_eigen3
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'foxit-pdf-reader' ] ; then
+        _dj_setup_foxit_reader
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'gcc-arm-stm32' ] ; then
+        _dj_setup_gcc_arm_stm32
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'gcc-arm-linux-gnueabi' ] ; then
+        _dj_setup_gcc_arm_linux_gnueabi
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'gcc-arm-linux-gnueabihf' ] ; then
+        _dj_setup_gcc_arm_linux_gnueabihf
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'gcc-aarch64-linux-gnu' ] ; then
+        _dj_setup_gcc_aarch64_linux
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'git-lfs' ] ; then
+        _dj_setup_git_lfs
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'gitg-gitk' ] ; then
+        _dj_setup_gitg_gitk
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'glfw3' ] ; then
+        _dj_setup_glfw3
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'google-repo' ] ; then
+        _dj_setup_google_repo
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'gtest-glog' ] ; then
+        _dj_setup_gtest_glog
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'gnome' ] ; then
+        _dj_setup_gnome
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'grpc-1.29.1' ] ; then
+        _dj_setup_grpc_1_29_1
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'g++-10' ] ; then
+        _dj_setup_gpp_10
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'i219-v' ] ; then
+        _dj_setup_i219_v $2
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'lcm' ] ; then
+        _dj_setup_lcm
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'libev-4.33' ] ; then
+        _dj_setup_libev_4_33
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'libgpiod' ] ; then
+        _dj_setup_libgpiod
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'libiio' ] ; then
+        _dj_setup_libiio
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'lib-serialport' ] ; then
+        _dj_setup_libserialport
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'mathpix' ] ; then
+        _dj_setup_mathpix
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'matplot++' ] ; then
+        _dj_setup_matplot_xx
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'mongodb' ] ; then
+        _dj_setup_mongodb
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'opencv-2.4.13' ] ; then
+        _dj_setup_opencv_2_4_13 $2 $3 $4 $5
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'opencv-4.1.1' ] ; then
+        _dj_setup_opencv_4_1_1 $2 $3 $4 $5
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'pangolin' ] ; then
+        _dj_setup_pangolin
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'pip' ] ; then
+        _dj_setup_pip
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'qemu' ] ; then
+        _dj_setup_qemu $2 $3 $4 $5
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'qt-5.13.1' ] ; then
+        _dj_setup_qt_5_13_1
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'qt-5.14.2' ] ; then
+        _dj_setup_qt_5_14_2
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'ros-melodic' ] ; then
+        _dj_setup_ros_melodic $2 $3 $4
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'ros-noetic' ] ; then
+        _dj_setup_ros_noetic $2 $3 $4
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'ros2-foxy' ] ; then
+        _dj_setup_ros2_foxy $2 $3 $4
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'slack' ] ; then
+        _dj_setup_slack
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'spdlog' ] ; then
+        _dj_setup_spdlog $2
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'stm32-cubeMX' ] ; then
+        _dj_setup_stm32_cubemx $2 $3
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'stm32-tools' ] ; then
+        _dj_setup_stm32_tools $2 $3
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'sublime' ] ; then
+        _dj_setup_sublime
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'typora' ] ; then
+        _dj_setup_typora
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'vim-env' ] ; then
+        _dj_setup_vim_env
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'vscode' ] ; then
+        _dj_setup_vscode
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'vtk-8.2.0' ] ; then
+        _dj_setup_vtk_8_2_0
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'wubi' ] ; then
+        _dj_setup_wubi
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'libyaml-cpp' ] ; then
+        _dj_setup_yaml_cpp $2
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'YouCompleteMe' ] || [ $1 = 'you-complete-me' ] ; then
+        _dj_setup_you_complete_me
+        return
+    fi
+    # --------------------------
+        _dj_setup_help
+        return
 }

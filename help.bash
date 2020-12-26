@@ -28,3 +28,34 @@ function _dj_help_auto_mount()
 
 EOM
 }
+
+# =============================================================================
+function _dj_help_ffmpeg()
+{
+    cat << EOM
+
+ -----------------------------------------
+  use ffmpeg to convert videos:
+  1. convert avi to mp4
+    $ ffmpeg -i input.avi output.mp4
+  1. convert mp4 to gif
+    $ ffmpeg -i input.mp4 output.gif
+  2. convert mp4 to gif (starting from time 00:00:02, for 3 seconds)
+    $ ffmpeg -t 3 -ss 00:00:02 -i input.mp4 output.gif
+ -----------------------------------------
+
+EOM
+}
+
+# =============================================================================
+function _dj_help_skill()
+{
+    if [ $1 = 'auto-mount' ] ; then
+        _dj_help_auto_mount
+        return
+    fi
+    if [ $1 = 'ffmpeg' ] ; then
+        _dj_help_ffmpeg
+        return
+    fi
+}

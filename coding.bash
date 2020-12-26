@@ -37,7 +37,7 @@ function _coding_clang_format_show()
 {
     cat << EOM
 
-                  clang format naming conventions
+        clang format naming conventions -- Camel Case
  +-----------------------------------------------------------+
  |          Code Element | Stype                             |
  +-----------------------------------------------------------+
@@ -60,90 +60,67 @@ EOM
 }
 
 # =============================================================================
-function coding()
+function _dj_replace()
 {
     cwd_before_running=$PWD
     
-    if [ $# = 0 ] ; then
-        _coding_help
-    elif [ $1 = 'help' ] ; then
-        _coding_help
-    elif [ $1 = 'replace' ] && [ $# = 4 ] ; then
-        if [ $4 = '.' ] ; then
+    if [ $# = 3 ] ; then
+        if [ $3 = '.' ] ; then
             # find . -name "*.c", how to rule out .git folder?
-            find . -type f -not -path "./.git*" -print0 | xargs -0 sed -i "s/"$2"/"$3"/g"
-        elif [[ -f $4 ]] ; then
-            echo $4" is a file "
-            sed -i "s/"$2"/"$3"/g" $4
+            find . -type f -not -path "./.git*" -print0 | xargs -0 sed -i "s/"$1"/"$2"/g"
+        elif [[ -f $3 ]] ; then
+            echo $3" is a file "
+            sed -i "s/"$1"/"$2"/g" $3
+            return
         else
             echo -e "\n ${PRP}coding${NOC}: not supported!"
-        fi
-    elif [ $1 = 'clang-format' ] ; then
-        if [ $# = 1 ] ; then
-            _coding_help
             return
         fi
-        if [ $2 = 'implement' ] ; then
-            _coding_clang_format_implement $3 $4 $5 $6 $7
-            return
-        fi
-        if [ $2 = 'show' ] ; then
-            _coding_clang_format_show $3 $4 $5 $6 $7
-            return
-        fi
-        if [ $2 = 'enable' ] ; then
-            _clang_vscode_setting_json_format_on_save "true"
-            return
-        fi
-        if [ $2 = 'disable' ] ; then
-            _clang_vscode_setting_json_format_on_save "false"
-            return
-        fi
-        _coding_help
-        return
-    else
-        _coding_help
     fi
-    
+
     cd ${cwd_before_running}
 }
 
 # =============================================================================
-function _coding()
+# bug: it only works for files in current directory, not in the sub-directory
+function dj_clang_format_brush()
 {
-    COMPREPLY=()
-
-    # All possible first values in command line
-    local SERVICES=("
-        help
-        replace
-        clang-format
-    ")
-
-    # declare an associative array for options
-    declare -A ACTIONS
-
-    # no space in front or after "="
-    ACTIONS[replace]+="help "
-    ACTIONS[help]+=" "
-    ACTIONS[clang-format]+="implement show enable disable "
-    format_style+="dj bg "
-    ACTIONS[implement]+="$format_style "
-    for i in $format_style ; do
-        ACTIONS[$i]=" "
-    done
-    ACTIONS[show]+=" "
-    ACTIONS[enable]+=" "
-    ACTIONS[disable]+=" "
-    
-    # ------------------------------------------------------------------------
-    local cur=${COMP_WORDS[COMP_CWORD]}
-    if [ ${ACTIONS[$3]+1} ] ; then
-        COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
-    else
-        COMPREPLY=( `compgen -W "${SERVICES[*]}" -- $cur` )
+    format_style=$1
+    echo $format_style
+    if [ $format_style = 'file' ] ; then
+        find . \
+        -name *.h -o -iname *.hpp -o -iname *.cpp -o -iname *.c \
+        | xargs clang-format -style=file -i
+    elif [ $format_style = 'google' ] ; then
+        find . \
+        -name *.h -o -iname *.hpp -o -iname *.cpp -o -iname *.c \
+        | xargs clang-format -style=google -i
     fi
 }
 
 # =============================================================================
-complete -F _coding coding
+function _dj_format()
+{
+    if [ $1 = 'brush' ] ; then
+        dj_clang_format_brush $2 $3 $4 $5
+        return
+    fi
+    if [ $1 = 'implement' ] ; then
+        _coding_clang_format_implement $2 $3 $4 $5 $6 $7
+        return
+    fi
+    if [ $1 = 'show' ] ; then
+        _coding_clang_format_show $2 $3 $4 $5 $6 $7
+        return
+    fi
+    if [ $1 = 'enable' ] ; then
+        _clang_vscode_setting_json_format_on_save "true"
+        return
+    fi
+    if [ $1 = 'disable' ] ; then
+        _clang_vscode_setting_json_format_on_save "false"
+        return
+    fi
+    
+    cd ${cwd_before_running}
+}

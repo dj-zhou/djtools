@@ -12,7 +12,9 @@ function _dj_setup_ros_melodic()
     fi
 
     # setup sources.list ---------------
-    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    if [ ! -f /etc/apt/sources.list.d/ros-latest.list ] ; then
+        sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    fi
 
     # setup keys ---------------
     sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
@@ -22,7 +24,9 @@ function _dj_setup_ros_melodic()
     sudo apt-get install ros-melodic-desktop-full -y
 
     # initialize rosdep ---------------
-    sudo apt install python-rosdep2
+    sudo apt-get install python-pip
+    sudo pip install -U rosdep
+    sudo rm /etc/ros/rosdep/sources.list.d/20-default.list
     sudo rosdep init || true
     rosdep update
 
@@ -37,18 +41,97 @@ function _dj_setup_ros_melodic()
         echo -e "source /opt/ros/melodic/setup.bash\n" >> ~/.bashrc
     fi
 
-    # setup workspace ---------------
-    mkdir -p ~/catkin_ws/src
-    cd ~/catkin_ws
-    catkin_make
+    sudo apt-get -y install python-roslaunch
+    sudo apt-get -y install python3-roslaunch
 
     echo -e '\n' >> ~/.bashrc
     echo '# ===========================================================' >> ~/.bashrc
     echo '# ROS (1) setup' >> ~/.bashrc
-    echo 'export HOSTNAME:' >> ~/.bashrc
+    # echo 'export HOSTNAME:' >> ~/.bashrc
     echo 'export ROS_MASTER_URI=http://localhost:11311' >> ~/.bashrc
     echo 'export ROS_IP=localhost' >> ~/.bashrc
     echo -e "\n ROS (1) settings are in ~/.bashrc.\n"
+
+    # setup workspace ---------------
+    cat << EOM
+
+    ---------------------------------------------
+    You can run those now:
+      $ source ~/.bashrc
+      $ mkdir -p ~/catkin_ws/src
+      $ cd ~/catkin_ws
+      $ catkin_make
+    ---------------------------------------------
+
+EOM
+
+    cd ${cwd_before_running}
+}
+
+# =============================================================================
+function _dj_setup_ros_noetic()
+{
+    cwd_before_running=$PWD
+
+    # only Uubntu 18.04 can install ros-melodic
+    if [[ $ubuntu_v != *'Ubuntu 20.04'* ]] ; then
+        echo -e "\n ROS Noetic can only be installed on Ubuntu 20.04\n"
+        return
+    fi
+
+    # setup sources.list ---------------
+    if [ ! -f /etc/apt/sources.list.d/ros-latest.list ] ; then
+        sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    fi
+    # setup keys ---------------
+    sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+    # or
+    # curl -sSL 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654' | sudo apt-key add -
+
+    # installation ---------------
+    sudo apt-get -y update || true
+    sudo apt-get install -y ros-noetic-desktop-full
+
+    # initialize rosdep ---------------
+    sudo apt-get install -y python3-rosdep2
+    sudo rm /etc/ros/rosdep/sources.list.d/20-default.list
+    sudo rosdep init || true
+    rosdep update
+
+    # fix a problem: ros noetic resource not found: roslaunch
+    sudo apt-get install ros-noetic-roswtf
+
+    installed=0
+    while IFS='' read -r line || [[ -n "$line" ]] ; do
+        if [[ $line == *"source /opt/ros/noetic/setup.bash"* ]] ; then
+            installed=1
+        fi
+    done < ~/.bashrc
+
+    if [ $installed = 0 ] ; then 
+        echo -e "source /opt/ros/noetic/setup.bash\n" >> ~/.bashrc
+    fi
+
+    echo -e '\n' >> ~/.bashrc
+    echo '# ===========================================================' >> ~/.bashrc
+    echo '# ROS (1) setup' >> ~/.bashrc
+    # echo 'export HOSTNAME:' >> ~/.bashrc
+    echo 'export ROS_MASTER_URI=http://localhost:11311' >> ~/.bashrc
+    echo 'export ROS_IP=localhost' >> ~/.bashrc
+    echo -e "\n ROS (1) settings are in ~/.bashrc\n"
+
+    # setup workspace ---------------
+        cat << EOM
+
+    ---------------------------------------------
+    You can run those now:
+      $ source ~/.bashrc
+      $ mkdir -p ~/catkin_ws/src
+      $ cd ~/catkin_ws
+      $ catkin_make
+    ---------------------------------------------
+
+EOM
 
     cd ${cwd_before_running}
 }
