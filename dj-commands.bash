@@ -715,17 +715,33 @@ function _dj_setup_gpp_10()
     elif [[ ($anw = 'y') || ($anw = 'Y') || ($anw = 'YES') \
        || ($anw = 'Yes') || ($anw = 'yes') ]] ; then
         echo -e '\n gcc/g++ are set to use gcc-10/g++-10\n'
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 10
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
-        if [[ ${ubuntu_v} = *'16.04'* ]] ; then
+        # ----------------------
+        if [ -f /usr/bin/gcc-5 ] ; then
             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5  5
+        fi
+        if [ -f /usr/bin/g++-5 ] ; then
             sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5  5
-        elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
+        fi
+        # ----------------------
+        if [ -f /usr/bin/gcc-7 ] ; then
             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  7
+        fi
+        if [ -f /usr/bin/g++-7 ] ; then
             sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7  7
-        elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
+        fi
+        # ----------------------
+        if [ -f /usr/bin/gcc-9 ] ; then
             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9  9
+        fi
+        if [ -f /usr/bin/g++-9 ] ; then
             sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9  9
+        fi
+        # ----------------------
+        if [ -f /usr/bin/gcc-10 ] ; then
+            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10  10
+        fi
+        if [ -f /usr/bin/g++-10 ] ; then
+            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10  10
         fi
         echo -e "\n-------------------\n"
         sudo update-alternatives --config gcc
@@ -1329,10 +1345,10 @@ function _dj()
     setup_tools+="computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
     setup_tools+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_tools+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
-    setup_tools+="grpc-1.29.1 g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport "
-    setup_tools+="mathpix matplot++ mongodb opencv-2.4.13 opencv-4.1.1 pangolin pip qemu "
+    setup_tools+="grpc-1.29.1 g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
+    setup_tools+="mathpix matplot++ mongodb nvidia nvtop opencv-2.4.13 opencv-4.1.1 pangolin pip qemu "
     setup_tools+="qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy spdlog slack stm32-cubeMX "
-    setup_tools+="stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi libyaml-cpp "
+    setup_tools+="stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi "
     setup_tools+="YouCompleteMe you-complete-me "
     ACTIONS[setup]="$setup_tools "
     for i in $setup_tools ; do

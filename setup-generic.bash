@@ -729,12 +729,14 @@ function _dj_setup_mathpix()
 }
 
 # =============================================================================
+# this might need a higher version of g++ to compile (>= 9.3?)
 function _dj_setup_matplot_xx()
 {
     static_shared=$1
     current_folder=${PWD}
     # dependency ------
-    sudo apt-get install gnuplot -y
+    sudo apt-get install -y gnuplot
+    sudo apt-get install -y libfftw3-dev
 
     # removed pre-installed files ------
     sudo rm -f /usr/local/lib/Matplot++/libnodesoup.a
@@ -753,9 +755,9 @@ function _dj_setup_matplot_xx()
     # compile and install ------
     mkdir build && cd build
     if [ "$static_shared" = 'static' ] ; then
-        cmake .. -DBUILD_SHARED_LIBS="off"
+        cmake .. -DBUILD_SHARED_LIBS=OFF
     else
-        cmake .. -DBUILD_SHARED_LIBS="on"
+        cmake .. -DBUILD_SHARED_LIBS=ON
     fi
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
@@ -775,7 +777,6 @@ function _dj_setup_matplot_xx()
     pkg-config file:
         none
     --------------------------------------------
-
 EOM
     else
     cat << EOM
@@ -799,7 +800,7 @@ EOM
 }
 
 # =============================================================================
-# reference: https://linux.ci/217.html
+# reference: https://andyfelong.com/2020/10/mongodb-4-4-ubuntu-20-04-on-raspberry-pi-4/
 # problem: if libyaml-cpp is installed first (0.6.3), then it cannot install
 # mongodb, don't know why
 function _dj_setup_mongodb()
@@ -807,25 +808,28 @@ function _dj_setup_mongodb()
     sudo apt-get update -y
     uname_a=$(uname -a)
     if [[ "${ubuntu_v}" = *'20.04'* ]] ; then
-        sudo apt-get -y install dirmngr
-        sudo apt-get -y install gnupg
-        sudo apt-get -y install apt-transport-https
-        sudo apt-get -y install ca-certificates
-        sudo apt-get -y install software-properties-common
+        # sudo apt-get -y install dirmngr
+        # sudo apt-get -y install gnupg
+        # sudo apt-get -y install apt-transport-https
+        # sudo apt-get -y install ca-certificates
+        # sudo apt-get -y install software-properties-common
 
-        if [[ "${uname_a}" = *'aarch64'* ]] ; then # not sure if it works on other platform
-            # unable to install v4.4 on raspberry Ubuntu  Server 20.04, so, install v4.2
-            curl -s https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add -
-            echo "deb [ arch=arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.2.list
+        # install v4.4 on x86 and aarch64 system
+        wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+        if [[ "${uname_a}" = *'aarch64'* ]] ; then
+            echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" \
+                | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
         elif [[ "${uname_a}" = *'x86_64'* ]] ; then
-            # unable to install v4.2 on laptop Ubuntu 20.04, so, install v4.4
-            wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-            sudo add-apt-repository "deb [arch=amd64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse"
+            echo "deb [ arch=amd64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" \
+                | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
         fi
 
         # install
         sudo apt-get -y update
         sudo apt-get -y install mongodb-org
+
+        # Enable and start MongoDB Deamon program
+        sudo systemctl enable --now mongod
 
         cat << EOM
 
@@ -841,6 +845,9 @@ function _dj_setup_mongodb()
         $ sudo systemctl enable --now mongod
         $ sudo systemctl start mongod
     
+    Check if MongoDB is running:
+        $ sudo service mongod status
+        
     Check if MongoDB is installed:
         $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
     --------------------------------------------
@@ -850,6 +857,56 @@ EOM
         echo -e "\n${YLW} TO BE IMPLEMENTED${NOC}\n"
         return
     fi
+}
+
+# =============================================================================
+# this may only work on desktop computer
+# nvidia-driver-455 is good at time of this commit
+function _dj_setup_nvidia()
+{
+    sudo apt-get purge nvidia*
+    sudo apt-get install -y libncurses5-dev
+    if [[ "${ubuntu_v}" = *'18.04'* || \
+          "${ubuntu_v}" = *'20.04'* ]] ; then
+        sudo add-apt-repository ppa:graphics-drivers/ppa
+        sudo apt-get -y update
+        sudo apt-get -y install nvidia-driver-455 nvidia-settings
+    fi
+    cat << EOM
+
+    --------------------------------------------
+    Now you need to reboot the computer
+    and you can run:
+    $ nvidia-smi
+    or
+    $ cat /proc/driver/nvidia/gpus/{tab}/information
+    --------------------------------------------
+
+EOM
+}
+
+# =============================================================================
+function _dj_setup_nvtop()
+{
+    cwd_before_running=$PWD
+
+    if [[ "${ubuntu_v}" = *'18.04'* || \
+          "${ubuntu_v}" = *'20.04'* ]] ; then
+        cd ~ && mkdir -p soft/ && cd soft/
+        rm nvtop -rf
+        git clone https://github.com/Syllo/nvtop.git
+        cd nvtop
+        mkdir build && cd build
+        cmake .. -DNVML_RETRIEVE_HEADER_ONLINE=True
+        make -j4
+        sudo make install
+    fi
+    # on my laptop, this method failed, due to some dependency issue
+    # if [[ "${ubuntu_v}" = *'20.04'* ]] ; then
+    #     sudo apt-get install -y nvtop
+    # fi
+
+    cd ${cwd_before_running}
 }
 
 # =============================================================================
@@ -1302,6 +1359,11 @@ function _dj_setup()
         return
     fi
     # --------------------------
+    if [ $1 = 'libyaml-cpp' ] ; then
+        _dj_setup_yaml_cpp $2
+        return
+    fi
+    # --------------------------
     if [ $1 = 'mathpix' ] ; then
         _dj_setup_mathpix
         return
@@ -1314,6 +1376,16 @@ function _dj_setup()
     # --------------------------
     if [ $1 = 'mongodb' ] ; then
         _dj_setup_mongodb
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'nvidia' ] ; then
+        _dj_setup_nvidia
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'nvtop' ] ; then
+        _dj_setup_nvtop
         return
     fi
     # --------------------------
@@ -1414,11 +1486,6 @@ function _dj_setup()
     # --------------------------
     if [ $1 = 'wubi' ] ; then
         _dj_setup_wubi
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'libyaml-cpp' ] ; then
-        _dj_setup_yaml_cpp $2
         return
     fi
     # --------------------------

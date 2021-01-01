@@ -34,7 +34,6 @@ function _rpi_shrink_cleanup() {
         local old_owner=$(stat -c %u:%g "$src")
         chown "$old_owner" "$LOGFILE"
     fi
-
 }
 
 # =============================================================================
@@ -320,6 +319,7 @@ function _rpi_shrink() {
         sudo rm -rvf $mountdir/var/tmp/*
         sudo rm -rvf $mountdir/tmp/*
         sudo rm -rvf $mountdir/etc/ssh/*_host_*
+        # add scripts here if want to remove more things fro mthe image
         sudo umount "$mountdir"
     fi
 
@@ -434,6 +434,21 @@ function _rpi_shrink() {
 }
 
 # =============================================================================
+function _rpi_backup()
+{
+    if [ $# -le 1 ] ; then
+        echo " usage: rpi backup /dev/sda image.img"
+        return
+    fi
+    blk=$1
+    file=$2
+    echo -e " $GRN$blk$NOC is backing up to $GRN$file$NOC"
+    sudo dd bs=4M if="$blk" of="$file" status=progress
+    sudo chown $USER "$file"
+    echo -e " you can run $PRP rpi shrink $file$NOC to make the file smaller"
+}
+
+# =============================================================================
 function rpi()
 {
     # ------------------------------
@@ -447,6 +462,11 @@ function rpi()
         return
     fi
     # ------------------------------
+    if [ $1 = 'backup' ] ; then
+        _rpi_backup $2 $3 $4
+        return
+    fi
+    # ------------------------------
 }
 
 # =============================================================================
@@ -457,15 +477,27 @@ function _rpi()
     # All possible first values in command line
     local SERVICES=("
         shrink
+        backup
     ")
 
     # declare an associative array for options
     declare -A ACTIONS
 
+    # ------------------------------------------------------------------------
     shrink_list="$(ls | grep img) "
     ACTIONS[shrink]="$shrink_list "
     for i in $shrink_list ; do
         ACTIONS[$i]=" "
+    done
+    # ------------------------------------------------------------------------
+    backup_list="/dev/sda /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg "
+    ACTIONS[backup]="$backup_list "
+    for i in $backup_list ; do
+        backup_file_lit="$(ls | grep img) "
+        ACTIONS[$i]="$backup_file_lit"
+        for j in $backup_file_lit ; do
+            ACTIONS[$j]=" "
+        done
     done
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

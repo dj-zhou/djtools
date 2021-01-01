@@ -62,7 +62,6 @@ function _dj_udev_logitech_f710()
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
-    # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
     string="${string}KERNEL==\"js[0-99]*\", "
     string="${string}ACTION==\"add\", "
@@ -82,7 +81,6 @@ function _dj_udev_logitech_f710()
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
-    # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
     string="${string}KERNEL==\"js[0-99]*\", "
     string="${string}ACTION==\"add\", "
