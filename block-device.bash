@@ -64,7 +64,6 @@ function _disk_size()
 function _find_block_device()
 {
     dev_to_check=$1
-    # echo "dev_to_check = "$dev_to_check
     if [ -b "$dev_to_check" ] ; then
         echo $dev_to_check
         return

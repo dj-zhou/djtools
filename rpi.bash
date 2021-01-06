@@ -210,11 +210,11 @@ function _rpi_shrink() {
         exec 2> >(stdbuf -i0 -o0 -e0 tee -a "$LOGFILE" >&2)
     fi
 
-    # arguments
-    src="$1"
+    # arguments ----------------
+    src="$1" # this seems not right
     img="$1"
 
-    # usage checks
+    # usage checks ----------------
     if [[ -z "$img" ]]; then
         _rpi_shrink_help
     fi
@@ -222,6 +222,13 @@ function _rpi_shrink() {
     if [[ ! -f "$img" ]]; then
         _rpi_shrink_error $LINENO "$img is not a file..."
         exit 2
+    fi
+
+    # check ownership ----------------
+    owner_ship=$(stat -c '%U' $img)
+    if [[ ! "$owner_ship" = "$USER" ]] ; then
+        echo -e "file $img is$RED NOT$NOC owned by $USER, cannot shrink."
+        return
     fi
 
     # check selected compression tool is supported and installed

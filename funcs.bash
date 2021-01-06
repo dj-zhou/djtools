@@ -164,7 +164,24 @@ function _if_option_exist()
 
 # =============================================================================
 # argument 1: the string
-# argument 2: the charactor
+# argument 2: the character
+function _count_a_char_in_str()
+{
+    the_line=$1
+    the_char=$2
+    found_count=0
+    for ((c=1;c<=${#the_line};c++ )) ; do
+        single_char=${the_line:${c}-1:1}
+        if [[ "$single_char" = "$the_char" ]] ; then
+            found_count=$((found_count+1))
+        fi
+    done
+    echo $found_count
+}
+
+# =============================================================================
+# argument 1: the string
+# argument 2: the character
 # argument 3: the 1st, 2nd, or the i-th item to be found in the string
 # return the position of the i-th character in the string
 #            if position == length of the string, means cannot find the char

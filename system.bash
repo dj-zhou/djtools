@@ -115,13 +115,27 @@ function _system_check_temperature()
 function _system_check_nvidia_driver()
 {
     result=$(inxi -G)
-    # echo $result
-    if [[ "$result" = *"not found"* ]] ; then
-        sudo apt-get install inxi
+    # this check does not work
+    if [[ "$result" = *"but can be installed with"* ]] ; then
+        sudo apt-get install -y inxi
     fi
     inxi -G
 
     nvidia-smi
+}
+
+# =============================================================================
+function _system_check_process()
+{
+    echo -e "run ${PRP}ps aux | grep $1${NOC}"
+    ps aux | grep $1
+}
+
+# =============================================================================
+function _system_check_threads()
+{
+    echo -e "run ${PRP}ps -eLf | grep $1${NOC}"
+    ps -eLf | grep $1
 }
 
 # =============================================================================
@@ -212,13 +226,23 @@ function system()
             return
         fi
         # --------------------------
+        if [ $2 = 'nvidia-driver' ] ; then
+            _system_check_nvidia_driver
+            return
+        fi
+        # --------------------------
+        if [ $2 = 'process' ] ; then
+            _system_check_process $3 $4 $5
+            return
+        fi
+        # --------------------------
         if [ $2 = 'temperature' ] ; then
             _system_check_temperature
             return
         fi
         # --------------------------
-        if [ $2 = 'nvidia-driver' ] ; then
-            _system_check_nvidia_driver
+        if [ $2 = 'threads' ] ; then
+            _system_check_threads $3 $4 $5
             return
         fi
         # --------------------------
@@ -278,15 +302,17 @@ function _system()
     disable_list="program-problem-detected apt-dpkg-locks "
     ACTIONS[disable]+="$disable_list "
     for i in $disable_list ; do
-        ACTIONS[i]=" "
+        ACTIONS[$i]=" "
     done
-    ACTIONS[check]+="cpu-memory temperature nvidia-driver udev-rules "
-    ACTIONS[cpu-memory]+=" "
-    ACTIONS[temperature]+=" "
-    ACTIONS[nvidia-driver]+=" "
-    ACTIONS[udev-rules]+=" "
+    check_list="cpu-memory temperature nvidia-driver udev-rules "
+    check_list+="process threads "
+    ACTIONS[check]+="$check_list "
+    for i in $check_list ; do
+        ACTIONS[$i]=" "
+    done
     ACTIONS[wallpaper]+="random "
     ACTIONS[random]+=" "
+    # ---------------------------------------------------------
     ACTIONS[ubuntu-drivers]+="autoinstall "
     ACTIONS[autoinstall]+=" "
 

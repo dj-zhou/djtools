@@ -400,7 +400,7 @@ function _dj_setup_container_dive()
 # =============================================================================
 function _dj_setup_container_lxd_4_0()
 {
-    sudo apt install snapd
+    sudo apt-get install snapd
     sudo snap install lxd --channel=4.0/stable
     echo -e "\n"
     echo 'next step: '
@@ -706,7 +706,7 @@ function _dj_setup_gpp_10()
 
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
     sudo apt-get update
-    sudo apt install -y gcc-10 g++-10
+    sudo apt-get install -y gcc-10 g++-10
     echo -e "\n do you want to set up the gcc/g++ priorities? [Yes/No]"
     read anw
     if [[ ($anw = 'n') || ($anw = 'N') || ($anw = 'NO') \
@@ -794,6 +794,7 @@ function _dj_setup_opencv_2_4_13()
 # https://github.com/PacktPublishing/Learn-OpenCV-4-By-Building-Projects-Second-Edition
 # however, this is a bad reference
 # notice: there is some manual work todo before actually automate this procedure
+# this does not work on Ubuntu 20.04!
 function _dj_setup_opencv_4_1_1()
 {
     cwd_before_running=$PWD
@@ -815,7 +816,7 @@ function _dj_setup_opencv_4_1_1()
     sudo apt-get install -y x264 v4l-utils
 
     cd ~ && mkdir -p soft && cd soft/
-    sudo rm -rf opencv-4.1.1 # otherwise, it will not going to clone into this folder
+    rm -rf opencv-4.1.1
 
     git clone https://github.com/dj-zhou/opencv-4.1.1.git
     git clone https://github.com/dj-zhou/ippicv.git
@@ -853,6 +854,90 @@ function _dj_setup_opencv_4_1_1()
     echo -e "\n"
     echo " example code or template project can be seen from:"
     echo " https://github.com/dj-zhou/opencv4-demo/001-imread-imshow"
+}
+
+# =============================================================================
+# https://medium.com/@sb.jaduniv/how-to-install-opencv-4-2-0-with-cuda-10-1-on-ubuntu-20-04-lts-focal-fossa-bdc034109df3
+function _dj_setup_opencv_4_2_0()
+{
+    cwd_before_running=$PWD
+    # Generic tools
+    sudo apt-get install -y build-essential cmake pkg-config unzip yasm git checkinstall
+    # Image I/O libs
+    sudo apt-get install -y libjpeg-dev libpng-dev libtiff-dev
+    # Video/Audio Libs — FFMPEG, GSTREAMER, x264 and so on
+    sudo apt-get install -y libavcodec-dev libavformat-dev libswscale-dev libavresample-dev
+    sudo apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+    sudo apt-get install -y libxvidcore-dev x264 libx264-dev libfaac-dev libmp3lame-dev libtheora-dev
+    sudo apt-get install -y libfaac-dev libmp3lame-dev libvorbis-dev
+    # OpenCore — Adaptive Multi Rate Narrow Band (AMRNB) and Wide Band (AMRWB) speech codec
+    sudo apt-get install -y libopencore-amrnb-dev libopencore-amrwb-dev
+    # Cameras programming interface libs
+    sudo apt-get install -y libdc1394-22 libdc1394-22-dev libxine2-dev libv4l-dev v4l-utils 
+    cd /usr/include/linux
+    sudo ln -s -f ../libv4l1-videodev.h videodev.h
+    # GTK lib for the graphical user functionalities coming from OpenCV highghui module
+    sudo apt-get install -y libgtk-3-dev
+    # Python libraries for Python3
+    sudo apt-get install -y python3-dev python3-pip
+    sudo -H pip3 install -U pip numpy
+    sudo apt-get install -y python3-testresources
+    # Parallelism library C++ for CPU
+    sudo apt-get install -y libtbb-dev
+    # Optimization libraries for OpenCV
+    sudo apt-get install -y libatlas-base-dev gfortran
+    # Optional libraries
+    sudo apt-get install -y libprotobuf-dev protobuf-compiler
+    sudo apt-get install -y libgoogle-glog-dev libgflags-dev
+    sudo apt-get install -y libgphoto2-dev libeigen3-dev libhdf5-dev doxygen
+    # Install OpenCL SDK related things
+    sudo apt-get install -y ocl-icd-opencl-dev
+
+    # start to install ---------------------------------------------------
+    cd ~ && mkdir -p soft && cd soft/
+    rm -rf opencv-4.2.0
+    rm -rf opencv_contrib-4.2.0
+    wget -O opencv.zip https://github.com/opencv/opencv/archive/4.2.0.zip
+    wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/4.2.0.zip
+    unzip opencv.zip
+    unzip opencv_contrib.zip
+
+    # some kind of virtual??
+    export WORKON_HOME=$HOME/.virtualenvs
+    export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+    source /usr/local/bin/virtualenvwrapper.sh
+    mkvirtualenv cv -p python3
+    
+    cd opencv-4.2.0
+    mkdir build && cd build
+    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+        -D CMAKE_C_COMPILER=/usr/bin/gcc-9 \
+        -D CMAKE_INSTALL_PREFIX=/usr/local \
+        -D INSTALL_PYTHON_EXAMPLES=ON \
+        -D INSTALL_C_EXAMPLES=OFF \
+        -D WITH_TBB=ON \
+        -D BUILD_opencv_cudacodec=OFF \
+        -D ENABLE_FAST_MATH=1 \
+        -D WITH_CUBLAS=1 \
+        -D WITH_V4L=ON \
+        -D WITH_QT=OFF \
+        -D WITH_OPENGL=ON \
+        -D WITH_GSTREAMER=ON \
+        -D OPENCV_GENERATE_PKGCONFIG=ON \
+        -D OPENCV_PC_FILE_NAME=opencv.pc \
+        -D OPENCV_ENABLE_NONFREE=ON \
+        -D OPENCV_PYTHON3_INSTALL_PATH=~/.virtualenvs/cv/lib/python3.8/site-packages \
+        -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.2.0/modules \
+        -D PYTHON_EXECUTABLE=~/.virtualenvs/cv/bin/python \
+        -D BUILD_EXAMPLES=ON \
+        -D WITH_CUDNN=ON \
+        -D CUDA_FAST_MATH=1 \
+        -D WITH_CUDA=ON \
+        -D OPENCV_DNN_CUDA=ON \
+        -D CUDA_ARCH_BIN=7.5 \
+        -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
+        -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include  ..
+    cd ${cwd_before_running}
 }
 
 # =============================================================================
@@ -1346,9 +1431,9 @@ function _dj()
     setup_tools+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_tools+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
     setup_tools+="grpc-1.29.1 g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
-    setup_tools+="mathpix matplot++ mongodb nvidia nvtop opencv-2.4.13 opencv-4.1.1 pangolin pip qemu "
-    setup_tools+="qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy spdlog slack stm32-cubeMX "
-    setup_tools+="stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi "
+    setup_tools+="mathpix matplot++ mongodb nvidia nvtop opencv-2.4.13 opencv-4.1.1 opencv-4.2.0 "
+    setup_tools+="pangolin pip qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy spdlog "
+    setup_tools+="slack stm32-cubeMX stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi "
     setup_tools+="YouCompleteMe you-complete-me "
     ACTIONS[setup]="$setup_tools "
     for i in $setup_tools ; do

@@ -1399,6 +1399,11 @@ function _dj_setup()
         return
     fi
     # --------------------------
+    if [ $1 = 'opencv-4.2.0' ] ; then
+        _dj_setup_opencv_4_2_0 $2 $3 $4 $5
+        return
+    fi
+    # --------------------------
     if [ $1 = 'pangolin' ] ; then
         _dj_setup_pangolin
         return
