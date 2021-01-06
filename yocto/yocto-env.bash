@@ -174,7 +174,7 @@ function _yocto_setup_plain_sdk()
     fi
     # find tmp/ folder ---------------
     TMPDIR=$(_yocto_find_TMPDIR)
-    if [ -z $sdk_source ] ; then
+    if [ -z $TMPDIR ] ; then
         echo -e "${RED}no TMPDIR found, is the image built? exit!\n${NOC}"
         return
     fi
@@ -205,18 +205,16 @@ function _yocto_setup_plain_sdk()
         distro_v=$answer
     fi
     sdk_folder=$HOME/.$image_name-$machine-$distro-$distro_v-oesdk
-    echo -e "$GRN"
-    echo "    image name: "$image_name >&2
-    echo "       machine: "$machine >&2
-    echo "        distro: "$distro >&2
-    echo "distro version: "$distro_v >&2
-    echo " sdk directory: "$sdk_folder  >&2
-    echo -e "$NOC"
+    echo -e "    image name: $GRN"$image_name$NOC >&2
+    echo -e "       machine: $GRN"$machine$NOC >&2
+    echo -e "        distro: $GRN"$distro$NOC >&2
+    echo -e "distro version: $GRN"$distro_v$NOC >&2
+    echo -e " sdk directory: $GRN"$sdk_folder$NOC  >&2
 
     # remove the existing sdk folder ---------
     if [ -d "$sdk_folder" ] ; then
-        echo -e "${PRP}rm \"$sdk_folder\" -r${NOC}\n"
-        rm "$sdk_folder" -r
+        echo -e "${PRP}sudo rm \"$sdk_folder\" -r${NOC}\n"
+        sudo rm "$sdk_folder" -r
     fi
 
     # start to install the plain SDK ----------------------
