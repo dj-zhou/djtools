@@ -64,7 +64,6 @@ function _dj_setup_adobe_pdf_reader()
 {
     current_folder=${PWD}
 
-    cd ~ && mkdir -p soft/ && cd soft/
 
     # install i386 related dependencies --------------------
     sudo dpkg --add-architecture i386
@@ -74,10 +73,12 @@ function _dj_setup_adobe_pdf_reader()
     sudo apt-get -y install gtk2-engines-murrine:i386
     sudo apt-get -y install libatk-adaptor:i386
 
-    link="ftp://ftp.adobe.com/pub/adobe/reader/unix/9.x"
+    cd ~ && mkdir -p soft/ && cd soft/
     file="AdbeRdr9.5.5-1_i386linux_enu.deb"
-    wget -O adobe.deb ${link}/9.5.5/enu/$file
-    sudo dpkg -i adobe.deb
+    url="ftp://ftp.adobe.com/pub/adobe/reader/unix/9.x"
+    url=${url}/9.5.5/enu/$file
+    _wget_if_not_exist $file "88036c68998d565c4365e2ad89b04d51" $url
+    sudo dpkg -i $file
 
     cd $current_folder && unset current_folder
 }
@@ -89,9 +90,11 @@ function _dj_setup_arduino_1_8_13()
 
     cd ~ && mkdir -p soft/ && cd soft/
     rm arduino* -rf
+    filename="arduino-1.8.13-linux64.tar.xz"
+    url=https://downloads.arduino.cc/$filename
+    _wget_if_not_exist $filename "e4d2ff4da4ba1ddb5bc010cb38b5fbc1" $url
+    tar -xvf $filename
 
-    wget https://downloads.arduino.cc/arduino-1.8.13-linux64.tar.xz
-    tar -xvf arduino-1.8.13-linux64.tar.xz
     sudo ln -sf ${HOME}/soft/arduino-1.8.13/arduino /usr/bin/arduino
 
     cd $current_folder && unset current_folder
@@ -258,17 +261,19 @@ function _dj_setup_foxit_reader()
 
     # no way to get the latest version?
     file=FoxitReader.enu.setup.2.4.4.0911.x64.run
-    wget http://cdn01.foxitsoftware.com/pub/foxit/reader/desktop/linux/2.x/2.4/en_us/$file.tar.gz
+    url="http://cdn01.foxitsoftware.com/pub/foxit/reader/desktop/"
+    url=${url}linux/2.x/2.4/en_us/$file.tar.gz
+    _wget_if_not_exist $file.tar.gz "22d2553945edc0af9dbd52dd4a2cee22" ${url}
     gzip -d $file.tar.gz
     tar xvf $file.tar
     sudo ./FoxitReader*.run
 
     # create a symbolic link
-    foxitreader_location=$(sudo find /opt -name "FoxitReader")
-    echo $foxitreader_location
-    if [ ! -z "$foxitreader_location" ] ; then
+    foxit_reader_location=$(sudo find /opt -name "FoxitReader")
+    echo $foxit_reader_location
+    if [[ ! -z "$foxit_reader_location" ]] ; then
         echo 'a symbolic link "foxit" is generated in /usr/bin'
-        sudo ln -sf $foxitreader_location /usr/bin/foxit
+        sudo ln -sf $foxit_reader_location /usr/bin/foxit
     else
         echo -e "\n FoxitReader not installed into a recommended location"
         echo -e "a symbolic link cannot be generated\n"
@@ -354,17 +359,7 @@ function _dj_setup_gcc_arm_stm32()
         file="gcc-arm-none-eabi-${compiler_date}-${compiler_q}-update"
         filename="${file}-x86_64-linux.tar.bz2"
         # check if the file exists --------------------
-        unset md5checksum
-        if [[ -f "$filename" ]] ; then
-            md5checksum=$(md5sum $filename)
-            echo "md5checksum = "$md5checksum
-        fi
-        if [[ "$md5checksum" = *"2b9eeccc33470f9d3cda26983b9d2dc6"* ]] ; then
-            echo "file exists, no need to download again"
-        else
-            wget ${url}/${compiler_date}${compiler_q}/${filename}
-            # md5 checksum: 2b9eeccc33470f9d3cda26983b9d2dc6
-        fi
+        _wget_if_not_exist $filename "2b9eeccc33470f9d3cda26983b9d2dc6" ${url}/${compiler_date}${compiler_q}/${filename}
         
         echo "sudo tar xjf ${filename} -C /usr/share/"
         sudo tar xjf ${filename} -C /usr/share/
@@ -375,8 +370,6 @@ function _dj_setup_gcc_arm_stm32()
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-gdb     /usr/bin/arm-none-eabi-gdb
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-size    /usr/bin/arm-none-eabi-size
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-objcopy /usr/bin/arm-none-eabi-objcopy
-
-        _ask_to_remove_a_file ${filename}
     fi
     cd $current_folder
     unset current_folder
@@ -920,22 +913,12 @@ function _dj_setup_qt_5_13_1()
     sudo apt-get install libqt5serialport5-dev -y
 
     cd ~ && mkdir -p soft/ && cd soft/
-    filename="qt-opensource-linux-x64-5.13.1.run"
 
     # check if the file exists --------------------
-    unset md5checksum
-    if [[ -f $filename ]] ; then
-        md5checksum=$(md5sum $filename)
-        echo "md5checksum = "$md5checksum
-    fi
-    if [[ "$md5checksum" = *"21c3b16f851697fa8da8009f73694373"* ]] ; then
-        echo "file exists, no need to download again"
-        chmod +x $filename
-    else
-        wget http://qt.mirror.constant.com/archive/qt/5.13/5.13.1/$filename
-        # md5 checksum: 21c3b16f851697fa8da8009f73694373  qt-opensource-linux-x64-5.13.1.run
-        chmod +x $filename
-    fi
+    filename="qt-opensource-linux-x64-5.13.1.run"
+    url=http://qt.mirror.constant.com/archive/qt/5.13/5.13.1/$filename
+    _wget_if_not_exist $filename "21c3b16f851697fa8da8009f73694373" $url
+    chmod +x $filename
 
     echo -e "\n It is recommended to install the Qt into ${HOME}/Qt5.13.1/"
     _press_enter_or_wait_s_continue 10
@@ -968,22 +951,12 @@ function _dj_setup_qt_5_14_2()
 
     cd ~ && mkdir -p soft/ && cd soft/
     http://qt.mirror.constant.com/archive/qt/5.14/5.14.2/qt-opensource-linux-x64-5.14.2.run
-    filename="qt-opensource-linux-x64-5.14.2.run"
 
     # check if the file exists --------------------
-    unset md5checksum
-    if [[ -f "$filename" ]] ; then
-        md5checksum=$(md5sum $filename)
-        echo "md5checksum = "$md5checksum
-    fi
-    if [[ "$md5checksum" = *"dce0588874fd369ce493ea5bc2a21d99"* ]] ; then
-        echo "file exists, no need to download again"
-        chmod +x $filename
-    else
-        wget http://qt.mirror.constant.com/archive/qt/5.14/5.14.2/$filename
-        # md5 checksum: dce0588874fd369ce493ea5bc2a21d99  qt-opensource-linux-x64-5.14.2.run
-        chmod +x $filename
-    fi
+    filename="qt-opensource-linux-x64-5.14.2.run"
+    url=http://qt.mirror.constant.com/archive/qt/5.14/5.14.2/$filename
+    _wget_if_not_exist $filename "dce0588874fd369ce493ea5bc2a21d99" $url
+    chmod +x $filename
 
     echo -e "\n It is recommended to install the Qt into ${HOME}/Qt5.14.2/"
     _press_enter_or_wait_s_continue 20

@@ -3,6 +3,10 @@
 # reference:
 #    https://ostechnix.com/pishrink-make-raspberry-pi-images-smaller/
 #    wget https://raw.githubusercontent.com/Drewsif/PiShrink/master/pishrink.sh
+#    github page: https://github.com/Drewsif/PiShrink
+#    MIT license
+# it is designed for RPI images, but it could also work for others
+
 CURRENT_DIR="$(pwd)"
 SCRIPTNAME="${0##*/}"
 MYNAME="${SCRIPTNAME%.*}"
@@ -179,7 +183,7 @@ EOM
 }
 
 # =============================================================================
-function _rpi_shrink() {
+function _mirror_shrink() {
     should_skip_autoexpand=false
     debug=false
     repair=false
@@ -441,7 +445,7 @@ function _rpi_shrink() {
 }
 
 # =============================================================================
-function _rpi_backup()
+function _mirror_backup()
 {
     if [ $# -le 1 ] ; then
         echo " usage: rpi backup /dev/sda image.img"
@@ -456,7 +460,7 @@ function _rpi_backup()
 }
 
 # =============================================================================
-function rpi()
+function mirror()
 {
     # ------------------------------
     if [ $# -eq 0 ] ; then
@@ -465,19 +469,19 @@ function rpi()
     fi
     # ------------------------------
     if [ $1 = 'shrink' ] ; then
-        _rpi_shrink $2
+        _mirror_shrink $2
         return
     fi
     # ------------------------------
     if [ $1 = 'backup' ] ; then
-        _rpi_backup $2 $3 $4
+        _mirror_backup $2 $3 $4
         return
     fi
     # ------------------------------
 }
 
 # =============================================================================
-function _rpi()
+function _mirror()
 {
     COMPREPLY=()
 
@@ -516,4 +520,4 @@ function _rpi()
 }
 
 # =============================================================================
-complete -F _rpi rpi
+complete -F _mirror mirror

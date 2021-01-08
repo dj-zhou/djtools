@@ -222,30 +222,24 @@ function _dj_setup_clang_llvm()
     elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
         clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
     elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
-        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
+        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04" # thtis is correct!
     fi
-    echo "clang_file = "$clang_file
     # check if the file exists --------------------
-    unset md5checksum
-    if [[ -f $clang_file.tar.xz ]] ; then
-        md5checksum=`md5sum $clang_file.tar.xz`
-        echo "md5checksum = "$md5checksum
+    # check if the file exists --------------------
+    
+    url=http://releases.llvm.org/9.0.0/${clang_file}.tar.xz
+    if [[ ${ubuntu_v} = *'18.04'* || ${ubuntu_v} = *'20.04'* ]] ; then
+        _wget_if_not_exist $clang_file.tar.xz "9d8044379e151029bb1df3663c2fb2c1" $url
+    elif [[ ${ubuntu_v} = *'16.04'* ]] ; then
+        _wget_if_not_exist $clang_file.tar.xz "b3c5618fb3a5d268c371539e9f6a4b1f" $url
     fi
-    if [[ ( ( ${ubuntu_v} = *'18.04'* ) && \
-        ( "$md5checksum" = *"9d8044379e151029bb1df3663c2fb2c1"* ) ) \
-      || ( ( ${ubuntu_v} = *'16.04'* ) && \
-        ( "$md5checksum" = *"b3c5618fb3a5d268c371539e9f6a4b1f"* ) ) ]] ; then
-        echo "file exists, no need to download again."
-    else
-        wget http://releases.llvm.org/9.0.0/${clang_file}.tar.xz
-    fi
+    
     echo "untar the clang file ..."
     tar xf ${clang_file}.tar.xz
     sudo rm -rf /opt/clang+llvm*
 
     echo "copy the clang file into /opt/ ..."
     sudo mv ${clang_file}/ /opt/
-    _ask_to_remove_a_file ${clang_file}.tar.xz
 
     mkdir -p ~/.config/Code/User
 
@@ -1112,18 +1106,17 @@ function _dj_ssh_no_password()
     pos=$(_find_a_char_in_str $user_and_ip "@" 1)
     ip=${user_and_ip:${pos}+1:${#user_and_ip}-${pos}}
 
-    # check if there is a file: ~/.ssh/id_rsa.pub
+    # if ~/.ssh/id_rsa.pub does not exist, create one
     key_file=~/.ssh/id_rsa.pub
-    if [ ! -f $key_file ] ; then
-        echo -e "$key_file not found, generate it by \n    ssh-keygen\n"
-        return
+    if [ ! -f "$key_file" ] ; then
+        printf "\n\n\n" | ssh-keygen
     fi
 
-    # just to create this folder
+    # just to create .ssh on target machine
     echo "ssh -l $user $ip \"mkdir -p ~/.ssh\""
     ssh -l $user $ip "mkdir -p ~/.ssh"
 
-    # then run:
+    # then run
     echo "cat $key_file | ssh $user_and_ip \"cat >> .ssh/authorized_keys\""
     cat $key_file | ssh $user_and_ip "cat >> .ssh/authorized_keys"
 }

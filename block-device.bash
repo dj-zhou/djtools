@@ -76,39 +76,16 @@ function _find_block_device()
 }
 
 # =============================================================================
+# use &> /dev/null to make it quiet
 function _prepare_sd_card_for_flash()
 {
-    sd_card=$1
+    dev=$1
+    sudo umount ${dev}?*  &> /dev/null
+    # this only work for a particular filesystem type
+    # printf "o\nn\np\n1\n\n\nw\n" | sudo fdisk "$dev"
+    sudo dd if=/dev/zero of=$dev bs=4M count=1 conv=notrunc
+    
+    sudo mkfs.ext4 "${dev}1" 
 
-    # umount all partitions: /dev/sda1; /dev/sda2; /dev/sda3; etc
-    for i in {1..100} ; do
-        partition=$sd_card"${i}"
-        if [ -b "$partition" ] ; then
-            # check if mounted
-            sudo mount | grep '^/' | grep -q $partition
-            if [ "$?" -ne 1 ] ; then # is mounted
-                echo -e " umount partition:" ${GRN}$partition${NOC}
-                sleep 1 # just make it noticable
-                sudo umount $partition
-            else
-                echo -e "        partition: ${GRN}$partition${NOC} not mounted"
-            fi
-        fi
-    done
-    # umount all partitions: /dev/mmcblk0p1; /dev/mmcblk0p2; etc
-    for i in {1..9} ; do
-        partition=$sd_card"p${i}"
-        if [ -b "$partition" ] ; then
-            # check if mounted
-            sudo mount | grep '^/' | grep -q $partition
-            if [ $? -ne 1 ] ; then # is mounted
-                echo -e " umount partition:" ${GRN}$partition${NOC}
-                sleep 1 # just make it noticable
-                sudo umount $partition
-            else
-                echo -e "        partition: ${GRN}$partition${NOC} not mounted"
-            fi
-        fi
-    done
-    sudo chmod 666 $sd_card
+    sudo chmod 666 $dev
 }

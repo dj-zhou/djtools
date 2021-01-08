@@ -35,9 +35,9 @@ source $djtools_path/funcs.bash
 source $djtools_path/keyremap.bash
 source $djtools_path/kernel.bash
 source $djtools_path/mark-down.bash
+source $djtools_path/mirror.bash
 source $djtools_path/repod.bash
 source $djtools_path/resized.bash
-source $djtools_path/rpi.bash
 source $djtools_path/system.bash
 source $djtools_path/terminal-format.bash
 source $djtools_path/touchpad.bash

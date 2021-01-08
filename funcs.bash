@@ -241,3 +241,22 @@ function _size_calculate() # $fz_byte $output_control
         fi
     fi
 }
+
+# =============================================================================
+function _wget_if_not_exist() # $filename $md5sum $url
+{
+    filename=$1
+    md5sum=$2
+    url=$3
+    unset md5checksum
+    if [[ -f "$filename" ]] ; then
+        md5checksum=$(md5sum $filename)
+    else
+        md5checksum=" "
+    fi
+    if [[ "$md5checksum" = *"$md5sum"* ]] ; then
+        echo "file exists, no need to wget again"
+    else
+        wget ${url}
+    fi
+}
