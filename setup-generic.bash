@@ -4,7 +4,7 @@
 function _dj_setup_help()
 {
     _dj_help
-    cat << EOM
+    cat << eom
   ------------------------------- dj setup --------------------------------
     second level commands:"
       baidu-netdisk    - to install the baidu netdisk tool
@@ -56,7 +56,7 @@ function _dj_setup_help()
       MORE IS COMMING"
   -------------------------------------------------------------------------
 
-EOM
+eom
 }
 
 # =============================================================================
@@ -133,7 +133,7 @@ function _dj_setup_computer()
     sudo apt-get upgrade -y
 
     # -----------------------------------
-    cat << EOM
+    cat << eom
     
     going to install the following packages: 
        ark cmake curl cutecom dconf-editor dconf-tools git
@@ -146,7 +146,7 @@ function _dj_setup_computer()
     exit methods for cu and screen:
         cu: input ~. and then [ENTER]
         screen: press Ctrl+A and then \, and [y]
-EOM
+eom
 
     _press_enter_or_wait_s_continue 10
 
@@ -524,7 +524,7 @@ function _dj_setup_lcm()
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
     sudo ldconfig
-    cat << EOM
+    cat << eom
 
     --------------------------------------------
     lcm is installed to:
@@ -539,7 +539,7 @@ function _dj_setup_lcm()
         /usr/local/lib/pkgconfig/lcm.pc
         /usr/local/lib/pkgconfig/lcm-java.pc
 
-EOM
+eom
     cd $current_folder
 }
 
@@ -611,7 +611,7 @@ function _dj_setup_libgpiod()
     cd ~/soft
     _ask_to_remove_a_folder $file_name
     
-    cat << EOM
+    cat << eom
 
     --------------------------------------------
     libgpiod is installed to:
@@ -626,7 +626,7 @@ function _dj_setup_libgpiod()
     pkg-config file:
         /usr/lib/x86_64-linux-gnu/pkgconfig/libgpiod.pc
 
-EOM
+eom
 
     cd $current_folder
 }
@@ -659,7 +659,7 @@ function _dj_setup_libiio()
     cd ~/soft
     _ask_to_remove_a_folder libiio
     
-    cat << EOM
+    cat << eom
 
     --------------------------------------------
     libiio is installed to:
@@ -675,7 +675,7 @@ function _dj_setup_libiio()
     pkg-config file:
         /usr/lib/x86_64-linux-gnu/pkgconfig/libiio.pc
 
-EOM
+eom
     cd $current_folder
 }
 
@@ -694,7 +694,7 @@ function _dj_setup_libserialport()
     ./configure
     make && sudo make install
 
-    cat << EOM
+    cat << eom
 
     --------------------------------------------
     the library is installed:
@@ -707,7 +707,7 @@ function _dj_setup_libserialport()
     example code:
         TODO
 
-EOM
+eom
     cd ~/soft/
     _ask_to_remove_a_folder libserialport/
     
@@ -756,7 +756,7 @@ function _dj_setup_matplot_xx()
     sudo make install
     sudo ldconfig
     if [ "$static_shared" = 'static' ] ; then
-    cat << EOM
+    cat << eom
 
     --------------------------------------------
     matplotplusplus is installed to:
@@ -770,9 +770,9 @@ function _dj_setup_matplot_xx()
     pkg-config file:
         none
     --------------------------------------------
-EOM
+eom
     else
-    cat << EOM
+    cat << eom
 
     --------------------------------------------
     matplotplusplus is installed to:
@@ -786,9 +786,60 @@ EOM
         none
     --------------------------------------------
 
-EOM
+eom
     fi
 
+    cd $current_folder
+}
+
+# =============================================================================
+# testing on Ubuntu 18.04
+function _dj_setup_mbed()
+{
+    current_folder=${PWD}
+
+    sudo apt-get install mercurial git
+    # install mbed-cli
+    python3 -m pip install mbed-cli
+    cat << eom
+    --------------------------------------------
+    to check if mbed CLI installed correctly:
+    $ mbed --help
+    to upgrade mbed CLI:
+    $ python3 -m pip install -U mbed-cli
+    --------------------------------------------
+eom
+    _press_enter_to_continue 10
+    # install bash-completion for mbed
+    cd ~ && mkdir -p soft/ && cd soft/ && rm mbed-cli -rf
+    git clone https://github.com/ARMmbed/mbed-cli
+    cd mbed-cli/tools/bash_completion
+    sudo cp mbed /usr/share/bash-completion/completions/
+    cat << eom
+    --------------------------------------------
+    mbed tab-completion is installed to
+        /usr/share/bash-completion/completions/mbed
+    --------------------------------------------
+eom
+    _press_enter_to_continue 10
+
+    # install mbed-studio
+    cd ~ && mkdir -p soft/ && cd soft/
+    wget https://studio.mbed.com/installers/latest/linux/MbedStudio.sh
+    chmod +x MbedStudio.sh
+    ./MbedStudio.sh
+    # reading the long license, is there a way to jump it?
+
+    # install some python moudles
+    python3 -m pip install jsonschema
+    python3 -m pip install mbed_cloud_sdk
+    python3 -m pip install mbed_ls
+    python3 -m pip install mbed_host_tests
+    python3 -m pip install mbed_greentea
+    python3 -m pip install manifest_tool
+    python3 -m pip install icetea
+    python3 -m pip install pycryptodome
+    python3 -m pip install cryptography
     cd $current_folder
 }
 
@@ -824,7 +875,7 @@ function _dj_setup_mongodb()
         # Enable and start MongoDB Deamon program
         sudo systemctl enable --now mongod
 
-        cat << EOM
+        cat << eom
 
     --------------------------------------------
     MongoDB istall:
@@ -845,7 +896,7 @@ function _dj_setup_mongodb()
         $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
     --------------------------------------------
 
-EOM
+eom
     else
         echo -e "\n${YLW} TO BE IMPLEMENTED${NOC}\n"
         return
@@ -865,7 +916,7 @@ function _dj_setup_nvidia()
         sudo apt-get -y update
         sudo apt-get -y install nvidia-driver-455 nvidia-settings
     fi
-    cat << EOM
+    cat << eom
 
     --------------------------------------------
     Now you need to reboot the computer
@@ -875,7 +926,7 @@ function _dj_setup_nvidia()
     $ cat /proc/driver/nvidia/gpus/{tab}/information
     --------------------------------------------
 
-EOM
+eom
 }
 
 # =============================================================================
@@ -987,6 +1038,26 @@ function _dj_setup_slack()
     sudo dpkg -i slack-desktop*.deb
     _ask_to_remove_a_file slack-desktop*.deb
 
+    cd ${cwd_before_running}
+}
+
+# =============================================================================
+function _dj_setup_saleae_logic()
+{
+    cwd_before_running=$PWD
+    
+    cd ~ && mkdir -p soft && cd soft/
+    version="1.2.18"
+    file="Logic $version (64-bit)"
+    url="https://downloads.saleae.com/logic/"
+    url="$url$version/$file.zip"
+    echo $url
+    _wget_if_not_exist "$file.zip" "8c586a272a89019540cc365c82ade451" "$url"
+    rm -rf "$file"
+    unzip "$file.zip"
+    rm -rf logic
+    mv "$file" logic
+    sudo ln -sf ${HOME}/soft/logic/Logic /usr/bin/logic
     cd ${cwd_before_running}
 }
 
@@ -1347,6 +1418,11 @@ function _dj_setup()
         return
     fi
     # --------------------------
+    if [ $1 = 'mbed' ] ; then
+        _dj_setup_mbed
+        return
+    fi
+    # --------------------------
     if [ $1 = 'mongodb' ] ; then
         _dj_setup_mongodb
         return
@@ -1414,6 +1490,12 @@ function _dj_setup()
     # --------------------------
     if [ $1 = 'ros2-foxy' ] ; then
         _dj_setup_ros2_foxy $2 $3 $4
+        return
+    fi
+    
+    # --------------------------
+    if [ $1 = 'saleae-logic' ] ; then
+        _dj_setup_saleae_logic
         return
     fi
     # --------------------------

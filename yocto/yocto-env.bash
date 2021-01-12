@@ -106,6 +106,22 @@ function _yocto_setup_dev_env()
 }
 
 # =============================================================================
+function _save_current_env_variables()
+{
+    rm ~/.saved-env
+    export -p > ~/.saved-env
+}
+
+# =============================================================================
+function _env_blacklisted()
+{
+  case $1 in
+    PWD|OLDPWD|SHELL|STORAGE|-*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# =============================================================================
 function _yocto_reset_env_variables()
 {
     source ~/.bashrc
@@ -133,7 +149,7 @@ function _yocto_reset_env_variables()
     unset AS
     unset AR
     unset TARGET_PREFIX
-    unset MM
+    unset NM
     unset CXX
     unset OECORE_TARGET_OS
     unset OECORE_TARGET_ARCH
@@ -148,19 +164,28 @@ function _yocto_reset_env_variables()
     unset CPP
     unset LD
 
-    # not very sure about this operation
+
+    # just don't know why PATH cannot be recovered!
     unset PATH
-    export PATH=${HOME}/.local/bin
-    export PATH=$PATH:${HOME}/.local/bin
+    export PATH=/usr/bin
+    export PATH=$PATH:/bin
     export PATH=$PATH:/usr/local/sbin
     export PATH=$PATH:/usr/local/bin
     export PATH=$PATH:/usr/sbin
     export PATH=$PATH:/usr/bin
     export PATH=$PATH:/sbin
-    export PATH=$PATH:/bin
-    export PATH=$PATH:/usr/games
-    export PATH=$PATH:/usr/local/games
-    export PATH=$PATH:/snap/bin
+
+    # what does this do?
+    eval '
+    export() {
+        blacklisted "${1%%=*}" || unset -v "${1%%=*}"
+    }
+    '"$(export -p)"
+
+    export() {
+    _env_blacklisted "${1%%=*}" || command export "$@"
+    }
+    source ~/.saved-env
 }
 
 # =============================================================================

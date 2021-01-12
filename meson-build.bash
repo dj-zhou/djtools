@@ -5,10 +5,11 @@
 # problem:
 # on Ubuntu 18.04, the SDK .appolo-image-wandboard-poky-2.6.4-oesdk does not work!
 # it still says native build (meson/ninja)
-function _build_use_oesdk() # sdk_path
+function _meson_build_use_oesdk() # sdk_path
 {
-    current_directory=${PWD}
+    _save_current_env_variables
 
+    current_directory=${PWD}
     sdk_path="${HOME}/$1-oesdk"
     sdk_output="_bsdk$1"
     # echo -e "sdk_path: ${GRN}$sdk_path${NOC}"
@@ -120,10 +121,34 @@ function _build_use_oesdk() # sdk_path
 }
 
 # =============================================================================
-function build()
+function _meson_build_native()
+{
+    current_directory=${PWD}
+    if [ -f "meson.build" ] ; then
+        if [ ! -d "build" ] ; then
+            meson setup build
+        fi
+        if [ ! -f "build/build.ninja" ] ; then
+            rm build -rf
+            meson setup build
+        fi
+        cd build
+        ninja
+    else
+        echo "not a meson directory, exit!"
+    fi
+    cd $current_directory
+}
+
+# =============================================================================
+function meson-build()
 {
     if [ $1 = '-use-oesdk' ] ; then
-        _build_use_oesdk $2 $3 $4 $5 $6 $7
+        _meson_build_use_oesdk $2 $3 $4 $5 $6 $7
+        return
+    fi
+    if [ $1 = '-native' ] ; then
+        _meson_build_native $2 $3 $4 $5 $6 $7
         return
     fi
     echo -e "\n ${PRP}build${NOC}: argument ${RED}$1${NOC} not supported.\n"
@@ -131,7 +156,7 @@ function build()
 }
 
 # =============================================================================
-function _build()
+function _meson-build()
 {
     COMPREPLY=()
 
@@ -165,118 +190,4 @@ function _build()
 }
 
 # =============================================================================
-complete -F _build build
-
-# =============================================================================
-# =============================================================================
-# not the build command
-
-# =============================================================================
-# example of .project-stm32: 
-# STM32F107VCT6
-# 256 FLASH (*1024)
-#  64 RAM   (*1024)
-
-
-# example output
-# Memory region         Used Size  Region Size  %age Used
-#            FLASH:       14644 B         2 MB      0.70%
-#             DTCM:          0 GB       128 KB      0.00%
-#             SRAM:        4544 B       384 KB      1.16%
-#         IDT_LIST:         200 B         2 KB      9.77%
-
-function compile_makefile()
-{
-    clean_tag=$1
-    if [ "$clean_tag" = "clean" ] ; then
-        echo -e "\n${PRP} make clean${NOC}\n"
-        make clean
-        return
-    fi
-    echo -e "\n${PRP}make -j$(cat /proc/cpuinfo | grep processor | wc -l) $clean_tag${NOC}\n"
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l) $clean_tag
-
-    # stm32 project dedicated scripts, can be moved into Makefile
-    if [ -f .project-stm32 ] && [ -f bin/*.elf ] ; then
-        micro_controller=$(grep "STM32" .project-stm32 | awk '{print $1}')
-        flash_kb=$(grep "FLASH" .project-stm32 | awk '{print $1}')
-        ram_kb=$(grep "RAM" .project-stm32 | awk '{print $1}')
-        text_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $1}')
-        text_used=$(echo $text_used | awk '{print $2}')
-        data_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $2}')
-        data_used=$(echo $text_used | awk '{print $2}')
-        flash_percentage=$(awk "BEGIN {print ($((text_used))+$((data_used))) * 100  / $((flash_kb)) / 1024}" | awk '{printf("%d",$0);}')
-        bss_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $3}')
-        bss_used=$(echo $bss_used | awk '{print $2}')
-        ram_percentage=$(awk "BEGIN {print $((bss_used)) * 100  / $((ram_kb)) / 1024}" | awk '{printf("%d",$0);}')
-        echo -e "${GRN}\n------------------------------------${NOC}"
-        echo -e " $micro_controller memory usage: FLASH: ${flash_percentage}%, RAM: ${ram_percentage}%\n"
-    fi
-    return
-}
-
-# =============================================================================
-function compile_cmakelist()
-{
-    current_directory=${PWD}
-
-    clean_tag=$1
-    if [ -z "$clean_tag" ] ; then
-        if [ ! -d build ] ; then
-            echo -e "${PRP}\n mkdir build && cd build && cmake ..${NOC}\n"
-            mkdir build && cd build && cmake ..
-        else
-            echo -e "${PRP}\n cd build/${NOC}\n"
-            cd build/
-        fi
-        echo -e "${PRP}\n make -j$(cat /proc/cpuinfo | grep processor | wc -l)${NOC}\n"
-        make -j$(cat /proc/cpuinfo | grep processor | wc -l)
-    elif [ "$clean_tag" = "clean" ] ; then
-        echo -e "${PRP}\n rm -rf build/${NOC}\n"
-        rm -rf build/
-    fi
-
-    cd $current_directory
-}
-
-# =============================================================================
-# if Makefile exists, use Makefile
-# then if CMakeLists.txt exists, use cmake
-# then if meson.build exists, use meson
-# then if make.sh exist, use it
-function compile_make_build_etc()
-{
-    clean_tag=$1
-    current_dir=${PWD}
-
-    if [ -f "Makefile" ] ; then
-        compile_makefile $clean_tag
-        return
-    fi
-    if [ -f "CMakeLists.txt" ] ; then
-        compile_cmakelist $clean_tag
-        return
-    fi
-    if [ -f "meson.build" ] ; then
-        echo "meson.build: todo"
-        return
-    fi
-    if [ -f "make.sh" ] ; then
-        ./make.sh $clean_tag
-        return
-    fi
-    echo "djtools: compile_make_build_etc: not defined"
-    cd $current_dir
-}
-
-# =============================================================================
-function m()
-{
-    compile_make_build_etc $1 $2 $3 $4 $5
-}
-
-# =============================================================================
-function mc()
-{
-    compile_make_build_etc clean
-}
+complete -F _meson-build meson-build

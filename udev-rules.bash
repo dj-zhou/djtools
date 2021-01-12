@@ -24,12 +24,24 @@ function _dj_udev_dialout()
     echo -e "udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo 'KERNEL=="ttyUSB[0-99]*",MODE="0666"' \
+    echo 'KERNEL=="ttyUSB[0-9]*",MODE="0666"' \
     | sudo tee -a /etc/udev/rules.d/$rule_file
-    echo 'KERNEL=="ttyACM[0-99]*",MODE="0666"' \
+    echo 'KERNEL=="ttyACM[0-9]*",MODE="0666"' \
     | sudo tee -a /etc/udev/rules.d/$rule_file
 
     sudo service udev restart
+}
+
+# =============================================================================
+function _dj_udev_show()
+{
+    current_folder=${PWD}
+
+    cd /etc/udev/rules.d/
+    pwd
+    tree
+
+    cd $current_folder
 }
 
 # =============================================================================
@@ -41,7 +53,7 @@ function _dj_udev_uvc_video_capture()
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
-    string="${string}KERNEL==\"video[0-99]*\", "
+    string="${string}KERNEL==\"video[0-9]*\", "
     string="${string}ACTION==\"add\", "
     string="${string}ATTRS{idVendor}==\"18ec\", "
     string="${string}ATTRS{idProduct}==\"5555\", "
@@ -63,7 +75,7 @@ function _dj_udev_logitech_f710()
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     string="SUBSYSTEMS==\"usb\", "
-    string="${string}KERNEL==\"js[0-99]*\", "
+    string="${string}KERNEL==\"js[0-9]*\", "
     string="${string}ACTION==\"add\", "
     string="${string}ATTRS{idVendor}==\"046d\", "
     string="${string}ATTRS{idProduct}==\"c21f\", "
@@ -82,7 +94,7 @@ function _dj_udev_logitech_f710()
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     string="SUBSYSTEMS==\"usb\", "
-    string="${string}KERNEL==\"js[0-99]*\", "
+    string="${string}KERNEL==\"js[0-9]*\", "
     string="${string}ACTION==\"add\", "
     string="${string}ATTRS{idVendor}==\"046d\", "
     string="${string}ATTRS{idProduct}==\"c219\", "
@@ -106,7 +118,7 @@ function _dj_udev_one_third_console()
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
-    string="${string}KERNEL==\"ttyUSB[0-99]*\", "
+    string="${string}KERNEL==\"ttyUSB[0-9]*\", "
     string="${string}ACTION==\"add\", "
     string="${string}ATTRS{idVendor}==\"0403\", "
     string="${string}ATTRS{idProduct}==\"6001\", "
@@ -128,6 +140,36 @@ function _dj_udev_one_third_console()
 }
 
 # =============================================================================
+# the One Third Debugger contains a USB to serial port chip: FT232RL
+# try this: ls -l /dev/serial/by-id/
+function _dj_udev_ft4232h()
+{
+    rule_file=ft4232h-serial.rules
+    sudo rm -f /etc/udev/rules.d/$rule_file
+    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+
+    string="SUBSYSTEMS==\"usb\", ENV{.LOCAL_serial}=\"\$attr{serial}\"\n"
+    string="${string}SUBSYSTEMS==\"usb\", ENV{.LOCAL_ifNum}=\"\$attr{bInterfaceNumber}\"\n"
+    # finally ----------------
+    for i in 0 1 2 3 ; do
+        string="${string}SUBSYSTEMS==\"usb\", "
+        string="${string}KERNEL==\"ttyUSB*\", "
+        string="${string}ACTION==\"add\", "
+        string="${string}ATTRS{idVendor}==\"0403\", "
+        string="${string}ATTRS{idProduct}==\"6011\", "
+        string="${string}ENV{.LOCAL_ifNum}==\"0${i}\", "
+        string="${string}ATTRS{manufacturer}==\"One Third Technologies\", "
+        string="${string}ATTRS{product}==\"Comm+Console\", "
+        string="${string}MODE=\"666\", "
+        string="${string}SYMLINK+=\"ft4232h/serial${i}\", "
+        string="${string}GROUP=\"dialout\"\n"
+    done
+
+    echo -e "${string}" | sudo tee -a /etc/udev/rules.d/$rule_file
+    sudo service udev restart
+}
+
+# =============================================================================
 function _dj_udev_stlink_v2_1()
 {
     rule_file=st-link-v2-1.rules
@@ -136,7 +178,7 @@ function _dj_udev_stlink_v2_1()
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
-    string="${string}KERNEL==\"ttyACM[0-99]*\", "
+    string="${string}KERNEL==\"ttyACM[0-9]*\", "
     string="${string}ACTION==\"add\", "
     string="${string}ATTRS{idVendor}==\"0483\", "
     string="${string}ATTRS{idProduct}==\"3752\", "
@@ -170,12 +212,23 @@ function _dj_udev()
         _dj_udev_dialout $2 $3 $4
         return
     fi
+    if [ $1 = '--show' ] ; then
+        _dj_udev_show 
+        return
+    fi
     if [ $1 = 'logitech-f710' ] ; then
         _dj_udev_logitech_f710 $2 $3 $4
         return
     fi
     if [ $1 = 'one-third-console' ] ; then
         _dj_udev_one_third_console $2 $3 $4
+        return
+    fi
+    if [ $1 = 'ft4232h' ] ; then
+        # for i in 0 1 2 3 ; do 
+        #     _dj_udev_ft4232h $i
+        # done
+        _dj_udev_ft4232h
         return
     fi
     if [ $1 = 'uvc-video-capture' ] ; then

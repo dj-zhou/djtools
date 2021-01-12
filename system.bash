@@ -138,17 +138,6 @@ function _system_check_threads()
     ps -eLf | grep $1
 }
 
-# =============================================================================
-function _system_check_udev_rules()
-{
-    current_folder=${PWD}
-
-    cd /etc/udev/rules.d/
-    pwd
-    tree
-
-    cd $current_folder
-}
 
 # =============================================================================
 function _system_wallpaper_random()
@@ -245,11 +234,6 @@ function system()
             _system_check_threads $3 $4 $5
             return
         fi
-        # --------------------------
-        if [ $2 = 'udev-rules' ] ; then
-            _system_check_udev_rules
-            return
-        fi
     fi
     # ------------------------------
     if [ $1 = 'wallpaper' ] ; then
@@ -304,7 +288,7 @@ function _system()
     for i in $disable_list ; do
         ACTIONS[$i]=" "
     done
-    check_list="cpu-memory temperature nvidia-driver udev-rules "
+    check_list="cpu-memory temperature nvidia-driver "
     check_list+="process threads "
     ACTIONS[check]+="$check_list "
     for i in $check_list ; do

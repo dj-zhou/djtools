@@ -26,7 +26,6 @@ djtools_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ubuntu_v=$(lsb_release -a)
 
 # =============================================================================
-source $djtools_path/build.bash
 source $djtools_path/block-device.bash
 source $djtools_path/code-name.bash
 source $djtools_path/coding.bash
@@ -35,6 +34,8 @@ source $djtools_path/funcs.bash
 source $djtools_path/keyremap.bash
 source $djtools_path/kernel.bash
 source $djtools_path/mark-down.bash
+source $djtools_path/m.bash
+source $djtools_path/meson-build.bash
 source $djtools_path/mirror.bash
 source $djtools_path/repod.bash
 source $djtools_path/resized.bash

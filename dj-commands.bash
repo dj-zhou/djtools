@@ -701,49 +701,54 @@ function _dj_setup_gpp_10()
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
     sudo apt-get update
     sudo apt-get install -y gcc-10 g++-10
-    echo -e "\n do you want to set up the gcc/g++ priorities? [Yes/No]"
-    read anw
-    if [[ ($anw = 'n') || ($anw = 'N') || ($anw = 'NO') \
-      || ($anw = 'No') || ($anw = 'no') ]] ; then
-        echo -e '\n gcc/g++ are not to set to use gcc-10/g++-10\n'
-    elif [[ ($anw = 'y') || ($anw = 'Y') || ($anw = 'YES') \
-       || ($anw = 'Yes') || ($anw = 'yes') ]] ; then
-        echo -e '\n gcc/g++ are set to use gcc-10/g++-10\n'
-        # ----------------------
-        if [ -f /usr/bin/gcc-5 ] ; then
-            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5  5
-        fi
-        if [ -f /usr/bin/g++-5 ] ; then
-            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5  5
-        fi
-        # ----------------------
-        if [ -f /usr/bin/gcc-7 ] ; then
-            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  7
-        fi
-        if [ -f /usr/bin/g++-7 ] ; then
-            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7  7
-        fi
-        # ----------------------
-        if [ -f /usr/bin/gcc-9 ] ; then
-            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9  9
-        fi
-        if [ -f /usr/bin/g++-9 ] ; then
-            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9  9
-        fi
-        # ----------------------
-        if [ -f /usr/bin/gcc-10 ] ; then
-            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10  10
-        fi
-        if [ -f /usr/bin/g++-10 ] ; then
-            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10  10
-        fi
-        echo -e "\n-------------------\n"
-        sudo update-alternatives --config gcc
-        echo -e "\n-------------------\n"
-        sudo update-alternatives --config g++
-    else
-        echo "Wrong answer! No action was taken!"
+    echo -e "Set up the gcc/g++ priorities:"
+ 
+    # ----------------------
+    if [ -f /usr/bin/gcc-5 ] ; then
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5  5
     fi
+    if [ -f /usr/bin/g++-5 ] ; then
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5  5
+    fi
+    # ----------------------
+    if [ -f /usr/bin/gcc-6 ] ; then
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6  6
+    fi
+    if [ -f /usr/bin/g++-6 ] ; then
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6  6
+    fi
+    # ----------------------
+    if [ -f /usr/bin/gcc-7 ] ; then
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  7
+    fi
+    if [ -f /usr/bin/g++-7 ] ; then
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7  7
+    fi
+    # ----------------------
+    if [ -f /usr/bin/gcc-8 ] ; then
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8  8
+    fi
+    if [ -f /usr/bin/g++-8 ] ; then
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8  8
+    fi
+    # ----------------------
+    if [ -f /usr/bin/gcc-9 ] ; then
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9  9
+    fi
+    if [ -f /usr/bin/g++-9 ] ; then
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9  9
+    fi
+    # ----------------------
+    if [ -f /usr/bin/gcc-10 ] ; then
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10  10
+    fi
+    if [ -f /usr/bin/g++-10 ] ; then
+       sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10  10
+    fi
+    echo -e "\n-------------------\n"
+    sudo update-alternatives --config gcc
+    echo -e "\n-------------------\n"
+    sudo update-alternatives --config g++
 }
 
 # =============================================================================
@@ -1003,14 +1008,14 @@ function _dj_work_check()
 }
 
 # =============================================================================
-# to find a library use: ldconfig -p | grep xxxx
-# once this command get extended, we add sub command to "dj find"
-function _dj_find()
+# to search a library use: ldconfig -p | grep xxxx
+# once this command get extended, we add sub command to "dj search"
+function _dj_search_package()
 {
     cwd_before_running=$PWD
     
     lib_to_find=$1
-    echo -e "\n run command:$GRN ldconfig -p | grep $lib_to_find$NOC\n"
+    echo -e "\n run command:$GRN ldconfig -p | grep $lib_to_find$NOC, we get:"
 
     ldconfig -p | grep $lib_to_find
     
@@ -1019,6 +1024,16 @@ function _dj_find()
     echo -e " ls | grep $lib_to_find\n"
     ls | grep $lib_to_find
     cd $cwd_before_running
+}
+
+# =============================================================================
+# to search some string in a project directory, excluding build/ and bin/
+function _dj_search_string()
+{
+    echo -e "\n run command:"
+    echo -e "   $GRN grep -ri --exclude-dir={build,bin,_bsdk*} $1 .$NOC"
+    echo -e " we get:"
+    grep -ri --exclude-dir={build,bin,_bsdk*} $1 .
 }
 
 # =============================================================================
@@ -1299,6 +1314,7 @@ function dj()
     fi
     # ------------------------------
     if [ $1 = 'format' ] ; then
+        # ------------------------------
         if [[ $# -ge 2 ]] ; then
             _dj_format $2 $3 $4 $5 $6 $7 $8
             return
@@ -1307,16 +1323,29 @@ function dj()
         return
     fi
     # ------------------------------
-    if [ $1 = 'find' ] ; then
-        if [[ $# -ge 2 ]] ; then
-            _dj_find $2 $3 $4 $5 $6 $7 $8
-            return
+    if [ $1 = 'search' ] ; then
+        # ------------------------------
+        if [ $2 = 'package' ] ; then
+            # ------------------------------
+            if [[ $# -ge 3 ]] ; then
+                _dj_search_package $3 $4 $5 $6 $7 $8
+                return
+            fi
+        fi
+        # ------------------------------
+        if [ $2 = 'string' ] ; then
+            # ------------------------------
+            if [[ $# -ge 3 ]] ; then
+                _dj_search_string $3 $4 $5 $6 $7 $8
+                return
+            fi
         fi
         echo 'arguments wrong, exit'
         return
     fi
     # ------------------------------
     if [ $1 = 'help' ] ; then
+        # ------------------------------
         if [ $# -ge 2 ] ; then
             _dj_help_skill $2
             return
@@ -1326,10 +1355,12 @@ function dj()
     fi
     # ------------------------------
     if [ $1 = 'meson' ] ; then
+        # ------------------------------
         if [ $# -ge 2 ] && [ $2 = 'build' ] ; then
             _dj_meson_build $3 $4 $5 $6
             return
         fi
+        # ------------------------------
         if [ $# -ge 2 ] && [ $2 = 'find' ] ; then
             _dj_meson_find $3 $4 $5 $6
             return
@@ -1344,6 +1375,7 @@ function dj()
     fi
     # ------------------------------
     if [ $1 = 'replace' ] ; then
+        # ------------------------------
         if [[ $# -ge 2 ]] ; then
             _dj_replace $2 $3 $4 $5 $6 $7 $8
             return
@@ -1353,6 +1385,7 @@ function dj()
     fi
     # ------------------------------
     if [ $1 = 'setup' ] ; then
+        # ------------------------------
         if [ $# -ge 2 ] ; then
             _dj_setup $2 $3 $4 $5 $6 $7
             return
@@ -1362,6 +1395,7 @@ function dj()
     fi
     # ------------------------------
     if [ $1 = 'ssh' ] ; then
+        # ------------------------------
         if [ $2 = 'no-password' ] ; then
             _dj_ssh_no_password $3 $4 $5 $6 $7
             return
@@ -1371,6 +1405,7 @@ function dj()
 
     # ------------------------------
     if [ $1 = 'udev' ] ; then
+        # ------------------------------
         if [ $# -ge 2 ] ; then
             _dj_udev $2 $3 $4 $5 $6 $7
             return
@@ -1402,11 +1437,11 @@ function _dj()
         clone
         clone-ssh
         format
-        find
         help
         meson
         open
         replace
+        search
         setup
         ssh
         udev
@@ -1419,17 +1454,17 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    setup_tools+="adobe-pdf-reader arduino-1.8.13 baidu-netdisk clang-format clang-llvm cmake "
-    setup_tools+="computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
-    setup_tools+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
-    setup_tools+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
-    setup_tools+="grpc-1.29.1 g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
-    setup_tools+="mathpix matplot++ mongodb nvidia nvtop opencv-2.4.13 opencv-4.1.1 opencv-4.2.0 "
-    setup_tools+="pangolin pip qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy spdlog "
-    setup_tools+="slack stm32-cubeMX stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi "
-    setup_tools+="YouCompleteMe you-complete-me "
-    ACTIONS[setup]="$setup_tools "
-    for i in $setup_tools ; do
+    setup_list+="adobe-pdf-reader arduino-1.8.13 baidu-netdisk clang-format clang-llvm cmake "
+    setup_list+="computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
+    setup_list+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
+    setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
+    setup_list+="grpc-1.29.1 g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
+    setup_list+="mathpix matplot++ mbed mongodb nvidia nvtop opencv-2.4.13 opencv-4.1.1 opencv-4.2.0 "
+    setup_list+="pangolin pip qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy saleae-logic "
+    setup_list+="spdlog slack stm32-cubeMX stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi "
+    setup_list+="YouCompleteMe you-complete-me "
+    ACTIONS[setup]="$setup_list "
+    for i in $setup_list ; do
         ACTIONS[$i]=" "
     done
     # special ones -----------------
@@ -1514,8 +1549,8 @@ function _dj()
     
     #---------------------------------------------------------
     #---------------------------------------------------------
-    udev_list="uvc-video-capture --dialout one-third-console "
-    udev_list+="stlink-v2.1 logitech-f710 "
+    udev_list="uvc-video-capture --dialout --show one-third-console "
+    udev_list+="stlink-v2.1 logitech-f710 ft4232h "
     ACTIONS[udev]="$udev_list "
     for i in $udev_list ; do
         ACTIONS[$i]=" "
@@ -1531,9 +1566,9 @@ function _dj()
 
     #---------------------------------------------------------
     #---------------------------------------------------------
-    find_list=" "
-    ACTIONS[find]="$find_list "
-    for i in $find_list ; do
+    search_list="package string "
+    ACTIONS[search]="$search_list "
+    for i in $search_list ; do
         ACTIONS[$i]=" "
     done
 

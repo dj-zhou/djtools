@@ -250,13 +250,13 @@ function _wget_if_not_exist() # $filename $md5sum $url
     url=$3
     unset md5checksum
     if [[ -f "$filename" ]] ; then
-        md5checksum=$(md5sum $filename)
+        md5checksum=$(md5sum "$filename")
     else
         md5checksum=" "
     fi
     if [[ "$md5checksum" = *"$md5sum"* ]] ; then
         echo "file exists, no need to wget again"
     else
-        wget ${url}
+        wget "${url}"
     fi
 }
