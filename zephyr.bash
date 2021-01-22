@@ -34,13 +34,17 @@ function _zephyr_setup_sdk_0_11_4()
     # install dependencies ---------------------
     echo -e "\n ${GRN} install dependencies ${NOC}"
     _press_enter_or_wait_s_continue 5
-    sudo apt-get update && sudo apt-get upgrade
-    sudo apt-get install --no-install-recommends git cmake ninja-build gperf \
-        ccache dfu-util device-tree-compiler wget \
-        python3-dev python3-pip python3-setuptools \
-        python3-tk python3-wheel xz-utils file \
-        make gcc gcc-multilib g++-multilib libsdl2-dev
-
+    sudo apt-get -y update && sudo apt-get -y upgrade
+    # sudo apt-get install --no-install-recommends git cmake ninja-build gperf \
+    #     ccache dfu-util device-tree-compiler wget \
+    #     python3-dev python3-pip python3-setuptools \
+    #     python3-tk python3-wheel xz-utils file \
+    #     make gcc gcc-multilib g++-multilib libsdl2-dev
+    _install_if_not_installed git cmake ninja-build gperf
+    _install_if_not_installed ccache dfu-util device-tree-compiler wget
+    _install_if_not_installed python3-dev python3-pip python3-setuptools
+    _install_if_not_installed python3-tk python3-wheel xz-utils file
+    _install_if_not_installed make gcc gcc-multilib g++-multilib libsdl2-dev
     # install latest CMake ---------------------
     dj setup cmake
 

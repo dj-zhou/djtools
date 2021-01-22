@@ -73,32 +73,50 @@ function compile_cmakelist()
 }
 
 # =============================================================================
-# if Makefile exists, use Makefile
-# then if CMakeLists.txt exists, use cmake
-# then if meson.build exists, use meson
-# then if make.sh exist, use it
+# if Makefile exists, use Makefile to compile and exit, otherwise
+# if CMakeLists.txt exists, use cmake to compile (use default cmake ..) and exit, otherwise
+# if meson.build exists, use "build meson -native" command to build and exit, otherwise
+# if make.sh exist, use it, and make.sh file can be writen in whatever fashion
+
+# build directories
+# Makefile           bin/
+# CMakeList.txt      build/
+# meson.build       _bnative/, or _bcross.*/
+# make.sh            no build directory
+
 function compile_make_build_etc()
 {
     clean_tag=$1
     current_dir=${PWD}
 
+    # ------------------------------
     if [ -f "Makefile" ] ; then
         compile_makefile $clean_tag
         return
     fi
+    # ------------------------------
     if [ -f "CMakeLists.txt" ] ; then
         compile_cmakelist $clean_tag
         return
     fi
+    # ------------------------------
     if [ -f "meson.build" ] ; then
-        meson-build -native
+        if [ "$clean_tag" = 'clean' ] ; then
+            rm build -rf
+            rm _bcross* -rf
+            rm _bnative -rf
+            rm builddir -rf
+            return
+        fi
+        build meson -native
         return
     fi
+    # ------------------------------
     if [ -f "make.sh" ] ; then
         ./make.sh $clean_tag
         return
     fi
-    echo "djtools: compile_make_build_etc: not defined"
+    echo -e "(djtools) m/mc: ${RED}build method not defined${NOC}"
     cd $current_dir
 }
 

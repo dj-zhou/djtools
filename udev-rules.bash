@@ -4,13 +4,34 @@
 function _dj_udev_help()
 {
     _dj_help
-    echo -e "\n --------------------- dj udev ----------------------"
-    echo    " Second level commands:"
-    echo    "   --dialout         - set the current user to dialout group"
-    echo    "   uvc-video-capture - to assign static device name to the UVC"
-    echo    "                       video capture device"
-    echo    "   MORE IS COMMING"
-    echo -e "-----------------------------------------------------\n"
+    cat << eom
+    --------------------- dj udev ----------------------
+    Second level commands:
+       --dialout         - set the current user to dialout group
+       --show            - ls udev rule files in /etc/udev/rules.d
+       ft4232h           - setup the udev rule for the customized FT4232H by 
+                           One Third Technologies
+       logitech-f710     - setup the udev rule for the LogiTech F710 game pad
+       stlink-v2.1       - setup the udev rule for ST-Link V2.1 debugger
+       one-third-console - setup the udev rule for the customized console by
+                           One Third Technologies, use FT232RL
+       uvc-video-capture - setup the udev rule for the UVC
+                           video capture device"
+       MORE IS COMMING
+    -------------------------------------------------------
+eom
+}
+
+# =============================================================================
+function _dj_udevadm_help()
+{
+    _dj_help
+    cat << eom
+    --------------------- dj udevadm ----------------------
+    used to grab information of a device, for example:
+    $  dj udevadm /dev/ttyUSB0
+    -------------------------------------------------------
+eom
 }
 
 # =============================================================================
@@ -24,9 +45,9 @@ function _dj_udev_dialout()
     echo -e "udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo 'KERNEL=="ttyUSB[0-9]*",MODE="0666"' \
+    echo 'KERNEL=="ttyUSB*",MODE="0666"' \
     | sudo tee -a /etc/udev/rules.d/$rule_file
-    echo 'KERNEL=="ttyACM[0-9]*",MODE="0666"' \
+    echo 'KERNEL=="ttyACM*",MODE="0666"' \
     | sudo tee -a /etc/udev/rules.d/$rule_file
 
     sudo service udev restart
@@ -53,11 +74,10 @@ function _dj_udev_uvc_video_capture()
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
-    string="${string}KERNEL==\"video[0-9]*\", "
+    string="${string}KERNEL==\"video*\", "
     string="${string}ACTION==\"add\", "
     string="${string}ATTRS{idVendor}==\"18ec\", "
     string="${string}ATTRS{idProduct}==\"5555\", "
-    # string="${string}ATTRS{manufacturer}==\"One Third Tech.\", " # do not delete
     string="${string}ATTRS{product}==\"USB2.0 PC CAMERA\", "
     string="${string}MODE=\"666\", "
     string="${string}SYMLINK+=\"uvc/video-cap\", "
@@ -75,7 +95,7 @@ function _dj_udev_logitech_f710()
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     string="SUBSYSTEMS==\"usb\", "
-    string="${string}KERNEL==\"js[0-9]*\", "
+    string="${string}KERNEL==\"js*\", "
     string="${string}ACTION==\"add\", "
     string="${string}ATTRS{idVendor}==\"046d\", "
     string="${string}ATTRS{idProduct}==\"c21f\", "
@@ -88,13 +108,13 @@ function _dj_udev_logitech_f710()
 
     sudo service udev restart
 
-    # the joystick can change its property, don't know why
+    # the joystick can change its property -----------------------
     rule_file=logitech-f710-d.rules # this is the D mode
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     string="SUBSYSTEMS==\"usb\", "
-    string="${string}KERNEL==\"js[0-9]*\", "
+    string="${string}KERNEL==\"js*\", "
     string="${string}ACTION==\"add\", "
     string="${string}ATTRS{idVendor}==\"046d\", "
     string="${string}ATTRS{idProduct}==\"c219\", "
@@ -118,7 +138,7 @@ function _dj_udev_one_third_console()
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
-    string="${string}KERNEL==\"ttyUSB[0-9]*\", "
+    string="${string}KERNEL==\"ttyUSB*\", "
     string="${string}ACTION==\"add\", "
     string="${string}ATTRS{idVendor}==\"0403\", "
     string="${string}ATTRS{idProduct}==\"6001\", "
@@ -141,6 +161,9 @@ function _dj_udev_one_third_console()
 
 # =============================================================================
 # the One Third Debugger contains a USB to serial port chip: FT232RL
+# need to manually configure the chip from FT_Prog on Windows, set:
+#         product: Comm+Console
+#    manufacturer: One Third Technologies
 # try this: ls -l /dev/serial/by-id/
 function _dj_udev_ft4232h()
 {
@@ -178,7 +201,7 @@ function _dj_udev_stlink_v2_1()
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
-    string="${string}KERNEL==\"ttyACM[0-9]*\", "
+    string="${string}KERNEL==\"ttyACM*\", "
     string="${string}ACTION==\"add\", "
     string="${string}ATTRS{idVendor}==\"0483\", "
     string="${string}ATTRS{idProduct}==\"3752\", "
@@ -208,36 +231,41 @@ function _dj_udevadm()
 # =============================================================================
 function _dj_udev()
 {
+    # --------------------------
     if [ $1 = '--dialout' ] ; then
         _dj_udev_dialout $2 $3 $4
         return
     fi
+    # --------------------------
     if [ $1 = '--show' ] ; then
         _dj_udev_show 
         return
     fi
+    # --------------------------
     if [ $1 = 'logitech-f710' ] ; then
         _dj_udev_logitech_f710 $2 $3 $4
         return
     fi
+    # --------------------------
     if [ $1 = 'one-third-console' ] ; then
         _dj_udev_one_third_console $2 $3 $4
         return
     fi
+    # --------------------------
     if [ $1 = 'ft4232h' ] ; then
-        # for i in 0 1 2 3 ; do 
-        #     _dj_udev_ft4232h $i
-        # done
         _dj_udev_ft4232h
         return
     fi
+    # --------------------------
     if [ $1 = 'uvc-video-capture' ] ; then
         _dj_udev_uvc_video_capture $2 $3 $4
         return
     fi
+    # --------------------------
     if [ $1 = 'stlink-v2.1' ] ; then
         _dj_udev_stlink_v2_1 $2 $3 $4
         return
     fi
+    _dj_udev_help
     return
 }

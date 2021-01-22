@@ -91,6 +91,7 @@ function _system_check_cpu_memory()
 # =============================================================================
 function _system_check_temperature()
 {
+    _install_if_not_installed lm-sensors
     if [[ "$ubuntu_v" = *"18.04"* ]] || \
        [[ "$ubuntu_v" = *"20.04"* ]] ; then
         ## cat /sys/class/thermal/thermal_zone*/temp
@@ -102,23 +103,13 @@ function _system_check_temperature()
         done
         return
     fi
-    result=$(sensors)
-    # echo $result
-    if [[ "$result" = *"not found"* ]] ; then
-        sudo apt-get install lm-sensors
-    fi
     sensors
-    
 }
 
 # =============================================================================
 function _system_check_nvidia_driver()
 {
-    result=$(inxi -G)
-    # this check does not work
-    if [[ "$result" = *"but can be installed with"* ]] ; then
-        sudo apt-get install -y inxi
-    fi
+    _install_if_not_installed inxi
     inxi -G
 
     nvidia-smi

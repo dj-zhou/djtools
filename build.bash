@@ -5,14 +5,22 @@
 # problem:
 # on Ubuntu 18.04, the SDK .appolo-image-wandboard-poky-2.6.4-oesdk does not work!
 # it still says native build (meson/ninja)
-function _meson_build_use_oesdk() # sdk_path
+function _build_meson_use_oesdk() # sdk_path
 {
+    if [ $# -lt 1 ] ; then
+        echo "build meson -cross: need the sdk path."
+        return
+    fi
     _save_current_env_variables
 
     current_directory=${PWD}
-    sdk_path="${HOME}/$1-oesdk"
-    sdk_output="_bsdk$1"
-    # echo -e "sdk_path: ${GRN}$sdk_path${NOC}"
+    # the path is determined by command:
+    #    yocto setup plain-sdk
+    machine_name=$(ls ${HOME}/$1-oesdk)
+    distro_name=$(ls ${HOME}/$1-oesdk/$machine_name)
+    
+    sdk_path="${HOME}/$1-oesdk/$machine_name/$distro_name" 
+    sdk_output="_bcross$1"
     sdk_env_set=$(ls $sdk_path | grep environment)
 
     if [ -n "$2" ] && [ $2 = '--conti' ] ; then
@@ -23,7 +31,7 @@ function _meson_build_use_oesdk() # sdk_path
         if [ -d $sdk_output ] ; then
             cd $sdk_output
             ninja
-            echo -e "\n ${PRP} build -use-oesdk${NOC}"
+            echo -e "\n ${PRP} build meson -cross${NOC}"
             echo -e "    with \"--conti\" option: contains $sdk_output/ directory"
             echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
             cd $current_directory
@@ -31,7 +39,7 @@ function _meson_build_use_oesdk() # sdk_path
         # just in the $sdk_output/ directory
         elif [ $directory_name = "$sdk_output" ] ; then
             ninja
-            echo -e "\n ${PRP} build -use-oesdk${NOC}"
+            echo -e "\n ${PRP} build meson -cross${NOC}"
             echo -e "    with \"--conti\" option: in $sdk_output/ directory"
             echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
         
@@ -42,11 +50,11 @@ function _meson_build_use_oesdk() # sdk_path
             cd $sdk_build_path
             ninja
             cd $current_directory
-            echo -e "\n ${PRP} build -use-oesdk${NOC}"
+            echo -e "\n ${PRP} build meson -cross${NOC}"
             echo -e "    with \"--conti\" option: in $sdk_output/ sub-directory"
             echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
         else
-            echo -e "\n ${PRP} build -use-oesdk${NOC}"
+            echo -e "\n ${PRP} build meson -cross${NOC}"
             echo -e "    not in $sdk_output/ or its sub directory, no build, exit!!\n"
         fi
         _yocto_reset_env_variables
@@ -73,7 +81,7 @@ function _meson_build_use_oesdk() # sdk_path
         meson . $sdk_output -Db_sanitize=none
         cd $sdk_output
         ninja
-        echo -e "\n ${PRP} build -use-oesdk${NOC}"
+        echo -e "\n ${PRP} build meson -cross${NOC}"
         echo -e "    fresh build, contains $sdk_output/ directory."
         echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
         cd $current_directory
@@ -86,9 +94,9 @@ function _meson_build_use_oesdk() # sdk_path
         meson . $sdk_output -Db_sanitize=none
         cd $sdk_output
         ninja
-        echo -e "\n ${PRP} build -use-oesdk${NOC}"
+        echo -e "\n ${PRP} build meson -cross${NOC}"
         echo -e "    fresh build, in $sdk_output/ directory."
-        echo -e "    sdk location:$sdk_path\n"
+        echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
 
     # if in a subdirectory of $sdk_output/
     elif [[ "$current_directory" = *"$sdk_output"* ]] ; then
@@ -98,9 +106,9 @@ function _meson_build_use_oesdk() # sdk_path
         meson . $sdk_output -Db_sanitize=none
         cd $sdk_output
         ninja
-        echo -e "\n ${PRP} build -use-oesdk${NOC}"
+        echo -e "\n ${PRP} build meson -cross${NOC}"
         echo -e "    fresh build, in $sdk_output/ sub-directory."
-        echo -e "    sdk location:$sdk_path\n"
+        echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
         cd $current_directory
 
     # if the current directory does not contain a $sdk_output/ directory,then
@@ -109,30 +117,33 @@ function _meson_build_use_oesdk() # sdk_path
         meson . $sdk_output -Db_sanitize=none
         cd $sdk_output
         ninja
-        echo -e "\n ${PRP} build -use-oesdk${NOC}"
+        echo -e "\n ${PRP} build meson -cross${NOC}"
         echo -e "    fresh build, have created the $sdk_output/ directory"
-        echo -e "    sdk location:$sdk_path\n"
+        echo -e "    sdk location: $sdk_path\n"
         cd $current_directory
     else
-        echo -e "\n ${PRP} build -use-oesdk${NOC}"
+        echo -e "\n ${PRP} build meson -cross${NOC}"
         echo -e "    fresh build, but no meson.build file found, no build, exit!! \n"
     fi
     _yocto_reset_env_variables
 }
 
 # =============================================================================
-function _meson_build_native()
+# this should implement the same logic as in _build_oesdk()
+function _build_meson_native()
 {
     current_directory=${PWD}
     if [ -f "meson.build" ] ; then
-        if [ ! -d "build" ] ; then
-            meson setup build
+        
+        if [ ! -d "_bnative" ] ; then
+            meson setup _bnative
         fi
-        if [ ! -f "build/build.ninja" ] ; then
-            rm build -rf
-            meson setup build
+        if [ ! -f "_bnative/build.ninja" ] ; then
+            rm _bnative -rf
+            meson setup _bnative
+            return
         fi
-        cd build
+        cd _bnative
         ninja
     else
         echo "not a meson directory, exit!"
@@ -141,14 +152,30 @@ function _meson_build_native()
 }
 
 # =============================================================================
-function meson-build()
+function build()
 {
-    if [ $1 = '-use-oesdk' ] ; then
-        _meson_build_use_oesdk $2 $3 $4 $5 $6 $7
+    # ------------------------------
+    if [ $1 = 'meson' ] ;  then
+        # ------------------------------
+        if [ $2 = '-cross' ] ; then
+            _build_meson_use_oesdk $3 $4 $5 $6 $7
+            return
+        fi
+        # ------------------------------
+        if [ $2 = '-native' ] ; then
+            _build_meson_native $3 $4 $5 $6 $7
+            return
+        fi
         return
     fi
-    if [ $1 = '-native' ] ; then
-        _meson_build_native $2 $3 $4 $5 $6 $7
+    # ------------------------------
+    if [ $1 = 'cmake' ] ; then
+        compile_cmakelist $2 $3 $4 $5 $6
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'make' ] ; then
+        compile_makefile $2 $3 $4 $5 $6
         return
     fi
     echo -e "\n ${PRP}build${NOC}: argument ${RED}$1${NOC} not supported.\n"
@@ -156,29 +183,80 @@ function meson-build()
 }
 
 # =============================================================================
-function _meson-build()
+function _build_meson_exists()
+{
+    if [ -f "meson.build" ] ; then
+        echo "meson"
+        return
+    fi
+    if [ -f "build.ninja" ] ; then
+        echo "meson"
+        return
+    fi
+    echo " "
+}
+
+# =============================================================================
+function _build_cmakelists_exists()
+{
+    if [ -f "CMakeLists.txt" ] ; then
+        echo "cmake"
+        return
+    fi
+    echo " "
+}
+
+# =============================================================================
+function _build_makefile_exists()
+{
+    if [ -f "Makefile" ] ; then
+        echo "make"
+        return
+    fi
+    echo " "
+}
+
+# =============================================================================
+function _build()
 {
     COMPREPLY=()
 
     # All possible first values in command line
+    service=$(_build_meson_exists)
+    service+=$(_build_cmakelists_exists)
+    service+=$(_build_makefile_exists)
     local SERVICES=("
-        -use-oesdk
-        -native
+        $service
     ")
 
     # declare an associative array for options
     declare -A ACTIONS
 
     # -----------------------------------------------------
-    sdk_list="$(ls -a ${HOME}/ | grep oesdk | sed 's/-oesdk//g') "
-    ACTIONS[-use-oesdk]="$sdk_list "
-    for i in $sdk_list ; do
+    meson_list="-cross -native "
+    ACTIONS[meson]="$meson_list "
+    oesdk_list="$(ls -a ${HOME}/ | grep oesdk | sed 's/-oesdk//g') "
+    ACTIONS[-cross]="$oesdk_list "
+    for i in $oesdk_list ; do
         ACTIONS[$i]="--conti --fresh "
     done
+    ACTIONS[-native]="--conti --fresh "
     ACTIONS[--conti]=" "
     ACTIONS[--fresh]=" "
+
     # -----------------------------------------------------
-    ACTIONS[-native]=" "
+    cmake_list="all clean "
+    ACTIONS[cmake]="$cmake_list "
+    for i in $cmake_list ; do
+        ACTIONS[$i]=" "
+    done
+    
+    # -----------------------------------------------------
+    make_list="all clean "
+    ACTIONS[make]="$make_list "
+    for i in $make_list ; do
+        ACTIONS[$i]=" "
+    done
 
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
@@ -190,4 +268,4 @@ function _meson-build()
 }
 
 # =============================================================================
-complete -F _meson-build meson-build
+complete -F _build build

@@ -166,7 +166,7 @@ EOF1
 # =============================================================================
 _rpi_shrink_help() {
     local _rpi_shrink_help
-    read -r -d '' _rpi_shrink_help << EOM
+    read -r -d '' _rpi_shrink_help << eom
 Usage: $0 [-adhrspvzZ] imagefile.img [newimagefile.img]
 
   -s         Don't expand filesystem when image is booted the first time
@@ -177,7 +177,7 @@ Usage: $0 [-adhrspvzZ] imagefile.img [newimagefile.img]
   -a         Compress image in parallel using multiple cores
   -p         Remove logs, apt archives, dhcp leases and ssh hostkeys
   -d         Write debug messages in a debug log file
-EOM
+eom
     echo "$_rpi_shrink_help"
     exit 1
 }
@@ -225,7 +225,7 @@ function _mirror_shrink() {
 
     if [[ ! -f "$img" ]]; then
         _rpi_shrink_error $LINENO "$img is not a file..."
-        exit 2
+        return
     fi
 
     # check ownership ----------------
@@ -239,7 +239,7 @@ function _mirror_shrink() {
     if [[ -n $ziptool ]]; then
         if [[ ! " ${ZIPTOOLS[@]} " =~ $ziptool ]]; then
             _rpi_shrink_error $LINENO "$ziptool is an unsupported ziptool."
-            exit 17
+            return
         else
             if [[ $parallel == true && $ziptool == "gzip" ]]; then
                 REQUIRED_TOOLS="$REQUIRED_TOOLS pigz"
@@ -254,7 +254,7 @@ function _mirror_shrink() {
         command -v $command >/dev/null 2>&1
         if (( $? != 0 )); then
             _rpi_shrink_error $LINENO "$command is not installed."
-            exit 4
+           return
         fi
     done
 
@@ -269,7 +269,7 @@ function _mirror_shrink() {
         cp --reflink=auto --sparse=always "$1" "$f"
         if (( $? != 0 )); then
             _rpi_shrink_error $LINENO "Could not copy file..."
-            exit 5
+                return
         fi
         old_owner=$(stat -c %u:%g "$1")
         chown "$old_owner" "$f"
@@ -287,7 +287,7 @@ function _mirror_shrink() {
     if (( $rc )); then
         _rpi_shrink_error $LINENO "parted failed with rc $rc"
         _rpi_shrink_info "Possibly invalid image. Run 'parted $img unit B print' manually to investigate"
-        exit 6
+        return
     fi
     
     partnum="$(echo "$parted_output" | tail -n 1 | cut -d ':' -f 1)"
@@ -303,9 +303,10 @@ function _mirror_shrink() {
     if (( $rc )); then
         echo "$tune2fs_output"
         _rpi_shrink_error $LINENO "tune2fs failed. Unable to shrink this type of image"
-        exit 7
+        return
     fi
     
+    return
     currentsize="$(echo "$tune2fs_output" | grep '^Block count:' | tr -d ' ' | cut -d ':' -f 2)"
     blocksize="$(echo "$tune2fs_output" | grep '^Block size:' | tr -d ' ' | cut -d ':' -f 2)"
 
@@ -313,7 +314,7 @@ function _mirror_shrink() {
 
     # check if we should make pi expand rootfs on next boot
     if [ "$parttype" == "logical" ]; then
-        echo "WARNING: PiShrink does not yet support autoexpanding of this type of image"
+        echo "WARNING: does not yet support autoexpanding of this type of image"
     elif [ "$should_skip_autoexpand" = false ]; then
         _rpi_shrink_set_autoexpand
     else
@@ -340,13 +341,13 @@ function _mirror_shrink() {
     if ! minsize=$(sudo resize2fs -P "$loopback"); then
         rc=$?
         _rpi_shrink_error $LINENO "resize2fs failed with rc $rc"
-        exit 10
+        return
     fi
     minsize=$(cut -d ':' -f 2 <<< "$minsize" | tr -d ' ')
     _rpi_shrink_log_variables $LINENO currentsize minsize
     if [[ $currentsize -eq $minsize ]]; then
         _rpi_shrink_error $LINENO "Image already shrunk to smallest size"
-        exit 11
+        return
     fi
 
     # add some free space to the end of the filesystem
@@ -370,7 +371,7 @@ function _mirror_shrink() {
         mv "$mountdir/etc/rc.local.bak" "$mountdir/etc/rc.local"
         sudo umount "$mountdir"
         sudo losetup -d "$loopback"
-        exit 12
+        return
     fi
     sleep 1
 
@@ -382,14 +383,14 @@ function _mirror_shrink() {
     rc=$?
     if (( $rc )); then
         _rpi_shrink_error $LINENO "parted failed with rc $rc"
-        exit 13
+        return
     fi
 
     sudo parted -s "$img" unit B mkpart "$parttype" "$partstart" "$newpartend"
     rc=$?
     if (( $rc )); then
         _rpi_shrink_error $LINENO "parted failed with rc $rc"
-        exit 14
+        return
     fi
 
     # truncate the file
@@ -398,7 +399,7 @@ function _mirror_shrink() {
     rc=$?
     if (( $rc )); then
         _rpi_shrink_error $LINENO "parted failed with rc $rc"
-        exit 15
+        return
     fi
 
     endresult=$(tail -1 <<< "$endresult" | cut -d ':' -f 2 | tr -d 'B')
@@ -407,7 +408,7 @@ function _mirror_shrink() {
     rc=$?
     if (( $rc )); then
         _rpi_shrink_error $LINENO "trunate failed with rc $rc"
-        exit 16
+        return
     fi
 
     # handle compression
@@ -424,7 +425,7 @@ function _mirror_shrink() {
             if ! $parallel_tool ${options} "$img"; then
                 rc=$?
                 _rpi_shrink_error $LINENO "$parallel_tool failed with rc $rc"
-                exit 18
+                return
             fi
 
         else # sequential
@@ -432,7 +433,7 @@ function _mirror_shrink() {
             if ! $ziptool ${options} "$img"; then
                 rc=$?
                 _rpi_shrink_error $LINENO "$ziptool failed with rc $rc"
-                exit 19
+                return
             fi
         fi
         img=$img.${ZIPEXTENSIONS[$ziptool]}
@@ -453,10 +454,10 @@ function _mirror_backup()
     fi
     blk=$1
     file=$2
-    echo -e " $GRN$blk$NOC is backing up to $GRN$file$NOC"
+    echo -e " backing up $GRN$blk$NOC to $GRN$file$NOC"
     sudo dd bs=4M if="$blk" of="$file" status=progress
     sudo chown $USER "$file"
-    echo -e " you can run $PRP rpi shrink $file$NOC to make the file smaller"
+    echo -e " you can run $PRP mirror shrink $file$NOC to make the file smaller"
 }
 
 # =============================================================================

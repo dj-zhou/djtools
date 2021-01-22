@@ -28,6 +28,7 @@ function _yocto_build_plain_sdk()
 # =============================================================================
 # $1 must be the device block, for example, /dev/sda
 # $2 to all others, can be -f and other options, like image.wic.gz, or *.wic.zst
+# todo: let it work for upboard
 function _yocto_flash()
 {
     # argument check -------------------

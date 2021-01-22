@@ -175,7 +175,7 @@ function _dj_setup_clang_format()
 {
     current_folder=${PWD}
 
-    sudo apt-get install -y clang-format
+    _install_if_not_installed clang-format
 
     cd $djtools_path
 
@@ -269,20 +269,22 @@ function _dj_setup_cmake()
 {
     echo -e "\n ${GRN} install latest CMake ${NOC}"
     _press_enter_or_wait_s_continue 5
-    if [ ! -f /etc/apt/sources.list.d/kitware-latest.list ] ; then
-        wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
-                2>/dev/null | sudo apt-key add -
-        sudo sh -c 'echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
-                >> /etc/apt/sources.list.d/kitware-latest.list'
-    fi
+    
+    sudo rm -rf /etc/apt/sources.list.d/kitware-latest.list
+    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
+        2>/dev/null | sudo apt-key add -
+    sudo sh -c 'echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
+        >> /etc/apt/sources.list.d/kitware-latest.list'
+    
     sudo apt-get -y update
-    sudo apt-get -y install cmake
+   _install_if_not_installed cmake
 }
 
 # =============================================================================
 function _dj_setup_kdiff3_meld()
 {
-    sudo apt-get install -y kdiff3 meld
+    _install_if_not_installed kdiff3
+    _install_if_not_installed meld
     
     all_config=$(git config --list)
     if [[ "$all_config" = *"merge.tool"* ]] ; then
@@ -321,7 +323,7 @@ function _dj_setup_dj_gadgets()
 # todo: for each package, yes (default) to intall, no to skip
 function _dj_setup_devtools()
 {
-    sudo apt-get install -y libncurses5-dev
+    _install_if_not_installed libncurses5-dev
 }
 
 # =============================================================================
@@ -332,8 +334,10 @@ function _dj_setup_container_docker()
     current_folder=${PWD}
 
     # Install a few prerequisite packages
-    sudo apt-get install -y apt-transport-https ca-certificates curl 
-    sudo apt-get install -y software-properties-common
+    packages=" apt-transport-https ca-certificates curl software-properties-common "
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
 
     docker_url="https://download.docker.com/linux/ubuntu"
 
@@ -346,7 +350,7 @@ function _dj_setup_container_docker()
     sudo apt-get -y update
 
     # Install
-    sudo apt-get -y install docker-ce
+    _install_if_not_installed docker-ce
 
     # check the status -- not sure if the "active status" need a system reboot
     sudo systemctl status docker
@@ -394,7 +398,8 @@ function _dj_setup_container_dive()
 # =============================================================================
 function _dj_setup_container_lxd_4_0()
 {
-    sudo apt-get install snapd
+    _install_if_not_installed snapd
+
     sudo snap install lxd --channel=4.0/stable
     echo -e "\n"
     echo 'next step: '
@@ -407,9 +412,10 @@ function _dj_setup_pangolin()
 {
     current_folder=${PWD}
     # dependency installation
-    sudo apt-get install libglew-dev mesa-utils -y
-    sudo apt-get install libglm-dev -y # opengl related mathematics lib
-    sudo apt-get install libxkbcommon-x11-dev # if error: No package 'xkbcommon' found
+    packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
 
     # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
     
@@ -449,8 +455,8 @@ function _dj_setup_pip()
     cwd_before_running=$PWD
 
     cd ~/
-    sudo apt-get install python3-pip -y
-    sudo apt-get install python-pip -y
+    _install_if_not_installed python3-pip
+    _install_if_not_installed python-pip
 
     sudo pip  install --upgrade pip
     sudo pip3 install --upgrade pip
@@ -471,7 +477,7 @@ function _dj_setup_qemu()
     echo $version
     if [ $version = "2.11.1" ] ; then
         # this may only work within Ubuntu 18.04, not tested on other platforms
-        sudo apt-get install qemu
+        _install_if_not_installed qemu
     elif [ $version = "4.2.0" ] ; then
         cd ~ && mkdir -p soft && cd soft/
         git clone git://git.qemu-project.org/qemu.git
@@ -522,9 +528,10 @@ function _dj_setup_stm32_tools()
     _press_enter_or_wait_s_continue 10
     
     # install dependencies and some software ----------------
-    sudo apt-get install -y libusb-1.0.0-dev gtk+-3.0
-    sudo apt-get install -y cu cutecom putty screen
-    sudo apt-get install -y cmake
+    packages="libusb-1.0.0-dev gtk+-3.0 cu cutecom putty screen cmake "
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
 
     # install stlink ----------------
     echo -e "\n install ${GRN}stlink${NOC}\n"
@@ -589,7 +596,10 @@ function _dj_setup_glfw3()
     cd ~ && mkdir -p soft && cd soft/
 
     # glfw3
-    sudo apt-get -y install build-essential cmake git xorg-dev libglu1-mesa-dev
+    packages="build-essential cmake git xorg-dev libglu1-mesa-dev "
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
     sudo rm -rf glfw3/
     git clone https://github.com/dj-zhou/glfw3.git
     cd glfw3/
@@ -609,6 +619,7 @@ function _dj_setup_google_repo()
     cwd_before_running=$PWD
 
     # it needs python
+    _install_if_not_installed python
 
     if [ -f $djtools_path/tools/repo ] ; then
         echo -e "\n use repo from tools/ \n"
@@ -621,13 +632,13 @@ function _dj_setup_google_repo()
         sudo mv repo /bin/
     fi
 
-    cat << EOM
+    cat << eom
 
  -----------------------------------------
-  Google tool "repo" is installed into folder: /bin/
+  Google tool "repo" is installed into directory: /bin/
  -----------------------------------------
 
-EOM
+eom
     cd ${cwd_before_running}
 }
 
@@ -642,14 +653,15 @@ function _dj_setup_gtest_glog()
     cd ~ && mkdir -p soft && cd soft/
     
     # gtest
-    sudo apt-get install libgtest-dev -y
+    packages="libgtest-dev libgoogle-glog-dev "
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
+    # compile gtest
     cd /usr/src/gtest
     sudo cmake CMakeLists.txt
     sudo make
     sudo cp *.a /usr/local/lib
-
-    # glog
-    sudo apt-get install libgoogle-glog-dev -y
 
     cd ${cwd_before_running}
 }
@@ -661,9 +673,9 @@ function _dj_setup_gnome()
     echo -e "\n install gnome on Ubuntu\n"
     _press_enter_or_wait_s_continue 20
 
-    sudo apt-get install tasksel
-    sudo apt-get install gnome-session
-    sudo tasksel install ubuntu-desktop
+    _install_if_not_installed tasksel
+    _install_if_not_installed gnome-session
+    _install_if_not_installed ubuntu-desktop
     
     echo -e "\n when log in, choose GNOME\n"
 }
@@ -699,8 +711,9 @@ function _dj_setup_gpp_10()
     _press_enter_or_wait_s_continue 20
 
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-    sudo apt-get update
-    sudo apt-get install -y gcc-10 g++-10
+    sudo apt-get -y update
+    _install_if_not_installed gcc-10
+    _install_if_not_installed g++-10
     echo -e "Set up the gcc/g++ priorities:"
  
     # ----------------------
@@ -804,16 +817,17 @@ function _dj_setup_opencv_4_1_1()
     _press_enter_or_wait_s_continue 20
 
     # install dependency:
-    sudo apt-get install -y libopencv-dev build-essential cmake libdc1394-22
-    sudo apt-get install -y libdc1394-22-dev libjpeg-dev libpng12-dev
-    sudo apt-get install -y libtiff5-dev libjasper-dev libavcodec-dev
-    sudo apt-get install -y libavformat-dev libswscale-dev libxine2-dev
-    sudo apt-get install -y libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev
-    sudo apt-get install -y libv4l-dev libtbb-dev libqt4-dev libmp3lame-dev
-    sudo apt-get install -y libopencore-amrnb-dev libopencore-amrwb-dev
-    sudo apt-get install -y libtheora-dev libvorbis-dev libxvidcore-dev
-    sudo apt-get install -y x264 v4l-utils
-
+    packages="libopencv-dev build-essential cmake libdc1394-22 "
+    packages+="libdc1394-22-dev libjpeg-dev libpng12-dev x264 "
+    packages+="libtiff5-dev libjasper-dev libavcodec-dev v4l-utils "
+    packages+="libavformat-dev libswscale-dev libxine2-dev "
+    packages+="libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev "
+    packages+="libv4l-dev libtbb-dev libqt4-dev libmp3lame-dev "
+    packages+="libopencore-amrnb-dev libopencore-amrwb-dev "
+    packages+="libtheora-dev libvorbis-dev libxvidcore-dev "
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
     cd ~ && mkdir -p soft && cd soft/
     rm -rf opencv-4.1.1
 
@@ -861,36 +875,40 @@ function _dj_setup_opencv_4_2_0()
 {
     cwd_before_running=$PWD
     # Generic tools
-    sudo apt-get install -y build-essential cmake pkg-config unzip yasm git checkinstall
+    packages="build-essential cmake pkg-config unzip yasm git checkinstall "
     # Image I/O libs
-    sudo apt-get install -y libjpeg-dev libpng-dev libtiff-dev
+    packages+="libjpeg-dev libpng-dev libtiff-dev "
     # Video/Audio Libs — FFMPEG, GSTREAMER, x264 and so on
-    sudo apt-get install -y libavcodec-dev libavformat-dev libswscale-dev libavresample-dev
-    sudo apt-get install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
-    sudo apt-get install -y libxvidcore-dev x264 libx264-dev libfaac-dev libmp3lame-dev libtheora-dev
-    sudo apt-get install -y libfaac-dev libmp3lame-dev libvorbis-dev
+    packages+="libavcodec-dev libavformat-dev libswscale-dev libavresample-dev "
+    packages+="libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev "
+    packages+="libxvidcore-dev x264 libx264-dev libfaac-dev libmp3lame-dev libtheora-dev "
+    packages+="libfaac-dev libmp3lame-dev libvorbis-dev "
     # OpenCore — Adaptive Multi Rate Narrow Band (AMRNB) and Wide Band (AMRWB) speech codec
-    sudo apt-get install -y libopencore-amrnb-dev libopencore-amrwb-dev
+    packages+="libopencore-amrnb-dev libopencore-amrwb-dev "
     # Cameras programming interface libs
-    sudo apt-get install -y libdc1394-22 libdc1394-22-dev libxine2-dev libv4l-dev v4l-utils 
+    packages+="libdc1394-22 libdc1394-22-dev libxine2-dev libv4l-dev v4l-utils "
     cd /usr/include/linux
     sudo ln -s -f ../libv4l1-videodev.h videodev.h
     # GTK lib for the graphical user functionalities coming from OpenCV highghui module
-    sudo apt-get install -y libgtk-3-dev
+    packages+="libgtk-3-dev "
     # Python libraries for Python3
-    sudo apt-get install -y python3-dev python3-pip
+    packages+="python3-dev python3-pip "
     sudo -H pip3 install -U pip numpy
-    sudo apt-get install -y python3-testresources
+    packages+="python3-testresources "
     # Parallelism library C++ for CPU
-    sudo apt-get install -y libtbb-dev
+    packages+="libtbb-dev "
     # Optimization libraries for OpenCV
-    sudo apt-get install -y libatlas-base-dev gfortran
+    packages+="libatlas-base-dev gfortran "
     # Optional libraries
-    sudo apt-get install -y libprotobuf-dev protobuf-compiler
-    sudo apt-get install -y libgoogle-glog-dev libgflags-dev
-    sudo apt-get install -y libgphoto2-dev libeigen3-dev libhdf5-dev doxygen
+    packages+="libprotobuf-dev protobuf-compiler "
+    packages+="libgoogle-glog-dev libgflags-dev "
+    packages+="libgphoto2-dev libeigen3-dev libhdf5-dev doxygen "
     # Install OpenCL SDK related things
-    sudo apt-get install -y ocl-icd-opencl-dev
+    packages+="ocl-icd-opencl-dev "
+
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
 
     # start to install ---------------------------------------------------
     cd ~ && mkdir -p soft && cd soft/
@@ -946,9 +964,10 @@ function _dj_setup_wubi()
 {
     cwd_before_running=$PWD
 
-    sudo apt-get install ibus ibus-table-wubi -y
+    _install_if_not_installed ibus
+    _install_if_not_installed ibus-table-wubi
     if [[ ${ubuntu_v} = *'16.04'* ]] ; then
-        cat << EOM
+        cat << eom
 
         Follow the steps:
             1. log out and log in again;
@@ -959,7 +978,7 @@ function _dj_setup_wubi()
             4. add an input source:
                Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chinese (WuBi-Jidian-86-JiShuang-6.0)
 
-EOM
+eom
     elif [[ ${ubuntu_v} = *'18.04'* \
         || ${ubuntu_v} = *'20.04'* ]] ; then
         echo -e "\n please follow the link below to finish the setup:"
@@ -979,7 +998,7 @@ function _dj_setup_vtk_8_2_0()
     # reference: https://kezunlin.me/post/b901735e/
     cd ~ && mkdir -p soft && cd soft/
 
-    sudo apt-get install cmake-qt-gui -y
+    _install_if_not_installed cmake-qt-gui
 
     git clone https://gitee.com/dj-zhou/vtk-8.2.0.git
 
@@ -1034,41 +1053,6 @@ function _dj_search_string()
     echo -e "   $GRN grep -ri --exclude-dir={build,bin,_bsdk*} $1 .$NOC"
     echo -e " we get:"
     grep -ri --exclude-dir={build,bin,_bsdk*} $1 .
-}
-
-# =============================================================================
-function _dj_meson_build()
-{
-    folder_name=$(basename "$current_folder")
-    
-    # if the curent folder is build, then
-    # cd ../ && rm build -r 
-    # meson build && cd build && ninja
-    if [ "$folder_name" = 'build' ] ; then
-        cd ../
-        rm build/ -rf
-        meson . build
-        cd build
-        ninja
-
-    # if the curent folder contains a build/ folder, then
-    # rm build -r 
-    # meson build && cd build && ninja
-    elif [ -d build ] ; then
-        rm build/ -rf
-        meson . build
-        cd build
-        ninja
-        
-    # if the current folder does not contain a build/ folder,then
-    # check if there is a meson.build file, then build
-    elif [ -f meson.build ] ; then
-        meson . build
-        cd build
-        ninja
-    else
-        echo -e '\nmeson: not in a meson folder\n'
-    fi
 }
 
 # =============================================================================
@@ -1147,12 +1131,10 @@ function _dj_setup_vim_env()
     VIMRC=~/.vimrc
 
     # install software, if not installed already
-    sudo apt-get install -y vim
-    sudo apt-get install -y ctags # Generate tag files for source code
-    sudo apt-get install -y cscope
-    # software needed to compile YouCompleteMe
-    sudo apt-get install -y build-essential cmake
-    sudo apt-get install -y python-dev python3-dev
+    packages="vim ctags cscope build-essential cmake python-dev python3-dev "
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
 
     # install Vundle -- plugin manager
     rm -rf ~/.vim/bundle/Vundle.vim
@@ -1356,11 +1338,6 @@ function dj()
     # ------------------------------
     if [ $1 = 'meson' ] ; then
         # ------------------------------
-        if [ $# -ge 2 ] && [ $2 = 'build' ] ; then
-            _dj_meson_build $3 $4 $5 $6
-            return
-        fi
-        # ------------------------------
         if [ $# -ge 2 ] && [ $2 = 'find' ] ; then
             _dj_meson_find $3 $4 $5 $6
             return
@@ -1410,12 +1387,16 @@ function dj()
             _dj_udev $2 $3 $4 $5 $6 $7
             return
         fi
-        echo 'arguments wrong, exit'
+        _dj_udev_help
         return
     fi
     # ------------------------------
     if [ $1 = 'udevadm' ] ; then
-        _dj_udevadm $2 $3
+        if [ $# -ge 2 ] ; then
+            _dj_udevadm $2 $3 $4 $5 $6 $7
+            return
+        fi
+        _dj_udevadm_help $2 $3
         return
     fi
     # ------------------------------
@@ -1452,8 +1433,8 @@ function _dj()
     # declare an associative array for options
     declare -A ACTIONS
 
-    #---------------------------------------------------------
-    #---------------------------------------------------------
+    # --------------------------------------------------------
+    # --------------------------------------------------------
     setup_list+="adobe-pdf-reader arduino-1.8.13 baidu-netdisk clang-format clang-llvm cmake "
     setup_list+="computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
     setup_list+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
@@ -1497,12 +1478,12 @@ function _dj()
     ACTIONS[0.6.2]=" "
     ACTIONS[0.6.3]=" "
 
-    #---------------------------------------------------------
-    #---------------------------------------------------------
+    # --------------------------------------------------------
+    # --------------------------------------------------------
     ACTIONS[clone]="bitbucket github gitee "
     ACTIONS[clone-ssh]="bitbucket github gitee "
     
-    #---------------------------------------------------------
+    # --------------------------------------------------------
     format_list="brush enable disable show "
     ACTIONS[format]="$format_list "
     for i in $format_list ; do
@@ -1510,45 +1491,51 @@ function _dj()
     done
     ACTIONS[format]+="implement "
     ACTIONS[brush]+="google file "
-    ACTIONS[implement]="dj bg "
+    ACTIONS[implement]="djz bg "
+    # -----------------
+    show_list="camel "
+    ACTIONS[show]="$show_list "
+    for i in $show_list ; do
+        ACTIONS[$i]=" "
+    done
     
-    #---------------------------------------------------------
+    # --------------------------------------------------------
     ACTIONS[replace]=" "
 
-    #---------------------------------------------------------
-    bitbucket_repos="$(_dj_clone_repo_list BitBucket)"
+    # --------------------------------------------------------
+    bitbucket_repos="$(_dj_clone_repo_list BitBucket) "
     ACTIONS[bitbucket]+="$bitbucket_repos "
     for i in $bitbucket_repos ; do
         ACTIONS[$i]=" "
     done
-    #---------------------------------------------------------
-    github_repos="$(_dj_clone_repo_list GitHub)"
+    # --------------------------------------------------------
+    github_repos="$(_dj_clone_repo_list GitHub) "
     ACTIONS[github]+="$github_repos "
     for i in $github_repos ; do
         ACTIONS[$i]=" "
     done
-    #---------------------------------------------------------
-    gitee_repos="$(_dj_clone_repo_list GiTee)"
+    # --------------------------------------------------------
+    gitee_repos="$(_dj_clone_repo_list GiTee) "
     ACTIONS[gitee]+="$gitee_repos "
     for i in $gitee_repos ; do
         ACTIONS[$i]=" "
     done
 
-    #---------------------------------------------------------
-    #---------------------------------------------------------
+    # --------------------------------------------------------
+    # --------------------------------------------------------
     ACTIONS[open]=" "
 
-    #---------------------------------------------------------
-    #---------------------------------------------------------
+    # --------------------------------------------------------
+    # --------------------------------------------------------
     ACTIONS[ssh]="no-password "
     ACTIONS[no-password]=" "
 
-    #---------------------------------------------------------
-    #---------------------------------------------------------
+    # --------------------------------------------------------
+    # --------------------------------------------------------
     ACTIONS[work-check]=" "
     
-    #---------------------------------------------------------
-    #---------------------------------------------------------
+    # --------------------------------------------------------
+    # --------------------------------------------------------
     udev_list="uvc-video-capture --dialout --show one-third-console "
     udev_list+="stlink-v2.1 logitech-f710 ft4232h "
     ACTIONS[udev]="$udev_list "
@@ -1556,32 +1543,32 @@ function _dj()
         ACTIONS[$i]=" "
     done
 
-    #---------------------------------------------------------
-    #---------------------------------------------------------
+    # --------------------------------------------------------
+    # --------------------------------------------------------
     udevadm_list="$(ls /dev/tty*) "
     ACTIONS[udevadm]="$udevadm_list "
     for i in $udevadm_list ; do
         ACTIONS[$i]=" "
     done
 
-    #---------------------------------------------------------
-    #---------------------------------------------------------
+    # --------------------------------------------------------
+    # --------------------------------------------------------
     search_list="package string "
     ACTIONS[search]="$search_list "
     for i in $search_list ; do
         ACTIONS[$i]=" "
     done
 
-    #---------------------------------------------------------
-    #---------------------------------------------------------
-    meson_list="build find "
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    meson_list="find "
     ACTIONS[meson]="$meson_list "
     for i in $meson_list ; do
         ACTIONS[$i]=" "
     done
 
-    #---------------------------------------------------------
-    #---------------------------------------------------------
+    # --------------------------------------------------------
+    # --------------------------------------------------------
     help_list="auto-mount ffmpeg "
     ACTIONS[help]="$help_list "
     for i in $help_list ; do

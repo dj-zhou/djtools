@@ -3,7 +3,7 @@
 # =============================================================================
 function _yocto_help()
 {
-    cat << EOM
+    cat << eom
 
 ------------------------------------  yocto -----------------------------------
    Author      : Dingjiang Zhou
@@ -19,90 +19,41 @@ function _yocto_help()
      setup   -- to install dependencies, setup plain SDK, etc
      show    -- to find distro-conf/image-bb/machine-conf/package-recipe-bb files
 
-EOM
+eom
 }
 
 # =============================================================================
 function _yocto_setup_dev_env()
 {
-    sudo apt-get install -y autoconf
-    sudo apt-get install -y automake
-    sudo apt-get install -y bmap-tools
-    sudo apt-get install -y bsdmainutils
-    sudo apt-get install -y build-essential
-    sudo apt-get install -y chrpath
-    sudo apt-get install -y coreutils
-    sudo apt-get install -y cpio
-    sudo apt-get install -y curl
-    sudo apt-get install -y dblatex
-    sudo apt-get install -y debianutils
-    sudo apt-get install -y desktop-file-utils
-    sudo apt-get install -y diffstat
-    sudo apt-get install -y docbook-utils
-    sudo apt-get install -y dosfstools
-    sudo apt-get install -y dos2unix # added due to any error report when bitbake
-    sudo apt-get install -y fop
-    sudo apt-get install -y gawk
-    sudo apt-get install -y gcc
-    sudo apt-get install -y gcc-multilib
-    sudo apt-get install -y git-core
-    sudo apt-get install -y gnupg
-    sudo apt-get install -y groff
-    sudo apt-get install -y g++
-    sudo apt-get install -y iputils-ping
-    sudo apt-get install -y libegl1-mesa
-    sudo apt-get install -y libgl1-mesa-dev
-    sudo apt-get install -y libglib2.0-dev
-    sudo apt-get install -y libglu1-mesa-dev
-    sudo apt-get install -y libsdl1.2-dev
-    if [[ "${ubuntu_v}" != *'20.04'* ]] ; then
-        sudo apt-get install -y libstdc++-5-dev # unavailable on Ubuntu 20.04
-    fi
-    sudo apt-get install -y libtool
-    sudo apt-get install -y libx11-dev
-    sudo apt-get install -y libxml-parser-perl
-    sudo apt-get install -y make
-    sudo apt-get install -y mtools
-    sudo apt-get install -y parted
-    sudo apt-get install -y pylint3
-    sudo apt-get install -y python
-    if [[ "${ubuntu_v}" != *'20.04'* ]] ; then
-        sudo apt-get install -y python-git # unavailable on Ubuntu 20.04
-    fi
-    sudo apt-get install -y python-gtk2
-    sudo apt-get install -y python-pysqlite2
-    sudo apt-get install -y python3
-    sudo apt-get install -y python3-git
-    sudo apt-get install -y python3-jinja2
-    sudo apt-get install -y python3-pexpect
-    sudo apt-get install -y python3-pip
-    sudo apt-get install -y screen
-    sudo apt-get install -y sed
-    sudo apt-get install -y socat
-    sudo apt-get install -y subversion
-    sudo apt-get install -y texi2html
-    sudo apt-get install -y texinfo
-    sudo apt-get install -y unzip
-    sudo apt-get install -y wget
-    sudo apt-get install -y xmlto
-    sudo apt-get install -y xsltproc
-    sudo apt-get install -y xterm
-    sudo apt-get install -y xz-utils
-    sudo apt-get install -y zstd # to support wic.zst file
-
+    packages="autoconf automake bmap-tools bsdmainutils build-essential "
+    packages+="chrpath coreutils cpio curl dblatex debianutils "
+    packages+="desktop-file-utils diffstat docbook-utils dosfstools "
+    packages+="dos2unix fop gawk gcc gcc-multilib git-core gnupg "
+    packages+="groff g++ iputils-ping libegl1-mesa libgl1-mesa-dev "
+    packages+="libglib2.0-dev libglu1-mesa-dev libsdl1.2-dev "
+    packages+="libtool libx11-dev libxml-parser-perl make mtools parted "
+    packages+="pylint3 python python-gtk2 python-pysqlite2 python3 "
+    packages+="python3-git python3-jinja2 python3-pexpect python3-pip "
+    packages+="screen sed socat subversion texi2html texinfo unzip "
+    packages+="wget xmlto xsltproc xsltproc xterm xz-utils zstd "
     # dependencies needed for building documents
-    sudo apt-get install -y fonts-liberation
-    sudo apt-get install -y libfreetype6-dev
-    sudo apt-get install -y libjpeg8-dev
-    sudo apt-get install -y python3-dev
-    sudo apt-get install -y python3-sphinx
-    sudo apt-get install -y texlive-fonts-recommended
-    sudo apt-get install -y texlive-latex-extra
-    sudo apt-get install -y zlib1g-dev
-    sudo pip3 install reportlab sphinxcontrib-blockdiag
+    packages+="fonts-liberation libfreetype6-dev libjpeg8-dev "
+    packages+="python3-dev python3-sphinx texlive-fonts-recommended "
+    packages+="texlive-latex-extra zlib1g-dev"
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
 
-    # SD card flash tools
-    sudo apt-get install -y bmap-tools
+    if [[ "${ubuntu_v}" != *'20.04'* ]] ; then
+        packages="libstdc++-5-dev python-git "
+        for package in $packages ; do
+            _install_if_not_installed $package
+        done
+    fi
+
+    sudo pip3 install reportlab sphinxcontrib-blockdiag &> /dev/null
+    
+    echo "Yocto build environment dependencies are installed"
 }
 
 # =============================================================================
@@ -163,7 +114,6 @@ function _yocto_reset_env_variables()
     unset PKG_CONFIG_PATH
     unset CPP
     unset LD
-
 
     # just don't know why PATH cannot be recovered!
     unset PATH
@@ -229,7 +179,7 @@ function _yocto_setup_plain_sdk()
         read answer
         distro_v=$answer
     fi
-    sdk_folder=$HOME/.$image_name-$machine-$distro-$distro_v-oesdk
+    sdk_folder=$HOME/.$image_name-oesdk/$machine/$distro-$distro_v
     echo -e "    image name: $GRN"$image_name$NOC >&2
     echo -e "       machine: $GRN"$machine$NOC >&2
     echo -e "        distro: $GRN"$distro$NOC >&2
@@ -238,8 +188,8 @@ function _yocto_setup_plain_sdk()
 
     # remove the existing sdk folder ---------
     if [ -d "$sdk_folder" ] ; then
-        echo -e "${PRP}sudo rm \"$sdk_folder\" -r${NOC}\n"
-        sudo rm "$sdk_folder" -r
+        echo -e "${PRP}sudo rm \"$HOME/.$image_name-oesdk\" -r${NOC}\n"
+        sudo rm "$HOME/.$image_name-oesdk" -r
     fi
 
     # start to install the plain SDK ----------------------

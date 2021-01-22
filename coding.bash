@@ -20,24 +20,24 @@ function _coding_clang_format_implement()
         echo "wrong usage"
         return
     fi
-    if [ $1 = 'dj' ] ; then
-        echo "copy .clang-format-dj to current folder"
+    if [ $1 = 'djz' ] ; then
+        echo ".clang-format in djz style"
         cp $djtools_path/settings/.clang-format-dj .clang-format
         return
     fi
     if [ $1 = 'bg' ] ; then
-        echo "copy .clang-format-bg to current folder"
+        echo ".clang-format in bg style"
         cp $djtools_path/settings/.clang-format-bg .clang-format
         return
     fi
 }
 
 # =============================================================================
-function _coding_clang_format_show()
+function _coding_clang_format_show_camel()
 {
-    cat << EOM
+    cat << eom
 
-        clang format naming conventions -- Camel Case
+                    Camel Case
  +-----------------------------------------------------------+
  |          Code Element | Stype                             |
  +-----------------------------------------------------------+
@@ -52,11 +52,7 @@ function _coding_clang_format_show()
  |            File names | Match the case of the class name  |
  +-----------------------------------------------------------+
 
-If you want to use Hungarian notation, refer to this page:
-    http://web.mst.edu/~cpp/common/hungarian.html
-
-  However, this is not encouraged
-EOM
+eom
 }
 
 # =============================================================================
@@ -110,7 +106,10 @@ function _dj_format()
         return
     fi
     if [ $1 = 'show' ] ; then
-        _coding_clang_format_show $2 $3 $4 $5 $6 $7
+        if [ $2 = 'camel' ] ; then
+            _coding_clang_format_show_camel $3 $4 $5 $6 $7
+            return
+        fi
         return
     fi
     if [ $1 = 'enable' ] ; then

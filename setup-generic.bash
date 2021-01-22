@@ -68,10 +68,10 @@ function _dj_setup_adobe_pdf_reader()
     # install i386 related dependencies --------------------
     sudo dpkg --add-architecture i386
     sudo apt-get -y update
-    sudo apt-get -y install libxml2:i386
-    sudo apt-get -y install libcanberra-gtk-module:i386
-    sudo apt-get -y install gtk2-engines-murrine:i386
-    sudo apt-get -y install libatk-adaptor:i386
+    _install_if_not_installed libxml2:i386
+    _install_if_not_installed libcanberra-gtk-module:i386
+    _install_if_not_installed gtk2-engines-murrine:i386
+    _install_if_not_installed libatk-adaptor:i386
 
     cd ~ && mkdir -p soft/ && cd soft/
     file="AdbeRdr9.5.5-1_i386linux_enu.deb"
@@ -149,10 +149,12 @@ function _dj_setup_computer()
 eom
 
     _press_enter_or_wait_s_continue 10
-
-    sudo apt-get install -y ark cmake curl cutecom dconf-editor dconf-tools git
-    sudo apt-get install -y git-lfs g++ htop libgtk2.0-dev lsb-core putty
-    sudo apt-get install -y screen scrot terminator tree vlc vim wmctrl xclip yasm
+    packages="ark cmake curl cutecom dconf-editor dconf-tools git "
+    packages+="git-lfs g++ htop libgtk2.0-dev lsb-core putty "
+    packages+="screen scrot terminator tree vlc vim wmctrl xclip yasm "
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
 
     # -----------------------------------
     echo -e "\n going to install Google Chrome\n"
@@ -168,9 +170,9 @@ eom
     # Windows fonts
     echo -e "\n going to support Windows fonts\n"
     _press_enter_or_wait_s_continue 10
-    sudo apt-get install ttf-mscorefonts-installer -y
-    sudo apt-get install msttcorefonts -y
-    sudo apt-get install gtk2-engines-pixbuf -y # works for solving the GTK warning
+    _install_if_not_installed ttf-mscorefonts-installer
+    _install_if_not_installed msttcorefonts
+    _install_if_not_installed gtk2-engines-pixbuf # works for solving the GTK warning
 
     # -----------------------------------
     # remove firefox
@@ -199,7 +201,7 @@ eom
     if [ ! "$gnome_v" = ' ' ] ; then
         echo -e "\n going to setup lock screen command\n"
         _press_enter_or_wait_s_continue 10
-        sudo apt-get install gnome-screensaver -y
+        _install_if_not_installed gnome-screensaver
     fi
     # -----------------------------------
     echo -e "\n time & date control: \n you need to run the code:\n"
@@ -214,8 +216,8 @@ function _dj_setup_dropbox()
     current_folder=${PWD}
 
     sudo apt-get --fix-broken install
-    sudo apt-get install libpango1.0-0 -y
-    sudo apt-get install curl -y
+    _install_if_not_installed libpango1.0-0
+    _install_if_not_installed curl
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -236,8 +238,8 @@ function _dj_setup_dropbox()
 function _dj_setup_eigen3()
 {
     current_folder=${PWD}
-    sudo apt-get install mlocate -y # updatedb is in this package
-    sudo apt-get install libeigen3-dev -y
+    _install_if_not_installed mlocate # updatedb is in this package
+    _install_if_not_installed libeigen3-dev
     echo -e "\n sudo updatedb\n this may take a few minutes\n"
     sudo updatedb
     
@@ -290,12 +292,13 @@ function _dj_setup_gcc_aarch64_linux()
     echo -e "\n install gcc-aarch64-linux-gnu ...\n"
     _press_enter_or_wait_s_continue 10
     # common
-    sudo apt-get install -y libssl-dev # needed for compiling the Linux Kernel for ARMv8
-    sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+    _install_if_not_installed libssl-dev # needed for compiling the Linux Kernel for ARMv8
+    _install_if_not_installed gcc-aarch64-linux-gnu
+    _install_if_not_installed g++-aarch64-linux-gnu
 
     if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
-        sudo apt-get install -y gcc-5-aarch64-linux-gnu
-        sudo apt-get install -y gcc-5-aarch64-linux-gnu
+        _install_if_not_installed gcc-5-aarch64-linux-gnu
+        _install_if_not_installed gcc-5-aarch64-linux-gnu
     else
         echo "do nothing at this moment"
     fi
@@ -328,15 +331,20 @@ function _dj_setup_gcc_arm_stm32()
     _press_enter_or_wait_s_continue 10
 
     cd ~ && mkdir -p soft/ && cd soft/
-
-    sudo apt-get install -y build-essential git flex bison libgmp3-dev libmpfr-dev 
-    sudo apt-get install -y libncurses5-dev libmpc-dev autoconf texinfo libtool
-    sudo apt-get install -y libftdi-dev libusb-1.0-0-dev zlib1g zlib1g-dev python-yaml
-    sudo apt-get install -y libncurses-dev
+    packages="build-essential git flex bison libgmp3-dev libmpfr-dev "
+    packages+="libncurses5-dev libmpc-dev autoconf texinfo libtool "
+    packages+="libftdi-dev libusb-1.0-0-dev zlib1g zlib1g-dev python-yaml "
+    packages+="libncurses-dev "
+    for package in $packages ; do
+        _install_if_not_installed $package
+    done
 
     if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
-        sudo echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" \
-        | sudo tee -a /etc/apt/sources.list
+        # sudo echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" \
+        # | sudo tee -a /etc/apt/sources.list
+        sudo rm -rf /etc/apt/sources.list.d/gcc-arm-stm32.list
+        sudo sh -c 'echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" \
+            >> /etc/apt/sources.list.d/gcc-arm-stm32.list'
     elif  [[ "${ubuntu_v}" = *'16.04'* ]] ; then
         echo "just do nothing"
     fi
@@ -345,7 +353,7 @@ function _dj_setup_gcc_arm_stm32()
         sudo apt-get remove gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
         sudo apt-add-repository ppa:team-gcc-arm-embedded/ppa
         sudo apt-get update
-        sudo apt-get install gcc-arm-embedded -y
+        _install_if_not_installed gcc-arm-embedded
 
         echo -e "\n"
         echo " (just maybe) gcc-arm-embedded is installed in /usr/share/gcc-arm-embedded/"
@@ -382,15 +390,16 @@ function _dj_setup_gcc_arm_linux_gnueabi()
 
     echo -e "\n install gcc-arm-linux-gnueabi ...\n"
     _press_enter_or_wait_s_continue 10
-    sudo apt-get install -y libncurses5-dev build-essential
+    _install_if_not_installed libncurses5-dev
+    _install_if_not_installed build-essential
     # commonly available
     # on Ubuntu 18.04, they are of 7.3.0 version (probably)
     # on Ubuntu 20.04, they are of 9.3.0 version
-    sudo apt-get install -y gcc-arm-linux-gnueabi
-    sudo apt-get install -y g++-arm-linux-gnueabi
+    _install_if_not_installed gcc-arm-linux-gnueabi
+    _install_if_not_installed g++-arm-linux-gnueabi
     if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
-        sudo apt-get install -y gcc-5-arm-linux-gnueabi
-        sudo apt-get install -y g++-5-arm-linux-gnueabi
+        _install_if_not_installed gcc-5-arm-linux-gnueabi
+        _install_if_not_installed g++-5-arm-linux-gnueabi
     else
         echo "do nothing at this moment"
     fi
@@ -425,14 +434,15 @@ function _dj_setup_gcc_arm_linux_gnueabihf()
 
     echo -e "\n install gcc-arm-linux-gnueabihf ...\n"
     _press_enter_or_wait_s_continue 10
-    sudo apt-get install -y libncurses5-dev build-essential
+    _install_if_not_installed libncurses5-dev
+    _install_if_not_installed build-essential
 
     # commom ones
-    sudo apt-get install -y gcc-arm-linux-gnueabihf
-    sudo apt-get install -y g++-arm-linux-gnueabihf
+    _install_if_not_installed gcc-arm-linux-gnueabihf
+    _install_if_not_installed g++-arm-linux-gnueabihf
     if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
-        sudo apt-get install -y gcc-5-arm-linux-gnueabihf
-        sudo apt-get install -y  g++-5-arm-linux-gnueabihf
+        _install_if_not_installed gcc-5-arm-linux-gnueabihf
+        _install_if_not_installed g++-5-arm-linux-gnueabihf
     else
         echo "do nothing at this moment"
     fi
@@ -467,7 +477,7 @@ function _dj_setup_git_lfs()
     curl -s \
       https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh \
       | sudo bash
-    sudo apt-get install git-lfs
+    _install_if_not_installed git-lfs
     cd $current_folder
 }
 
@@ -478,7 +488,8 @@ function _dj_setup_gitg_gitk()
 
     echo -e "\n install gitg and gitk ...\n"
     _press_enter_or_wait_s_continue 10 # to check the key pressed TODO
-    sudo apt-get install gitg gitk -y
+    _install_if_not_installed gitg
+    _install_if_not_installed gitk
     git config --global credential.helper store
     # git config --global credential.helper 'cache --timeout=36000'
     cd $current_folder
@@ -513,7 +524,7 @@ function _dj_setup_lcm()
     fi
     current_folder=${PWD}
 
-    sudo apt-get install -y default-jdk
+    _install_if_not_installed default-jdk
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf lcm
     git clone https://github.com/lcm-proj/lcm.git 
@@ -545,7 +556,7 @@ eom
 
 # =============================================================================
 # libev can also be installed by 
-# $ sudo apt-get install -y libev-dev
+# $ _install_if_not_installed libev-dev
 # however, it is the v4.22 to be installed, and the installation location is
 #   /usr/lib/x86_64-linux-gnu/
 # install from the source, will have the libev installed into
@@ -637,10 +648,10 @@ function _dj_setup_libiio()
     current_folder=${PWD}
     # install some software
     if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
-        sudo apt-get install -y libxml2-dev
+        _install_if_not_installed libxml2-dev
     fi
     if [[ "${ubuntu_v}" = *'20.04'* ]] ; then
-        sudo apt-get install -y bison flex libxml2-dev
+        _install_if_not_installed bison flex libxml2-dev
     fi
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf libiio
@@ -717,7 +728,7 @@ eom
 # =============================================================================
 function _dj_setup_mathpix()
 {
-    sudo apt-get install -y snapd
+    _install_if_not_installed snapd
     sudo snap install mathpix-snipping-tool
 }
 
@@ -728,8 +739,8 @@ function _dj_setup_matplot_xx()
     static_shared=$1
     current_folder=${PWD}
     # dependency ------
-    sudo apt-get install -y gnuplot
-    sudo apt-get install -y libfftw3-dev
+    _install_if_not_installed gnuplot
+    _install_if_not_installed libfftw3-dev
 
     # removed pre-installed files ------
     sudo rm -f /usr/local/lib/Matplot++/libnodesoup.a
@@ -798,7 +809,7 @@ function _dj_setup_mbed()
 {
     current_folder=${PWD}
 
-    sudo apt-get install mercurial git
+    _install_if_not_installed mercurial git
     # install mbed-cli
     python3 -m pip install mbed-cli
     cat << eom
@@ -852,12 +863,6 @@ function _dj_setup_mongodb()
     sudo apt-get update -y
     uname_a=$(uname -a)
     if [[ "${ubuntu_v}" = *'20.04'* ]] ; then
-        # sudo apt-get -y install dirmngr
-        # sudo apt-get -y install gnupg
-        # sudo apt-get -y install apt-transport-https
-        # sudo apt-get -y install ca-certificates
-        # sudo apt-get -y install software-properties-common
-
         # install v4.4 on x86 and aarch64 system
         wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
         if [[ "${uname_a}" = *'aarch64'* ]] ; then
@@ -870,7 +875,7 @@ function _dj_setup_mongodb()
 
         # install
         sudo apt-get -y update
-        sudo apt-get -y install mongodb-org
+        _install_if_not_installed mongodb-org
 
         # Enable and start MongoDB Deamon program
         sudo systemctl enable --now mongod
@@ -909,12 +914,12 @@ eom
 function _dj_setup_nvidia()
 {
     sudo apt-get purge nvidia*
-    sudo apt-get install -y libncurses5-dev
+    _install_if_not_installed libncurses5-dev
     if [[ "${ubuntu_v}" = *'18.04'* || \
           "${ubuntu_v}" = *'20.04'* ]] ; then
         sudo add-apt-repository ppa:graphics-drivers/ppa
         sudo apt-get -y update
-        sudo apt-get -y install nvidia-driver-455 nvidia-settings
+        _install_if_not_installed nvidia-driver-455 nvidia-settings
     fi
     cat << eom
 
@@ -947,7 +952,7 @@ function _dj_setup_nvtop()
     fi
     # on my laptop, this method failed, due to some dependency issue
     # if [[ "${ubuntu_v}" = *'20.04'* ]] ; then
-    #     sudo apt-get install -y nvtop
+    #     _install_if_not_installed nvtop
     # fi
 
     cd ${cwd_before_running}
@@ -961,7 +966,7 @@ function _dj_setup_qt_5_13_1()
     echo -e "\n install Qt 5.13.1 \n"
     
     # install serialport module
-    sudo apt-get install libqt5serialport5-dev -y
+    _install_if_not_installed libqt5serialport5-dev
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -998,7 +1003,7 @@ function _dj_setup_qt_5_14_2()
     _press_enter_or_wait_s_continue 10
     
     # install serialport module
-    sudo apt-get install libqt5serialport5-dev -y
+    _install_if_not_installed libqt5serialport5-dev
 
     cd ~ && mkdir -p soft/ && cd soft/
     http://qt.mirror.constant.com/archive/qt/5.14/5.14.2/qt-opensource-linux-x64-5.14.2.run
@@ -1131,14 +1136,14 @@ function _dj_setup_sublime()
     current_folder=${PWD}
 
     sudo apt-get update
-    sudo apt-get install apt-transport-https ca-certificates curl -y
-    sudo apt-get install software-properties-common -y
+    _install_if_not_installed apt-transport-https ca-certificates curl
+    _install_if_not_installed software-properties-common
 
     curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
     sudo add-apt-repository "deb https://download.sublimetext.com/ apt/stable/"
     
     sudo apt-get update
-    sudo apt-get install sublime-text
+    _install_if_not_installed sublime-text
     
     cd $current_folder
 }
@@ -1149,9 +1154,9 @@ function _dj_setup_typora()
     wget -qO - https://typora.io/linux/public-key.asc | sudo apt-key add -
     # add Typora's repository
     sudo add-apt-repository 'deb https://typora.io/linux ./'
-    sudo apt-get update
+    sudo apt-get -y update
     # install typora
-    sudo apt-get install typora -y
+    _install_if_not_installed typora
 }
 
 # =============================================================================
@@ -1163,7 +1168,7 @@ function _dj_setup_vscode()
     cd ~ && mkdir -p soft/ && cd soft/
     
     # install dependency
-    sudo apt-get install -y curl
+    _install_if_not_installed curl
 
     echo -e "\n install vscode ...\n"
     curl -L "https://go.microsoft.com/fwlink/?LinkID=760868" > vscode.deb
@@ -1186,7 +1191,7 @@ function _dj_setup_yaml_cpp()
 
     # dependencies to install --------------
     sudo apt-get -y update
-    sudo apt-get -y install build-essential
+    _install_if_not_installed build-essential
 
     dj setup cmake
     sudo rm -rf /usr/local/lib/libyaml-cpp*

@@ -12,7 +12,7 @@ function _dj_clone_repo_list() # platform
         file=$HOME/.$platform-repos-$BitBucket_username
     fi
     if [ ! -f $file ] ; then
-        echo "no_repo_list_file_in_${HOME}/_directory"
+        echo "no_repo_list_file_in_${HOME}/_directory" &> /dev/null
         return
     fi
     list=$(cat $file)
@@ -23,7 +23,7 @@ function _dj_clone_repo_list() # platform
 function _dj_clone_help()
 {
     _dj_help
-    cat << EOM
+    cat << eom
 
  ---------------------- dj clone/clone-ssh ------------------------
  Second level commands:
@@ -32,7 +32,7 @@ function _dj_clone_help()
     gitee    - to clone repo from GiTee
     MORE IS COMMING
  ------------------------------------------------------------------
-EOM
+eom
 }
 
 # =============================================================================

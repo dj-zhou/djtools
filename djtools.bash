@@ -27,6 +27,7 @@ ubuntu_v=$(lsb_release -a)
 
 # =============================================================================
 source $djtools_path/block-device.bash
+source $djtools_path/build.bash
 source $djtools_path/code-name.bash
 source $djtools_path/coding.bash
 source $djtools_path/dj-commands.bash
@@ -35,7 +36,6 @@ source $djtools_path/keyremap.bash
 source $djtools_path/kernel.bash
 source $djtools_path/mark-down.bash
 source $djtools_path/m.bash
-source $djtools_path/meson-build.bash
 source $djtools_path/mirror.bash
 source $djtools_path/repod.bash
 source $djtools_path/resized.bash
@@ -60,7 +60,6 @@ alias maek="make"
 alias mkae="make"
 alias amke="make"
 alias maek="make"
-# alias mc="make clean"
 alias d="djfile"
 alias ccc="clear"
 alias geidt="gedit"

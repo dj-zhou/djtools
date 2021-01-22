@@ -21,10 +21,10 @@ function _dj_setup_ros_melodic()
 
     # installation ---------------
     sudo apt-get -y update || true
-    sudo apt-get install ros-melodic-desktop-full -y
+    _install_if_not_installed ros-melodic-desktop-full
 
     # initialize rosdep ---------------
-    sudo apt-get install python-pip
+    _install_if_not_installed python-pip
     sudo pip install -U rosdep
     sudo rm /etc/ros/rosdep/sources.list.d/20-default.list
     sudo rosdep init || true
@@ -41,8 +41,8 @@ function _dj_setup_ros_melodic()
         echo -e "source /opt/ros/melodic/setup.bash\n" >> ~/.bashrc
     fi
 
-    sudo apt-get -y install python-roslaunch
-    sudo apt-get -y install python3-roslaunch
+    _install_if_not_installed python-roslaunch
+    _install_if_not_installed python3-roslaunch
 
     echo -e '\n' >> ~/.bashrc
     echo '# ===========================================================' >> ~/.bashrc
@@ -53,7 +53,7 @@ function _dj_setup_ros_melodic()
     echo -e "\n ROS (1) settings are in ~/.bashrc.\n"
 
     # setup workspace ---------------
-    cat << EOM
+    cat << eom
 
     ---------------------------------------------
     You can run those now:
@@ -63,7 +63,7 @@ function _dj_setup_ros_melodic()
       $ catkin_make
     ---------------------------------------------
 
-EOM
+eom
 
     cd ${cwd_before_running}
 }
@@ -90,16 +90,16 @@ function _dj_setup_ros_noetic()
 
     # installation ---------------
     sudo apt-get -y update || true
-    sudo apt-get install -y ros-noetic-desktop-full
+    _install_if_not_installed ros-noetic-desktop-full
 
     # initialize rosdep ---------------
-    sudo apt-get install -y python3-rosdep2
+    _install_if_not_installed python3-rosdep2
     sudo rm /etc/ros/rosdep/sources.list.d/20-default.list
     sudo rosdep init || true
     rosdep update
 
     # fix a problem: ros noetic resource not found: roslaunch
-    sudo apt-get install ros-noetic-roswtf
+    _install_if_not_installed ros-noetic-roswtf
 
     installed=0
     while IFS='' read -r line || [[ -n "$line" ]] ; do
@@ -121,7 +121,7 @@ function _dj_setup_ros_noetic()
     echo -e "\n ROS (1) settings are in ~/.bashrc\n"
 
     # setup workspace ---------------
-        cat << EOM
+    cat << eom
 
     ---------------------------------------------
     You can run those now:
@@ -131,7 +131,7 @@ function _dj_setup_ros_noetic()
       $ catkin_make
     ---------------------------------------------
 
-EOM
+eom
 
     cd ${cwd_before_running}
 }
@@ -155,17 +155,19 @@ function _dj_setup_ros2_foxy_from_deb_package()
     
     # install dependencies ---------------
     sudo apt-get -y update
-    sudo apt-get -y install curl gnupg2 lsb-release
+    _install_if_not_installed curl gnupg2 lsb-release
 
     # authorize our GPG key with apt ---------------
     curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 
     # setup sources.list ---------------
-    sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+    if [ ! -f /etc/apt/sources.list.d/ros2-latest.list ] ; then
+        sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+    fi
 
     # installation ---------------
     sudo apt-get -y update || true
-    sudo apt-get -y install ros-foxy-desktop
+    _install_if_not_installed ros-foxy-desktop
 
     source /opt/ros/foxy/setup.bash
 
@@ -186,7 +188,7 @@ function _dj_setup_ros2_foxy_from_deb_package()
         echo -e "source /opt/ros/foxy/setup.bash\n" >> ~/.bashrc
     fi
 
-    cat << EOM
+    cat << eom
 
     ---------------------------------------------
     Try ROS2:
@@ -203,7 +205,7 @@ function _dj_setup_ros2_foxy_from_deb_package()
     https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/#install-additional-rmw-implementations-optional
     https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/#install-additional-packages-using-ros-1-packages
 
-EOM
+eom
 
     cd ${cwd_before_running}
 }
@@ -216,7 +218,7 @@ function _dj_setup_ros2_foxy()
         return
     fi
     if [ $1 = '--from-source' ] ; then
-        echo  "from source, todo"
+        echo  "from source: todo"
         return
     fi
 }

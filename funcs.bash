@@ -260,3 +260,31 @@ function _wget_if_not_exist() # $filename $md5sum $url
         wget "${url}"
     fi
 }
+
+# =============================================================================
+# this looks not precise?
+function _check_if_package_installed()
+{
+    # https://stackoverflow.com/questions/1298066/check-if-an-apt-get-package-is-installed-and-then-install-it-if-its-not-on-linu
+    PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $1 | grep "install ok installed")
+    if [ "" = "$PKG_OK" ]; then
+        echo "no"
+    else
+        echo "yes"
+    fi
+
+}
+
+# =============================================================================
+# should find a better way to install
+function _install_if_not_installed()
+{
+    for package in "$@" ; do
+        if [[ "no" = $(_check_if_package_installed $package) ]] ; then
+            echo -e "install $GRN$package$NOC"
+            sudo apt-get install -y $package &> /dev/null
+        else
+            echo -e "$GRN$package$NOC is already installed"
+        fi
+    done
+}

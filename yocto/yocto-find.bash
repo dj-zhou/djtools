@@ -234,6 +234,8 @@ function _yocto_find_image_name_in_build_directory()
 }
 
 # =============================================================================
+# todo: for hddimg file, there is still a *.wic file, not just *.wic.gz file
+# todo: let it work for upboard
 function _yocto_find_image_file() # $tmp_dir $machine
 {
     tmp_dir=$1
