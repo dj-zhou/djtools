@@ -3,15 +3,16 @@
 # =============================================================================
 function _zephyr_help()
 {
-    echo " "
-    echo "---------------------  zephyr ------------------------"
-    echo " Author      : Dingjiang Zhou"
-    echo " Email       : zhoudingjiang@gmail.com "
-    echo " Create Date : June 14th, 2020 "
-    echo "-----------------------------------------------------"
-    echo " "
-    echo " TODO"
-    echo " "
+    cat << eom
+    ---------------------- zephyr -----------------------
+     Author      : Dingjiang Zhou
+     Email       : zhoudingjiang@gmail.com
+     Create Date : June 14th, 2020
+    -----------------------------------------------------
+
+    TODO
+
+eom
 }
 
 # =============================================================================
@@ -35,16 +36,12 @@ function _zephyr_setup_sdk_0_11_4()
     echo -e "\n ${GRN} install dependencies ${NOC}"
     _press_enter_or_wait_s_continue 5
     sudo apt-get -y update && sudo apt-get -y upgrade
-    # sudo apt-get install --no-install-recommends git cmake ninja-build gperf \
-    #     ccache dfu-util device-tree-compiler wget \
-    #     python3-dev python3-pip python3-setuptools \
-    #     python3-tk python3-wheel xz-utils file \
-    #     make gcc gcc-multilib g++-multilib libsdl2-dev
     _install_if_not_installed git cmake ninja-build gperf
     _install_if_not_installed ccache dfu-util device-tree-compiler wget
     _install_if_not_installed python3-dev python3-pip python3-setuptools
     _install_if_not_installed python3-tk python3-wheel xz-utils file
     _install_if_not_installed make gcc gcc-multilib g++-multilib libsdl2-dev
+
     # install latest CMake ---------------------
     dj setup cmake
 
@@ -240,16 +237,16 @@ function _zephyr_setup_sdk_0_11_4()
 function _zephyr_build_help()
 {
     echo -e "\n ------------ zephyr build (simplified tool) --------------"
-    echo "  maitainer: Dingjiang Zhou "
+    echo    "  maitainer: Dingjiang Zhou "
     echo -e " ----------------------------------------------------------\n"
-    echo "supported commands:"
-    echo " zephyr build -b <board> [-G <make tool>]"
-    echo " - <board> "
-    echo "   supported boards. includes the following: "
-    echo "      nucleo_f767zi"
-    echo "      ..."
-    echo " - <make tool>"
-    echo "   ninja or cmake, or west (wip)"
+    echo    "supported commands:"
+    echo    " zephyr build -b <board> [-G <make tool>]"
+    echo    " - <board> "
+    echo    "   supported boards. includes the following: "
+    echo    "      nucleo_f767zi"
+    echo    "      ..."
+    echo    " - <make tool>"
+    echo    "   ninja or cmake, or west (wip)"
     echo -e "   the default tool is ninja\n"
 }
 

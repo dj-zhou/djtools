@@ -46,9 +46,9 @@ function _dj_udev_dialout()
 
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo 'KERNEL=="ttyUSB*",MODE="0666"' \
-    | sudo tee -a /etc/udev/rules.d/$rule_file
+        | sudo tee -a /etc/udev/rules.d/$rule_file
     echo 'KERNEL=="ttyACM*",MODE="0666"' \
-    | sudo tee -a /etc/udev/rules.d/$rule_file
+        | sudo tee -a /etc/udev/rules.d/$rule_file
 
     sudo service udev restart
 }

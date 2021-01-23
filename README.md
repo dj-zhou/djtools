@@ -1,15 +1,13 @@
 # djtools
 ### Introduction
 
-This repo contains some useful scripts for installing software, check daily work, check status on repos, and so on.
+This is a **tab-completable** toolsets  contain some useful scripts for installing software, checking daily work, checking status on repos, building projects, dealing with mirrors, simplifying Yocto BitBake commands, and so on.
 
 Supported system: Ubuntu 16.04/18.04/20.04. Note that Ubuntu 16.04 is not fully tested, and Ubuntu 20.04 is under test.
 
-The commands in this repo are **tab-completable**. 
-
 ### Installation
 
-The installation script will install some necessary software, and will make the bash scripts in this repo valid by putting **bitbucket/github/gitee usernames** into **~/.bashrc**, which, will source the **djtools.bash** every time open a new terminal.
+The installation script will install some necessary software, and will make the bash scripts in this repo valid by putting **BitBucket/GitHub/GiTee usernames** into **~/.bashrc**, which, will source the **djtools.bash** every time when opening a new terminal.
 
 ```bash
 cd /path/to/djtools
@@ -57,13 +55,23 @@ GiTee_username=dj-zhou
 source /home/robot/workspace/djtools/djtools.bash
 ```
 
+Meanwhile, there are three files generated in `~` directory:
+
+```text
+.BitBucket-repos-sky-Hawk
+.GiTee-repos-d-zhou
+.GitHub-repos-dj-zhou
+```
+
+You can put the names of repositories into theses files to enable the **tab completable** feature of  `dj clone` and `dj clone-ssh` commands.
+
 ### `dj` Commands
 
 #### `dj clone`
 
 Used to clone the repositories from **BitBucket/GitHub/GiTee**. A specific branch can be cloned.
 
-The tab-completion feature requires to add the repository names into a hard-coded file. For example, you can create a file `.github-repos-<github username>` in home directory, then the command:
+The tab-completion feature requires to add the repository names into a hard-coded file. For example, you can create a file `.GitHub-repos-<github username>` in home directory, then the command:
 
 ```bash
 dj clone github <tab> <tab>
@@ -81,13 +89,13 @@ cv                   math-for-ml-note     pangolin             tutorials
 dj-gadgets           matplotlib-cpp       robotics-note        yaml-cpp
 ```
 
-since I have those listed in the `~/.github-repos-dj-zhou`. If the file is not found, it will use the repository listed in `settings/github-repos` instead.
+since I have those listed in the `~/.GitHub-repos-dj-zhou`.
 
 The same rules applied to GiTee and BitBucket.
 
 #### `dj clone-ssh`
 
-A similar command to `dj clone`, with the difference that the repository is with ssh links. For example,
+A similar command to `dj clone`, with the difference that the repository is with ssh links. For example, the command
 
 ```bash
 dj clone-ssh github robotics-note
@@ -101,19 +109,31 @@ git clone git@github.com:dj-zhou/robotics-note.git
 
 #### `dj setup`
 
-Used to install software, including arm-gcc, clang-9.0.0, eigen, foxit, gitg, kdiff3, glfw3, opencv, pangolin, pip, Qt, stm32tools, typora, vscode, vtk, yaml-cpp. The list will be extended without notification. By table completion, you can see the full installation list.
+Used to install software, including `gcc-arm-stm32,` etc. The list will be extended without notification. By table completion, you can see the full installation list:
 
 ```bash
 $ dj setup 
-arm-gcc           gitg-kdiff3       pangolin          sublime
-baidu-netdisk     glfw3-gtest-glog  pip               typora
-clang-9.0.0       grpc-1.29.1       qt-5.11.2         vscode
-computer          i219-v            qt-5.13.1         vtk-8.2.0
-container         libev-4.33        qt-5.14.2         wubi
-dj-gadgets        mathpix           ros2-foxy         yaml-cpp
-dropbox           matplotlib-cpp    ros-melodic       
-eigen             opencv-2.4.13     slack             
-foxit             opencv-4.1.1      stm32tools 
+adobe-pdf-reader         gnome                    pangolin
+arduino-1.8.13           google-repo              pip
+baidu-netdisk            grpc-1.29.1              qemu
+clang-format             gtest-glog               qt-5.13.1
+clang-llvm               i219-v                   qt-5.14.2
+cmake                    kdiff3-meld              ros2-foxy
+computer                 lcm                      ros-melodic
+container                libev-4.33               ros-noetic
+devtools                 libgpiod                 saleae-logic
+dj-gadgets               libiio                   slack
+dropbox                  lib-serialport           spdlog
+eigen3                   libyaml-cpp              stm32-cubeMX
+foxit-pdf-reader         mathpix                  stm32-tools
+g++-10                   matplot++                sublime
+gcc-aarch64-linux-gnu    mbed                     typora
+gcc-arm-linux-gnueabi    mongodb                  vim-env
+gcc-arm-linux-gnueabihf  nvidia                   vscode
+gcc-arm-stm32            nvtop                    vtk-8.2.0
+gitg-gitk                opencv-2.4.13            wubi
+git-lfs                  opencv-4.1.1             you-complete-me
+glfw3                    opencv-4.2.0             
 ```
 
 #### `dj ssh`
@@ -128,9 +148,13 @@ This command is used to copy the ssh key to a remote computer such that you will
 
 #### `dj udev`
 
-Used to setup some udev for USB to serial ports, and  video capture card.
+Used to setup some udev for USB to serial ports, and  video capture card, FT4232H, etc.
 
-<span style="color:blue">This part will be revised to be none-project specific.</span>
+```bash
+~ $ dj udev 
+--dialout          logitech-f710      --show             uvc-video-capture
+ft4232h            one-third-console  stlink-v2.1  
+```
 
 #### `dj work-check`
 
@@ -146,34 +170,24 @@ It is recommended to run this command to see if there is some work have not been
 
 #### `dj meson`
 
-It is a simplified version of meson configuration and build. It has some logic:
+`dj meson find` is used to find some contents in the `meson.build` files in a project. It is very useful if the project has multiple `meson.build` files.
 
-* If the current path is in a `build` folder, it will `cd ..` and `rm build` and `meson build` and then `ninja -C build`.
-* If the current path contains a `build` folder, it will `rm build` and `meson build` and then `ninja -C build`.
-* Otherwise, if there is a `meson.build` file, it will  `meson build` and then `ninja -C build`.
+#### `dj replace`
 
-### `coding` Commands
-
-The `coding` commands are used to work with `clang-format` and replacing some content in a folder, or a specific file.
-
-replace strings in a file or the files in a folder; and for coping the `.clang-format` to current folder `./`.
-
-#### `coding replace`
-
-Used to replace the text content of \<original\> to \<new\> in a file or a folder. Usage:
+Used to replace the text content of `\<original\>` to `\<new\>` in a file or a folder. Usage:
 
 ```bash
-coding replace <original> <new> <path to file or folder>
+dj replace <original> <new> <path to file or folder>
 ```
 
-It is useful to replace the name of a global variable in a folder. <span style="color:blue">Note: global variables are not recommended in programming.</span>
+It is useful to replace the name of a global variable in a folder.
 
-#### `coding clang-format`
+#### `dj formrat`
 
 Used to implement a `.clang-format` file to the current path. For example:
 
 ```bash
-coding clang-format implement dj
+coding clang-format implement djz
 ```
 
 will copy the file `.clang-format-dj` from the `djtools` folder to the current folder, and rename it to `.clang-format`.
@@ -253,13 +267,71 @@ This command will leave settings in the `~/.bashrc` file.
 
 ### `yocto` Commands
 
-#### `yocto clone`
+#### `yocto bake`
 
-To clone Yocto related meta data or repos.
+To bitbake an image defined in some meta layer. The command is valid only in a Yocto Build directory. Take [yocto-up-board](https://github.com/dj-zhou/yocto-up-board) as an example:
+
+```bash
+cd yocto-up-board/up-board
+mamba@asus-rog: up-board $ yocto bake <tab tab>
+meta-intel           meta-up-board        openembedded-core    
+meta-openembedded    meta-virtualization  poky                 
+mamba@asus-rog: up-board $ yocto bake meta-up-board upboard- <tab tab>
+upboard-image-base        upboard-image-secureboot  
+upboard-image-sato        upboard-robotics-image    
+```
+
+#### `yocto build`
+
+It is used tot build a plain SDK. If there are multiple images in the build directory, you will need to choose one image:
+
+```bash
+mamba@asus-rog: up-board $ yocto build plain-sdk upboard-
+upboard-image-base      upboard-robotics-image  
+```
 
 #### `yocto flash`
 
-Used to flash the image to the SD card.
+Used to flash the image to the SD card. For ARM based Yocto images, it will flash the `wic` iamge file to a SD card:
+
+```bash
+yocto flash /dev/sda appolo-image
+```
+
+The output is:
+
+```bash
+todo
+```
+
+For x86 based Yocto images: TODO.
+
+#### `yocto list`
+
+It is used to list distributions, images, machines defined in the meta layers.
+
+```bash
+mamba@asus-rog: up-board $ yocto list 
+distros    images     machines   resources 
+```
+
+#### `yocto setup`
+
+It is used to setup the development environment, or the plain-sdk.
+
+#### `yocto show`
+
+It is used to  list a specific distro, image, machine, or recipe. For example:
+
+```bash
+mamba@asus-rog: yocto-up-board $ yocto show recipe-bb eigen
+
+---------------------------------------
+meta-openembedded
+./meta-oe/recipes-support/libeigen/libeigen_3.3.7.bb
+```
+
+hence we know the `libeigen` upstream is defined in `meta-openembedded` layer.
 
 ### `zephyr` Commands
 

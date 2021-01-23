@@ -13,6 +13,7 @@ function _yocto_help()
   The yocto toolset is to make the Yocto related commands simpler.
 
   supported first level commands:
+     bake    -- to bitbake an image
      build   -- to build the plain SDK, or build applications using the SDK, etc
      flash   -- to flash the image into SD card
      list    -- to list machines, images, or resources
@@ -139,8 +140,13 @@ function _yocto_reset_env_variables()
 }
 
 # =============================================================================
-function _yocto_setup_plain_sdk()
+function _yocto_setup_plain_sdk() #image-name
 {
+    if [ $# -lt 1 ] ; then
+        echo "yocto setup plain-sdk: need the image name"
+        return
+    fi
+    image_name=$1
     # must be a valid buid directory ------------------
     if [ $(_yocto_check_is_a_build_directory) = 'false' ] ; then
         echo -e "\n ${PRP}yocto setup plain-sdk${NOC}:"
@@ -156,21 +162,21 @@ function _yocto_setup_plain_sdk()
 
     # check if there is a sdk/ directory --------------
     if [ ! -d $TMPDIR/deploy/sdk ] ; then
-        echo -e "\n ${PRP}yocto install sdk${NOC}:"
+        echo -e "\n ${PRP}yocto setup plain-sdk${NOC}:"
         echo -e "    no SDK found, exit!!"
-        echo -e "    run: \"b${PRP}itbake -c populate_sdk <image>${NOC}\" to build a SDK.\n"
+        echo -e "    run: \"b${PRP}itbake -c populate_sdk <image name>${NOC}\" to build a SDK.\n"
         return
     fi
     
     # there should be only one sh file, and that is the SDK source
-    sdk_source=$(ls $TMPDIR/deploy/sdk | grep host.manifest | sed 's/host.manifest/sh/g')
-    if [ -z $sdk_source ] ; then
-        echo -e "${RED}SDK source is not found, exit.!\n${NOC}"
+    sdk_source=$(ls $TMPDIR/deploy/sdk/*$image_name* | grep host.manifest | sed 's/host.manifest/sh/g')
+    # echo "sdk_source = $sdk_source"
+    if [ -z "$sdk_source" ] ; then
+        echo -e "${RED}SDK source is not found, exit!\n${NOC}"
         return
     fi
-    
+
     # get the final target SDK directory -------------------
-    image_name=$(_yocto_find_image_name_in_build_directory)
     machine=$(_yocto_find_MACHINE)
     distro=$(_yocto_find_DISTRO)
     distro_v=$(_yocto_find_DISTRO_VERSION)
@@ -186,6 +192,7 @@ function _yocto_setup_plain_sdk()
     echo -e "distro version: $GRN"$distro_v$NOC >&2
     echo -e " sdk directory: $GRN"$sdk_folder$NOC  >&2
 
+    # return
     # remove the existing sdk folder ---------
     if [ -d "$sdk_folder" ] ; then
         echo -e "${PRP}sudo rm \"$HOME/.$image_name-oesdk\" -r${NOC}\n"
@@ -195,6 +202,6 @@ function _yocto_setup_plain_sdk()
     # start to install the plain SDK ----------------------
     tmp_var=$LD_LIBRARY_PATH
     unset LD_LIBRARY_PATH # this is important, why? not sure yet.
-    ./$TMPDIR/deploy/sdk/$sdk_source -d $sdk_folder
+    $sdk_source -d $sdk_folder
     LD_LIBRARY_PATH=$tmp_var
 }

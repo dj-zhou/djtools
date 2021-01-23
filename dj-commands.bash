@@ -29,6 +29,7 @@ function _dj_help()
     echo -e "\n"
 }
 
+# =============================================================================
 function _clang_write_to_file_part1() {
     file=$1
     echo '{'                                            >> ${file}
@@ -147,7 +148,6 @@ function _clang_format_vscode_setting_json()
     echo -e " you can revise it manually"
     cd $current_folder_json
 }
-
 
 # =============================================================================
 function _clang_llvm_vscode_setting_json()

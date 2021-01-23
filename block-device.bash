@@ -83,9 +83,23 @@ function _prepare_sd_card_for_flash()
     sudo umount ${dev}?*  &> /dev/null
     # this only work for a particular filesystem type
     # printf "o\nn\np\n1\n\n\nw\n" | sudo fdisk "$dev"
-    sudo dd if=/dev/zero of=$dev bs=4M count=1 conv=notrunc
+    sudo dd if=/dev/zero of=$dev bs=4M count=1 conv=notrunc &> /dev/null
     
-    sudo mkfs.ext4 "${dev}1" 
+    sudo mkfs.ext4 "${dev}1" &> /dev/null
 
-    sudo chmod 666 $dev
+    sudo chmod 666 $dev &> /dev/null
+}
+
+# =============================================================================
+function _find_block_device()
+{
+    devices="/dev/sda /dev/sdb /dev/sdc /dev/sdd /dev/sde "
+    devices+="/dev/sdf /dev/sdg /dev/sdh "
+    existed_devices=" "
+    for d in $devices ; do
+        if [ -b "$d" ] ; then
+            existed_devices+="$d "
+        fi
+    done
+    echo "$existed_devices"
 }

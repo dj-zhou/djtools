@@ -36,7 +36,6 @@ function _work_check()
     else
         target_path="$1"
     fi
-    # echo "target_path: "$target_path
     
     # check all folders target_path folder --------------------
     if [[ ! -d $target_path ]] ; then
@@ -47,7 +46,6 @@ function _work_check()
     fi
     cd $target_path
     workspace_path=$(pwd)
-    # echo $workspace_path
 
     CURRENT_DATE_TIME=$(date +"%Y%m%d-%I%M%S")
     OUTPUT_FILE="${HOME}/work-check-${HOSTNAME}-${CURRENT_DATE_TIME}.txt"
@@ -145,9 +143,7 @@ function _work_check()
     echo -ne "\n" >> $OUTPUT_FILE
     echo -ne "\n" >> $OUTPUT_FILE
     echo -ne "\n" >> $OUTPUT_FILE
-    # echo " "
-    # echo " "
-    # echo "----------------- git simple diff -----------------"
+
     cd $workspace_path/
     echo -ne "+-----------------------------------------------+\n" >> $OUTPUT_FILE
     echo -ne "|--------------- git simple diff ---------------|\n" >> $OUTPUT_FILE
@@ -178,9 +174,6 @@ function _work_check()
     echo -ne "\n" >> $OUTPUT_FILE
     echo -ne "\n" >> $OUTPUT_FILE
 
-    # echo " "
-    # echo " "
-    # echo "------------ git detailed local change ------------"
     cd $workspace_path/
     echo -ne "+-----------------------------------------------+\n" >> $OUTPUT_FILE
     echo -ne "|---------- git detailed local change ----------|\n" >> $OUTPUT_FILE
@@ -191,7 +184,6 @@ function _work_check()
             git_source=$(_work_check_git_source)
             if [[ $git_source != "----" ]] ; then
                 repo=$(basename "$folder")
-                # echo $repo
                 if [ -x "$path" ]; then
                     cd $workspace_path/$repo
                     branch_diff=$(git diff)

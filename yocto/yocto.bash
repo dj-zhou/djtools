@@ -4,8 +4,19 @@ source $djtools_path/yocto/yocto-env.bash
 source $djtools_path/yocto/yocto-find.bash
 
 # =============================================================================
-function _yocto_build_plain_sdk()
+function _yocto_bake_image() # meta-layer #image-name
 {
+    source ../poky/oe-init-build-env .
+    bitbake $2
+}
+
+# =============================================================================
+function _yocto_build_plain_sdk() # image-file
+{
+    if [ $# -lt 1 ] ; then
+        echo "yocto build plain-sdk: need the image name"
+        return
+    fi
     # must be in a build directory ---------------
     if [ $(_yocto_check_is_a_build_directory) = 'false' ] ; then
         echo -e "not in a valid bitbake build directory, exit!\n"
@@ -13,31 +24,30 @@ function _yocto_build_plain_sdk()
     fi
 
     # it can fail to find image name ------------------
-    image_name=$(_yocto_find_image_name_in_build_directory) 
-    if [ -z $image_name ] ; then
+    image_file=$(_yocto_find_image_file_from_its_name $1) 
+    if [ -z $image_file ] ; then
         echo -e "image is not built, need to build the image first, exit!\n"
         return
     fi
     # finally, build the plain-sdk ------------------
     echo -e "\n is going to build the SDK with the command:"
-    echo -e "   ${PRP}bitbake -c populate_sdk $image_name${NOC}\n"
+    echo -e "   ${PRP}bitbake -c populate_sdk $1${NOC}\n"
     _press_enter_or_wait_s_continue 5
-    bitbake -c populate_sdk $image_name
+    bitbake -c populate_sdk $1
 }
 
 # =============================================================================
 # $1 must be the device block, for example, /dev/sda
 # $2 to all others, can be -f and other options, like image.wic.gz, or *.wic.zst
 # todo: let it work for upboard
-function _yocto_flash()
+function _yocto_flash() # block-device # image-file
 {
     # argument check -------------------
     if [ $# -lt 1 ] ; then
-        echo -e "\n usage:\n   yocto flash /dev/sdx"
+        echo -e "\n usage:\n   yocto flash /dev/sdx <image name>"
         echo -e "      or \n   yocto flash /dev/sdx -f [filename].wic.gz"
         return
     fi
-
     # check the device block ------------
     dev_str=$1
     dev=$(_find_block_device $dev_str)
@@ -73,14 +83,14 @@ function _yocto_flash()
         fi
         # find the wic.gz or wic.zst file ----------
         # if some other target use some other kind of file, update this ------
-        image_file=$(_yocto_find_image_file $tmp_dir $machine)
+        image_file=$(_yocto_find_image_file_from_its_name $2)
         if [ -z "$image_file" ] ; then
             echo -e "image file not found, exit!\n"
             return
         fi
-        echo -e "       image file: ${GRN}$image_file${NOC}"
+        echo -e "       image name: ${GRN}$2${NOC}"
         echo -e "    file location: ${GRN}$tmp_dir/deploy/images/$machine/${NOC}"
-        wic_file=$tmp_dir/deploy/images/$machine/$image_file
+        wic_file=$image_file
         # if it is a symbolic file ----------
         if [ -L "$wic_file" ] ; then
             wic_file=$(readlink -f $wic_file)
@@ -133,6 +143,11 @@ function yocto()
     # ------------------------------
     if [ $# -eq 0 ] ; then
         _yocto_help
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'bake' ] ; then
+        _yocto_bake_image $2 $3 $4 $5
         return
     fi
     # ------------------------------
@@ -217,6 +232,7 @@ function _yocto()
 
     # All possible first values in command line
     local SERVICES=("
+        bake
         build
         flash
         list
@@ -228,19 +244,45 @@ function _yocto()
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
+    bake_list="$(_yocto_find_meta_layers) "
+    ACTIONS[bake]="$bake_list "
+    for i in $bake_list ; do
+        image_list="$(_yocto_find_images_of_layer $i) "
+        ACTIONS[$i]="$image_list "
+        for j in $image_list ; do
+            ACTIONS[j]=" "
+        done
+    done
+    # ------------------------------------------------------------------------
     build_list="plain-sdk "
     ACTIONS[build]="$build_list "
     for i in $build_list ; do
         ACTIONS[$i]=" "
     done
-    # ------------------------------------------------------------------------
-    flash_list="/dev/sda /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg "
-    ACTIONS[flash]="$flash_list "
-    for i in $flash_list ; do
+    # ---------------------------
+    setup_list="dev-env plain-sdk "
+    ACTIONS[setup]="$setup_list "
+    for i in $setup_list ; do
         ACTIONS[$i]=" "
     done
-    # smart tab-completion ----------------
-    wic_files="$(ls . | grep wic.gz)"
+    plain_sdk_list="$(_yocto_find_images_in_tmp_deploy) "
+    ACTIONS[plain-sdk]="$plain_sdk_list "
+    for i in $plain_sdk_list ; do
+        ACTIONS[$i]=" "
+    done
+    # ------------------------------------------------------------------------
+    block_device_list="$(_find_block_device)"
+    ACTIONS[flash]="$block_device_list "
+    for i in $block_device_list ; do
+        image_file_list="$(_yocto_find_images_in_tmp_deploy) "
+        ACTIONS[$i]="$image_file_list "
+        for j in $image_file_list ; do
+            ACTIONS[$j]=" "
+        done
+    done
+    
+    # smart tab-completion for -f option ----------------
+    wic_files="$(ls . | grep wic.gz) "
     wic_files+="$(ls . | grep wic.zst) "
     ACTIONS[-f]="$wic_files "
     for i in $wic_files ; do
@@ -252,12 +294,7 @@ function _yocto()
     for i in $list_list ; do
         ACTIONS[$i]=" "
     done
-    # ------------------------------------------------------------------------
-    setup_list="dev-env plain-sdk "
-    ACTIONS[setup]="$setup_list "
-    for i in $setup_list ; do
-        ACTIONS[$i]=" "
-    done
+    
     # ------------------------------------------------------------------------
     show_list="distro-conf machine-conf image-bb recipe-bb "
     ACTIONS[show]+="$show_list "

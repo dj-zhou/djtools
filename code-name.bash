@@ -119,6 +119,7 @@ function _code_name_stm32_dev()
     echo "  Excalibur Halberd Hatchet Machete Saber Samurai "
     echo "  Scimitar Scythe Stiletto Spear Sword"
 }
+
 # =============================================================================
 function code-name()
 {

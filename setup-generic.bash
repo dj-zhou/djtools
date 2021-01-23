@@ -950,10 +950,6 @@ function _dj_setup_nvtop()
         make -j4
         sudo make install
     fi
-    # on my laptop, this method failed, due to some dependency issue
-    # if [[ "${ubuntu_v}" = *'20.04'* ]] ; then
-    #     _install_if_not_installed nvtop
-    # fi
 
     cd ${cwd_before_running}
 }
@@ -1006,7 +1002,6 @@ function _dj_setup_qt_5_14_2()
     _install_if_not_installed libqt5serialport5-dev
 
     cd ~ && mkdir -p soft/ && cd soft/
-    http://qt.mirror.constant.com/archive/qt/5.14/5.14.2/qt-opensource-linux-x64-5.14.2.run
 
     # check if the file exists --------------------
     filename="qt-opensource-linux-x64-5.14.2.run"
@@ -1559,6 +1554,6 @@ function _dj_setup()
         return
     fi
     # --------------------------
-        _dj_setup_help
-        return
+    _dj_setup_help
+    return
 }

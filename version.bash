@@ -3,6 +3,7 @@
 # todo
 # ROS (1)
 # openCV
+
 # =============================================================================
 function _version_help()
 {
@@ -87,6 +88,7 @@ function _version_check_ubuntu()
     vv=$(echo $v | awk '{ print $3 }')
     echo $vv
 }
+
 # =============================================================================
 function version()
 {

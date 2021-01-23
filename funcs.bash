@@ -89,6 +89,7 @@ function _press_enter_to_continue()
     read answer
     echo $answer
 }
+
 # =============================================================================
 function _press_enter_or_wait_s_continue()
 {

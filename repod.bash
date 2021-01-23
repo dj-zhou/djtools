@@ -144,6 +144,7 @@ function _repod_update_help()
     echo -e "      --all-sub-folders\n"
 
 }
+
 # =============================================================================
 function _repod_update_repos_all_folders()
 {

@@ -73,9 +73,9 @@ function _yocto_find_MACHINE()
 function _yocto_find_TMPDIR()
 {
     if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
-        TMPDIR=$(_yocto_find_variable_in_file "TMPDIR" conf/local.conf)
-        if [ ! -z $TMPDIR ] ; then
-            echo $TMPDIR
+        tmp_dir=$(_yocto_find_variable_in_file "TMPDIR" conf/local.conf)
+        if [ ! -z $tmp_dir ] ; then
+            echo $tmp_dir
         elif [ -d tmp/ ] ; then
             echo "tmp"
         else
@@ -199,6 +199,8 @@ function _yocto_find_DISTRO_VERSION()
 }
 
 # =============================================================================
+# this function should be retired
+# todo: it could contain multiple images
 function _yocto_find_image_name_in_build_directory()
 {
     # must be a valid build directory ------------------
@@ -209,7 +211,7 @@ function _yocto_find_image_name_in_build_directory()
         return
     fi
     # find two terms ----------------------
-    TMPDIR=$(_yocto_find_TMPDIR)
+    tmp_dir=$(_yocto_find_TMPDIR)
     MACHINE=$(_yocto_find_MACHINE)
     if [ -z $MACHINE ] ; then
         # output information to stderr ------
@@ -221,7 +223,7 @@ function _yocto_find_image_name_in_build_directory()
 
     # the image file can be wic.gz, or wic.zst ----------
     # or it can be something else, should add later
-    find_wic_file=$(ls $TMPDIR/deploy/images/$MACHINE | grep wic)
+    find_wic_file=$(ls $tmp_dir/deploy/images/$MACHINE | grep wic)
     if [[ ! -z $find_wic_file ]] ; then
         wic_file=$(echo $find_wic_file | awk '{print $1}')
     else
@@ -234,15 +236,61 @@ function _yocto_find_image_name_in_build_directory()
 }
 
 # =============================================================================
-# todo: for hddimg file, there is still a *.wic file, not just *.wic.gz file
 # todo: let it work for upboard
-function _yocto_find_image_file() # $tmp_dir $machine
+# it can be multiple files!
+# wic file can be wic.gz, wic.zst, etc
+function _yocto_find_image_name() # $tmp_dir $machine
 {
     tmp_dir=$1
     machine=$2
-    potential_image=$(ls $tmp_dir/deploy/images/$machine/ | grep wic )
-    potential_image=$(echo $potential_image | awk '{ print $2 }' )
-    echo $potential_image
+    images=" "
+    file_types="rootfs.wic.gz "
+    file_types+="rootfs.wic.zst "
+    file_types+="hddimg "
+    for f in $file_types ; do
+        potential_files=$(ls $tmp_dir/deploy/images/$machine/ | grep $f )
+        for p in $potential_files ; do
+            if [[ ! -L $p ]] ; then
+                images+="${p%"-$machine"*} "
+            fi
+        done
+    done
+    echo $images
+}
+
+# =============================================================================
+function _yocto_find_images_in_tmp_deploy()
+{
+    if [ $(_yocto_check_is_a_build_directory) = 'false' ] ; then
+        echo " "
+        return
+    fi
+    tmp_dir=$(_yocto_find_TMPDIR)
+    machine=$(_yocto_find_MACHINE)
+    images=$(_yocto_find_image_name $tmp_dir $machine)
+    echo $images
+}
+
+# =============================================================================
+function _yocto_find_image_file_from_its_name()
+{
+    tmp_dir=$(_yocto_find_TMPDIR)
+    machine=$(_yocto_find_MACHINE)
+    image_name=$1
+    image_file=""
+    file_types="rootfs.wic.gz "
+    file_types+="rootfs.wic.zst "
+    file_types+="hddimg "
+    for f in $file_types ; do
+        potential_files=$(ls $tmp_dir/deploy/images/$machine/$image_name* | grep $f )
+        for p in $potential_files ; do
+            if [[ ! -L $p ]] ; then
+                image_file+="$p "
+                echo "$image_file"
+                return
+            fi
+        done
+    done
 }
 
 # =============================================================================
@@ -361,6 +409,10 @@ function _yocto_show_inc_file() #filter
 # =============================================================================
 function _yocto_list_things()
 {
+    if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+        echo "in a build directory, exit!"
+        return
+    fi
     current_folder=${PWD}
 
     things=$1
@@ -443,4 +495,42 @@ function _yocto_list()
         _yocto_list_resources
         return
     fi
+}
+
+# =============================================================================
+# this can only run in a build directory
+function _yocto_find_meta_layers()
+{
+      if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+        layers=" "
+        dirs=$(ls ../)
+        for i in $dirs ; do
+            if [[ -d ../$i/.git ]] ; then
+                layers+="$i "
+            fi
+        done
+        echo $layers
+    else
+        echo " "
+    fi
+}
+
+# =============================================================================
+# this can only run in a build directory
+function _yocto_find_images_of_layer()
+{
+    if [ $(_yocto_check_is_a_build_directory) = 'false' ] ; then
+        echo " "
+        return
+    fi
+    dir=$1
+    image_bb=""
+    for loop in "./" "./*/" "./*/*/" "./*/*/*/" ; do
+        image_bb+=$(ls ../$dir/${loop}images 2>/dev/null)
+    done
+    images=""
+    for i in $image_bb ; do
+        images+="${i%"."*} "
+    done
+    echo "$images " 
 }
