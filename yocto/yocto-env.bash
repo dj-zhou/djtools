@@ -140,12 +140,14 @@ function _yocto_reset_env_variables()
 }
 
 # =============================================================================
+# must run this function in a build directory
 function _yocto_setup_plain_sdk() #image-name
 {
     if [ $# -lt 1 ] ; then
         echo "yocto setup plain-sdk: need the image name"
         return
     fi
+    source ../poky/oe-init-build-env . &> /dev/null
     image_name=$1
     # must be a valid buid directory ------------------
     if [ $(_yocto_check_is_a_build_directory) = 'false' ] ; then

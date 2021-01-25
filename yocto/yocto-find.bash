@@ -79,11 +79,11 @@ function _yocto_find_TMPDIR()
         elif [ -d tmp/ ] ; then
             echo "tmp"
         else
-            echo "no tmp/ directory, return empty string " >&2
+            # echo "no tmp/ directory, return empty string " >&2
             echo " "
         fi
     else
-        echo "not in a build directory, return empty string " >&2
+        # echo "not in a build directory, return empty string " >&2
         echo " "
     fi
 }
@@ -266,6 +266,10 @@ function _yocto_find_images_in_tmp_deploy()
         return
     fi
     tmp_dir=$(_yocto_find_TMPDIR)
+    if [ ! -d "$tmp_dir" ] ; then # no built yet
+        echo " "
+        return
+    fi
     machine=$(_yocto_find_MACHINE)
     images=$(_yocto_find_image_name $tmp_dir $machine)
     echo $images
