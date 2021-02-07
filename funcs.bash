@@ -244,21 +244,22 @@ function _size_calculate() # $fz_byte $output_control
 }
 
 # =============================================================================
-function _wget_if_not_exist() # $filename $md5sum $url
+function _wget_if_not_exist() # $filename $md5sum $url $option
 {
     filename=$1
-    md5sum=$2
+    md5sum_passed_in=$2
     url=$3
+    option=$4
     unset md5checksum
     if [[ -f "$filename" ]] ; then
         md5checksum=$(md5sum "$filename")
     else
         md5checksum=" "
     fi
-    if [[ "$md5checksum" = *"$md5sum"* ]] ; then
+    if [[ "$md5checksum" = *"$md5sum_passed_in"* ]] ; then
         echo "file exists, no need to wget again"
     else
-        wget "${url}"
+        wget $option $filename "${url}"
     fi
 }
 
@@ -280,12 +281,14 @@ function _check_if_package_installed()
 # should find a better way to install
 function _install_if_not_installed()
 {
+    cwd=$PWD
     for package in "$@" ; do
         if [[ "no" = $(_check_if_package_installed $package) ]] ; then
-            echo -e "install $GRN$package$NOC"
+            echo -e "$GRN$package$NOC: ${BLU}installing$NOC"
             sudo apt-get install -y $package &> /dev/null
         else
-            echo -e "$GRN$package$NOC is already installed"
+            echo -e "$GRN$package$NOC: is already installed"
         fi
     done
+    cd $cwd
 }

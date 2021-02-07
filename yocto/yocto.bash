@@ -52,7 +52,7 @@ function _yocto_flash() # block-device # image-file
     fi
     # check the device block ------------
     dev_str=$1
-    dev=$(_find_block_device $dev_str)
+    dev=$(_verify_block_device $dev_str)
     if [ -z $dev ] ; then
         echo -e "\n block device $dev_str not found, exit!!"
         echo -e " you can use command \"lsblk\" to find it.\n"
@@ -140,9 +140,11 @@ function _yocto_flash() # block-device # image-file
     fi
     # hddimg for upboard -------------
     if [[ "${image_file}" = *'hddimg'* ]] ; then
-        echo "run the command:"
-        echo -e "${PRP}  sudo dd bs=4M if=<image file> of=$dev status=progress${NOC}"
-        sudo dd bs=4M if=$image_file of=$dev status=progress
+        echo -e "\nrun the command:"
+        echo -e "${PRP}  sudo dd bs=4M if=<image file> | pv | dd of=$dev${NOC}"
+        # sudo dd bs=4M if=$image_file of=$dev status=progress
+        sudo dd bs=4M if=$image_file | pv | dd of=$dev
+        sync
         return
     fi
 }

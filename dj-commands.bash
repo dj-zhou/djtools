@@ -3,6 +3,7 @@
 source $djtools_path/clone.bash
 source $djtools_path/help.bash
 source $djtools_path/setup-generic.bash
+source $djtools_path/setup-opencv.bash
 source $djtools_path/setup-ros.bash
 source $djtools_path/udev-rules.bash
 
@@ -313,8 +314,10 @@ function _dj_setup_dj_gadgets()
     cd dj-file/
     ./install.sh
 
+    # opencv version check
+    ./install-opencv-version.sh
+
     cd ~/workspace/
-    _ask_to_remove_a_folder dj-gadgets
     
     cd $current_folder
 }
@@ -364,6 +367,7 @@ function _dj_setup_container_docker()
     
     # to solve a problem: dial unix /var/run/docker.sock: connect: permission denied
     sudo chmod 666 /var/run/docker.sock
+    echo -e "you need to reboot computer so docker does not need sudo to run"
     
     # ----------------------------------------------
     cd $current_folder
@@ -705,6 +709,7 @@ function _dj_setup_grpc_1_29_1()
 # default compiles:
 # Ubuntu 18.04: g++-7
 # Ubuntu 20.04: g++-9
+# make this function to install g++-9 on Ubuntu 18.04 as well!
 function _dj_setup_gpp_10()
 {
     echo -e "\n instal ${GRN}gcc-10${NOC} and ${GRN}g++-10${NOC} \n"
@@ -714,6 +719,11 @@ function _dj_setup_gpp_10()
     sudo apt-get -y update
     _install_if_not_installed gcc-10
     _install_if_not_installed g++-10
+
+    if [[ ${ubuntu_v} = *'18.04'* ]] ; then
+        _install_if_not_installed gcc-9
+        _install_if_not_installed g++-9
+    fi
     echo -e "Set up the gcc/g++ priorities:"
  
     # ----------------------
@@ -762,199 +772,6 @@ function _dj_setup_gpp_10()
     sudo update-alternatives --config gcc
     echo -e "\n-------------------\n"
     sudo update-alternatives --config g++
-}
-
-# =============================================================================
-# may not be a good way to install opencv
-# recommend to install opencv-4.1.1
-function _dj_setup_opencv_2_4_13()
-{
-    cwd_before_running=$PWD
-
-    echo -e "\n Have you installed Qt? The openCV installation may need Qt"
-    echo " use the following command to install Qt 5.11.2"
-    echo -e "     dj setup qt-5.11.2\n\n"
-    _press_enter_or_wait_s_continue 20
-    
-    cd ~ && mkdir -p soft && cd soft/
-
-    sudo rm -rf opencv-4.1.1 # otherwise, it will not going to clone into this folder
-
-    wget https://codeload.github.com/opencv/opencv/zip/2.4.13.6
-    mv 2.4.13.6 opencv-2.4.13.6.zip
-    unzip opencv-2.4.13.6.zip
-    cd opencv-2.4.13.6
-    mkdir build && cd build
-    cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
-          -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON \
-          WITH_OPENCL=ON WITH_GDAL=ON WITH_IPP=ON BUILD_JASPER=ON BUILD_JPEG=ON \
-          BUILD_PNG=ON BUIILD_TIFF=ON WITH_OPENMP=ON ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
-
-    _ask_to_remove_a_folder opencv-2.4.13
-    _ask_to_remove_a_file opencv-2.4.13.zip
-
-    cd ${cwd_before_running}
-    echo -e "\n" 
-    echo " lib files *.so are installed in /usr/local/lib/"
-    echo " header files are installded in /usr/local/include/opencv2/"
-    echo -e "\n" 
-}
-
-# =============================================================================
-# the installation is from the book, which has a github repo:
-# https://github.com/PacktPublishing/Learn-OpenCV-4-By-Building-Projects-Second-Edition
-# however, this is a bad reference
-# notice: there is some manual work todo before actually automate this procedure
-# this does not work on Ubuntu 20.04!
-function _dj_setup_opencv_4_1_1()
-{
-    cwd_before_running=$PWD
-
-    echo -e "\n Have you installed Qt? The openCV installation may need Qt"
-    echo " use the following command to install Qt 5.14.2"
-    echo -e "     dj setup qt-5.14.2\n\n"
-    _press_enter_or_wait_s_continue 20
-
-    # install dependency:
-    packages="libopencv-dev build-essential cmake libdc1394-22 "
-    packages+="libdc1394-22-dev libjpeg-dev libpng12-dev x264 "
-    packages+="libtiff5-dev libjasper-dev libavcodec-dev v4l-utils "
-    packages+="libavformat-dev libswscale-dev libxine2-dev "
-    packages+="libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev "
-    packages+="libv4l-dev libtbb-dev libqt4-dev libmp3lame-dev "
-    packages+="libopencore-amrnb-dev libopencore-amrwb-dev "
-    packages+="libtheora-dev libvorbis-dev libxvidcore-dev "
-    for package in $packages ; do
-        _install_if_not_installed $package
-    done
-    cd ~ && mkdir -p soft && cd soft/
-    rm -rf opencv-4.1.1
-
-    git clone https://github.com/dj-zhou/opencv-4.1.1.git
-    git clone https://github.com/dj-zhou/ippicv.git
-
-    if [ $# = 1 ] && [ $1 = 'with-contrib' ] ; then
-        git clone https://github.com/dj-zhou/opencv_contrib-4.1.1.git
-    fi
-    
-    cd opencv-4.1.1
-    git checkout add-eigen3-include
-    sudo rm -rf build && mkdir build && cd build
-    if [ $# = 1 ] && [ $1 = 'with-contrib' ] ; then
-        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
-              -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON \
-              -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.1.1/modules ..
-    else
-        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
-              -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON ..
-    fi
-    
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
-    
-    cd ~/soft/
-    
-    _ask_to_remove_a_folder opencv-4.1.1
-    if [ $# = 1 ] && [ $1 = 'with-contrib' ] ; then
-        _ask_to_remove_a_folder opencv_contrib-4.1.1
-    fi
-
-    cd ${cwd_before_running}
-    echo -e "\n"
-    echo " lib files *.so are installed in /usr/local/lib/"
-    echo " header files are installded in /usr/local/include/opencv4/, "
-         "   in which there is another folder opencv2/"
-    echo -e "\n"
-    echo " example code or template project can be seen from:"
-    echo " https://github.com/dj-zhou/opencv4-demo/001-imread-imshow"
-}
-
-# =============================================================================
-# https://medium.com/@sb.jaduniv/how-to-install-opencv-4-2-0-with-cuda-10-1-on-ubuntu-20-04-lts-focal-fossa-bdc034109df3
-function _dj_setup_opencv_4_2_0()
-{
-    cwd_before_running=$PWD
-    # Generic tools
-    packages="build-essential cmake pkg-config unzip yasm git checkinstall "
-    # Image I/O libs
-    packages+="libjpeg-dev libpng-dev libtiff-dev "
-    # Video/Audio Libs — FFMPEG, GSTREAMER, x264 and so on
-    packages+="libavcodec-dev libavformat-dev libswscale-dev libavresample-dev "
-    packages+="libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev "
-    packages+="libxvidcore-dev x264 libx264-dev libfaac-dev libmp3lame-dev libtheora-dev "
-    packages+="libfaac-dev libmp3lame-dev libvorbis-dev "
-    # OpenCore — Adaptive Multi Rate Narrow Band (AMRNB) and Wide Band (AMRWB) speech codec
-    packages+="libopencore-amrnb-dev libopencore-amrwb-dev "
-    # Cameras programming interface libs
-    packages+="libdc1394-22 libdc1394-22-dev libxine2-dev libv4l-dev v4l-utils "
-    cd /usr/include/linux
-    sudo ln -s -f ../libv4l1-videodev.h videodev.h
-    # GTK lib for the graphical user functionalities coming from OpenCV highghui module
-    packages+="libgtk-3-dev "
-    # Python libraries for Python3
-    packages+="python3-dev python3-pip "
-    sudo -H pip3 install -U pip numpy
-    packages+="python3-testresources "
-    # Parallelism library C++ for CPU
-    packages+="libtbb-dev "
-    # Optimization libraries for OpenCV
-    packages+="libatlas-base-dev gfortran "
-    # Optional libraries
-    packages+="libprotobuf-dev protobuf-compiler "
-    packages+="libgoogle-glog-dev libgflags-dev "
-    packages+="libgphoto2-dev libeigen3-dev libhdf5-dev doxygen "
-    # Install OpenCL SDK related things
-    packages+="ocl-icd-opencl-dev "
-
-    for package in $packages ; do
-        _install_if_not_installed $package
-    done
-
-    # start to install ---------------------------------------------------
-    cd ~ && mkdir -p soft && cd soft/
-    rm -rf opencv-4.2.0
-    rm -rf opencv_contrib-4.2.0
-    wget -O opencv.zip https://github.com/opencv/opencv/archive/4.2.0.zip
-    wget -O opencv_contrib.zip https://github.com/opencv/opencv_contrib/archive/4.2.0.zip
-    unzip opencv.zip
-    unzip opencv_contrib.zip
-
-    # some kind of virtual??
-    export WORKON_HOME=$HOME/.virtualenvs
-    export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
-    source /usr/local/bin/virtualenvwrapper.sh
-    mkvirtualenv cv -p python3
-    
-    cd opencv-4.2.0
-    mkdir build && cd build
-    cmake -D CMAKE_BUILD_TYPE=RELEASE \
-        -D CMAKE_C_COMPILER=/usr/bin/gcc-9 \
-        -D CMAKE_INSTALL_PREFIX=/usr/local \
-        -D INSTALL_PYTHON_EXAMPLES=ON \
-        -D INSTALL_C_EXAMPLES=OFF \
-        -D WITH_TBB=ON \
-        -D BUILD_opencv_cudacodec=OFF \
-        -D ENABLE_FAST_MATH=1 \
-        -D WITH_CUBLAS=1 \
-        -D WITH_V4L=ON \
-        -D WITH_QT=OFF \
-        -D WITH_OPENGL=ON \
-        -D WITH_GSTREAMER=ON \
-        -D OPENCV_GENERATE_PKGCONFIG=ON \
-        -D OPENCV_PC_FILE_NAME=opencv.pc \
-        -D OPENCV_ENABLE_NONFREE=ON \
-        -D OPENCV_PYTHON3_INSTALL_PATH=~/.virtualenvs/cv/lib/python3.8/site-packages \
-        -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.2.0/modules \
-        -D PYTHON_EXECUTABLE=~/.virtualenvs/cv/bin/python \
-        -D BUILD_EXAMPLES=ON \
-        -D WITH_CUDNN=ON \
-        -D CUDA_FAST_MATH=1 \
-        -D WITH_CUDA=ON \
-        -D OPENCV_DNN_CUDA=ON \
-        -D CUDA_ARCH_BIN=7.5 \
-        -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
-        -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include  ..
-    cd ${cwd_before_running}
 }
 
 # =============================================================================
@@ -1050,9 +867,9 @@ function _dj_search_package()
 function _dj_search_string()
 {
     echo -e "\n run command:"
-    echo -e "   $GRN grep -ri --exclude-dir={build,bin,_bsdk*} $1 .$NOC"
+    echo -e "   $GRN grep -ri --exclude-dir={build,bin,_bcross*,_bnative,.git} $1 .$NOC"
     echo -e " we get:"
-    grep -ri --exclude-dir={build,bin,_bsdk*} $1 .
+    grep -ri --exclude-dir={build,bin,_bcross*,_bnative,.git} $1 .
 }
 
 # =============================================================================
@@ -1440,10 +1257,10 @@ function _dj()
     setup_list+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
     setup_list+="grpc-1.29.1 g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
-    setup_list+="mathpix matplot++ mbed mongodb nvidia nvtop opencv-2.4.13 opencv-4.1.1 opencv-4.2.0 "
-    setup_list+="pangolin pip qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy saleae-logic "
-    setup_list+="spdlog slack stm32-cubeMX stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi "
-    setup_list+="YouCompleteMe you-complete-me "
+    setup_list+="mathpix matplot++ mbed mongodb nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 "
+    setup_list+="opencv-4.2.0 pangolin pip qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy "
+    setup_list+="saleae-logic spdlog slack stm32-cubeMX stm32-tools sublime typora vim-env vscode "
+    setup_list+="vtk-8.2.0 wubi YouCompleteMe you-complete-me "
     ACTIONS[setup]="$setup_list "
     for i in $setup_list ; do
         ACTIONS[$i]=" "

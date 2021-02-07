@@ -61,7 +61,7 @@ function _disk_size()
 }
 
 # =============================================================================
-function _find_block_device()
+function _verify_block_device()
 {
     dev_to_check=$1
     if [ -b "$dev_to_check" ] ; then

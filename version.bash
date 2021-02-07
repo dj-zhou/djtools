@@ -82,6 +82,12 @@ function _version_check_gnome()
 }
 
 # =============================================================================
+function _version_check_opencv()
+{
+    opencv-version
+}
+
+# =============================================================================
 function _version_check_ubuntu()
 {
     v=$(lsb_release -a | awk '{ print $3 }')
@@ -143,6 +149,11 @@ function version()
         # ------------------------------
         if [ $2 = 'gnome' ] ; then
             _version_check_gnome
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'opencv' ] ; then
+            _version_check_opencv
             return
         fi
         # ------------------------------
@@ -212,7 +223,7 @@ function _version()
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
-    check_list+="cmake gcc g++ gnome ubuntu "
+    check_list+="cmake gcc g++ gnome opencv ubuntu "
     ACTIONS[check]="$check_list "
     for i in $check_list ; do
         ACTIONS[$i]=" "

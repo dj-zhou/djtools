@@ -60,14 +60,14 @@ function compile_cmakelist()
             echo -e "${PRP}\n mkdir build && cd build && cmake ..${NOC}\n"
             mkdir build && cd build && cmake ..
         else
-            echo -e "${PRP}\n cd build/${NOC}\n"
             cd build/
         fi
         echo -e "${PRP}\n make -j$(cat /proc/cpuinfo | grep processor | wc -l)${NOC}\n"
         make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     elif [ "$clean_tag" = "clean" ] ; then
-        echo -e "${PRP}\n rm -rf build/${NOC}\n"
+        echo -e "${PRP}\n rm -rf build/, bin/${NOC}\n"
         rm -rf build/
+        rm -rf bin/
     fi
 
     cd $current_directory
