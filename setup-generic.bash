@@ -83,6 +83,58 @@ function _dj_setup_adobe_pdf_reader()
     cd $current_folder && unset current_folder
 }
 
+# =============================================================================================
+function _create_anaconda_desktop_item()
+{
+    folder="/usr/share/applications"
+
+    # copy the icon file
+    sudo cp $djtools_path/settings/anaconda-navigator.xpm $folder
+
+    file="anaconda-navigator.desktop"
+    touch $file
+
+    echo '[Desktop Entry]'                               >> $file
+    echo 'Encoding=UTF-8'                                >> $file
+    echo 'Name=anaconda-navigator'                       >> $file
+    echo 'Comment=anaconda-navigator'                    >> $file
+    echo 'Exec='$HOME'/anaconda3/bin/anaconda-navigator' >> $file
+    echo 'Icon='$folder'/anaconda-navigator.xpm'         >> $file
+    echo 'StartupNotify=false'                           >> $file
+    echo 'Type=Application'                              >> $file
+    echo 'Categories=Application;Development;'           >> $file
+
+    sudo rm -rf $folder/$file
+    sudo mv $file $folder
+
+    sudo chmod +x $folder/$file
+}
+
+# =============================================================================
+function _dj_setup_anaconda()
+{
+    python3_ver=$(version check python3)
+    if [[ ! "$python3_ver" = '3.8'* ]] ; then
+        echo "anaconda for Python 3.8.* only"
+        return
+    fi
+
+    current_folder=${PWD}
+
+    cd ~ && mkdir -p soft/ && cd soft/
+
+    file=Anaconda3-2020.11-Linux-x86_64.sh
+    url=https://repo.anaconda.com/archive/$file
+    _wget_if_not_exist $file "4cd48ef23a075e8555a8b6d0a8c4bae2" $url
+    chmod +x $file
+    ./$file
+    
+    _create_anaconda_desktop_item
+
+    cd $current_folder
+
+}
+
 # =============================================================================
 function _dj_setup_arduino_1_8_13()
 {
@@ -151,10 +203,8 @@ eom
     _press_enter_or_wait_s_continue 10
     packages="ark cmake curl cutecom dconf-editor dconf-tools git "
     packages+="git-lfs g++ htop libgtk2.0-dev lsb-core putty "
-    packages+="screen scrot terminator tree vlc vim wmctrl xclip yasm "
-    for package in $packages ; do
-        _install_if_not_installed $package
-    done
+    packages+="screen scrot terminator tree vlc vim wmctrl xclip yasm "     
+    _install_if_not_installed $packages
 
     # -----------------------------------
     echo -e "\n going to install Google Chrome\n"
@@ -335,9 +385,7 @@ function _dj_setup_gcc_arm_stm32()
     packages+="libncurses5-dev libmpc-dev autoconf texinfo libtool "
     packages+="libftdi-dev libusb-1.0-0-dev zlib1g zlib1g-dev python-yaml "
     packages+="libncurses-dev "
-    for package in $packages ; do
-        _install_if_not_installed $package
-    done
+    _install_if_not_installed $packages
 
     if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
         # sudo echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" \
@@ -1234,6 +1282,11 @@ function _dj_setup()
 {
     if [ $1 = 'adobe-pdf-reader' ] ; then
         _dj_setup_adobe_pdf_reader
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'anaconda' ] ; then
+        _dj_setup_anaconda
         return
     fi
     # --------------------------

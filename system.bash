@@ -70,6 +70,10 @@ function _system_disable_apt_dpkg_locks()
     echo "sudo rm -f /var/lib/apt/lists/lock"
     sudo rm -f /var/lib/apt/lists/lock
     _press_enter_to_continue
+
+    echo "sudo rm -f /var/cache/apt/archives/lock"
+    sudo rm -f /var/cache/apt/archives/lock
+    _press_enter_to_continue
 }
 
 # =============================================================================

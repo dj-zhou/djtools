@@ -338,9 +338,7 @@ function _dj_setup_container_docker()
 
     # Install a few prerequisite packages
     packages=" apt-transport-https ca-certificates curl software-properties-common "
-    for package in $packages ; do
-        _install_if_not_installed $package
-    done
+    _install_if_not_installed $packages
 
     docker_url="https://download.docker.com/linux/ubuntu"
 
@@ -417,9 +415,7 @@ function _dj_setup_pangolin()
     current_folder=${PWD}
     # dependency installation
     packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
-    for package in $packages ; do
-        _install_if_not_installed $package
-    done
+    _install_if_not_installed $packages
 
     # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
     
@@ -427,22 +423,16 @@ function _dj_setup_pangolin()
     rm -rf Pangolin/
     git clone https://github.com/stevenlovegrove/Pangolin.git
     cd Pangolin
-    # this following commit tis tested on Ubuntu 20.04, on Sept. 25th, 2020
+    # this following commit is tested on Ubuntu 20.04, on Sept. 25th, 2020
     git checkout 86eb4975fc4fc8b5d92148c2e370045ae9bf9f5d # it is on master
     rm -rf build/ && mkdir build && cd build
     cmake ..
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
-    cd ~/soft/
-    _ask_to_remove_a_folder Pangolin
-
-    _press_enter_or_wait_s_continue 10
-
     echo -e "\n libpangolin.so is in path: ${GRN}/usr/local/lib/${NOC}"
     echo -e " header files are in path: ${GRN}/usr/local/include/pangolin/${NOC}\n"
-    
-    _press_enter_or_wait_s_continue 10
+
 
     echo -e "\n If you see error like this:"
     echo    "   Could not find GLEW"
@@ -533,9 +523,7 @@ function _dj_setup_stm32_tools()
     
     # install dependencies and some software ----------------
     packages="libusb-1.0.0-dev gtk+-3.0 cu cutecom putty screen cmake "
-    for package in $packages ; do
-        _install_if_not_installed $package
-    done
+    _install_if_not_installed $packages
 
     # install stlink ----------------
     echo -e "\n install ${GRN}stlink${NOC}\n"
@@ -595,15 +583,12 @@ function _dj_setup_glfw3()
     cwd_before_running=$PWD
 
     echo -e "\n install glfw3 ...\n"
-    _press_enter_or_wait_s_continue 20
     
     cd ~ && mkdir -p soft && cd soft/
 
     # glfw3
     packages="build-essential cmake git xorg-dev libglu1-mesa-dev "
-    for package in $packages ; do
-        _install_if_not_installed $package
-    done
+    _install_if_not_installed $packages
     sudo rm -rf glfw3/
     git clone https://github.com/dj-zhou/glfw3.git
     cd glfw3/
@@ -611,8 +596,6 @@ function _dj_setup_glfw3()
     cmake .. -DBUILD_SHARED_LIBS=ON
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install && sudo ldconfig
-    cd ~/soft/
-    _ask_to_remove_a_folder glfw3
 
     cd ${cwd_before_running}
 }
@@ -652,15 +635,13 @@ function _dj_setup_gtest_glog()
     cwd_before_running=$PWD
 
     echo -e "\n install gtest and glog ...\n"
-    _press_enter_or_wait_s_continue 20
     
     cd ~ && mkdir -p soft && cd soft/
     
     # gtest
     packages="libgtest-dev libgoogle-glog-dev "
-    for package in $packages ; do
-        _install_if_not_installed $package
-    done
+    _install_if_not_installed $packages
+    
     # compile gtest
     cd /usr/src/gtest
     sudo cmake CMakeLists.txt
@@ -949,9 +930,7 @@ function _dj_setup_vim_env()
 
     # install software, if not installed already
     packages="vim ctags cscope build-essential cmake python-dev python3-dev "
-    for package in $packages ; do
-        _install_if_not_installed $package
-    done
+    _install_if_not_installed $packages
 
     # install Vundle -- plugin manager
     rm -rf ~/.vim/bundle/Vundle.vim
@@ -1252,8 +1231,8 @@ function _dj()
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    setup_list+="adobe-pdf-reader arduino-1.8.13 baidu-netdisk clang-format clang-llvm cmake "
-    setup_list+="computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
+    setup_list+="adobe-pdf-reader anaconda arduino-1.8.13 baidu-netdisk clang-format clang-llvm "
+    setup_list+="cmake computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
     setup_list+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
     setup_list+="grpc-1.29.1 g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "

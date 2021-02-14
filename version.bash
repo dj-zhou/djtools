@@ -58,6 +58,35 @@ function _version_check_cmake()
 }
 
 # =============================================================================
+function _version_check_eigen3()
+{
+    # example:
+    # #define EIGEN_WORLD_VERSION 3
+    # #define EIGEN_MAJOR_VERSION 3
+    # #define EIGEN_MINOR_VERSION 4
+
+    files="/usr/local/include/eigen3/Eigen/src/Core/util/Macros.h "
+    files+="/usr/include/eigen3/Eigen/src/Core/util/Macros.h "
+    for file in $files ; do
+        if [[ -f "$file" ]] ; then
+                while IFS='' read -r line || [[ -n "$line" ]] ; do
+                if [[ $line == *"define EIGEN_WORLD_VERSION"* ]] ; then
+                    word_version=$(echo $line  | awk '{ print $3 }')
+                fi
+                if [[ $line == *"define EIGEN_MAJOR_VERSION"* ]] ; then
+                    major_version=$(echo $line  | awk '{ print $3 }')
+                fi
+                if [[ $line == *"define EIGEN_MINOR_VERSION"* ]] ; then
+                    minor_version=$(echo $line  | awk '{ print $3 }')
+                fi
+            done < $file
+        echo $word_version.$major_version.$minor_version
+        return
+        fi
+    done
+}
+
+# =============================================================================
 function _version_check_gcc()
 {
     v=$(gcc --version | awk '{ print $4 }')
@@ -84,7 +113,41 @@ function _version_check_gnome()
 # =============================================================================
 function _version_check_opencv()
 {
-    opencv-version
+    # example:
+    # #define CV_VERSION_MAJOR    3
+    # #define CV_VERSION_MINOR    4
+    # #define CV_VERSION_REVISION 13
+
+    files="/usr/local/include/opencv2/core/version.hpp "
+    files+="/usr/include/opencv2/core/version.hpp "
+    for file in $files ; do
+        if [[ -f "$file" ]] ; then
+                while IFS='' read -r line || [[ -n "$line" ]] ; do
+                if [[ $line == *"define CV_VERSION_MAJOR"* ]] ; then
+                    major_version=$(echo $line  | awk '{ print $3 }')
+                fi
+                if [[ $line == *"define CV_VERSION_MINOR"* ]] ; then
+                    minor_version=$(echo $line  | awk '{ print $3 }')
+                fi
+                if [[ $line == *"define CV_VERSION_REVISION"* ]] ; then
+                    revision=$(echo $line  | awk '{ print $3 }')
+                fi
+            done < $file
+        echo $major_version.$minor_version.$revision
+        return
+        fi
+    done
+}
+
+# =============================================================================
+function _version_check_python3()
+{
+    anw=$(_check_if_package_installed python3)
+    if [[ "$anw" = "no" ]] ; then
+        echo "python3 not installed"
+        return
+    fi
+    echo $(python3 --version | awk '{ print $2 }')
 }
 
 # =============================================================================
@@ -137,6 +200,11 @@ function version()
             return
         fi
         # ------------------------------
+        if [ $2 = 'eigen3' ] ; then
+            _version_check_eigen3
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'gcc' ] ; then
             _version_check_gcc
             return
@@ -154,6 +222,11 @@ function version()
         # ------------------------------
         if [ $2 = 'opencv' ] ; then
             _version_check_opencv
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'python3' ] ; then
+            _version_check_python3
             return
         fi
         # ------------------------------
@@ -223,7 +296,7 @@ function _version()
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
-    check_list+="cmake gcc g++ gnome opencv ubuntu "
+    check_list+="cmake eigen3 gcc g++ gnome opencv python3 ubuntu "
     ACTIONS[check]="$check_list "
     for i in $check_list ; do
         ACTIONS[$i]=" "
