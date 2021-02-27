@@ -58,6 +58,7 @@ function _build_meson_use_oesdk() # sdk_path
             echo -e "    not in $sdk_output/ or its sub directory, no build, exit!!\n"
         fi
         _yocto_reset_env_variables
+        rm -rf builddir # just a hack
         return
     fi
 
@@ -126,6 +127,7 @@ function _build_meson_use_oesdk() # sdk_path
         echo -e "    fresh build, but no meson.build file found, no build, exit!! \n"
     fi
     _yocto_reset_env_variables
+    rm -rf builddir # just a hack
 }
 
 # =============================================================================
@@ -141,6 +143,7 @@ function _build_meson_native()
         if [ ! -f "_bnative/build.ninja" ] ; then
             rm _bnative -rf
             meson setup _bnative
+            rm -rf builddir # just a hack
             return
         fi
         cd _bnative
@@ -148,6 +151,7 @@ function _build_meson_native()
     else
         echo "not a meson directory, exit!"
     fi
+    rm -rf builddir # just a hack
     cd $current_directory
 }
 

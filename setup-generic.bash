@@ -98,7 +98,7 @@ function _create_anaconda_desktop_item()
     echo 'Encoding=UTF-8'                                >> $file
     echo 'Name=anaconda-navigator'                       >> $file
     echo 'Comment=anaconda-navigator'                    >> $file
-    echo 'Exec='$HOME'/anaconda3/bin/anaconda-navigator' >> $file
+    echo 'Exec='$HOME'/.anaconda3/bin/anaconda-navigator'>> $file
     echo 'Icon='$folder'/anaconda-navigator.xpm'         >> $file
     echo 'StartupNotify=false'                           >> $file
     echo 'Type=Application'                              >> $file
@@ -108,14 +108,19 @@ function _create_anaconda_desktop_item()
     sudo mv $file $folder
 
     sudo chmod +x $folder/$file
+
+
+    echo -e "${YLW}if Anaconda is not installed to ~/.anaconda3, you need to revise${NOC}"
+    echo -e "${YLW} /usr/share/applications/$file accordingly.${NOC}"
 }
 
 # =============================================================================
 function _dj_setup_anaconda()
 {
     python3_ver=$(version check python3)
-    if [[ ! "$python3_ver" = '3.8'* ]] ; then
-        echo "anaconda for Python 3.8.* only"
+    anw=$(_version_if_ge_than $python3_ver "3.8")
+    if [[ "$anw" = 'no' ]] ; then
+        echo "anaconda for Python >=3.8.* only"
         return
     fi
 
@@ -127,12 +132,13 @@ function _dj_setup_anaconda()
     url=https://repo.anaconda.com/archive/$file
     _wget_if_not_exist $file "4cd48ef23a075e8555a8b6d0a8c4bae2" $url
     chmod +x $file
+
+    echo -e "${YLW}You need to install Anaconda to ~/.anaconda3 directory!${NOC}"
     ./$file
     
     _create_anaconda_desktop_item
 
-    cd $current_folder
-
+    cd $current_folder && unset current_folder
 }
 
 # =============================================================================
@@ -213,7 +219,6 @@ eom
     wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
     sudo dpkg -i google-chrome*
 
-    _ask_to_remove_a_file google-chrome*
     cd ~
 
     # -----------------------------------
@@ -275,8 +280,6 @@ function _dj_setup_dropbox()
     https://linux.dropbox.com/packages/ubuntu/dropbox_2020.03.04_amd64.deb \
         > dropbox.deb
     sudo dpkg -i dropbox.deb
-    
-    _ask_to_remove_a_file dropbox.deb
     
     echo -e "\n You can run the following command to setup the Dropbox"
     echo -e "   dropbox start -i\n"
@@ -556,7 +559,6 @@ function _dj_setup_i219_v()
     sudo make install
 
     cd ~/soft/
-    _ask_to_remove_a_folder i219-v
 
     _ask_to_execute_cmd "sudo reboot"
 
@@ -636,8 +638,6 @@ function _dj_setup_libev_4_33()
     fi
 
     cd ~/soft
-    _ask_to_remove_a_folder $file
-    _ask_to_remove_a_file $file.tar.gz
 
     cd $current_folder
 }
@@ -668,7 +668,6 @@ function _dj_setup_libgpiod()
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
     cd ~/soft
-    _ask_to_remove_a_folder $file_name
     
     cat << eom
 
@@ -716,7 +715,6 @@ function _dj_setup_libiio()
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
     cd ~/soft
-    _ask_to_remove_a_folder libiio
     
     cat << eom
 
@@ -768,7 +766,6 @@ function _dj_setup_libserialport()
 
 eom
     cd ~/soft/
-    _ask_to_remove_a_folder libserialport/
     
     cd $current_folder
 }
@@ -965,8 +962,10 @@ function _dj_setup_nvidia()
     _install_if_not_installed libncurses5-dev
     if [[ "${ubuntu_v}" = *'18.04'* || \
           "${ubuntu_v}" = *'20.04'* ]] ; then
-        sudo add-apt-repository ppa:graphics-drivers/ppa
-        sudo apt-get -y update
+        if [[ ! -f /etc/apt/sources.list.d/graphics-drivers*.list ]] ; then
+            sudo add-apt-repository ppa:graphics-drivers/ppa
+            sudo apt-get -y update
+        fi
         _install_if_not_installed nvidia-driver-455 nvidia-settings
     fi
     cat << eom
@@ -1025,8 +1024,6 @@ function _dj_setup_qt_5_13_1()
 
     ./$filename
 
-    _ask_to_remove_a_file $filename
-
     # setup the PATH and LD_LIBRARY_PATH into ~/.bashrc
     echo -e '\n' >> ~/.bashrc
     echo '# ===========================================================' >> ~/.bashrc
@@ -1062,8 +1059,6 @@ function _dj_setup_qt_5_14_2()
 
     ./$filename
 
-    _ask_to_remove_a_file $filename
-
     # setup the PATH and LD_LIBRARY_PATH into ~/.bashrc
     echo -e '\n' >> ~/.bashrc
     echo '# ===========================================================' >> ~/.bashrc
@@ -1084,7 +1079,6 @@ function _dj_setup_slack()
     # the download page: https://slack.com/downloads/linux
     wget https://downloads.slack-edge.com/linux_releases/slack-desktop-4.8.0-amd64.deb
     sudo dpkg -i slack-desktop*.deb
-    _ask_to_remove_a_file slack-desktop*.deb
 
     cd ${cwd_before_running}
 }
@@ -1168,8 +1162,7 @@ function _dj_setup_spdlog() # static/shared
         echo -e " you can run \"sudo ldconfig\" before running programs\n"
     fi
     echo -e "\n ---------------------------------------\n"
-    _ask_to_remove_a_folder spdlog
-
+    
     cd ${cwd_before_running}
 }
 
@@ -1236,7 +1229,7 @@ function _dj_setup_yaml_cpp()
     sudo apt-get -y update
     _install_if_not_installed build-essential
 
-    dj setup cmake
+    dj setup cmake-3.19.5
     sudo rm -rf /usr/local/lib/libyaml-cpp*
 
     yaml_v=$(_find_argument_after_option -v $1 $2 $3 $4 $5 $6 $7 $8)
@@ -1262,8 +1255,7 @@ function _dj_setup_yaml_cpp()
 
     echo -e "\n libyaml-cpp.so is installed in /usr/local/lib/"
         echo -e " header files are installed in /usr/local/include/yaml-cpp/\n"
-    _ask_to_remove_a_folder yaml-cpp/
-
+    
     # ---------------------------------------------
     # # a better way to install it
     # sudo apt-get update
@@ -1310,8 +1302,8 @@ function _dj_setup()
         return
     fi
     # --------------------------
-    if [ $1 = 'cmake' ] ; then
-        _dj_setup_cmake
+    if [ $1 = 'cmake-3.19.5' ] ; then
+        _dj_setup_cmake_3_19_5
         return
     fi
     # --------------------------
@@ -1518,6 +1510,16 @@ function _dj_setup()
     # --------------------------
     if [ $1 = 'pip' ] ; then
         _dj_setup_pip
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'pycharm' ] ; then
+        _dj_setup_pycharm
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'python3.9' ] ; then
+        _dj_setup_python_3_9
         return
     fi
     # --------------------------

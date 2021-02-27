@@ -266,19 +266,35 @@ function _dj_setup_clang_llvm()
 }
 
 # =============================================================================
-function _dj_setup_cmake()
+# setting a fixed version is not a good idea, but ...
+function _dj_setup_cmake_3_19_5()
 {
-    echo -e "\n ${GRN} install latest CMake ${NOC}"
+    v="3.19.5"
+    echo -e "\n ${GRN} install CMake $v ${NOC}"
     _press_enter_or_wait_s_continue 5
     
-    sudo rm -rf /etc/apt/sources.list.d/kitware-latest.list
-    wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
-        2>/dev/null | sudo apt-key add -
-    sudo sh -c 'echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
-        >> /etc/apt/sources.list.d/kitware-latest.list'
+    current_folder=${PWD}
+
+    # where did I got this? I cannot find the source -- do not delete
+    # sudo rm -rf /etc/apt/sources.list.d/kitware-latest.list
+    # wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
+    #     2>/dev/null | sudo apt-key add -
+    # sudo sh -c 'echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
+    #     >> /etc/apt/sources.list.d/kitware-latest.list'
     
-    sudo apt-get -y update
-   _install_if_not_installed cmake
+    cd ~ && mkdir -p soft/ &&  cd soft/
+    file="cmake-$v.tar.gz"
+    url="https://github.com/Kitware/CMake/releases/download/v$v/$file"
+    _wget_if_not_exist $file "b05ac439a6f49c75a0faaeca4a2c3144" $url
+    rm -rf cmake-$v
+    tar zxvf cmake-$v.tar.gz
+    cd cmake-$v
+    rm build -rf && mkdir build && cd build
+    cmake ..
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    sudo make install
+
+    cd $current_folder
 }
 
 # =============================================================================
@@ -463,6 +479,41 @@ function _dj_setup_pip()
 }
 
 # =============================================================================
+function _dj_setup_pycharm()
+{
+    _install_if_not_installed snap
+
+    # cd ~ && mkdir -p soft && cd soft/
+    # file=pycharm-community-2020.3.3.tar.gz
+    # url=https://download-cf.jetbrains.com/python/$file
+    # _wget_if_not_exist $file "12e20683a01fb7182a029fe1ceeeed95" $url
+    
+    sudo snap install pycharm-community --classic
+}
+
+# =============================================================================
+function _dj_setup_python_3_9()
+{
+    if [[ ! -f /etc/apt/sources.list.d/deadsnake*.list ]] ; then
+        sudo add-apt-repository ppa:deadsnakes/ppa 
+        sudo apt-get -y update
+    fi
+    _install_if_not_installed python3.9
+
+    # ----------------------
+    echo -e "run update-alternatives:"
+    for i in 3 4 6 7 8 9 ; do
+        if [ -f /usr/bin/python3.$i ] ; then
+            sudo update-alternatives --install \
+                /usr/bin/python3 python3 /usr/bin/python3.$i $i
+        fi
+    done
+
+    # ----------------------
+    sudo update-alternatives --config python3
+}
+
+# =============================================================================
 function _dj_setup_qemu()
 {
     cwd_before_running=$PWD
@@ -605,7 +656,7 @@ function _dj_setup_google_repo()
 {
     cwd_before_running=$PWD
 
-    # it needs python
+    # it needs python2
     _install_if_not_installed python
 
     if [ -f $djtools_path/tools/repo ] ; then
@@ -696,8 +747,11 @@ function _dj_setup_gpp_10()
     echo -e "\n instal ${GRN}gcc-10${NOC} and ${GRN}g++-10${NOC} \n"
     _press_enter_or_wait_s_continue 20
 
-    sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-    sudo apt-get -y update
+    if [[ ! -f /etc/apt/sources.list.d/ubuntu-toolchain-r*.list ]] ; then
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get -y update
+    fi
+
     _install_if_not_installed gcc-10
     _install_if_not_installed g++-10
 
@@ -705,50 +759,19 @@ function _dj_setup_gpp_10()
         _install_if_not_installed gcc-9
         _install_if_not_installed g++-9
     fi
-    echo -e "Set up the gcc/g++ priorities:"
  
     # ----------------------
-    if [ -f /usr/bin/gcc-5 ] ; then
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5  5
-    fi
-    if [ -f /usr/bin/g++-5 ] ; then
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5  5
-    fi
-    # ----------------------
-    if [ -f /usr/bin/gcc-6 ] ; then
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6  6
-    fi
-    if [ -f /usr/bin/g++-6 ] ; then
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6  6
-    fi
-    # ----------------------
-    if [ -f /usr/bin/gcc-7 ] ; then
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7  7
-    fi
-    if [ -f /usr/bin/g++-7 ] ; then
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7  7
-    fi
-    # ----------------------
-    if [ -f /usr/bin/gcc-8 ] ; then
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8  8
-    fi
-    if [ -f /usr/bin/g++-8 ] ; then
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8  8
-    fi
-    # ----------------------
-    if [ -f /usr/bin/gcc-9 ] ; then
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9  9
-    fi
-    if [ -f /usr/bin/g++-9 ] ; then
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9  9
-    fi
-    # ----------------------
-    if [ -f /usr/bin/gcc-10 ] ; then
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10  10
-    fi
-    if [ -f /usr/bin/g++-10 ] ; then
-       sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10  10
-    fi
+    echo -e "run update-alternatives:"
+    for i in 4 5 6 7 8 9 10 ; do
+        if [ -f /usr/bin/gcc-$i ] ; then
+            sudo update-alternatives --install \
+                /usr/bin/gcc gcc /usr/bin/gcc-$i $i
+        fi
+        if [ -f /usr/bin/g++-$i ] ; then
+            sudo update-alternatives --install \
+                /usr/bin/g++ g++ /usr/bin/g++-$i $i
+        fi
+    done
     echo -e "\n-------------------\n"
     sudo update-alternatives --config gcc
     echo -e "\n-------------------\n"
@@ -1232,14 +1255,14 @@ function _dj()
     # --------------------------------------------------------
     # --------------------------------------------------------
     setup_list+="adobe-pdf-reader anaconda arduino-1.8.13 baidu-netdisk clang-format clang-llvm "
-    setup_list+="cmake computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
+    setup_list+="cmake-3.19.5 computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
     setup_list+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
     setup_list+="grpc-1.29.1 g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
     setup_list+="mathpix matplot++ mbed mongodb nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 "
-    setup_list+="opencv-4.2.0 pangolin pip qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy "
-    setup_list+="saleae-logic spdlog slack stm32-cubeMX stm32-tools sublime typora vim-env vscode "
-    setup_list+="vtk-8.2.0 wubi YouCompleteMe you-complete-me "
+    setup_list+="opencv-4.2.0 pangolin pip pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic "
+    setup_list+="ros2-foxy saleae-logic spdlog slack stm32-cubeMX stm32-tools sublime typora vim-env "
+    setup_list+="vscode vtk-8.2.0 wubi YouCompleteMe you-complete-me "
     ACTIONS[setup]="$setup_list "
     for i in $setup_list ; do
         ACTIONS[$i]=" "
@@ -1269,6 +1292,8 @@ function _dj()
     ACTIONS[--from-source]=" "
     # ---------------------
     ACTIONS[spdlog]="static shared "
+    ACTIONS[static]=" "
+    ACTIONS[shared]=" "
     ACTIONS[libyaml-cpp]="-v "
     ACTIONS[-v]="0.6.2 0.6.3 "
     ACTIONS[0.6.2]=" "
@@ -1365,7 +1390,7 @@ function _dj()
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    help_list="auto-mount ffmpeg "
+    help_list="auto-mount ffmpeg jupyter "
     ACTIONS[help]="$help_list "
     for i in $help_list ; do
         ACTIONS[$i]=" "

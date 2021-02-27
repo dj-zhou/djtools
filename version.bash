@@ -18,6 +18,46 @@ function _version_help()
 }
 
 # =============================================================================
+_version_if_ge_than() { # current verion #  required version
+    current_ver=$1
+    current_ver=$(echo $1 | grep -o '[^-]*$')
+    crr_ver_mjr=$(echo $current_ver | cut -d. -f1)
+    crr_ver_mnr=$(echo $current_ver | cut -d. -f2)
+    crr_ver_rev=$(echo $current_ver | cut -d. -f3)
+    
+    require_ver=$(echo $2 | grep -o '[^-]*$')
+    req_ver_mjr=$(echo $require_ver | cut -d. -f1)
+    req_ver_mnr=$(echo $require_ver | cut -d. -f2)
+    req_ver_rev=$(echo $require_ver | cut -d. -f3)
+    
+    if [[ "$crr_ver_mjr" -gt "$req_ver_mjr" ]] ; then
+        echo "yes"
+        return
+    elif [[ "$crr_ver_mjr" -lt "$req_ver_mjr" ]] ; then
+        echo "no"
+        return
+    fi
+    # reach here, means major version is the same
+    if [[ "$crr_ver_mnr" -gt "$req_ver_mnr" ]] ; then
+        echo "yes"
+        return
+    elif [[ "$crr_ver_mnr" -lt "$req_ver_mnr" ]] ; then
+        echo "no"
+        return
+    fi
+    # reach here, means minor version is the same
+    if [[ "$crr_ver_rev" -gt "$req_ver_rev" ]] ; then
+        echo "yes"
+        return
+    elif [[ "$crr_ver_rev" -lt "$req_ver_rev" ]] ; then
+        echo "no"
+        return
+    fi
+    # reach here, means the version are the same
+    echo "yes"
+}
+
+# =============================================================================
 function _version_check_arm_linux_gnueabi_gcc()
 {
     v=$(arm-linux-gnueabi-gcc --version | awk '{ print $4 }')
@@ -100,6 +140,8 @@ function _version_check_gpp()
     v=$(g++ --version | awk '{ print $4 }')
     vv=$(echo $v | awk '{ print $1 }')
     echo $vv
+    unset v
+    unset vv
 }
 
 # =============================================================================
@@ -108,6 +150,7 @@ function _version_check_gnome()
     v=$(gnome-shell --version | awk '{ print $3 }')
     # return the version value
     echo $v
+    unset v
 }
 
 # =============================================================================
@@ -137,6 +180,15 @@ function _version_check_opencv()
         return
         fi
     done
+    unset file
+    unset files
+}
+
+# =============================================================================
+function _version_check_opengl()
+{
+    _install_if_not_installed mesa-utils &> /dev/null
+    glxinfo | grep version
 }
 
 # =============================================================================
@@ -156,6 +208,8 @@ function _version_check_ubuntu()
     v=$(lsb_release -a | awk '{ print $3 }')
     vv=$(echo $v | awk '{ print $3 }')
     echo $vv
+    unset v
+    unset vv
 }
 
 # =============================================================================
@@ -222,6 +276,11 @@ function version()
         # ------------------------------
         if [ $2 = 'opencv' ] ; then
             _version_check_opencv
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'opengl' ] ; then
+            _version_check_opengl
             return
         fi
         # ------------------------------
@@ -296,7 +355,7 @@ function _version()
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
-    check_list+="cmake eigen3 gcc g++ gnome opencv python3 ubuntu "
+    check_list+="cmake eigen3 gcc g++ gnome opencv opengl python3 ubuntu "
     ACTIONS[check]="$check_list "
     for i in $check_list ; do
         ACTIONS[$i]=" "

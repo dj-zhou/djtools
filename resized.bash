@@ -103,6 +103,12 @@ _resize_embedded()
         wmctrl -r "Sublime Text" -e 0,1030,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,600,0,1340,1080
         return
+    elif [[ "$SCREENSIZE" = *"1920x1200"* ]]; then
+        echo "resized embedded: Single 1920x1200 screen"
+        #                   none, x,     y,   width,   height
+        wmctrl -r "/bin/bash" -e 0,10,0,800,1150
+        wmctrl -r ${vs_code_window} -e 0,700,0,1250,1150
+        return
     elif [[ "$SCREENSIZE" = *"1920x994"* ]]; then
         echo "resized embedded: Single 1920x994 screen (in VMware, non fullscreen mode)"
         #                   none, x,     y,   width,   height

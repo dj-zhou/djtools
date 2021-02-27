@@ -25,24 +25,23 @@ echo '# djtools setup' >> ~/.bashrc
 repo_source="GitHub GiTee BitBucket"
 for rs in $repo_source ; do
 # -----------------------------------------------------------------
-echo -e "\n Do you have a $rs username? [Yes/No]"
-    read anw
-    username=""
-    if [[ ("$anw" = 'n') || ("$anw" = 'N') || ("$anw" = 'NO') || \
-        ("$anw" = 'No') || ("$anw" = 'no') ]] ; then
-        echo "$rs username is not set."
-    elif [[ ("$anw" = 'y') || ("$anw" = 'Y') || ("$anw" = 'YES') || \
-        ("$anw" = 'Yes') || ("$anw" = 'yes') ]] ; then
-        echo " "
-        echo " Please enter your $rs username:"
-        read username
+echo -e "\n Please enter your $rs username [empty answer means no account]: "
+    read username
+    echo "$username"
+    if [ ! -z $username ] ; then
         echo "${rs}_username="$username >> ~/.bashrc
+        echo "~/.${rs}-repos-$username is created."
+        touch ~/.${rs}-repos-$username
+    else
+        echo "no $rs username set"
     fi
-    touch ~/.${rs}-repos-$username
-    echo -e "\n you can put repos in the ~/.GitHub-repos-$username to enable command \"dj clone\"\n"
 done
 
-echo -e "\n If GitHub/GiTee/BitBucket usernames set wrong, you can still edit them in ~/.bashrc\n"
+echo -e "\n If "
+for rs in $repo_source ; do
+    echo "$rs/"
+done
+echo -e "usernames set wrong, you can still edit them in ~/.bashrc\n"
 echo "source $djtools_path/djtools.bash" >> ~/.bashrc
 echo -e "\n djtools installation finished.\n"
 echo -e "\n" >> ~/.bashrc

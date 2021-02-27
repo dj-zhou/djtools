@@ -38,10 +38,23 @@ function _dj_help_ffmpeg()
   use ffmpeg to convert videos:
   1. convert avi to mp4
     $ ffmpeg -i input.avi output.mp4
-  1. convert mp4 to gif
+  2. convert mp4 to gif
     $ ffmpeg -i input.mp4 output.gif
-  2. convert mp4 to gif (starting from time 00:00:02, for 3 seconds)
+  3. convert mp4 to gif (starting from time 00:00:02, for 3 seconds)
     $ ffmpeg -t 3 -ss 00:00:02 -i input.mp4 output.gif
+ -----------------------------------------
+
+eom
+}
+
+# =============================================================================
+function _dj_help_jupyter()
+{
+    cat << eom
+
+ -----------------------------------------
+  1. convert juypter files to python scripts
+    $ jupyter nbconvert --to python file.ipynb 
  -----------------------------------------
 
 eom
@@ -56,6 +69,10 @@ function _dj_help_skill()
     fi
     if [ $1 = 'ffmpeg' ] ; then
         _dj_help_ffmpeg
+        return
+    fi
+    if [ $1 = 'jupyter' ] ; then
+        _dj_help_jupyter
         return
     fi
 }

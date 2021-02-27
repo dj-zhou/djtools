@@ -163,8 +163,7 @@ function _work_check()
                 else
                     echo >> $OUTPUT_FILE
                 fi
-            else
-                echo $folder": not a supported git repo"
+                # echo $(basename "$folder")": not a supported git repo"
             fi
             cd $workspace_path/
         fi
@@ -192,8 +191,6 @@ function _work_check()
                 else
                     echo >> $OUTPUT_FILE
                 fi
-            else
-                echo $folder": not a supported git repo"
             fi
             cd $workspace_path/
         fi

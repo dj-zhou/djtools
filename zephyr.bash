@@ -43,7 +43,7 @@ function _zephyr_setup_sdk_0_11_4()
     _install_if_not_installed make gcc gcc-multilib g++-multilib libsdl2-dev
 
     # install latest CMake ---------------------
-    dj setup cmake
+    dj setup cmake-3.19.5
 
     # install west ---------------------
     echo -e "\n ${GRN} install ${YLW}west ${NOC}"
