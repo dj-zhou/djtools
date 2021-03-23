@@ -47,7 +47,7 @@ function _mark_down_help_table_of_content()
 # =============================================================================
 function mark-down()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     # ------------------------------
     if [ $# -eq 0 ] ; then
@@ -80,8 +80,8 @@ function mark-down()
     _mark-down_help
 
     # ------------------------------
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================

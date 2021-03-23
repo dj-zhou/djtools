@@ -13,7 +13,7 @@ function _build_meson_use_oesdk() # sdk_path
     fi
     _save_current_env_variables
 
-    current_directory=${PWD}
+    cur_dir=${PWD}
     # the path is determined by command:
     #    yocto setup plain-sdk
     machine_name=$(ls ${HOME}/$1-oesdk)
@@ -34,7 +34,7 @@ function _build_meson_use_oesdk() # sdk_path
             echo -e "\n ${PRP} build meson -cross${NOC}"
             echo -e "    with \"--conti\" option: contains $sdk_output/ directory"
             echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
-            cd $current_directory
+            cd $cur_dir
 
         # just in the $sdk_output/ directory
         elif [ $directory_name = "$sdk_output" ] ; then
@@ -44,12 +44,12 @@ function _build_meson_use_oesdk() # sdk_path
             echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
         
         # if the current path is ~/xx/$sdk_output/yy/zz --------
-        elif [[ "$current_directory" = *"$sdk_output"* ]] ; then
-            sdk_build_path=${current_directory%"$sdk_output"*}
+        elif [[ "$cur_dir" = *"$sdk_output"* ]] ; then
+            sdk_build_path=${cur_dir%"$sdk_output"*}
             sdk_build_path=$sdk_build_path"$sdk_output"
             cd $sdk_build_path
             ninja
-            cd $current_directory
+            cd $cur_dir
             echo -e "\n ${PRP} build meson -cross${NOC}"
             echo -e "    with \"--conti\" option: in $sdk_output/ sub-directory"
             echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
@@ -85,7 +85,7 @@ function _build_meson_use_oesdk() # sdk_path
         echo -e "\n ${PRP} build meson -cross${NOC}"
         echo -e "    fresh build, contains $sdk_output/ directory."
         echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
-        cd $current_directory
+        cd $cur_dir
     
     # if the curent directory is $fb2_sdk_build_directory/, then
     elif [ $directory_name = "$sdk_output" ] ; then
@@ -100,8 +100,8 @@ function _build_meson_use_oesdk() # sdk_path
         echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
 
     # if in a subdirectory of $sdk_output/
-    elif [[ "$current_directory" = *"$sdk_output"* ]] ; then
-        sdk_build_parent_path=${current_directory%"$sdk_output"*}
+    elif [[ "$cur_dir" = *"$sdk_output"* ]] ; then
+        sdk_build_parent_path=${cur_dir%"$sdk_output"*}
         cd $sdk_build_parent_path
         rm $sdk_output/ -rf
         meson . $sdk_output -Db_sanitize=none
@@ -110,7 +110,7 @@ function _build_meson_use_oesdk() # sdk_path
         echo -e "\n ${PRP} build meson -cross${NOC}"
         echo -e "    fresh build, in $sdk_output/ sub-directory."
         echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
-        cd $current_directory
+        cd $cur_dir
 
     # if the current directory does not contain a $sdk_output/ directory,then
     # check if there is a meson.build file, then build
@@ -121,7 +121,7 @@ function _build_meson_use_oesdk() # sdk_path
         echo -e "\n ${PRP} build meson -cross${NOC}"
         echo -e "    fresh build, have created the $sdk_output/ directory"
         echo -e "    sdk location: $sdk_path\n"
-        cd $current_directory
+        cd $cur_dir
     else
         echo -e "\n ${PRP} build meson -cross${NOC}"
         echo -e "    fresh build, but no meson.build file found, no build, exit!! \n"
@@ -132,27 +132,97 @@ function _build_meson_use_oesdk() # sdk_path
 
 # =============================================================================
 # this should implement the same logic as in _build_oesdk()
-function _build_meson_native()
+# now, it does not take --fresh or --conti option, but it runs a taking --conti option
+function _build_meson_native() 
 {
-    current_directory=${PWD}
+    cur_dir=${PWD}
+    proj_dir="_bnative.meson"
     if [ -f "meson.build" ] ; then
-        
-        if [ ! -d "_bnative" ] ; then
-            meson setup _bnative
+        if [ ! -d "$proj_dir" ] ; then
+            meson setup $proj_dir
         fi
-        if [ ! -f "_bnative/build.ninja" ] ; then
-            rm _bnative -rf
-            meson setup _bnative
+        if [ ! -f "$proj_dir/build.ninja" ] ; then
+            rm $proj_dir -rf
+            meson setup $proj_dir
             rm -rf builddir # just a hack
             return
         fi
-        cd _bnative
-        ninja
+        cd $proj_dir && ninja
+        cd $cur_dir && rm -rf builddir # just a hack
     else
-        echo "not a meson directory, exit!"
+        echo -e "${RED}not a meson project directory, exit!${NOC}"
     fi
     rm -rf builddir # just a hack
-    cd $current_directory
+    cd $cur_dir
+}
+
+# =============================================================================
+# example of .project-stm32: 
+# STM32F107VCT6
+# 256 FLASH (*1024)
+#  64 RAM   (*1024)
+
+
+# example output
+# Memory region         Used Size  Region Size  %age Used
+#            FLASH:       14644 B         2 MB      0.70%
+#             DTCM:          0 GB       128 KB      0.00%
+#             SRAM:        4544 B       384 KB      1.16%
+#         IDT_LIST:         200 B         2 KB      9.77%
+
+# =============================================================================
+function compile_makefile()
+{
+    clean_tag=$1
+    if [ "$clean_tag" = "clean" ] ; then
+        echo -e "\n${PRP} make clean${NOC}\n"
+        make clean
+        return
+    fi
+    echo -e "\n${PRP}make -j$(cat /proc/cpuinfo | grep processor | wc -l) $clean_tag${NOC}\n"
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l) $clean_tag
+
+    # stm32 project dedicated scripts, can be moved into Makefile
+    if [ -f .project-stm32 ] && [ -f bin/*.elf ] ; then
+        micro_controller=$(grep "STM32" .project-stm32 | awk '{print $1}')
+        flash_kb=$(grep "FLASH" .project-stm32 | awk '{print $1}')
+        ram_kb=$(grep "RAM" .project-stm32 | awk '{print $1}')
+        text_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $1}')
+        text_used=$(echo $text_used | awk '{print $2}')
+        data_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $2}')
+        data_used=$(echo $text_used | awk '{print $2}')
+        flash_percentage=$(awk "BEGIN {print ($((text_used))+$((data_used))) * 100  / $((flash_kb)) / 1024}" | awk '{printf("%d",$0);}')
+        bss_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $3}')
+        bss_used=$(echo $bss_used | awk '{print $2}')
+        ram_percentage=$(awk "BEGIN {print $((bss_used)) * 100  / $((ram_kb)) / 1024}" | awk '{printf("%d",$0);}')
+        echo -e "${GRN}\n------------------------------------${NOC}"
+        echo -e " $micro_controller memory usage: FLASH: ${flash_percentage}%, RAM: ${ram_percentage}%\n"
+    fi
+    return
+}
+
+# =============================================================================
+function compile_cmakelist()
+{
+    cur_dir=${PWD}
+
+    clean_tag=$1
+    if [ -z "$clean_tag" ] ; then
+        if [ ! -d build ] ; then
+            echo -e "${PRP}\n mkdir build && cd build && cmake ..${NOC}\n"
+            mkdir build && cd build && cmake ..
+        else
+            cd build/
+        fi
+        echo -e "${PRP}\n make -j$(cat /proc/cpuinfo | grep processor | wc -l)${NOC}\n"
+        make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    elif [ "$clean_tag" = "clean" ] ; then
+        echo -e "${PRP}\n rm -rf build/, bin/${NOC}\n"
+        rm -rf build/
+        rm -rf bin/
+    fi
+
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -244,7 +314,7 @@ function _build()
     for i in $oesdk_list ; do
         ACTIONS[$i]="--conti --fresh "
     done
-    ACTIONS[-native]="--conti --fresh "
+    ACTIONS[-native]=" " # does not take --conti or --fresh options
     ACTIONS[--conti]=" "
     ACTIONS[--fresh]=" "
 

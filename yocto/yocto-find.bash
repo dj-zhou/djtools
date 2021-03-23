@@ -119,12 +119,12 @@ function _yocto_find_DISTRO_VERSION()
     # then to find $DISTRO.conf, in which, to find something like
     # 'DISTRO_VERSION = "2.6.4"'. however, this file can require some other
     # file, then ... it can be too hard
-    current_folder=${PWD}
+    cur_dir=${PWD}
     # it assumes that the meta-data directories are parallel to the build
     # directory, it is not always true (TODO)
     cd ..
     for item in ./*; do
-        cd $current_folder/../
+        cd $cur_dir/../
         # not a directory, continue -----------
         if [[ ! -d $item ]] ; then
             continue
@@ -141,19 +141,19 @@ function _yocto_find_DISTRO_VERSION()
         if [  -z "$file_path" ] ; then
             continue
         fi
-        file_full_path=$current_folder/../$folder_name/$file_path
+        file_full_path=$cur_dir/../$folder_name/$file_path
         # find something like 'DISTRO_VERSION = "2.6.4"' in this file
         DISTRO_V=$(_yocto_find_variable_in_file "DISTRO_VERSION" $file_full_path)
         if [ ! -z $DISTRO_V ] ; then
             echo $DISTRO_V
-            cd $current_folder
+            cd $cur_dir
             return
         fi
     done
 
     # if reaches here, means $DISTRO_V is empty --------------
     # echo -e "\n\nDISTRO_VERSION not found, trying to find it in another way\n" <&2
-    cd $current_folder/../
+    cd $cur_dir/../
     # find the actual conf file
     required_file=$(grep -r require $file_full_path | awk '{print $2 }')
     slash_count=$(_count_a_char_in_str "$required_file" "/")
@@ -161,9 +161,9 @@ function _yocto_find_DISTRO_VERSION()
     conf_file=${required_file:${pos}+1:${#required_file}}
     
     # search that file again ---------------
-    cd $current_folder/../
+    cd $cur_dir/../
     for item in ./*; do
-        cd $current_folder/../
+        cd $cur_dir/../
         # not a directory, continue -----------
         if [[ ! -d $item ]] ; then
             continue
@@ -180,7 +180,7 @@ function _yocto_find_DISTRO_VERSION()
         if [  -z "$file_path" ] ; then
             continue
         fi
-        file_full_path=$current_folder/../$folder_name/$file_path
+        file_full_path=$cur_dir/../$folder_name/$file_path
         # find something like 'DISTRO_VERSION = "2.6.4"' in this file
         DISTRO_V=$(_yocto_find_variable_in_file "DISTRO_VERSION" $file_full_path)
         # if there is a $ in the string ...
@@ -191,11 +191,11 @@ function _yocto_find_DISTRO_VERSION()
                 DISTRO_V=${DISTRO_V:0:${#the_line}-1}
             fi
             echo $DISTRO_V
-            cd $current_folder
+            cd $cur_dir
             return
         fi
     done
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -315,12 +315,12 @@ function _yocto_find_bmap_file() # $wic_file
 # find a file in current directory, excluding the build directory
 function _yocto_show_a_file() # file_full_name filter
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     file_full_name=$1
     filter=$2
     for item in ./*; do
-        cd $current_folder
+        cd $cur_dir
         if [[ ! -d $item ]] ; then
             continue
         fi
@@ -345,7 +345,7 @@ function _yocto_show_a_file() # file_full_name filter
             done
         fi
     done
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -417,11 +417,11 @@ function _yocto_list_things()
         echo "in a build directory, exit!"
         return
     fi
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     things=$1
     for item in ./*; do
-        cd $current_folder
+        cd $cur_dir
         if [[ ! -d $item ]] ; then
             continue
         fi
@@ -440,7 +440,7 @@ function _yocto_list_things()
         done
     done
     echo -e "\n"
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -458,7 +458,7 @@ function _yocto_list_resources()
     fi
 
     # iterate all folders ----------
-    current_folder=${PWD}
+    cur_dir=${PWD}
     
     for item in ./*; do
         if [[ -d $item ]] && ( [[ -d $item/.git ]] || [[ -f $item/.git ]] ) ; then
@@ -475,7 +475,7 @@ function _yocto_list_resources()
             echo "remote: $(git remote -v | grep fetch | awk '{print $2}')"
             echo "branch: $branch_name"
             git log --decorate=short --pretty=oneline -n1
-            cd $current_folder
+            cd $cur_dir
         fi
     done
 }
@@ -505,12 +505,21 @@ function _yocto_list()
 # this can only run in a build directory
 function _yocto_find_meta_layers()
 {
-      if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
+    if [ $(_yocto_check_is_a_build_directory) = 'true' ] ; then
         layers=" "
         dirs=$(ls ../)
         for i in $dirs ; do
-            if [[ -d ../$i/.git ]] ; then
+            if [[ -f ../$i/.git ]] ; then
                 layers+="$i "
+                continue;
+            fi
+            if compgen -G "../$i/recipe*" >> /dev/null ; then
+                layers+="$i "
+                continue;
+            fi
+            if compgen -G "../$i/meta-*" >> /dev/null ; then
+                layers+="$i "
+                continue;
             fi
         done
         echo $layers

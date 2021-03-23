@@ -22,7 +22,6 @@ function _dj_setup_help()
       gnome            - to install Gnome, for Ubuntu 20.04, etc
       google-repo      - to install the repo utility developed by Google
       grpc-1.29.1      - to install the gRPC, v1.29.1
-      gtest-glog       - to install gtest/glog
       i219-v           - to install Intel I219-V WiFi chipset driver
       libev-4.33       - to install libev, v4.33
       lib-serialport   - to install libserialport
@@ -62,7 +61,7 @@ eom
 # =============================================================================
 function _dj_setup_adobe_pdf_reader()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
 
     # install i386 related dependencies --------------------
@@ -80,7 +79,7 @@ function _dj_setup_adobe_pdf_reader()
     _wget_if_not_exist $file "88036c68998d565c4365e2ad89b04d51" $url
     sudo dpkg -i $file
 
-    cd $current_folder && unset current_folder
+    cd $cur_dir && unset cur_dir
 }
 
 # =============================================================================================
@@ -124,7 +123,7 @@ function _dj_setup_anaconda()
         return
     fi
 
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -138,13 +137,13 @@ function _dj_setup_anaconda()
     
     _create_anaconda_desktop_item
 
-    cd $current_folder && unset current_folder
+    cd $cur_dir && unset cur_dir
 }
 
 # =============================================================================
 function _dj_setup_arduino_1_8_13()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
     rm arduino* -rf
@@ -155,13 +154,13 @@ function _dj_setup_arduino_1_8_13()
 
     sudo ln -sf ${HOME}/soft/arduino-1.8.13/arduino /usr/bin/arduino
 
-    cd $current_folder && unset current_folder
+    cd $cur_dir && unset cur_dir
 }
 
 # =============================================================================
 function _dj_setup_baidu_netdisk()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -170,13 +169,13 @@ function _dj_setup_baidu_netdisk()
 
     sudo dpkg -i $file
     
-    cd $current_folder && unset current_folder
+    cd $cur_dir && unset cur_dir
 }
 
 # =============================================================================
 function _dj_setup_computer()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     sudo rm -rf ~/Documents/
     sudo rm -rf ~/Music/
@@ -216,8 +215,13 @@ eom
     echo -e "\n going to install Google Chrome\n"
     _press_enter_or_wait_s_continue 10
     cd ~ && mkdir -p soft/ && cd soft/
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    sudo dpkg -i google-chrome*
+    google_ver=$(google-chrome --version)
+    if [[ "$google_ver" = *"Google Chrome"* ]]; then
+        echo "Google Chrome already installed"
+    else
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo dpkg -i google-chrome*
+    fi
 
     cd ~
 
@@ -244,6 +248,7 @@ eom
         gsettings set org.gnome.gedit.preferences.encodings \
             auto-detected "['CURRENT','GB18030','GBK','GB2312','UTF-8','UTF-16']"
     fi
+    
     # -----------------------------------
     # to disable the fixed dock (in dock setting, it is Auto-hide the Dock option)
     if [ ! "$gnome_v" = ' ' ] ; then
@@ -262,13 +267,13 @@ eom
     echo -e "\n time & date control: \n you need to run the code:\n"
     echo -e "    timedatectl set-local-rtc 1\n"    
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_dropbox()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     sudo apt-get --fix-broken install
     _install_if_not_installed libpango1.0-0
@@ -284,13 +289,13 @@ function _dj_setup_dropbox()
     echo -e "\n You can run the following command to setup the Dropbox"
     echo -e "   dropbox start -i\n"
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_eigen3()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
     _install_if_not_installed mlocate # updatedb is in this package
     _install_if_not_installed libeigen3-dev
     echo -e "\n sudo updatedb\n this may take a few minutes\n"
@@ -300,13 +305,13 @@ function _dj_setup_eigen3()
     echo " if see error \"fatal error: Eigen/Core: No such file or directory\""
     echo -e " add \"-I/usr/include/eigen3\" to your Makefile\n"
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_foxit_reader()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     echo -e "\n install Foxit Reader ..."
     echo -e "  recommended location: /opt/foxitsoftware/foxitreader\n"
@@ -334,13 +339,13 @@ function _dj_setup_foxit_reader()
         echo -e "a symbolic link cannot be generated\n"
     fi
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_gcc_aarch64_linux()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     echo -e "\n install gcc-aarch64-linux-gnu ...\n"
     _press_enter_or_wait_s_continue 10
@@ -369,8 +374,8 @@ function _dj_setup_gcc_aarch64_linux()
         echo -e "\n-------------------\n"
         sudo update-alternatives --config aarch64-linux-gnu-gcc
     fi
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================
@@ -378,7 +383,7 @@ function _dj_setup_gcc_aarch64_linux()
 # https://askubuntu.com/questions/1243252/how-to-install-arm-none-eabi-gdb-on-ubuntu-20-04-lts-focal-fossa
 function _dj_setup_gcc_arm_stm32()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     echo -e "\n remove ${RED}gcc-arm-none-eabi${NOC}, and install ${GRN}gcc-arm-embedded${NOC} ...\n"
     _press_enter_or_wait_s_continue 10
@@ -430,14 +435,14 @@ function _dj_setup_gcc_arm_stm32()
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-size    /usr/bin/arm-none-eabi-size
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-objcopy /usr/bin/arm-none-eabi-objcopy
     fi
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================
 function _dj_setup_gcc_arm_linux_gnueabi()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     echo -e "\n install gcc-arm-linux-gnueabi ...\n"
     _press_enter_or_wait_s_continue 10
@@ -474,14 +479,14 @@ function _dj_setup_gcc_arm_linux_gnueabi()
         sudo update-alternatives --config arm-linux-gnueabi-gcc
         sudo update-alternatives --config arm-linux-gnueabi-g++
     fi
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================
 function _dj_setup_gcc_arm_linux_gnueabihf()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     echo -e "\n install gcc-arm-linux-gnueabihf ...\n"
     _press_enter_or_wait_s_continue 10
@@ -517,25 +522,25 @@ function _dj_setup_gcc_arm_linux_gnueabihf()
         sudo update-alternatives --config arm-linux-gnueabihf-g++
     fi
 
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================
 function _dj_setup_git_lfs()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
     curl -s \
       https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh \
       | sudo bash
     _install_if_not_installed git-lfs
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_gitg_gitk()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     echo -e "\n install gitg and gitk ...\n"
     _press_enter_or_wait_s_continue 10 # to check the key pressed TODO
@@ -543,14 +548,14 @@ function _dj_setup_gitg_gitk()
     _install_if_not_installed gitk
     git config --global credential.helper store
     # git config --global credential.helper 'cache --timeout=36000'
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 # make sure the related package is public available in dj-zhou's github
 function _dj_setup_i219_v()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
     
@@ -562,7 +567,7 @@ function _dj_setup_i219_v()
 
     _ask_to_execute_cmd "sudo reboot"
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -572,7 +577,7 @@ function _dj_setup_lcm()
         echo "lcm installation is only tested within Ubuntu 20.04/18.04"
         return
     fi
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     _install_if_not_installed default-jdk
     cd ~ && mkdir -p soft/ && cd soft/
@@ -601,7 +606,7 @@ function _dj_setup_lcm()
         /usr/local/lib/pkgconfig/lcm-java.pc
 
 eom
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -615,7 +620,7 @@ eom
 # cross compilers
 function _dj_setup_libev_4_33()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -639,13 +644,13 @@ function _dj_setup_libev_4_33()
 
     cd ~/soft
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_libgpiod()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf libgpiod*
     if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
@@ -686,13 +691,13 @@ function _dj_setup_libgpiod()
 
 eom
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_libiio()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
     # install some software
     if [[ "${ubuntu_v}" = *'18.04'* ]] ; then
         _install_if_not_installed libxml2-dev
@@ -733,13 +738,13 @@ function _dj_setup_libiio()
         /usr/lib/x86_64-linux-gnu/pkgconfig/libiio.pc
 
 eom
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_libserialport()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -762,12 +767,12 @@ function _dj_setup_libserialport()
         /usr/local/include/libserialport.h
 
     example code:
-        TODO
+        todo
 
 eom
     cd ~/soft/
     
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -782,7 +787,7 @@ function _dj_setup_mathpix()
 function _dj_setup_matplot_xx()
 {
     static_shared=$1
-    current_folder=${PWD}
+    cur_dir=${PWD}
     # dependency ------
     _install_if_not_installed gnuplot
     _install_if_not_installed libfftw3-dev
@@ -845,14 +850,43 @@ eom
 eom
     fi
 
-    cd $current_folder
+    cd $cur_dir
+}
+
+# =============================================================================
+function _dj_setup_magic_enum()
+{
+    cur_dir=${PWD}
+    cd ~ && mkdir -p soft/ && cd soft/ && rm magic_enum -rf
+
+    ver="v0.7.2" # use static version number at this moment
+    git clone https://github.com/Neargye/magic_enum
+    cd magic_enum
+    git checkout $ver
+    sudo cp include/magic_enum.hpp /usr/local/include/
+    
+    echo -e "    --------------------------------------------------------"
+    echo -e "    The header of ${GRN}Magic Enum C++${NOC} ($ver) is installed as:"
+    echo -e "       /usr/local/include/magic_enum.hpp"
+    echo -e "    --------------------------------------------------------"
+    cat << eom
+  __  __             _        ______                          _____
+ |  \/  |           (_)      |  ____|                        / ____|_     _
+ | \  / | __ _  __ _ _  ___  | |__   _ __  _   _ _ __ ___   | |   _| |_ _| |_
+ | |\/| |/ _\ |/ _\ | |/ __| |  __| | '_ \| | | | '_ \ _  \ | |  |_   _|_   _|
+ | |  | | (_| | (_| | | (__  | |____| | | | |_| | | | | | | | |____|_|   |_|
+ |_|  |_|\__,_|\__, |_|\___| |______|_| |_|\__,_|_| |_| |_|  \_____|
+                __/ | https://github.com/Neargye/magic_enum
+               |___ / version 0.7.2
+eom
+    cd $cur_dir
 }
 
 # =============================================================================
 # testing on Ubuntu 18.04
 function _dj_setup_mbed()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     _install_if_not_installed mercurial git
     # install mbed-cli
@@ -896,7 +930,24 @@ eom
     python3 -m pip install icetea
     python3 -m pip install pycryptodome
     python3 -m pip install cryptography
-    cd $current_folder
+    cd $cur_dir
+}
+
+# =============================================================================
+# testing
+function _dj_setup_meson()
+{
+    # remove /usr/bin/meson
+    sudo apt-get remove meson
+    
+    # install needed software
+    _install_if_not_installed python3
+
+    # use fixed version to install meson, and it is installed to ~/.local/bin
+    python3 -m pip install meson==0.57.0
+    
+    # make sure ~/.local/bin is in the PATH variable
+    # but not sure if it is in it for new installed Ubuntu ... will check
 }
 
 # =============================================================================
@@ -954,6 +1005,41 @@ eom
 }
 
 # =============================================================================
+function _dj_setup_nlohmann_json3_dev()
+{
+    # Ubuntu 18.04
+    # due to an error: ImportError: No module named apt_pkg
+    # I need to use Python3.6 to use the add-apt-repository command
+    python3_v=$(version check python3)
+    anw=$(_version_if_ge_than $python3_v "3.7")
+    # did not try it on Ubuntu 20.04
+    if [[ "$anw" = 'yes' && "${ubuntu_v}" = *'18.04'* ]] ; then
+        echo "Python3 should be of v3.6 to continue."
+        return
+    fi
+    # on Ubuntu 18.04, this installed the 3.1.2-2~bionic version
+    # (sudo apt-cache madison nlohmann-json3-dev)
+    # sudo add-apt-repository ppa:team-xbmc/ppa
+    # sudo apt-get update
+    # sudo apt-get install nlohmann-json3-dev
+
+    # install from source
+    cur_dir=${PWD}
+
+    cd ~ && mkdir -p soft/ && cd soft/
+
+    rm json -rf
+    git clone https://github.com/nlohmann/json.git
+    cd json
+    git checkout v3.9.1 # use a fixed version at this moment
+    rm build -rf && mkdir build && cd build
+    cmake ..
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+
+    cd $cur_dir
+}
+
+# =============================================================================
 # this may only work on desktop computer
 # nvidia-driver-455 is good at time of this commit
 function _dj_setup_nvidia()
@@ -984,7 +1070,7 @@ eom
 # =============================================================================
 function _dj_setup_nvtop()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     if [[ "${ubuntu_v}" = *'18.04'* || \
           "${ubuntu_v}" = *'20.04'* ]] ; then
@@ -994,17 +1080,17 @@ function _dj_setup_nvtop()
         cd nvtop
         mkdir build && cd build
         cmake .. -DNVML_RETRIEVE_HEADER_ONLINE=True
-        make -j4
+        make -j$(cat /proc/cpuinfo | grep processor | wc -l)
         sudo make install
     fi
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
 function _dj_setup_qt_5_13_1()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     echo -e "\n install Qt 5.13.1 \n"
     
@@ -1032,13 +1118,13 @@ function _dj_setup_qt_5_13_1()
     echo 'export LD_LIBRARY_PATH=~/Qt5.13.1/5.13.1/gcc_64/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
     echo -e "\n PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
     
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
 function _dj_setup_qt_5_14_2()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     echo -e "\nInstall Qt 5.14.2\n"
     _press_enter_or_wait_s_continue 10
@@ -1067,26 +1153,26 @@ function _dj_setup_qt_5_14_2()
     echo 'export LD_LIBRARY_PATH=~/Qt5.14.2/5.14.2/gcc_64/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
     echo -e "\n PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
 function _dj_setup_slack()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
     
     cd ~ && mkdir -p soft && cd soft/
     # the download page: https://slack.com/downloads/linux
     wget https://downloads.slack-edge.com/linux_releases/slack-desktop-4.8.0-amd64.deb
     sudo dpkg -i slack-desktop*.deb
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
 function _dj_setup_saleae_logic()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
     
     cd ~ && mkdir -p soft && cd soft/
     version="1.2.18"
@@ -1100,7 +1186,7 @@ function _dj_setup_saleae_logic()
     rm -rf logic
     mv "$file" logic
     sudo ln -sf ${HOME}/soft/logic/Logic /usr/bin/logic
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
@@ -1134,7 +1220,7 @@ function _dj_setup_spdlog() # static/shared
         version="v1.7.0"
     esac
     echo "version = $version"
-    cwd_before_running=$PWD
+    cur_dir=$PWD
     
     cd ~ && mkdir -p soft && cd soft/
     rm spdlog -rf
@@ -1163,13 +1249,13 @@ function _dj_setup_spdlog() # static/shared
     fi
     echo -e "\n ---------------------------------------\n"
     
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
 function _dj_setup_sublime()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     sudo apt-get update
     _install_if_not_installed apt-transport-https ca-certificates curl
@@ -1181,7 +1267,7 @@ function _dj_setup_sublime()
     sudo apt-get update
     _install_if_not_installed sublime-text
     
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -1199,7 +1285,7 @@ function _dj_setup_typora()
 # tested: Ubuntu 18.04, Ubuntu 20.04
 function _dj_setup_vscode()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
     
@@ -1211,7 +1297,7 @@ function _dj_setup_vscode()
     sudo dpkg -i vscode.deb
     sudo rm vscode.deb
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -1223,7 +1309,7 @@ function _dj_setup_vscode()
 # shared library build seems not working!
 function _dj_setup_yaml_cpp()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     # dependencies to install --------------
     sudo apt-get -y update
@@ -1266,7 +1352,7 @@ function _dj_setup_yaml_cpp()
 
     # echo -e '\n if the version is NOT 0.5.2, it may have some problem.\n'
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
@@ -1289,6 +1375,11 @@ function _dj_setup()
     # --------------------------
     if [ $1 = 'baidu-netdisk' ] ; then
         _dj_setup_baidu_netdisk
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'boost' ] ; then
+        _dj_setup_boost
         return
     fi
     # --------------------------
@@ -1398,8 +1489,13 @@ function _dj_setup()
         return
     fi
     # --------------------------
-    if [ $1 = 'gtest-glog' ] ; then
-        _dj_setup_gtest_glog
+    if [ $1 = 'gtest' ] ; then
+        _dj_setup_gtest $2 $3 $4
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'glog' ] ; then
+        _dj_setup_glog $2 $3 $4
         return
     fi
     # --------------------------
@@ -1463,15 +1559,30 @@ function _dj_setup()
         return
     fi
     # --------------------------
+    if [ $1 = 'magic-enum' ] ; then
+        _dj_setup_magic_enum
+        return
+    fi
+    # --------------------------
     if [ $1 = 'mbed' ] ; then
         _dj_setup_mbed
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'meson' ] ; then
+        _dj_setup_meson
         return
     fi
     # --------------------------
     if [ $1 = 'mongodb' ] ; then
         _dj_setup_mongodb
         return
-    fi
+    fi 
+    # --------------------------
+    if [ $1 = 'nlohmann-json3-dev' ] ; then
+        _dj_setup_nlohmann_json3_dev
+        return
+    fi 
     # --------------------------
     if [ $1 = 'nvidia' ] ; then
         _dj_setup_nvidia
@@ -1609,7 +1720,7 @@ function _dj_setup()
         return
     fi
     # --------------------------
-    if [ $1 = 'YouCompleteMe' ] || [ $1 = 'you-complete-me' ] ; then
+    if [ $1 = 'you-complete-me' ] ; then
         _dj_setup_you_complete_me
         return
     fi

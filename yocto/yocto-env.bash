@@ -118,6 +118,7 @@ function _yocto_reset_env_variables()
 
     # just don't know why PATH cannot be recovered!
     unset PATH
+    export PATH=$PATH:$HOME/.local/bin
     export PATH=/usr/bin
     export PATH=$PATH:/bin
     export PATH=$PATH:/usr/local/sbin

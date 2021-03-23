@@ -123,7 +123,7 @@ function _code_name_stm32_dev()
 # =============================================================================
 function code-name()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
     
     if [ $# = 0 ] ; then
         _code_name_help
@@ -145,7 +145,7 @@ function code-name()
         return
     fi
     
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================

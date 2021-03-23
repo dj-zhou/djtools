@@ -58,7 +58,7 @@ eom
 # =============================================================================
 function _dj_replace()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
     
     if [ $# = 3 ] ; then
         if [ $3 = '.' ] ; then
@@ -74,7 +74,7 @@ function _dj_replace()
         fi
     fi
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
@@ -121,5 +121,5 @@ function _dj_format()
         return
     fi
     
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }

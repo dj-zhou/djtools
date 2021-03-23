@@ -109,9 +109,9 @@ function _version_check_eigen3()
     files+="/usr/include/eigen3/Eigen/src/Core/util/Macros.h "
     for file in $files ; do
         if [[ -f "$file" ]] ; then
-                while IFS='' read -r line || [[ -n "$line" ]] ; do
+            while IFS='' read -r line || [[ -n "$line" ]] ; do
                 if [[ $line == *"define EIGEN_WORLD_VERSION"* ]] ; then
-                    word_version=$(echo $line  | awk '{ print $3 }')
+                    world_version=$(echo $line  | awk '{ print $3 }')
                 fi
                 if [[ $line == *"define EIGEN_MAJOR_VERSION"* ]] ; then
                     major_version=$(echo $line  | awk '{ print $3 }')
@@ -120,8 +120,8 @@ function _version_check_eigen3()
                     minor_version=$(echo $line  | awk '{ print $3 }')
                 fi
             done < $file
-        echo $word_version.$major_version.$minor_version
-        return
+            echo $world_version.$major_version.$minor_version
+            return
         fi
     done
 }
@@ -132,6 +132,44 @@ function _version_check_gcc()
     v=$(gcc --version | awk '{ print $4 }')
     vv=$(echo $v | awk '{ print $1 }')
     echo $vv
+}
+
+# =============================================================================
+# I found /usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc
+# but it is from sudo apt-get install libgoogle-glog-dev
+# however, the source code installation does not generate this package config file:
+# https://github.com/google/glog/pull/239
+function _version_check_glog()
+{
+    file=/usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc
+    if [ ! -f $file ] ; then
+        echo "glog may not installed correctly!"
+        echo "note: source code installation does not have a libglog.pc file"
+        return
+    fi
+    while IFS='' read -r line || [[ -n "$line" ]] ; do
+        if [[ $line == *"Version: "* ]] ; then
+            version=$(echo $line  | awk '{ print $2 }')
+        fi
+    done < $file
+    echo $version
+}
+
+# =============================================================================
+# I could only find /usr/local/lib/pkgconfig/gtest.pc to check its version
+function _version_check_gtest()
+{
+    file=/usr/local/lib/pkgconfig/gtest.pc
+    if [ ! -f $file ] ; then
+        echo "gtest may not installed correctly!"
+        return
+    fi
+    while IFS='' read -r line || [[ -n "$line" ]] ; do
+        if [[ $line == *"Version: "* ]] ; then
+            version=$(echo $line  | awk '{ print $2 }')
+        fi
+    done < $file
+    echo $version
 }
 
 # =============================================================================
@@ -154,6 +192,26 @@ function _version_check_gnome()
 }
 
 # =============================================================================
+function _version_check_magic_enum()
+{
+    file="/usr/local/include/magic_enum.hpp"
+    if [[ -f "$file" ]] ; then
+        while IFS='' read -r line || [[ -n "$line" ]] ; do
+            if [[ $line == *"define MAGIC_ENUM_VERSION_MAJOR"* ]] ; then
+                major_version=$(echo $line  | awk '{ print $3 }')
+            fi
+            if [[ $line == *"define MAGIC_ENUM_VERSION_MINOR"* ]] ; then
+                minor_version=$(echo $line  | awk '{ print $3 }')
+            fi
+             if [[ $line == *"define MAGIC_ENUM_VERSION_PATCH"* ]] ; then
+                patch_version=$(echo $line  | awk '{ print $3 }')
+            fi
+        done < $file
+        echo $major_version.$minor_version.$patch_version
+    fi
+}
+
+# =============================================================================
 function _version_check_opencv()
 {
     # example:
@@ -165,7 +223,7 @@ function _version_check_opencv()
     files+="/usr/include/opencv2/core/version.hpp "
     for file in $files ; do
         if [[ -f "$file" ]] ; then
-                while IFS='' read -r line || [[ -n "$line" ]] ; do
+            while IFS='' read -r line || [[ -n "$line" ]] ; do
                 if [[ $line == *"define CV_VERSION_MAJOR"* ]] ; then
                     major_version=$(echo $line  | awk '{ print $3 }')
                 fi
@@ -176,8 +234,8 @@ function _version_check_opencv()
                     revision=$(echo $line  | awk '{ print $3 }')
                 fi
             done < $file
-        echo $major_version.$minor_version.$revision
-        return
+            echo $major_version.$minor_version.$revision
+            return
         fi
     done
     unset file
@@ -264,6 +322,16 @@ function version()
             return
         fi
         # ------------------------------
+        if [ $2 = 'glog' ] ; then
+            _version_check_glog
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'gtest' ] ; then
+            _version_check_gtest
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'g++' ] ; then
             _version_check_gpp
             return
@@ -271,6 +339,11 @@ function version()
         # ------------------------------
         if [ $2 = 'gnome' ] ; then
             _version_check_gnome
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'magic-enum' ] ; then
+            _version_check_magic_enum
             return
         fi
         # ------------------------------
@@ -315,6 +388,12 @@ function version()
             return
         fi
         # ------------------------------
+        if [ $2 = 'gxx' ] ; then
+            sudo update-alternatives --config gcc
+            sudo update-alternatives --config g++
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'arm-linux-gnueabi-gxx' ] ; then
             sudo update-alternatives --config arm-linux-gnueabi-gcc
             sudo update-alternatives --config arm-linux-gnueabi-g++
@@ -324,6 +403,12 @@ function version()
         if [ $2 = 'arm-linux-gnueabihf-gxx' ] ; then
             sudo update-alternatives --config arm-linux-gnueabihf-gcc
             sudo update-alternatives --config arm-linux-gnueabihf-g++
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'python3' ] ; then
+            # this does not work due to anaconda setup! be careful
+            sudo update-alternatives --config python3
             return
         fi
         # ------------------------------
@@ -355,13 +440,14 @@ function _version()
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
-    check_list+="cmake eigen3 gcc g++ gnome opencv opengl python3 ubuntu "
+    check_list+="cmake eigen3 gcc glog gtest g++ gnome magic-enum opencv opengl "
+    check_list+="python3 ubuntu "
     ACTIONS[check]="$check_list "
     for i in $check_list ; do
         ACTIONS[$i]=" "
     done
-    swap_list+="gcc g++ arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
-    swap_list+="aarch64-linux-gnu-gcc "
+    swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
+    swap_list+="aarch64-linux-gnu-gcc gcc g++ gxx python3 "
     ACTIONS[swap]="$swap_list "
     for i in $swap_list ; do
         ACTIONS[$i]=" "

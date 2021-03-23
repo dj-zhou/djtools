@@ -41,8 +41,8 @@ _resize_embedded()
     # ---------------------------------------------------------------
     # get the real screen size
     SCREENSIZE=$(xrandr | grep '*')
-    current_folder=$(pwd | xargs -n1 basename)
-    # vs_code_window=${current_folder}"Visual Studio Code" # did not work!
+    cur_dir=$(pwd | xargs -n1 basename)
+    # vs_code_window=${cur_dir}"Visual Studio Code" # did not work!
     vs_code_window="Visual Studio Code"
     if [[ "$SCREENSIZE" = *"3840x2160"*"3840x2160"* ]]; then
         echo "resized embedded: Double 3840x2160 screens"
@@ -53,15 +53,32 @@ _resize_embedded()
         wmctrl -r "Sublime Text" -e 0,5660,0,1500,2150
         wmctrl -r ${vs_code_window} -e 0,5660,0,2000,2080
         return
-    elif [[ $SCREENSIZE = *"3840x2160"* ]]; then
-        echo "resized embedded: Single 3840x2160 screen"
+    fi
+    if [[ $SCREENSIZE = *"3840x2160"* ]]; then
+        echo "resized embedded: single 3840x2160 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,1200,2030
         wmctrl -r "eclipse" -e 0,1830,0,2000,2050
         wmctrl -r "Sublime Text" -e 0,1730,0,2000,2050
         wmctrl -r ${vs_code_window} -e 0,1730,0,2300,2030
         return
-    elif [[ "$SCREENSIZE" = *"1920x1200"*"1920x1200"* ]]; then
+    fi
+    if [[ "$SCREENSIZE" = *"2560x1440"*"1920x1200"* ]]; then
+        echo "resized embedded: 2560x1440 and 1920x1200 screens"
+        if [[ $1 = 'right' ]] ; then
+            #               none, x,     y,   width,   height
+            wmctrl -r "/bin/bash" -e 0,1920,0,1000,1380
+            wmctrl -r ${vs_code_window} -e 0,2920,0,1560,1400
+            return
+        fi
+        wmctrl -r "/bin/bash" -e 0,0,10,800,1120
+        wmctrl -r "Terminal" -e 0,1200,0,710,1150
+        wmctrl -r "eclipse" -e 0,2720,0,1200,1150
+        wmctrl -r "Sublime Text" -e 0,2830,0,1500,1100
+        wmctrl -r ${vs_code_window} -e 0,800,0,1120,1150
+        return
+    fi
+    if [[ "$SCREENSIZE" = *"1920x1200"*"1920x1200"* ]]; then
         echo "resized embedded: at least double 1920x1200 screens"
         if [[ $1 = 'right' ]] ; then
             #               none, x,     y,   width,   height
@@ -78,7 +95,8 @@ _resize_embedded()
         wmctrl -r "Sublime Text" -e 0,2830,0,1500,1100
         wmctrl -r ${vs_code_window} -e 0,800,0,1120,1150
         return
-    elif [[ "$SCREENSIZE" = *"1920x1080"*"1920x1080"* ]]; then
+    fi
+    if [[ "$SCREENSIZE" = *"1920x1080"*"1920x1080"* ]]; then
         echo "resized embedded: Double 1920x1080 screens"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,1930,0,800,1020
@@ -87,7 +105,8 @@ _resize_embedded()
         wmctrl -r "Sublime Text" -e 0,2830,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,2720,0,1120,1050
         return
-    elif [[ "$SCREENSIZE" = *"2560x1440"*"1920x1080"* ]]; then
+    fi
+    if [[ "$SCREENSIZE" = *"2560x1440"*"1920x1080"* ]]; then
         echo "resized embedded: 2560x1440 + 1920x1080 screens"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,1000,1380
@@ -95,53 +114,45 @@ _resize_embedded()
         wmctrl -r "Sublime Text" -e 0,810,0,800,1380
         wmctrl -r ${vs_code_window} -e 0,1020,0,1530,1380
         return
-    elif [[ "$SCREENSIZE" = *"1920x1080"* ]]; then
-        echo "resized embedded: Single 1920x1080 screen"
+    fi
+    if [[ "$SCREENSIZE" = *"1920x1080"* ]]; then
+        echo "resized embedded: single 1920x1080 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,800,1000
         wmctrl -r "eclipse" -e 0,820,0,1200,1000
         wmctrl -r "Sublime Text" -e 0,1030,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,600,0,1340,1080
         return
-    elif [[ "$SCREENSIZE" = *"1920x1200"* ]]; then
-        echo "resized embedded: Single 1920x1200 screen"
+    fi
+    if [[ "$SCREENSIZE" = *"1920x1200"* ]]; then
+        echo "resized embedded: single 1920x1200 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,800,1150
         wmctrl -r ${vs_code_window} -e 0,700,0,1250,1150
         return
-    elif [[ "$SCREENSIZE" = *"1920x994"* ]]; then
-        echo "resized embedded: Single 1920x994 screen (in VMware, non fullscreen mode)"
+    fi
+    if [[ "$SCREENSIZE" = *"1920x994"* ]]; then
+        echo "resized embedded: single 1920x994 screen (in VMware, non fullscreen mode)"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,800,930
         wmctrl -r "Sublime Text" -e 0,1030,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,700,0,1250,930
         return
-    elif [[ "$SCREENSIZE" = *"2560x1080"* ]]; then
-        echo "resized embedded: Single 2560x1080 screen"
+    fi
+    if [[ "$SCREENSIZE" = *"2560x1080"* ]]; then
+        echo "resized embedded: single 2560x1080 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,1000,1020
         wmctrl -r "eclipse" -e 0,1530,0,1200,1060
         wmctrl -r "Sublime Text" -e 0,810,0,800,1040
         wmctrl -r ${vs_code_window} -e 0,1020,0,1530,1070
         return
-    elif [[ "$SCREENSIZE" = *"1366x768"* ]]; then
-        echo "resized embedded: Single 1366x768 screen"
-        #                   none, x,     y,   width,   height
-        wmctrl -r "/bin/bash" -e 0,10,0,600,700
-        wmctrl -r ${vs_code_window} -e 0,620,0,800,700
-        return
-    elif [[ "$SCREENSIZE" = *"1280x800"* ]]; then
-        echo "resized embedded: Single 1280x800 screen"
-        #                   none, x,     y,   width,   height
-        wmctrl -r "/bin/bash" -e 0,10,0,600,700
-        wmctrl -r ${vs_code_window} -e 0,620,0,800,700
-        return
     fi
 }
 
 # =============================================================================
 # special use, do not put this function to funcs.bash
-function _resized_get_current_folder_name()
+function _resized_get_cur_dir_name()
 {
     cwd=$PWD
     # echo $cwd 
@@ -168,7 +179,7 @@ function _resize_gitg()
     # ---------------------------------------------------------------
     # get the real screen size
     SCREENSIZE=$(xrandr |grep '*')
-    folder_name=$(_resized_get_current_folder_name)
+    folder_name=$(_resized_get_cur_dir_name)
     echo "folder_name = "$folder_name
     # echo $folder_name
     if [[ "$SCREENSIZE" = *"3840x2160"*"3840x2160"* ]]; then
@@ -178,20 +189,20 @@ function _resize_gitg()
         wmctrl -r $folder_name -e 0,2300,0,1560,2180
         wmctrl -R "$folder_name"
     elif [[ $SCREENSIZE = *"3840x2160"* ]]; then 
-        echo "resized gitg: Single 3840x2160 screen"
+        echo "resized gitg: single 3840x2160 screen"
         wmctrl -r "/bin/bash" -e 0,10,0,1800,2030
         #                   none, x,     y,   width,   height
         wmctrl -r $folder_name -e 0,1820,0,1830,2030
         wmctrl -R "$folder_name"
     elif [[ "$SCREENSIZE" = *"1920x1080"* ]]; then
-        echo "resized gitg: Single 1920x1080 screen"
+        echo "resized gitg: single 1920x1080 screen"
         #                   none, x,     y,   width,   height
     elif [[ "$SCREENSIZE" = *"2560x1080"* ]]; then
-        echo "resized gitg: Single 2560x1080 screen"
+        echo "resized gitg: single 2560x1080 screen"
         #                   none, x,     y,   width,   height
     
     elif [[ "$SCREENSIZE" = *"1366x768"* ]]; then
-        echo "resized gitg: Single 1366x768 screen"
+        echo "resized gitg: single 1366x768 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,600,700
         wmctrl -r $folder_name -e 0,620,0,750,750
@@ -216,25 +227,25 @@ _resize_fullscreen()
         wmctrl -r "Sublime Text" -e 0,3860,0,1500,2150
         wmctrl -r ${vs_code_window} -e 0,5040,0,2000,2080
     elif [[ $SCREENSIZE = *"3840x2160"* ]]; then
-        echo "resized fullscreen: Single 3840x2160 screen"
+        echo "resized fullscreen: single 3840x2160 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,3820,2030
     elif [[ "$SCREENSIZE" = *"1920x1080"* ]]; then
-        echo "resized fullscreen: Single 1920x1080 screen"
+        echo "resized fullscreen: single 1920x1080 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,800,1000
         wmctrl -r "eclipse" -e 0,820,0,1200,1000
         wmctrl -r "Sublime Text" -e 0,1030,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,530,0,1000,800
     elif [[ "$SCREENSIZE" = *"2560x1080"* ]]; then
-        echo "resized fullscreen: Single 2560x1080 screen"
+        echo "resized fullscreen: single 2560x1080 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,1000,1020
         wmctrl -r "eclipse" -e 0,1530,0,1200,1060
         wmctrl -r "Sublime Text" -e 0,810,0,800,1040
         wmctrl -r ${vs_code_window} -e 0,1020,0,1500,1020
     elif [[ "$SCREENSIZE" = *"1366x768"* ]]; then
-        echo "resized fullscreen: Single 1366x768 screen"
+        echo "resized fullscreen: single 1366x768 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,1360,750
         wmctrl -r ${vs_code_window} -e 0,620,0,800,700
@@ -254,28 +265,28 @@ _resize_typora()
         #                   none, x,     y,   width,   height
         echo "todo"
     elif [[ $SCREENSIZE = *"3840x2160"* ]]; then
-        echo "resized typora: Single 3840x2160 screen"
+        echo "resized typora: single 3840x2160 screen"
         #                   none, x,     y,   width,   height
         echo "todo"
     elif [[ "$SCREENSIZE" = *"1920x1080"* ]]; then
-        echo "resized typora: Single 1920x1080 screen"
+        echo "resized typora: single 1920x1080 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,800,1000
         wmctrl -r "Typora" -e 0,730,0,1200,1080
         wmctrl -R "Typora"
     elif [[ "$SCREENSIZE" = *"1920x994"* ]]; then
-        echo "resized embedded: Single 1920x994 screen (in VMware, non fullscreen mode)"
+        echo "resized embedded: single 1920x994 screen (in VMware, non fullscreen mode)"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,800,930
         wmctrl -r "Typora" -e 0,730,0,1200,930
         wmctrl -R "Typora"
     elif [[ "$SCREENSIZE" = *"2560x1080"* ]]; then
-        echo "resized typora: Single 2560x1080 screen"
+        echo "resized typora: single 2560x1080 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,1200,1000
         wmctrl -r "Typora" -e 0,1210,0,1350,1080
     elif [[ "$SCREENSIZE" = *"1366x768"* ]]; then
-        echo "resized typora: Single 1366x768 screen"
+        echo "resized typora: single 1366x768 screen"
         #                   none, x,     y,   width,   height
         echo "todo"
     fi

@@ -152,7 +152,7 @@ function _yocto_flash() # block-device # image-file
 # =============================================================================
 function yocto()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     # ------------------------------
     if [ $# -eq 0 ] ; then
@@ -235,8 +235,8 @@ function yocto()
     _yocto_help
 
     # ------------------------------
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================

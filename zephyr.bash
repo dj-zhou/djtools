@@ -30,7 +30,7 @@ function _zephyr_setup_sdk_0_11_4()
     # hard coded version number -------------------
     sdk_ver="0.11.4"
 
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     # install dependencies ---------------------
     echo -e "\n ${GRN} install dependencies ${NOC}"
@@ -229,8 +229,8 @@ function _zephyr_setup_sdk_0_11_4()
     echo -e "  zephyr flash\n"
 
     # ------------------------------
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================
@@ -395,7 +395,7 @@ function _zephyr_flash()
 # =============================================================================
 function zephyr()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     # ------------------------------
     if [ $# -eq 0 ] ; then
@@ -424,8 +424,8 @@ function zephyr()
     _zephyr_help
 
     # ------------------------------
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================

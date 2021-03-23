@@ -56,13 +56,13 @@ function _dj_udev_dialout()
 # =============================================================================
 function _dj_udev_show()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd /etc/udev/rules.d/
     pwd
     tree
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================

@@ -6,7 +6,7 @@
 # recommend to install opencv-4.1.1
 function _dj_setup_opencv_2_4_13()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     echo -e "\n Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.11.2"
@@ -31,7 +31,7 @@ function _dj_setup_opencv_2_4_13()
     _ask_to_remove_a_folder opencv-2.4.13
     _ask_to_remove_a_file opencv-2.4.13.zip
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
     echo -e "\n" 
     echo " lib files *.so are installed in /usr/local/lib/"
     echo " header files are installded in /usr/local/include/opencv2/"
@@ -55,10 +55,10 @@ function _setup_opencv_dependencies()
     # Cameras programming interface libs
     packages+="libdc1394-22 libdc1394-22-dev libxine2-dev libv4l-dev v4l-utils "
 
-    cwd_before_running=$PWD
+    cur_dir=$PWD
     cd /usr/include/linux
     sudo ln -s -f ../libv4l1-videodev.h videodev.h
-    cd $cwd_before_running
+    cd $cur_dir
 
     # GTK lib for the graphical user functionalities coming from OpenCV highghui module
     packages+="libgtk-3-dev "
@@ -90,7 +90,7 @@ function _dj_setup_opencv_3_4_13()
 {
     _setup_opencv_dependencies
 
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     cd ~ && mkdir -p soft && cd soft/
 
@@ -146,7 +146,7 @@ function _dj_setup_opencv_3_4_13()
     
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
     
-    cd ${cwd_before_running}
+    cd ${cur_dir}
     cat << eom
     lib files *.so:
             /usr/local/lib/
@@ -171,7 +171,7 @@ function _dj_setup_opencv_4_1_1()
         return
     fi
 
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     echo -e "\n Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.14.2"
@@ -207,7 +207,7 @@ function _dj_setup_opencv_4_1_1()
     sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
     
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
     cat << eom
     lib files *.so are installed in
             /usr/local/lib/
@@ -232,7 +232,7 @@ function _dj_setup_opencv_4_2_0()
 
     _setup_opencv_dependencies
 
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     cd ~ && mkdir -p soft && cd soft/
     
@@ -287,5 +287,5 @@ function _dj_setup_opencv_4_2_0()
     
     sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }

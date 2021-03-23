@@ -3,7 +3,7 @@
 # =============================================================================
 function _random_wallpaper()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd $wallpaper_folder
     set -- *
@@ -12,7 +12,7 @@ function _random_wallpaper()
     gsettings set org.gnome.desktop.background picture-uri \
         "file://$wallpaper_folder/${!random_num}"
     
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -264,17 +264,15 @@ function _wget_if_not_exist() # $filename $md5sum $url $option
 }
 
 # =============================================================================
-# this looks not precise?
+# https://stackoverflow.com/questions/1298066/check-if-an-apt-get-package-is-installed-and-then-install-it-if-its-not-on-linu
 function _check_if_package_installed()
 {
-    # https://stackoverflow.com/questions/1298066/check-if-an-apt-get-package-is-installed-and-then-install-it-if-its-not-on-linu
     PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $1 | grep "install ok installed")
     if [ "" = "$PKG_OK" ]; then
         echo "no"
     else
         echo "yes"
     fi
-
 }
 
 # =============================================================================

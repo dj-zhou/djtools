@@ -41,7 +41,7 @@ function _kernel_find_version()
 #   -i : busybox install folder, default : _install
 function _kernel_config_initramfs()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     # this command has to be run in a linux kernel folder, otherwise, exit
     if [ ! -f Makefile ] ; then
@@ -157,7 +157,7 @@ function _kernel_config_initramfs()
     echo    "   make menuconfig ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-"
     echo -e " you should put \"_install\" into: General setup ---> \"Initramfs source file(s) \"\n"
     
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================

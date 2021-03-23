@@ -27,10 +27,10 @@ function _repod_help()
 # =============================================================================
 function _backup_to_github()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     # -------------------------------------------------
-    repo=$(basename "$current_folder")
+    repo=$(basename "$cur_dir")
     echo $repo
 
     # -------------------------------------------------
@@ -65,18 +65,18 @@ function _backup_to_github()
     fi
     git remote set-url origin $git_original_remote_url
     # -------------------------------------------------
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================
 # only back up to personal private repo
 function _backup_to_gitee()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     # -------------------------------------------------
-    repo=$(basename "$current_folder")
+    repo=$(basename "$cur_dir")
     echo $repo
 
     # -------------------------------------------------
@@ -111,8 +111,8 @@ function _backup_to_gitee()
     fi
     git remote set-url origin $git_original_remote_url
     # -------------------------------------------------
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================
@@ -148,7 +148,7 @@ function _repod_update_help()
 # =============================================================================
 function _repod_update_repos_all_folders()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     for folder in ./* ; do
         if [ -d $folder ] ; then
@@ -170,12 +170,12 @@ function _repod_update_repos_all_folders()
                 printf " ${BRN}NOT a git repo${NOC}"
                 echo " "
             fi
-            cd $current_folder
+            cd $cur_dir
         fi
     done
 
-    cd $current_folder
-    unset current_folder
+    cd $cur_dir
+    unset cur_dir
 }
 
 # =============================================================================
@@ -186,7 +186,7 @@ function _repod_update_repos_all_folders()
 # 4. git@github.com:berkshiregrey/meta-bg.git
 function _repod_switch_to()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     target_host=$1
     repo_name=$(basename $(git remote show -n origin | grep Fetch | cut -d: -f2-))
@@ -232,7 +232,7 @@ function _repod_switch_to()
     echo " $remote_v"
    _display_section
 
-    current_folder=${PWD}
+    cur_dir=${PWD}
 }
 
 # =============================================================================

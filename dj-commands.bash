@@ -133,7 +133,7 @@ function _clang_write_to_file_partN() {
 function _clang_format_vscode_setting_json()
 {
     format_on_save=$1
-    current_folder_json=${PWD}
+    cur_dir_json=${PWD}
 
     folder="/home/$USER/.config/Code/User"
     mkdir -p $folder
@@ -147,14 +147,14 @@ function _clang_format_vscode_setting_json()
 
     echo -e "\n the default settings is in $folder/settings.json\n"
     echo -e " you can revise it manually"
-    cd $current_folder_json
+    cd $cur_dir_json
 }
 
 # =============================================================================
 function _clang_llvm_vscode_setting_json()
 {
     format_on_save=$1
-    current_folder_json=${PWD}
+    cur_dir_json=${PWD}
 
     folder="/home/$USER/.config/Code/User"
     mkdir -p $folder
@@ -168,13 +168,50 @@ function _clang_llvm_vscode_setting_json()
 
     echo -e "\n the default settings is in $folder/settings.json\n"
     echo -e " you can revise it manually"
-    cd $current_folder_json
+    cd $cur_dir_json
+}
+
+# =============================================================================
+function _dj_setup_boost()
+{
+    cur_dir=${PWD}
+    cd ~ && mkdir -p soft/ && cd soft/
+    
+    echo -e "${GRN}boost-1.74.0${NOC} is going to be installed\n"
+    _press_enter_to_continue
+
+    rm -rf boost
+    git clone https://github.com/boostorg/boost.git
+    
+    cd boost
+    # checkout a specific version
+    git checkout boost-1.74.0
+    # clone the submodules! this takes long though
+    git submodule update --init --recursive
+    # install is simple
+    ./bootstrap.sh --prefix=/usr/local
+    ./b2
+    
+    echo -e "${PRP}sudo cp libboost_* /usr/local/lib/${NOC}"
+    sudo cp libboost_* /usr/local/lib/
+
+    cat << eom
+ -----------------------------------------------------------------
+    headers installed to:
+        /usr/include/
+    shared library is copied to:
+        /usr/local/lib/
+ -----------------------------------------------------------------
+
+eom
+
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_clang_format()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     _install_if_not_installed clang-format
 
@@ -196,13 +233,13 @@ function _dj_setup_clang_format()
 
     echo -e "\n"
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_clang_llvm()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     echo -e "\n"
     if [[ ${ubuntu_v} = *'16.04'* ]] ; then
@@ -262,7 +299,7 @@ function _dj_setup_clang_llvm()
 
     echo ' '
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -273,7 +310,7 @@ function _dj_setup_cmake_3_19_5()
     echo -e "\n ${GRN} install CMake $v ${NOC}"
     _press_enter_or_wait_s_continue 5
     
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     # where did I got this? I cannot find the source -- do not delete
     # sudo rm -rf /etc/apt/sources.list.d/kitware-latest.list
@@ -294,7 +331,7 @@ function _dj_setup_cmake_3_19_5()
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -319,7 +356,7 @@ function _dj_setup_kdiff3_meld()
 # =============================================================================
 function _dj_setup_dj_gadgets()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd ~ && mkdir -p workspace/ &&  cd workspace/
     git clone https://dj-zhou@github.com/dj-zhou/dj-gadgets.git
@@ -330,12 +367,9 @@ function _dj_setup_dj_gadgets()
     cd dj-file/
     ./install.sh
 
-    # opencv version check
-    ./install-opencv-version.sh
-
     cd ~/workspace/
     
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -350,7 +384,7 @@ function _dj_setup_devtools()
 # this is only tested in Ubuntu 18.04
 function _dj_setup_container_docker()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     # Install a few prerequisite packages
     packages=" apt-transport-https ca-certificates curl software-properties-common "
@@ -384,7 +418,7 @@ function _dj_setup_container_docker()
     echo -e "you need to reboot computer so docker does not need sudo to run"
     
     # ----------------------------------------------
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -392,7 +426,7 @@ function _dj_setup_container_docker()
 # how to clone the repo and use its Makefile to install? -- don't know
 function _dj_setup_container_dive()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     # ----------------------------------------------
     cd ~ && mkdir -p soft/ &&  cd soft/
@@ -400,7 +434,6 @@ function _dj_setup_container_dive()
     drive_url="https://github.com/wagoodman/dive/releases/download/v"
     wget $drive_url$dive_version"/dive_"$dive_version"_linux_amd64.deb"
     sudo dpkg -i dive_*.deb
-    _ask_to_remove_a_file dive_*.deb
 
     echo -e "\n"
     echo "use the following command to check the docker image layouts"
@@ -410,7 +443,7 @@ function _dj_setup_container_dive()
     echo -e "\n"
 
     # ----------------------------------------------
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -428,7 +461,7 @@ function _dj_setup_container_lxd_4_0()
 # =============================================================================
 function _dj_setup_pangolin()
 {
-    current_folder=${PWD}
+    cur_dir=${PWD}
     # dependency installation
     packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
     _install_if_not_installed $packages
@@ -456,13 +489,13 @@ function _dj_setup_pangolin()
     echo    "   dj setup glfw3"
     echo -e "   dj setup gtest-glog\n"
     
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
 function _dj_setup_pip()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     cd ~/
     _install_if_not_installed python3-pip
@@ -475,7 +508,7 @@ function _dj_setup_pip()
     echo    "   pip --version"
     echo -e "   pip3 --version\n"
     
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
@@ -498,7 +531,7 @@ function _dj_setup_python_3_9()
         sudo add-apt-repository ppa:deadsnakes/ppa 
         sudo apt-get -y update
     fi
-    _install_if_not_installed python3.9
+    _install_if_not_installed python3.9 python3.8
 
     # ----------------------
     echo -e "run update-alternatives:"
@@ -511,12 +544,19 @@ function _dj_setup_python_3_9()
 
     # ----------------------
     sudo update-alternatives --config python3
+
+    # install some related software package
+    _install_if_not_installed python3.9-distutils
+
+    # others ------------
+    _install_if_not_installed python3-pip
+    pip3 install --upgrade setuptools
 }
 
 # =============================================================================
 function _dj_setup_qemu()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     version=$1
     echo $version
@@ -535,13 +575,44 @@ function _dj_setup_qemu()
         echo -e "\n $CYN the installed qemu is probably for ARM only, check it later$NOC\n"
     fi
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
+}
+
+# =============================================================================================
+function _create_stm32cubemx_desktop_item()
+{
+    folder="/usr/share/applications"
+
+    # copy the icon file
+    sudo cp $djtools_path/settings/cubemx.xpm $folder
+
+    file="cubeMX.desktop"
+    touch $file
+
+    echo '[Desktop Entry]'                    >> $file
+    echo 'Encoding=UTF-8'                     >> $file
+    echo 'Name=cube-MX'                       >> $file
+    echo 'Comment=cube-MX'                    >> $file
+    echo 'Exec='$HOME'/soft/STM32CubeMX/STM32CubeMX' >> $file
+    echo 'Icon='$folder'/cubemx.xpm'             >> $file
+    echo 'StartupNotify=false'                   >> $file
+    echo 'Type=Application'                      >> $file
+    echo 'Categories=Application;Development;'   >> $file
+
+    sudo rm -rf $folder/$file
+    sudo mv $file $folder
+
+    sudo chmod +x $folder/$file
+
+
+    echo -e "${YLW}if cubeMX is not installed to ~/soft/STM32CubeMX/, you need to revise${NOC}"
+    echo -e "${YLW} /usr/share/applications/$file accordingly.${NOC}"
 }
 
 # =============================================================================
 function _dj_setup_stm32_cubemx()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     cd ~ && mkdir -p soft && cd soft/
 
@@ -552,7 +623,9 @@ function _dj_setup_stm32_cubemx()
     chmod +x SetupSTM32CubeMX-6.0.1.linux
     ./SetupSTM32CubeMX-6.0.1.linux
 
-    cd $cwd_before_running
+    cd $cur_dir
+
+    _create_stm32cubemx_desktop_item
 }
 
 # =============================================================================
@@ -567,7 +640,7 @@ function _dj_setup_stm32_cubemx()
 # v1.6.0 failed
 function _dj_setup_stm32_tools()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     echo -e "\n install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
     _press_enter_or_wait_s_continue 10
@@ -580,7 +653,7 @@ function _dj_setup_stm32_tools()
     echo -e "\n install ${GRN}stlink${NOC}\n"
     _press_enter_or_wait_s_continue 10
 
-    mkdir -p ~/workspace && cd ~/workspace
+    mkdir -p ~/soft && cd ~/soft
     rm stlink -rf
     git clone https://github.com/stlink-org/stlink
 
@@ -602,7 +675,7 @@ function _dj_setup_stm32_tools()
     # install stm32flash ----------------
     echo -e "\n install  stm32flash\n"
     _press_enter_or_wait_s_continue 10
-    cd ~/workspace/
+    cd ~/soft/
     rm stm32-tools -rf
     git clone https://github.com/dj-zhou/stm32-tools.git
     cd stm32-tools/stm32flash
@@ -622,16 +695,14 @@ function _dj_setup_stm32_tools()
     sudo service udev restart
 
     echo -e "\n"
-    cd ~/workspace
-    _ask_to_remove_a_folder stm32-tools
-    _ask_to_remove_a_folder stlink
-    cd ${cwd_before_running}
+
+    cd ${cur_dir}
 }
 
 # =============================================================================
 function _dj_setup_glfw3()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     echo -e "\n install glfw3 ...\n"
     
@@ -648,13 +719,13 @@ function _dj_setup_glfw3()
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install && sudo ldconfig
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
 function _dj_setup_google_repo()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     # it needs python2
     _install_if_not_installed python
@@ -672,34 +743,82 @@ function _dj_setup_google_repo()
 
     cat << eom
 
- -----------------------------------------
+ -----------------------------------------------------------------
   Google tool "repo" is installed into directory: /bin/
- -----------------------------------------
+ -----------------------------------------------------------------
 
 eom
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
-function _dj_setup_gtest_glog()
+function _dj_setup_gtest()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
-    echo -e "\n install gtest and glog ...\n"
-    
+    echo -e "\n install gtest ...\n"
+       
+    # install gtest from source, v1.10
     cd ~ && mkdir -p soft && cd soft/
-    
-    # gtest
-    packages="libgtest-dev libgoogle-glog-dev "
-    _install_if_not_installed $packages
-    
-    # compile gtest
-    cd /usr/src/gtest
-    sudo cmake CMakeLists.txt
-    sudo make
-    sudo cp *.a /usr/local/lib
+    rm -rf googletest
+    git clone https://github.com/google/googletest.git
+    cd googletest
+    git checkout release-1.10.0 # a fixed version on Oct. 3rd, 2019
+    rm build -rf && mkdir build && cd build
+    cmake ..
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
 
-    cd ${cwd_before_running}
+    cat << eom
+
+ -----------------------------------------------------------------
+    gtest.a and gtest_main.a are installed to:
+        /usr/local/lib/
+    
+    header files:
+        /usr/local/include/gtest/*
+
+    pkg-config file:
+        /usr/local/lib/pkgconfig/gtest.pc
+        /usr/local/lib/pkgconfig/gtest_main.pc
+ -----------------------------------------------------------------
+
+eom
+
+    cd ${cur_dir}
+}
+
+# =============================================================================
+function _dj_setup_glog()
+{
+    cur_dir=$PWD
+
+    echo -e "\n install glog ...\n"
+    
+    # install gtest from source
+    cd ~ && mkdir -p soft && cd soft/
+    rm -rf glog
+    git clone https://github.com/google/glog.git
+    cd glog
+    git checkout v0.4.0  # a fixed version on March 21st, 2019
+    rm build -rf && mkdir build && cd build
+    cmake ..
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
+
+    cat << eom
+
+ -----------------------------------------------------------------
+    glog static library is installed to:
+        /usr/local/lib/libglog.a
+    
+    header files:
+        /usr/local/include/glog/*
+
+    pkg-config file:
+        none
+ -----------------------------------------------------------------
+eom
+
+    cd ${cur_dir}
 }
 
 # =============================================================================
@@ -720,7 +839,7 @@ function _dj_setup_gnome()
 # ninja is used to compile
 function _dj_setup_grpc_1_29_1()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     cd ~ && mkdir -p soft && cd soft/
     git clone https://github.com/grpc/grpc.git --recurse-submodules \
@@ -731,10 +850,7 @@ function _dj_setup_grpc_1_29_1()
     cmake --build .
     sudo cmake --build . -- install
 
-    cd ~/soft/
-    _ask_to_remove_a_folder grpc
-
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
@@ -744,24 +860,27 @@ function _dj_setup_grpc_1_29_1()
 # make this function to install g++-9 on Ubuntu 18.04 as well!
 function _dj_setup_gpp_10()
 {
-    echo -e "\n instal ${GRN}gcc-10${NOC} and ${GRN}g++-10${NOC} \n"
-    _press_enter_or_wait_s_continue 20
+    # install g++10/gcc-10
+    echo -e "\n install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC} \n"
+    _press_enter_or_wait_s_continue 10
 
+    _install_if_not_installed gcc-10
+    _install_if_not_installed g++-10
     if [[ ! -f /etc/apt/sources.list.d/ubuntu-toolchain-r*.list ]] ; then
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get -y update
     fi
 
-    _install_if_not_installed gcc-10
-    _install_if_not_installed g++-10
-
+    # install g++10/gcc-10
     if [[ ${ubuntu_v} = *'18.04'* ]] ; then
+        echo -e "\n install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} \n"
+        _press_enter_or_wait_s_continue 10
         _install_if_not_installed gcc-9
         _install_if_not_installed g++-9
     fi
  
     # ----------------------
-    echo -e "run update-alternatives:"
+    echo -e "run update-alternatives:\n"
     for i in 4 5 6 7 8 9 10 ; do
         if [ -f /usr/bin/gcc-$i ] ; then
             sudo update-alternatives --install \
@@ -783,12 +902,13 @@ function _dj_setup_gpp_10()
 # tested on Ubuntu 16.04, 18.04 and 20.04
 function _dj_setup_wubi()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     _install_if_not_installed ibus
     _install_if_not_installed ibus-table-wubi
     if [[ ${ubuntu_v} = *'16.04'* ]] ; then
         cat << eom
+ -----------------------------------------------------------------
 
         Follow the steps:
             1. log out and log in again;
@@ -798,6 +918,7 @@ function _dj_setup_wubi()
                this step will show nothing
             4. add an input source:
                Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chinese (WuBi-Jidian-86-JiShuang-6.0)
+ -----------------------------------------------------------------
 
 eom
     elif [[ ${ubuntu_v} = *'18.04'* \
@@ -805,7 +926,7 @@ eom
         echo -e "\n please follow the link below to finish the setup:"
         echo -e " https://www.pinyinjoe.com/linux/ubuntu-18-gnome-chinese-setup.htm\n"
     fi
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
@@ -813,7 +934,7 @@ function _dj_setup_vtk_8_2_0()
 {
     echo "vtk 8.2.0 installation"
 
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     # vtk 8 ----------------
     # reference: https://kezunlin.me/post/b901735e/
@@ -835,9 +956,7 @@ function _dj_setup_vtk_8_2_0()
     echo " the installed header files seem to be in /usr/local/include/vtk-8.2/ folder"
     echo -e "\n"
 
-    cd ~/soft/
-    _ask_to_remove_a_folder VTK-8.2.0
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
@@ -852,7 +971,7 @@ function _dj_work_check()
 # once this command get extended, we add sub command to "dj search"
 function _dj_search_package()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
     
     lib_to_find=$1
     echo -e "\n run command:$GRN ldconfig -p | grep $lib_to_find$NOC, we get:"
@@ -863,7 +982,7 @@ function _dj_search_package()
     cd /usr/lib/x86_64-linux-gnu/pkgconfig
     echo -e " ls | grep $lib_to_find\n"
     ls | grep $lib_to_find
-    cd $cwd_before_running
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -871,15 +990,17 @@ function _dj_search_package()
 function _dj_search_string()
 {
     echo -e "\n run command:"
-    echo -e "   $GRN grep -ri --exclude-dir={build,bin,_bcross*,_bnative,.git} $1 .$NOC"
+    echo -e "   $GRN grep -rI $1 .$NOC"
     echo -e " we get:"
-    grep -ri --exclude-dir={build,bin,_bcross*,_bnative,.git} $1 .
+    # how to use the variable in the below?? -- $excluded_dir does not work
+    # -I option ignores the search from binary files, that is perfect!
+    grep -rI --exclude-dir={build,bin,_bcross*,_bnative*,builddir,.git} $1 .
 }
 
 # =============================================================================
 # to find something in a meson file
 # only works in . directory
-function _dj_meson_find() # term
+function _dj_find_in_meson() # term
 {
     term=$1
     if [ -z "$term" ] ; then
@@ -914,11 +1035,11 @@ function _dj_open_file()
 }
 
 # =============================================================================
-function _dj_ssh_no_password()
+function _dj_ssh_general_no_password()
 {
     if [ $# = 0 ] ; then
         echo -e "usage:"
-        echo -e " dj ssh no-password username@ip_address\n"
+        echo -e " dj ssh-general no-password username@ip_address\n"
         return
     fi
     user_and_ip="$1"
@@ -926,19 +1047,41 @@ function _dj_ssh_no_password()
     pos=$(_find_a_char_in_str $user_and_ip "@" 1)
     ip=${user_and_ip:${pos}+1:${#user_and_ip}-${pos}}
 
-    # if ~/.ssh/id_rsa.pub does not exist, create one
-    key_file=~/.ssh/id_rsa.pub
+    # if ~/.ssh/id_rsa-general.pub does not exist, create one
+    key_file=id_rsa-general
     if [ ! -f "$key_file" ] ; then
-        printf "\n\n\n" | ssh-keygen
+        printf "${HOME}/.ssh/${key_file}\n\n\n" | ssh-keygen
     fi
 
     # just to create .ssh on target machine
     echo "ssh -l $user $ip \"mkdir -p ~/.ssh\""
     ssh -l $user $ip "mkdir -p ~/.ssh"
 
-    # then run
-    echo "cat $key_file | ssh $user_and_ip \"cat >> .ssh/authorized_keys\""
-    cat $key_file | ssh $user_and_ip "cat >> .ssh/authorized_keys"
+    # then run, copy the content of local id_rsa.pub to .ssh/autorized_keys in remote
+    echo "cat ${HOME}/.ssh/${key_file}.pub | ssh $user_and_ip \"cat >> .ssh/authorized_keys\""
+    cat ${HOME}/.ssh/${key_file}.pub | ssh $user_and_ip "cat >> .ssh/authorized_keys"
+}
+
+# =============================================================================
+# reference: https://gist.github.com/jexchan/2351996
+# I don't know why ~/.ssh/config is not needed
+# make sure the content in ~/.ssh/id_rsa-github-<account>.pub is pasted to the GitHub account
+# there may be a better solution
+function _dj_ssh_github_switch()
+{
+    github_account=$1
+    echo "github_account = $github_account"
+    key_file=${HOME}/.ssh/id_rsa-github-$github_account
+    echo "key_file = $key_file"
+    if [ ! -f ${key_file} ] ; then
+        echo "SSH key file not found, you need to generate one, and link it to your account."
+        return
+    fi
+    # if see this error: Error connecting to agent: Connection refused, do
+    # eval "$(ssh-agent)"
+
+    ssh-add -D
+    ssh-add ${key_file}
 }
 
 # =============================================================================
@@ -947,7 +1090,7 @@ function _dj_setup_vim_env()
     echo -e "\n setup the vim as an IDE\n"
     _press_enter_or_wait_s_continue 20
 
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     VIMRC=~/.vimrc
 
@@ -1060,13 +1203,13 @@ function _dj_setup_vim_env()
     echo -e "YouCompleteMe needs to be compiled after the plugins are installed:"
     echo -e "  dj setup you-complete-me\n"
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
 function _dj_setup_you_complete_me()
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     folder=~/.vim/bundle/YouCompleteMe
     if [ -d $folder ] ; then
@@ -1078,7 +1221,7 @@ function _dj_setup_you_complete_me()
         echo -e "dj setup vim-env\n"
     fi
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }
 
 # =============================================================================
@@ -1151,17 +1294,17 @@ function dj()
             _dj_help_skill $2
             return
         fi
-        echo 'arguments wrong, exit'
+        echo 'dj help: wrong argument, exit'
         return
     fi
     # ------------------------------
-    if [ $1 = 'meson' ] ; then
+    if [ $1 = 'find' ] ; then
         # ------------------------------
-        if [ $# -ge 2 ] && [ $2 = 'find' ] ; then
-            _dj_meson_find $3 $4 $5 $6
+        if [ $# -ge 2 ] && [ $2 = '-in-meson' ] ; then
+            _dj_find_in_meson $3 $4 $5 $6
             return
         fi
-        echo 'arguments wrong, exit'
+        echo 'dj find: wrong argument, exit'
         return
     fi
     # ------------------------------
@@ -1190,15 +1333,23 @@ function dj()
         return
     fi
     # ------------------------------
-    if [ $1 = 'ssh' ] ; then
+    if [ $1 = 'ssh-general' ] ; then
         # ------------------------------
         if [ $2 = 'no-password' ] ; then
-            _dj_ssh_no_password $3 $4 $5 $6 $7
+            _dj_ssh_general_no_password $3 $4 $5 $6 $7
             return
         fi
         return
     fi
-
+    # ------------------------------
+    if [ $1 = 'ssh-github' ] ; then
+        # ------------------------------
+        if [ $2 = 'switch' ] ; then
+            _dj_ssh_github_switch $3 $4 $5 $6 $7
+            return
+        fi
+        return
+    fi
     # ------------------------------
     if [ $1 = 'udev' ] ; then
         # ------------------------------
@@ -1237,13 +1388,14 @@ function _dj()
         clone
         clone-ssh
         format
+        find
         help
-        meson
         open
         replace
         search
         setup
-        ssh
+        ssh-general
+        ssh-github
         udev
         udevadm
         work-check
@@ -1254,15 +1406,15 @@ function _dj()
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    setup_list+="adobe-pdf-reader anaconda arduino-1.8.13 baidu-netdisk clang-format clang-llvm "
+    setup_list+="adobe-pdf-reader anaconda arduino-1.8.13 baidu-netdisk boost clang-format clang-llvm "
     setup_list+="cmake-3.19.5 computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
     setup_list+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
-    setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo gtest-glog gnome "
-    setup_list+="grpc-1.29.1 g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
-    setup_list+="mathpix matplot++ mbed mongodb nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 "
-    setup_list+="opencv-4.2.0 pangolin pip pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic "
-    setup_list+="ros2-foxy saleae-logic spdlog slack stm32-cubeMX stm32-tools sublime typora vim-env "
-    setup_list+="vscode vtk-8.2.0 wubi YouCompleteMe you-complete-me "
+    setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo glog gnome grpc-1.29.1 "
+    setup_list+="gtest g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
+    setup_list+="mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev nvidia nvtop "
+    setup_list+="opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin pip pycharm python3.9 "
+    setup_list+="qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy saleae-logic spdlog slack "
+    setup_list+="stm32-cubeMX stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi you-complete-me "
     ACTIONS[setup]="$setup_list "
     for i in $setup_list ; do
         ACTIONS[$i]=" "
@@ -1348,8 +1500,12 @@ function _dj()
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ACTIONS[ssh]="no-password "
+    ACTIONS[ssh-general]="no-password "
     ACTIONS[no-password]=" "
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    ACTIONS[ssh-github]="switch "
+    ACTIONS[switch]=" "
 
     # --------------------------------------------------------
     # --------------------------------------------------------
@@ -1382,9 +1538,9 @@ function _dj()
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    meson_list="find "
-    ACTIONS[meson]="$meson_list "
-    for i in $meson_list ; do
+    find_list="-in-meson "
+    ACTIONS[find]="$find_list "
+    for i in $find_list ; do
         ACTIONS[$i]=" "
     done
 

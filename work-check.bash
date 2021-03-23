@@ -24,7 +24,7 @@ function _work_check_git_source()
 # =============================================================================
 function _work_check() 
 {
-    cwd_before_running=$PWD
+    cur_dir=$PWD
 
     package_width=30
     branch_width=40
@@ -196,5 +196,5 @@ function _work_check()
         fi
     done
 
-    cd ${cwd_before_running}
+    cd ${cur_dir}
 }

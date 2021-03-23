@@ -155,7 +155,7 @@ function _system_wallpaper_random()
         echo -e "\n"
     fi
     # _random_wallpaper # from funcs.bash
-    current_folder=${PWD}
+    cur_dir=${PWD}
 
     cd $wallpaper_folder
     set -- *
@@ -164,7 +164,7 @@ function _system_wallpaper_random()
     # it only works for gnome
     gsettings set org.gnome.desktop.background picture-uri "file://$wallpaper_folder/${!random_num}"
     
-    cd $current_folder
+    cd $cur_dir
 }
 
 # =============================================================================
