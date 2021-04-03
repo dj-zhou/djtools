@@ -4,12 +4,12 @@
 function _dj_clone_repo_list() # platform
 {
     platform="$1"
-    if [ $platform = 'GitHub' ] ; then
-        file=$HOME/.$platform-repos-$GitHub_username
-    elif [ $platform = 'GiTee' ] ; then
-        file=$HOME/.$platform-repos-$GiTee_username
-    elif [ $platform = 'BitBucket' ] ; then
-        file=$HOME/.$platform-repos-$BitBucket_username
+    if [ $platform = 'github' ] ; then
+        file=$HOME/.$platform-repos-$github_username
+    elif [ $platform = 'gitee' ] ; then
+        file=$HOME/.$platform-repos-$gitee_username
+    elif [ $platform = 'bitbucket' ] ; then
+        file=$HOME/.$platform-repos-$bitbucket_username
     fi
     if [ ! -f $file ] ; then
         echo "no_repo_list_file_in_${HOME}/_directory" &> /dev/null
@@ -30,7 +30,12 @@ function _dj_clone_help()
     bitbuket - to clone repo from BitBucket
     github   - to clone repo from GitHub
     gitee    - to clone repo from GiTee
-    MORE IS COMMING
+
+ Third level argument:
+    --add        - to add the $4 argument into a repo file in ~ directory
+                   such that the command "dj clone-ssh github" can tab-complete with
+                   repo names
+    <repo name>  - to clone a repo from a platform
  ------------------------------------------------------------------
 eom
 }
@@ -40,15 +45,15 @@ function _dj_clone_find_username()
 {
     platform=$1
     if [ "$platform" = 'bitbucket' ] ; then
-        echo $BitBucket_username
+        echo $bitbucket_username
         return
     fi
     if [ "$platform" = 'github' ] ; then
-        echo $GitHub_username
+        echo $github_username
         return
     fi
     if [ "$platform" = 'gitee' ] ; then
-        echo $GiTee_username
+        echo $gitee_username
         return
     fi
 }
@@ -74,6 +79,7 @@ function _dj_clone_find_link()
 # =============================================================================
 function _dj_clone_from() # platform, repo, etc
 {
+    echo -e "${YLW}http clone with username and password is going to be deprecated${NOC}"
     platform=$1
     repo_name=$2
     if [[ -z $repo_name ]] ; then
@@ -97,6 +103,16 @@ function _dj_clone_from() # platform, repo, etc
 # =============================================================================
 function _dj_clone_ssh_from()
 {
+    # ------------------------------------------------------
+    # add repo name into files to make a completable list
+    if [ "--add" == $2 ] ; then
+        uname=$(_dj_clone_find_username $platform)
+        echo -e "add ${GRN}$3${NOC} into file ${GRN}${HOME}/.$platform-repos-$uname${NOC}:"
+        echo $3 >> ${HOME}/.$platform-repos-$uname
+        return
+    fi
+
+    # ------------------------------------------------------
     platform=$1
     repo_name=$2
     if [[ -z $repo_name ]] ; then

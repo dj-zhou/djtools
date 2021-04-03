@@ -115,12 +115,19 @@ _resize_embedded()
         wmctrl -r ${vs_code_window} -e 0,1020,0,1530,1380
         return
     fi
+    if [[ "$SCREENSIZE" = *"2560x1440"* ]]; then
+        echo "resized embedded: a single 2560x1440 screens"
+        #                   none, x,     y,   width,   height
+        wmctrl -r "/bin/bash" -e 0,10,0,1000,1380
+        wmctrl -r "eclipse" -e 0,1530,0,1200,1380
+        wmctrl -r "Sublime Text" -e 0,810,0,800,1380
+        wmctrl -r ${vs_code_window} -e 0,1020,0,1530,1380
+        return
+    fi
     if [[ "$SCREENSIZE" = *"1920x1080"* ]]; then
         echo "resized embedded: single 1920x1080 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,800,1000
-        wmctrl -r "eclipse" -e 0,820,0,1200,1000
-        wmctrl -r "Sublime Text" -e 0,1030,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,600,0,1340,1080
         return
     fi

@@ -49,9 +49,9 @@ After the installation, you will get those (similar) lines in `~/.bashrc`:
 ```bash
 # ===========================================================
 # djtools setup
-BitBucket_username=sky-Hawk
-GitHub_username=dj-zhou
-GiTee_username=dj-zhou
+bitbucket_username=sky-Hawk
+github_username=dj-zhou
+gitee_username=dj-zhou
 source /home/robot/workspace/djtools/djtools.bash
 ```
 

@@ -217,9 +217,12 @@ function compile_cmakelist()
         echo -e "${PRP}\n make -j$(cat /proc/cpuinfo | grep processor | wc -l)${NOC}\n"
         make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     elif [ "$clean_tag" = "clean" ] ; then
-        echo -e "${PRP}\n rm -rf build/, bin/${NOC}\n"
-        rm -rf build/
+        echo -e "${PRP}\n rm -rf bin/ build* bcross* _bnative*${NOC}\n"
+        rm -rf build*
         rm -rf bin/
+        # just remove all build directory
+        rm -rf _bcross*
+        rm -rf _bnative*
     fi
 
     cd $cur_dir
@@ -260,11 +263,11 @@ function build()
 function _build_meson_exists()
 {
     if [ -f "meson.build" ] ; then
-        echo "meson"
+        echo "meson "
         return
     fi
     if [ -f "build.ninja" ] ; then
-        echo "meson"
+        echo "meson "
         return
     fi
     echo " "
@@ -274,7 +277,7 @@ function _build_meson_exists()
 function _build_cmakelists_exists()
 {
     if [ -f "CMakeLists.txt" ] ; then
-        echo "cmake"
+        echo "cmake "
         return
     fi
     echo " "
@@ -284,7 +287,7 @@ function _build_cmakelists_exists()
 function _build_makefile_exists()
 {
     if [ -f "Makefile" ] ; then
-        echo "make"
+        echo "make "
         return
     fi
     echo " "

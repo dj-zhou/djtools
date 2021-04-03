@@ -271,6 +271,35 @@ eom
 }
 
 # =============================================================================
+function _dj_setup_driver_wifi()
+{
+    if [ $1 = 'rtl8812au' ] ; then
+        if [[ "${ubuntu_v}" = *'20.04'* ]] ; then
+            url="http://archive.ubuntu.com/ubuntu/pool/main/d/dkms"
+            file="dkms_2.8.1-5ubuntu1_all.deb"
+            echo "1. download dkms from $url/$file, then install it by:"
+            echo " $ sudo dpkg -i $file"
+            echo "2. clone repo: https://github.com/dj-zhou/usb-wifi-driver, and install driver:"
+            echo " $ cd usb-wifi-driver/rtl8812au/"
+            echo " $ make"
+            echo " $ sudo make install"
+            return
+        fi
+        echo -e "rtl8812au driver is only tested on Ubuntu 20.04 LTS (x86_64), exit"
+        return
+    fi 
+}
+
+# =============================================================================
+function _dj_setup_driver()
+{
+    if [ $1 = 'wifi' ] ; then
+        _dj_setup_driver_wifi $2 $3 $4 $5
+        return
+    fi 
+}
+
+# =============================================================================
 function _dj_setup_dropbox()
 {
     cur_dir=${PWD}
@@ -1431,6 +1460,11 @@ function _dj_setup()
     # --------------------------
     if [ $1 = 'devtools' ] ; then
         _dj_setup_devtools
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'driver' ] ; then
+        _dj_setup_driver $2 $3 $4 $5
         return
     fi
     # --------------------------

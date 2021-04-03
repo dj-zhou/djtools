@@ -47,7 +47,7 @@ function _backup_to_github()
     fi
 
     # -------------------------------------------------
-    git remote set-url origin https://$GitHub_username@github.com/$GitHub_username/$repo.git
+    git remote set-url origin https://$github_username@github.com/$github_username/$repo.git
     if [ $# = 0 ] ; then
         git push -u origin master
         git push --tags
@@ -93,7 +93,7 @@ function _backup_to_gitee()
     fi
 
     # -------------------------------------------------
-    git remote set-url origin https://$GiTee_username@gitee.com/$GiTee_username/$repo.git
+    git remote set-url origin https://$gitee_username@gitee.com/$gitee_username/$repo.git
     if [ $# = 0 ] ; then
         git push -u origin master
         git push --tags
@@ -201,28 +201,28 @@ function _repod_switch_to()
     if [[ $target_host = 'bitbucket' ]] ; then
         if [[ "$remote_v" = *"https"* ]] ; then
             git remote set-url origin \
-                https://$BitBucket_username@bitbucket.org/$BitBucket_username/$repo_name
+                https://$bitbucket_username@bitbucket.org/$bitbucket_username/$repo_name
         else
             git remote set-url origin \
-                git@bitbucket.org:$BitBucket_username/$repo_name
+                git@bitbucket.org:$bitbucket_username/$repo_name
         fi
     fi
     if [[ $target_host = 'github' ]] ; then
         if [[ "$remote_v" = *"https"* ]] ; then
             git remote set-url origin \
-                https://$GitHub_username@github.com/$GitHub_username/$repo_name
+                https://$github_username@github.com/$github_username/$repo_name
         else
             git remote set-url origin \
-                git@github.com:$GitHub_username/$repo_name
+                git@github.com:$github_username/$repo_name
         fi
     fi
     if [[ $target_host = 'gitee' ]] ; then
         if [[ "$remote_v" = *"https"* ]] ; then
             git remote set-url origin \
-                https://$GiTee_username@gitee.com/$GiTee_username/$repo_name
+                https://$gitee_username@gitee.com/$gitee_username/$repo_name
         else
             git remote set-url origin \
-                git@gitee.com:$GiTee_username/$repo_name
+                git@gitee.com:$gitee_username/$repo_name
         fi
     fi
 

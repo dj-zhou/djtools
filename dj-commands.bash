@@ -1067,21 +1067,58 @@ function _dj_ssh_general_no_password()
 # I don't know why ~/.ssh/config is not needed
 # make sure the content in ~/.ssh/id_rsa-github-<account>.pub is pasted to the GitHub account
 # there may be a better solution
-function _dj_ssh_github_switch()
+function _dj_ssh_github_activate()
 {
-    github_account=$1
-    echo "github_account = $github_account"
-    key_file=${HOME}/.ssh/id_rsa-github-$github_account
-    echo "key_file = $key_file"
+    github_username=$1
+    key_file=${HOME}/.ssh/id_rsa-github-$github_username
     if [ ! -f ${key_file} ] ; then
-        echo "SSH key file not found, you need to generate one, and link it to your account."
-        return
+        # ask if proceed (yes/no) --------------
+        echo -e "\n account $1 does not exist, do you want to create it? (yes/no)"
+        read asw
+        if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || \
+            ($asw = 'No') || ($asw = 'no') ]] ; then
+            echo 'Canceled and exit!'
+            return
+        elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || \
+            ($asw = 'Yes') || ($asw = 'yes') ]] ; then
+            # proceed -------------
+            echo -e "SSH key file ${GRN}${key_file}${NOC} not found, generate one automatically:"
+            printf "${key_file}\n\n\n" | ssh-keygen
+            echo -e "\ncopy the following content into a new GitHub SSH Key (https://github.com/settings/keys, need login):"
+            echo -e "${GRN}"
+            cat ${key_file}.pub
+            echo -e "${NOC}"
+        else
+            echo "Wrong answer! Canceled and exit!"
+        fi
     fi
+
     # if see this error: Error connecting to agent: Connection refused, do
     # eval "$(ssh-agent)"
-
     ssh-add -D
     ssh-add ${key_file}
+    echo $github_username > ~/.ssh/.github-activated-account
+}
+
+# =============================================================================
+function _dj_ssh_github_all_accounts()
+{
+    all_github_accounts=$(ls ~/.ssh | grep .pub)
+    for i in $all_github_accounts ; do
+        username=${i%".pub"}
+        username=$(echo "${username/"id_rsa-github-"/}")
+        echo $username
+    done
+}
+
+# =============================================================================
+function _dj_ssh_github_current_account()
+{
+    if [ ! -f ~/.ssh/.github-activated-account ] ; then
+        echo -e "you need to run ${PRP} dj ssh-github activate <github username>${NOC} to activate one"
+        return
+    fi
+    cat  ~/.ssh/.github-activated-account
 }
 
 # =============================================================================
@@ -1263,7 +1300,7 @@ function dj()
             _dj_format $2 $3 $4 $5 $6 $7 $8
             return
         fi
-        echo 'arguments wrong, exit'
+        echo "dj format: wrong argument, exit."
         return
     fi
     # ------------------------------
@@ -1284,7 +1321,7 @@ function dj()
                 return
             fi
         fi
-        echo 'arguments wrong, exit'
+        echo "dj search: wrong argument, exit."
         return
     fi
     # ------------------------------
@@ -1294,7 +1331,7 @@ function dj()
             _dj_help_skill $2
             return
         fi
-        echo 'dj help: wrong argument, exit'
+        echo 'dj help: wrong argument, exit.'
         return
     fi
     # ------------------------------
@@ -1304,7 +1341,7 @@ function dj()
             _dj_find_in_meson $3 $4 $5 $6
             return
         fi
-        echo 'dj find: wrong argument, exit'
+        echo 'dj find: wrong argument, exit.'
         return
     fi
     # ------------------------------
@@ -1319,7 +1356,7 @@ function dj()
             _dj_replace $2 $3 $4 $5 $6 $7 $8
             return
         fi
-        echo 'arguments wrong, exit'
+        echo "dj replace: wrong argument, exit."
         return
     fi
     # ------------------------------
@@ -1329,7 +1366,7 @@ function dj()
             _dj_setup $2 $3 $4 $5 $6 $7
             return
         fi
-        echo 'arguments wrong, exit'
+        echo "dj setup: wrong argument, exit."
         return
     fi
     # ------------------------------
@@ -1344,10 +1381,22 @@ function dj()
     # ------------------------------
     if [ $1 = 'ssh-github' ] ; then
         # ------------------------------
-        if [ $2 = 'switch' ] ; then
-            _dj_ssh_github_switch $3 $4 $5 $6 $7
+        if [ $2 = 'activate' ] ; then
+            _dj_ssh_github_activate $3 $4 $5 $6 $7
             return
         fi
+        # ------------------------------
+        if [ $2 = 'all-accounts' ] ; then
+            _dj_ssh_github_all_accounts
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'current-account' ] ; then
+            _dj_ssh_github_current_account
+            return
+        fi
+        # ------------------------------
+        echo "dj ssh-github: wrong argument, exit."
         return
     fi
     # ------------------------------
@@ -1407,10 +1456,10 @@ function _dj()
     # --------------------------------------------------------
     # --------------------------------------------------------
     setup_list+="adobe-pdf-reader anaconda arduino-1.8.13 baidu-netdisk boost clang-format clang-llvm "
-    setup_list+="cmake-3.19.5 computer container kdiff3-meld dj-gadgets devtools dropbox eigen3 "
+    setup_list+="cmake-3.19.5 computer container dj-gadgets devtools driver dropbox eigen3 "
     setup_list+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo glog gnome grpc-1.29.1 "
-    setup_list+="gtest g++-10 i219-v lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
+    setup_list+="gtest g++-10 i219-v kdiff3-meld lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
     setup_list+="mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev nvidia nvtop "
     setup_list+="opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin pip pycharm python3.9 "
     setup_list+="qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy saleae-logic spdlog slack "
@@ -1424,6 +1473,13 @@ function _dj()
     ACTIONS[docker]=" "
     ACTIONS[dive]="  "
     ACTIONS[lxd-4.0]=" "
+    # ---------------------
+    ACTIONS[driver]="wifi "
+    wifi_list="rtl8812au "
+    ACTIONS[wifi]="$wifi_list "
+    for i in $wifi_list ; do
+        ACTIONS[$i]=" "
+    done
     # ---------------------
     ACTIONS[i219-v]="e1000e-3.4.2.1 e1000e-3.4.2.4 "
     ACTIONS[e1000e-3.4.2.1]=" "
@@ -1476,24 +1532,28 @@ function _dj()
     ACTIONS[replace]=" "
 
     # --------------------------------------------------------
-    bitbucket_repos="$(_dj_clone_repo_list BitBucket) "
+    bitbucket_repos="$(_dj_clone_repo_list bitbucket) "
     ACTIONS[bitbucket]+="$bitbucket_repos "
+    ACTIONS[bitbucket]+="--add "
     for i in $bitbucket_repos ; do
         ACTIONS[$i]=" "
     done
     # --------------------------------------------------------
-    github_repos="$(_dj_clone_repo_list GitHub) "
+    github_repos="$(_dj_clone_repo_list github) "
     ACTIONS[github]+="$github_repos "
+    ACTIONS[github]+="--add "
     for i in $github_repos ; do
         ACTIONS[$i]=" "
     done
     # --------------------------------------------------------
-    gitee_repos="$(_dj_clone_repo_list GiTee) "
+    gitee_repos="$(_dj_clone_repo_list gitee) "
     ACTIONS[gitee]+="$gitee_repos "
+    ACTIONS[gitee]+="--add "
     for i in $gitee_repos ; do
         ACTIONS[$i]=" "
     done
-
+    ACTIONS[--add]=" "
+    
     # --------------------------------------------------------
     # --------------------------------------------------------
     ACTIONS[open]=" "
@@ -1504,8 +1564,12 @@ function _dj()
     ACTIONS[no-password]=" "
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ACTIONS[ssh-github]="switch "
-    ACTIONS[switch]=" "
+    ssh_github_list="activate all-accounts current-account "
+    ACTIONS[ssh-github]="$ssh_github_list"
+    for i in $ssh_github_list ; do
+        ACTIONS[$i]=" "
+    done
+    ACTIONS[activate]=$(_dj_ssh_github_all_accounts)
 
     # --------------------------------------------------------
     # --------------------------------------------------------
