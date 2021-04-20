@@ -227,11 +227,11 @@ eom
 
     # -----------------------------------
     # Windows fonts
-    echo -e "\n going to support Windows fonts\n"
-    _press_enter_or_wait_s_continue 10
-    _install_if_not_installed ttf-mscorefonts-installer
-    _install_if_not_installed msttcorefonts
-    _install_if_not_installed gtk2-engines-pixbuf # works for solving the GTK warning
+    # echo -e "\n going to support Windows fonts\n"
+    # _press_enter_or_wait_s_continue 10
+    # _install_if_not_installed ttf-mscorefonts-installer
+    # _install_if_not_installed msttcorefonts
+    # _install_if_not_installed gtk2-engines-pixbuf # works for solving the GTK warning
 
     # -----------------------------------
     # remove firefox
@@ -619,6 +619,7 @@ function _dj_setup_lcm()
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
     sudo ldconfig
+
     cat << eom
 
     --------------------------------------------
@@ -635,6 +636,37 @@ function _dj_setup_lcm()
         /usr/local/lib/pkgconfig/lcm-java.pc
 
 eom
+    cd $cur_dir
+}
+
+# =============================================================================
+function _dj_setup_libcsv_3_0_2()
+{
+    cur_dir=${PWD} && cd ~ && mkdir -p soft/ && cd soft/
+
+    rm -rf libcsv-3.0.2
+    git clone https://github.com/dj-zhou/libcsv-3.0.2
+    # the master branch is of version 3.0.2
+    cd libcsv-3.0.2
+    ./configure
+    make check
+    sudo make install
+
+    cat << eom
+
+    --------------------------------------------
+    libcsv
+        /usr/local/lib/libcsv.a
+        /usr/local/lib/libcsv.la
+        /usr/local/lib/libcsv.so
+        /usr/local/lib/libcsv.so.3
+        /usr/local/lib/libcsv.so.3.0.2
+    
+    header file:
+        /usr/local/include/csv.h
+
+eom
+
     cd $cur_dir
 }
 
@@ -966,8 +998,10 @@ eom
 # testing
 function _dj_setup_meson()
 {
+    echo -e "\n install ${YLW}meson v0.57.0${NOC} and ${YLW}ninja v1.10.2${NOC} \n"
+    _press_enter_or_wait_s_continue 5
     # remove /usr/bin/meson
-    sudo apt-get remove meson
+    sudo apt-get remove meson &> /dev/null
     
     # install needed software
     _install_if_not_installed python3
@@ -977,6 +1011,28 @@ function _dj_setup_meson()
     
     # make sure ~/.local/bin is in the PATH variable
     # but not sure if it is in it for new installed Ubuntu ... will check
+    
+    meson_path=$(grep "PATH:~/.local/bin" ~/.bashrc)
+    if [ ! -z "$meson_path" ] ; then
+        echo -e "\n ${YLW}meson ${GRN} path was set in ~/.bashrc${NOC}"
+    else
+        echo -e '\n' >>~/.bashrc
+        echo '# ===========================================================' >>~/.bashrc
+        echo '# (djtools) meson path setup' >> ~/.bashrc
+        echo -e 'export PATH=$PATH:~/.local/bin\n' >> ~/.bashrc
+    fi
+
+    # ninja is needed for meson, so install it as well
+    cur_dir=${PWD}
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm -rf ninja
+    git clone git://github.com/ninja-build/ninja.git && cd ninja
+    git checkout v1.10.2 # use fixed version, released on Nov. 28th, 2020
+    mkdir build && cd build
+    cmake ..
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    sudo make install
+    cd $cur_dir
 }
 
 # =============================================================================
@@ -1365,11 +1421,14 @@ function _dj_setup_yaml_cpp()
     elif [[ "$yaml_v" = "0.6.3" ]] ; then
         cmake .. -DYAML_BUILD_SHARED_LIBS=ON
     fi
+    echo -e "version to be installed $YLW$yaml_v$NOC"
+    _press_enter_or_wait_s_continue 5
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
     echo -e "\n libyaml-cpp.so is installed in /usr/local/lib/"
-        echo -e " header files are installed in /usr/local/include/yaml-cpp/\n"
+    echo -e " header files are installed in /usr/local/include/yaml-cpp/"
+    echo -e " pkg-config file installed to: /usr/local/lib/pkgconfig/yaml-cpp.pc\n"
     
     # ---------------------------------------------
     # # a better way to install it
@@ -1412,13 +1471,18 @@ function _dj_setup()
         return
     fi
     # --------------------------
+    if [ $1 = 'clang-format' ] ; then
+        _dj_setup_clang_format
+        return
+    fi
+    # --------------------------
     if [ $1 = 'clang-llvm' ] ; then
         _dj_setup_clang_llvm
         return
     fi
     # --------------------------
-    if [ $1 = 'clang-format' ] ; then
-        _dj_setup_clang_format
+    if [ $1 = 'cli11' ] ; then
+        _dj_setup_cli11
         return
     fi
     # --------------------------
@@ -1555,6 +1619,10 @@ function _dj_setup()
     # --------------------------
     if [ $1 = 'lcm' ] ; then
         _dj_setup_lcm
+        return
+    fi
+    if [ $1 = 'libcsv-3.0.2' ] ; then
+        _dj_setup_libcsv_3_0_2
         return
     fi
     # --------------------------

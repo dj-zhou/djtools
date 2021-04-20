@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source $djtools_path/clang-format.bash
 source $djtools_path/clone.bash
 source $djtools_path/help.bash
 source $djtools_path/setup-generic.bash
@@ -10,165 +11,20 @@ source $djtools_path/udev-rules.bash
 # =============================================================================
 function _dj_help()
 {
-    echo -e "\n"
-    echo "------------------------ dj -------------------------"
+    echo -e "\n------------------------ dj -------------------------"
     echo " Author      : Dingjiang Zhou"
     echo " Email       : zhoudingjiang@gmail.com "
     echo " Create Date : Mar. 1st, 2020"
     echo "-----------------------------------------------------"
-    echo -e "\n"
-    echo " First level commands:"
+    echo -e " \nFirst level commands:"
     echo "   setup         - to install some software"
     echo "   clone         - clone a repo from github/gitee/bitbucket"
     echo "   clone-ssh     - use ssh protocol to clone a repo from github/gitee/bitbucket"
     echo "   udev          - udev rule setup for usb devices"
     echo "   work-check    - check work status of all repos in a folder"
     echo -e "\n"
-    echo "   MORE IS COMMING"
-    echo -e "\n"
-    echo " All commands support tab completion"
-    echo -e "\n"
-}
-
-# =============================================================================
-function _clang_write_to_file_part1() {
-    file=$1
-    echo '{'                                            >> ${file}
-    echo '    "files.hotExit": "onExit",'               >> ${file}
-    echo '    "editor.tabSize": 4,'                     >> ${file}
-    echo '    "workbench.editor.enablePreview": false,' >> ${file}
-    echo '    "C_Cpp.updateChannel": "Insiders",'       >> ${file}
-    echo '    "C_Cpp.default.cppStandard": "c++17",'    >> ${file}
-    echo '    "editor.detectIndentation": false,'       >> ${file}
-    echo '    "files.autoSave": "afterDelay",'          >> ${file}
-    echo '    "workbench.iconTheme": "vscode-icons",'   >> ${file}
-    echo '    "editor.fontSize": 16,'                   >> ${file}
-    echo '    "cSpell.enabledLanguageIds": ['           >> ${file}
-    echo '        "asciidoc",'                          >> ${file}
-    echo '        "c",'                                 >> ${file}
-    echo '        "cpp",'                               >> ${file}
-    echo '        "csharp",'                            >> ${file}
-    echo '        "css",'                               >> ${file}
-    echo '        "git-commit",'                        >> ${file}
-    echo '        "go",'                                >> ${file}
-    echo '        "handlebars",'                        >> ${file}
-    echo '        "haskell",'                           >> ${file}
-    echo '        "html",'                              >> ${file}
-    echo '        "jade",'                              >> ${file}
-    echo '        "java",'                              >> ${file}
-    echo '        "javascript",'                        >> ${file}
-    echo '        "javascriptreact",'                   >> ${file}
-    echo '        "json",'                              >> ${file}
-    echo '        "jsonc",'                             >> ${file}
-    echo '        "less",'                              >> ${file}
-    echo '        "markdown",'                          >> ${file}
-    echo '        "php",'                               >> ${file}
-    echo '        "plaintext",'                         >> ${file}
-    echo '        "pug",'                               >> ${file}
-    echo '        "python",'                            >> ${file}
-    echo '        "restructuredtext",'                  >> ${file}
-    echo '        "rust",'                              >> ${file}
-    echo '        "scala",'                             >> ${file}
-    echo '        "scss",'                              >> ${file}
-    echo '        "text",'                              >> ${file}
-    echo '        "typescript",'                        >> ${file}
-    echo '        "typescriptreact",'                   >> ${file}
-    echo '        "yaml",'                              >> ${file}
-    echo '        "yml"'                                >> ${file}
-    echo '    ],'                                       >> ${file}
-    echo '    "[cpp]": {'                               >> ${file}
-    echo '        "editor.defaultFormatter": "ms-vscode.cpptools"' >> ${file}
-    echo '    },'                                       >> ${file}
-    echo '    "Clang_format_style": "file",'            >> ${file}
-    echo '    "clang-format.assumeFilename": "~/.config/Code/User/.clang-format",' >> ${file}
-}
-
-# =============================================================================
-function _clang_write_to_file_part2_clang_version_clang_format() {
-    file=$1
-    clang_file_path="/usr/bin"
-    
-    string1="\"C_Cpp.clang_format_path\": \"${clang_file_path}/clang-format\""
-    echo "    $string1," >> ${file}
-}
-
-# =============================================================================
-function _clang_write_to_file_part2_clang_version_clang_llvm() {
-    file=$1
-    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
-        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04/bin"
-    fi
-    if [[ ${ubuntu_v} = *'18.04'* ]] ; then
-        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04/bin"
-    fi
-    if [[ ${ubuntu_v} = *'20.04'* ]] ; then
-        clang_file_path="/opt/clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04/bin"
-    fi
-    string1="\"C_Cpp.clang_format_path\": \"${clang_file_path}/clang-format\""
-    string2="\"clang.executable\": \"${clang_file_path}/clang\""
-    # echo "$string1"
-    # echo "$string2"
-    echo "    $string1," >> ${file}
-    echo "    $string2," >> ${file}
-}
-
-# =============================================================================
-function _clang_write_to_file_part3_format_on_save() {
-    file=$1
-    save_or_not=$2
-    if [ $save_or_not = 'true' ] ; then
-        echo '    "editor.formatOnSave": true,'  >> ${file}
-    elif [ $save_or_not = 'false' ] ; then
-        echo '    "editor.formatOnSave": false,' >> ${file}
-    fi
-}
-
-# =============================================================================
-function _clang_write_to_file_partN() {
-    file=$1
-    echo '}' >> ${file}
-}
-
-# =============================================================================
-function _clang_format_vscode_setting_json()
-{
-    format_on_save=$1
-    cur_dir_json=${PWD}
-
-    folder="/home/$USER/.config/Code/User"
-    mkdir -p $folder
-
-    target_file=$folder/settings.json
-    sudo rm -f $target_file
-    _clang_write_to_file_part1 $target_file
-    _clang_write_to_file_part2_clang_version_clang_format $target_file
-    _clang_write_to_file_part3_format_on_save $target_file "$format_on_save"
-    _clang_write_to_file_partN $target_file
-
-    echo -e "\n the default settings is in $folder/settings.json\n"
-    echo -e " you can revise it manually"
-    cd $cur_dir_json
-}
-
-# =============================================================================
-function _clang_llvm_vscode_setting_json()
-{
-    format_on_save=$1
-    cur_dir_json=${PWD}
-
-    folder="/home/$USER/.config/Code/User"
-    mkdir -p $folder
-
-    target_file=$folder/settings.json
-    sudo rm -f $target_file
-    _clang_write_to_file_part1 $target_file
-    _clang_write_to_file_part2_clang_version_clang_llvm $target_file
-    _clang_write_to_file_part3_format_on_save $target_file "$format_on_save"
-    _clang_write_to_file_partN $target_file
-
-    echo -e "\n the default settings is in $folder/settings.json\n"
-    echo -e " you can revise it manually"
-    cd $cur_dir_json
+    echo -e "\n   MORE IS COMMING\n"
+    echo -e " All commands support tab completion\n"
 }
 
 # =============================================================================
@@ -209,97 +65,36 @@ eom
 }
 
 # =============================================================================
-function _dj_setup_clang_format()
+function _dj_setup_cli11()
 {
     cur_dir=${PWD}
-
-    _install_if_not_installed clang-format
-
-    cd $djtools_path
-
-    echo -e "\nDo you want to apply the default vscode settings? [Yes/No]\n"
-    read asw
-    
-    if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') \
-      || ($asw = 'No') || ($asw = 'no') ]] ; then
-        echo "You can edit ~/.config/Code/User/settings.json manually."
-    elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') \
-       || ($asw = 'Yes') || ($asw = 'yes') ]] ; then
-        _clang_format_vscode_setting_json "true"
-    else
-        echo "wrong answer, not setting applied!"
-        echo "You can edit ~/.config/Code/User/settings.json manually."
-    fi
-
-    echo -e "\n"
-
-    cd $cur_dir
-}
-
-# =============================================================================
-function _dj_setup_clang_llvm()
-{
-    cur_dir=${PWD}
-
-    echo -e "\n"
-    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
-        echo " Install clang+llvm for Ubuntu 16.04 ..."
-    elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
-        echo " Install clang+llvm for Ubuntu 18.04 ..."
-    elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
-        echo " Install clang+llvm for Ubuntu 20.04 ..."
-    fi
-    echo -e "\n"
-    _press_enter_to_continue
-
     cd ~ && mkdir -p soft/ && cd soft/
-    
-    # how to choose a version?
-    if [[ ${ubuntu_v} = *'16.04'* ]] ; then
-        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-16.04"
-    elif [[ ${ubuntu_v} = *'18.04'* ]] ; then
-        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04"
-    elif [[ ${ubuntu_v} = *'20.04'* ]] ; then
-        clang_file="clang+llvm-9.0.0-x86_64-linux-gnu-ubuntu-18.04" # thtis is correct!
-    fi
-    # check if the file exists --------------------
-    # check if the file exists --------------------
-    
-    url=http://releases.llvm.org/9.0.0/${clang_file}.tar.xz
-    if [[ ${ubuntu_v} = *'18.04'* || ${ubuntu_v} = *'20.04'* ]] ; then
-        _wget_if_not_exist $clang_file.tar.xz "9d8044379e151029bb1df3663c2fb2c1" $url
-    elif [[ ${ubuntu_v} = *'16.04'* ]] ; then
-        _wget_if_not_exist $clang_file.tar.xz "b3c5618fb3a5d268c371539e9f6a4b1f" $url
-    fi
-    
-    echo "untar the clang file ..."
-    tar xf ${clang_file}.tar.xz
-    sudo rm -rf /opt/clang+llvm*
 
-    echo "copy the clang file into /opt/ ..."
-    sudo mv ${clang_file}/ /opt/
+    rm -rf CLI11/
+    git clone https://github.com/CLIUtils/CLI11
+    cd CLI11
+    git checkout v1.9.1 # v1.9.1 was released on June 20th, 2020.
+    git submodule update --init # gtest is a submodule of it
+    mkdir build
+    cd build
+    cmake ..
+    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    sudo make install
 
-    mkdir -p ~/.config/Code/User
+    cat << eom
+ -----------------------------------------------------------------
+    headers files installed to:
+        /usr/local/include/CLI/
+    *.cmake files installed to:
+        /usr/local/lib/cmake/CLI11/
+    package config file installed to:
+        /usr/local/lib/pkgconfig/CLI11.pc
+ -----------------------------------------------------------------
 
-    cd $djtools_path
-
-    echo -e "\nDo you want to apply the default vscode settings? [Yes/No]\n"
-    read asw
-    
-    if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') \
-      || ($asw = 'No') || ($asw = 'no') ]] ; then
-        echo "You can edit ~/.config/Code/User/settings.json manually."
-    elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') \
-       || ($asw = 'Yes') || ($asw = 'yes') ]] ; then
-        _clang_llvm_vscode_setting_json "true"
-    else
-        echo "wrong answer, not setting applied!"
-        echo "You can edit ~/.config/Code/User/settings.json manually."
-    fi
-
-    echo ' '
+eom
 
     cd $cur_dir
+
 }
 
 # =============================================================================
@@ -1455,12 +1250,12 @@ function _dj()
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    setup_list+="adobe-pdf-reader anaconda arduino-1.8.13 baidu-netdisk boost clang-format clang-llvm "
-    setup_list+="cmake-3.19.5 computer container dj-gadgets devtools driver dropbox eigen3 "
+    setup_list="adobe-pdf-reader anaconda arduino-1.8.13 baidu-netdisk boost clang-format clang-llvm "
+    setup_list+="cli11 cmake-3.19.5 computer container dj-gadgets devtools driver dropbox eigen3 "
     setup_list+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo glog gnome grpc-1.29.1 "
-    setup_list+="gtest g++-10 i219-v kdiff3-meld lcm libev-4.33 libgpiod libiio lib-serialport libyaml-cpp "
-    setup_list+="mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev nvidia nvtop "
+    setup_list+="gtest g++-10 i219-v kdiff3-meld lcm libcsv-3.0.2 libev-4.33 libgpiod libiio lib-serialport "
+    setup_list+="libyaml-cpp mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev nvidia nvtop "
     setup_list+="opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin pip pycharm python3.9 "
     setup_list+="qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy saleae-logic spdlog slack "
     setup_list+="stm32-cubeMX stm32-tools sublime typora vim-env vscode vtk-8.2.0 wubi you-complete-me "

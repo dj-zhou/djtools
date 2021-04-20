@@ -95,19 +95,28 @@ function _system_check_cpu_memory()
 # =============================================================================
 function _system_check_temperature()
 {
-    _install_if_not_installed lm-sensors
+    if [[ "yes" = $(_check_if_package_installed lm-sensors) ]] ; then
+        sensors
+        return
+    fi
     if [[ "$ubuntu_v" = *"18.04"* ]] || \
        [[ "$ubuntu_v" = *"20.04"* ]] ; then
         ## cat /sys/class/thermal/thermal_zone*/temp
         zones=$(ls /sys/class/thermal/ | grep thermal_zone)
-        echo "temperature X 1000: "
+        num_of_zones=$(echo "$zones" | wc -w)
+        # echo "number of zones: $num_of_zones"
+        sum_temp=0
+        # echo "temperature X 1000: "
         for i in $zones ; do
-            temp_x1000=$(cat /sys/class/thermal/$i/temp)
-            echo -e "$i\t $temp_x1000" # how to convert string to float?
+            temp=$(($(cat /sys/class/thermal/$i/temp)/1000))
+            echo -e "$i\t $temp" # how to convert string to float?
+            sum_temp=$(($sum_temp+$temp))
         done
+        # calcuate the average and show in C
+        echo -e "average temperature: $(($sum_temp/14))°C"
+        echo -e "you can install ${GRN}lm-sensors${NOC} to have a better view"
         return
     fi
-    sensors
 }
 
 # =============================================================================

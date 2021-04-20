@@ -22,12 +22,11 @@ echo '# djtools setup' >> ~/.bashrc
 
 # =============================================================================
 # get bitbucket/github, etc, user name
-repo_source="GitHub GiTee BitBucket"
+repo_source="github gitee bitbucket"
 for rs in $repo_source ; do
 # -----------------------------------------------------------------
 echo -e "\n Please enter your $rs username [empty answer means no account]: "
     read username
-    echo "$username"
     if [ ! -z $username ] ; then
         echo "${rs}_username="$username >> ~/.bashrc
         echo "~/.${rs}-repos-$username is created."
@@ -45,3 +44,4 @@ echo -e "usernames set wrong, you can still edit them in ~/.bashrc\n"
 echo "source $djtools_path/djtools.bash" >> ~/.bashrc
 echo -e "\n djtools installation finished.\n"
 echo -e "\n" >> ~/.bashrc
+

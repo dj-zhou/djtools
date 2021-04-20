@@ -217,8 +217,8 @@ function compile_cmakelist()
         echo -e "${PRP}\n make -j$(cat /proc/cpuinfo | grep processor | wc -l)${NOC}\n"
         make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     elif [ "$clean_tag" = "clean" ] ; then
-        echo -e "${PRP}\n rm -rf bin/ build* bcross* _bnative*${NOC}\n"
-        rm -rf build*
+        echo -e "${PRP}\n rm -rf bin/ build/ _bcross* _bnative*${NOC}\n"
+        rm -rf build/
         rm -rf bin/
         # just remove all build directory
         rm -rf _bcross*

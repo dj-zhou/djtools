@@ -34,7 +34,7 @@ function compile_make_build_etc()
     # ------------------------------
     if [ -f "meson.build" ] ; then
         if [ "$clean_tag" = 'clean' ] ; then
-            rm -rf build*
+            rm -rf build/
             rm -rf _bcross*
             rm -rf _bnative*
             return

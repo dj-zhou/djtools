@@ -90,6 +90,22 @@ function _version_check_aarch64_linux_gnu_gcc()
 }
 
 # =============================================================================
+function _version_check_cli11()
+{
+    file=/usr/local/lib/pkgconfig/CLI11.pc
+    if [ ! -f $file ] ; then
+        echo "cli11 may not installed correctly!"
+        return
+    fi
+    while IFS='' read -r line || [[ -n "$line" ]] ; do
+        if [[ $line == *"Version: "* ]] ; then
+            version=$(echo $line  | awk '{ print $2 }')
+        fi
+    done < $file
+    echo $version
+}
+
+# =============================================================================
 function _version_check_cmake()
 {
     v=$(cmake --version | grep -v kitware | awk '{ print $3 }')
@@ -271,6 +287,22 @@ function _version_check_ubuntu()
 }
 
 # =============================================================================
+function _version_check_yaml_cpp()
+{
+    file=/usr/local/lib/pkgconfig/yaml-cpp.pc
+    if [ ! -f $file ] ; then
+        echo "libyaml-cpp may not be installed correctly!"
+        return
+    fi
+    while IFS='' read -r line || [[ -n "$line" ]] ; do
+        if [[ $line == *"Version: "* ]] ; then
+            version=$(echo $line  | awk '{ print $2 }')
+        fi
+    done < $file
+    echo $version
+}
+
+# =============================================================================
 function version()
 {
     # ------------------------------
@@ -304,6 +336,11 @@ function version()
         # ------------------------------
         if [ $2 = 'aarch64-linux-gnu-gcc' ] ; then
             _version_check_aarch64_linux_gnu_gcc
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'cli11' ] ; then
+            _version_check_cli11
             return
         fi
         # ------------------------------
@@ -364,6 +401,11 @@ function version()
         # ------------------------------
         if [ $2 = 'ubuntu' ] ; then
             _version_check_ubuntu
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'yaml-cpp' ] ; then
+            _version_check_yaml_cpp
             return
         fi
         # ------------------------------
@@ -440,8 +482,8 @@ function _version()
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
-    check_list+="cmake eigen3 gcc glog gtest g++ gnome magic-enum opencv opengl "
-    check_list+="python3 ubuntu "
+    check_list+="cli11 cmake eigen3 gcc glog gtest g++ gnome magic-enum opencv "
+    check_list+="opengl python3 ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list ; do
         ACTIONS[$i]=" "
