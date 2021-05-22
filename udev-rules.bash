@@ -1,10 +1,9 @@
 #!/bin/bash
 
 # =============================================================================
-function _dj_udev_help()
-{
+function _dj_udev_help() {
     _dj_help
-    cat << eom
+    cat <<eom
     --------------------- dj udev ----------------------
     Second level commands:
        --dialout         - set the current user to dialout group
@@ -23,10 +22,9 @@ eom
 }
 
 # =============================================================================
-function _dj_udevadm_help()
-{
+function _dj_udevadm_help() {
     _dj_help
-    cat << eom
+    cat <<eom
     --------------------- dj udevadm ----------------------
     used to grab information of a device, for example:
     $  dj udevadm /dev/ttyUSB0
@@ -35,8 +33,7 @@ eom
 }
 
 # =============================================================================
-function _dj_udev_dialout()
-{
+function _dj_udev_dialout() {
     echo \-e "\n This is to solve the serial port problem: Permission denied\n"
 
     sudo usermod -a -G dialout $USER
@@ -45,17 +42,16 @@ function _dj_udev_dialout()
     echo -e "udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo 'KERNEL=="ttyUSB*",MODE="0666"' \
-        | sudo tee -a /etc/udev/rules.d/$rule_file
-    echo 'KERNEL=="ttyACM*",MODE="0666"' \
-        | sudo tee -a /etc/udev/rules.d/$rule_file
+    echo 'KERNEL=="ttyUSB*",MODE="0666"' |
+        sudo tee -a /etc/udev/rules.d/$rule_file
+    echo 'KERNEL=="ttyACM*",MODE="0666"' |
+        sudo tee -a /etc/udev/rules.d/$rule_file
 
     sudo service udev restart
 }
 
 # =============================================================================
-function _dj_udev_show()
-{
+function _dj_udev_show() {
     cur_dir=${PWD}
 
     cd /etc/udev/rules.d/
@@ -66,8 +62,7 @@ function _dj_udev_show()
 }
 
 # =============================================================================
-function _dj_udev_uvc_video_capture()
-{
+function _dj_udev_uvc_video_capture() {
     rule_file=uvc-video-capture.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
@@ -88,8 +83,7 @@ function _dj_udev_uvc_video_capture()
 }
 
 # =============================================================================
-function _dj_udev_logitech_f710()
-{
+function _dj_udev_logitech_f710() {
     rule_file=logitech-f710-x.rules # this is the X mode
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
@@ -130,8 +124,7 @@ function _dj_udev_logitech_f710()
 
 # =============================================================================
 # the One Third Debugger contains a USB to serial port chip: FT232RL
-function _dj_udev_one_third_console()
-{
+function _dj_udev_one_third_console() {
     rule_file=one-third-console.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
@@ -165,8 +158,7 @@ function _dj_udev_one_third_console()
 #         product: Comm+Console
 #    manufacturer: One Third Technologies
 # try this: ls -l /dev/serial/by-id/
-function _dj_udev_ft4232h()
-{
+function _dj_udev_ft4232h() {
     rule_file=ft4232h-serial.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
@@ -174,7 +166,7 @@ function _dj_udev_ft4232h()
     string="SUBSYSTEMS==\"usb\", ENV{.LOCAL_serial}=\"\$attr{serial}\"\n"
     string="${string}SUBSYSTEMS==\"usb\", ENV{.LOCAL_ifNum}=\"\$attr{bInterfaceNumber}\"\n"
     # finally ----------------
-    for i in 0 1 2 3 ; do
+    for i in 0 1 2 3; do
         string="${string}SUBSYSTEMS==\"usb\", "
         string="${string}KERNEL==\"ttyUSB*\", "
         string="${string}ACTION==\"add\", "
@@ -193,8 +185,7 @@ function _dj_udev_ft4232h()
 }
 
 # =============================================================================
-function _dj_udev_stlink_v2_1()
-{
+function _dj_udev_stlink_v2_1() {
     rule_file=st-link-v2-1.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
@@ -223,46 +214,44 @@ function _dj_udev_stlink_v2_1()
 }
 
 # =============================================================================
-function _dj_udevadm()
-{
+function _dj_udevadm() {
     udevadm info -a -n $1
 }
 
 # =============================================================================
-function _dj_udev()
-{
+function _dj_udev() {
     # --------------------------
-    if [ $1 = '--dialout' ] ; then
+    if [ $1 = '--dialout' ]; then
         _dj_udev_dialout $2 $3 $4
         return
     fi
     # --------------------------
-    if [ $1 = '--show' ] ; then
-        _dj_udev_show 
+    if [ $1 = '--show' ]; then
+        _dj_udev_show
         return
     fi
     # --------------------------
-    if [ $1 = 'logitech-f710' ] ; then
+    if [ $1 = 'logitech-f710' ]; then
         _dj_udev_logitech_f710 $2 $3 $4
         return
     fi
     # --------------------------
-    if [ $1 = 'one-third-console' ] ; then
+    if [ $1 = 'one-third-console' ]; then
         _dj_udev_one_third_console $2 $3 $4
         return
     fi
     # --------------------------
-    if [ $1 = 'ft4232h' ] ; then
+    if [ $1 = 'ft4232h' ]; then
         _dj_udev_ft4232h
         return
     fi
     # --------------------------
-    if [ $1 = 'uvc-video-capture' ] ; then
+    if [ $1 = 'uvc-video-capture' ]; then
         _dj_udev_uvc_video_capture $2 $3 $4
         return
     fi
     # --------------------------
-    if [ $1 = 'stlink-v2.1' ] ; then
+    if [ $1 = 'stlink-v2.1' ]; then
         _dj_udev_stlink_v2_1 $2 $3 $4
         return
     fi

@@ -1,18 +1,17 @@
 #!/bin/bash
 
 # =============================================================================
-function _dj_setup_ros_melodic()
-{
+function _dj_setup_ros_melodic() {
     cur_dir=$PWD
 
     # only Uubntu 18.04 can install ros-melodic
-    if [[ $ubuntu_v != *'Ubuntu 18.04'* ]] ; then
+    if [[ $ubuntu_v != *'Ubuntu 18.04'* ]]; then
         echo -e "\n ROS Melodic can only be installed on Ubuntu 18.04\n"
         return
     fi
 
     # setup sources.list ---------------
-    if [ ! -f /etc/apt/sources.list.d/ros-latest.list ] ; then
+    if [ ! -f /etc/apt/sources.list.d/ros-latest.list ]; then
         sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
     fi
 
@@ -31,29 +30,29 @@ function _dj_setup_ros_melodic()
     rosdep update
 
     installed=0
-    while IFS='' read -r line || [[ -n "$line" ]] ; do
-        if [[ $line == *"source /opt/ros/melodic/setup.bash"* ]] ; then
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"source /opt/ros/melodic/setup.bash"* ]]; then
             installed=1
         fi
-    done < ~/.bashrc
+    done <~/.bashrc
 
-    if [ $installed = 0 ] ; then 
-        echo -e "source /opt/ros/melodic/setup.bash\n" >> ~/.bashrc
+    if [ $installed = 0 ]; then
+        echo -e "source /opt/ros/melodic/setup.bash\n" >>~/.bashrc
     fi
 
     _install_if_not_installed python-roslaunch
     _install_if_not_installed python3-roslaunch
 
-    echo -e '\n' >> ~/.bashrc
-    echo '# ===========================================================' >> ~/.bashrc
-    echo '# ROS (1) setup' >> ~/.bashrc
+    echo -e '\n' >>~/.bashrc
+    echo '# ===========================================================' >>~/.bashrc
+    echo '# ROS (1) setup' >>~/.bashrc
     # echo 'export HOSTNAME:' >> ~/.bashrc
-    echo 'export ROS_MASTER_URI=http://localhost:11311' >> ~/.bashrc
-    echo 'export ROS_IP=localhost' >> ~/.bashrc
+    echo 'export ROS_MASTER_URI=http://localhost:11311' >>~/.bashrc
+    echo 'export ROS_IP=localhost' >>~/.bashrc
     echo -e "\n ROS (1) settings are in ~/.bashrc.\n"
 
     # setup workspace ---------------
-    cat << eom
+    cat <<eom
 
     ---------------------------------------------
     You can run those now:
@@ -69,18 +68,17 @@ eom
 }
 
 # =============================================================================
-function _dj_setup_ros_noetic()
-{
+function _dj_setup_ros_noetic() {
     cur_dir=$PWD
 
     # only Uubntu 18.04 can install ros-melodic
-    if [[ $ubuntu_v != *'Ubuntu 20.04'* ]] ; then
+    if [[ $ubuntu_v != *'Ubuntu 20.04'* ]]; then
         echo -e "\n ROS Noetic can only be installed on Ubuntu 20.04\n"
         return
     fi
 
     # setup sources.list ---------------
-    if [ ! -f /etc/apt/sources.list.d/ros-latest.list ] ; then
+    if [ ! -f /etc/apt/sources.list.d/ros-latest.list ]; then
         sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
     fi
     # setup keys ---------------
@@ -102,26 +100,26 @@ function _dj_setup_ros_noetic()
     _install_if_not_installed ros-noetic-roswtf
 
     installed=0
-    while IFS='' read -r line || [[ -n "$line" ]] ; do
-        if [[ $line == *"source /opt/ros/noetic/setup.bash"* ]] ; then
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"source /opt/ros/noetic/setup.bash"* ]]; then
             installed=1
         fi
-    done < ~/.bashrc
+    done <~/.bashrc
 
-    if [ $installed = 0 ] ; then 
-        echo -e "source /opt/ros/noetic/setup.bash\n" >> ~/.bashrc
+    if [ $installed = 0 ]; then
+        echo -e "source /opt/ros/noetic/setup.bash\n" >>~/.bashrc
     fi
 
-    echo -e '\n' >> ~/.bashrc
-    echo '# ===========================================================' >> ~/.bashrc
-    echo '# ROS (1) setup' >> ~/.bashrc
+    echo -e '\n' >>~/.bashrc
+    echo '# ===========================================================' >>~/.bashrc
+    echo '# ROS (1) setup' >>~/.bashrc
     # echo 'export HOSTNAME:' >> ~/.bashrc
-    echo 'export ROS_MASTER_URI=http://localhost:11311' >> ~/.bashrc
-    echo 'export ROS_IP=localhost' >> ~/.bashrc
+    echo 'export ROS_MASTER_URI=http://localhost:11311' >>~/.bashrc
+    echo 'export ROS_IP=localhost' >>~/.bashrc
     echo -e "\n ROS (1) settings are in ~/.bashrc\n"
 
     # setup workspace ---------------
-    cat << eom
+    cat <<eom
 
     ---------------------------------------------
     You can run those now:
@@ -138,12 +136,11 @@ eom
 
 # =============================================================================
 # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
-function _dj_setup_ros2_foxy_from_deb_package()
-{
+function _dj_setup_ros2_foxy_from_deb_package() {
     cur_dir=$PWD
 
     # only Uubntu 20.04 can install ros2 Foxy Fitzroy
-    if [[ $ubuntu_v != *'Ubuntu 20.04'* ]] ; then
+    if [[ $ubuntu_v != *'Ubuntu 20.04'* ]]; then
         echo -e "\n ROS2 Foxy Fitzroy can only be installed on Ubuntu 20.04\n"
         return
     fi
@@ -152,7 +149,7 @@ function _dj_setup_ros2_foxy_from_deb_package()
     sudo locale-gen en_US en_US.UTF-8
     sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
     export LANG=en_US.UTF-8
-    
+
     # install dependencies ---------------
     sudo apt-get -y update
     _install_if_not_installed curl gnupg2 lsb-release
@@ -161,7 +158,7 @@ function _dj_setup_ros2_foxy_from_deb_package()
     curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 
     # setup sources.list ---------------
-    if [ ! -f /etc/apt/sources.list.d/ros2-latest.list ] ; then
+    if [ ! -f /etc/apt/sources.list.d/ros2-latest.list ]; then
         sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
     fi
 
@@ -175,20 +172,20 @@ function _dj_setup_ros2_foxy_from_deb_package()
     sudo apt install python3-argcomplete
 
     installed=0
-    while IFS='' read -r line || [[ -n "$line" ]] ; do
-        if [[ $line == *"ource /opt/ros/foxy/setup.bash"* ]] ; then
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"ource /opt/ros/foxy/setup.bash"* ]]; then
             installed=1
         fi
-    done < ~/.bashrc
+    done <~/.bashrc
 
-    if [ $installed = 0 ] ; then
-        echo -e '\n' >> ~/.bashrc
-        echo '# ===========================================================' >> ~/.bashrc
-        echo '# (djtools) ROS 2 setup' >> ~/.bashrc
-        echo -e "source /opt/ros/foxy/setup.bash\n" >> ~/.bashrc
+    if [ $installed = 0 ]; then
+        echo -e '\n' >>~/.bashrc
+        echo '# ===========================================================' >>~/.bashrc
+        echo '# (djtools) ROS 2 setup' >>~/.bashrc
+        echo -e "source /opt/ros/foxy/setup.bash\n" >>~/.bashrc
     fi
 
-    cat << eom
+    cat <<eom
 
     ---------------------------------------------
     Try ROS2:
@@ -211,14 +208,13 @@ eom
 }
 
 # =============================================================================
-function _dj_setup_ros2_foxy()
-{
-    if [ $1 = '--from-deb-package' ] ; then
+function _dj_setup_ros2_foxy() {
+    if [ $1 = '--from-deb-package' ]; then
         _dj_setup_ros2_foxy_from_deb_package
         return
     fi
-    if [ $1 = '--from-source' ] ; then
-        echo  "from source: todo"
+    if [ $1 = '--from-source' ]; then
+        echo "from source: todo"
         return
     fi
 }

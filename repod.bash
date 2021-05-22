@@ -1,14 +1,13 @@
 #!/bin/bash
 
 # remove the local branches that the upstreams are gone: to test
-# git fetch -p 
-# for branch in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do 
+# git fetch -p
+# for branch in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do
 #     git branch -D $branch;
 # done
 
 # =============================================================================
-function _repod_help()
-{
+function _repod_help() {
     echo -e "\n ---------------------- repod ------------------------"
     echo "  Author      : Dingjiang Zhou"
     echo "  Email       : zhoudingjiang@gmail.com "
@@ -25,8 +24,7 @@ function _repod_help()
 }
 
 # =============================================================================
-function _backup_to_github()
-{
+function _backup_to_github() {
     cur_dir=${PWD}
 
     # -------------------------------------------------
@@ -34,28 +32,28 @@ function _backup_to_github()
     echo $repo
 
     # -------------------------------------------------
-    if [[ ! -d .git ]] ; then
+    if [[ ! -d .git ]]; then
         echo " not a git repo, cannot backup to GitHub"
         return
     fi
 
     git_original_remote_url=$(git remote get-url origin)
-    
-    if [[ $git_original_remote_url = *"github"* ]] ; then
+
+    if [[ $git_original_remote_url = *"github"* ]]; then
         echo " already a GitHub repo, no need to backup"
         return
     fi
 
     # -------------------------------------------------
     git remote set-url origin https://$github_username@github.com/$github_username/$repo.git
-    if [ $# = 0 ] ; then
+    if [ $# = 0 ]; then
         git push -u origin master
         git push --tags
         echo -e "\n master and all tags are pushed into GitHub\n"
     fi
 
-    if [ $# = 1 ] ; then
-        if [ $1 = '--all' ] ; then
+    if [ $# = 1 ]; then
+        if [ $1 = '--all' ]; then
             git push --all # that is only all local branches
             git push --tags
         else # push a specific branch
@@ -71,8 +69,7 @@ function _backup_to_github()
 
 # =============================================================================
 # only back up to personal private repo
-function _backup_to_gitee()
-{
+function _backup_to_gitee() {
     cur_dir=${PWD}
 
     # -------------------------------------------------
@@ -80,29 +77,29 @@ function _backup_to_gitee()
     echo $repo
 
     # -------------------------------------------------
-    if [[ ! -d .git ]] ; then
+    if [[ ! -d .git ]]; then
         echo " not a git repo, cannot backup to GiTee"
         return
     fi
 
     git_original_remote_url=$(git remote get-url origin)
-    
-    if [[ $git_original_remote_url = *"gitee"* ]] ; then
+
+    if [[ $git_original_remote_url = *"gitee"* ]]; then
         echo " already a GiTee repo, no need to backup"
         return
     fi
 
     # -------------------------------------------------
     git remote set-url origin https://$gitee_username@gitee.com/$gitee_username/$repo.git
-    if [ $# = 0 ] ; then
+    if [ $# = 0 ]; then
         git push -u origin master
         git push --tags
         echo -e "\n master and all tags are pushed into GiTee\n"
     fi
 
-    if [ $# = 1 ] ; then
-        if [ $1 = '--all' ] ; then
-            git push --all  # that is only all local branches
+    if [ $# = 1 ]; then
+        if [ $1 = '--all' ]; then
+            git push --all # that is only all local branches
             git push --tags
         else # push a specific branch
             git push -u origin $1
@@ -116,8 +113,7 @@ function _backup_to_gitee()
 }
 
 # =============================================================================
-function _repod_branches_list()
-{
+function _repod_branches_list() {
     # git for-each-ref --count=10 --sort=-committerdate refs/heads/ --format='%(refname:short)'
     # this is not the latest
     git for-each-ref --count=10 --sort=committerdate refs/heads/ \
@@ -126,18 +122,16 @@ function _repod_branches_list()
 }
 
 # =============================================================================
-function _repod_branches_list_all()
-{
-    if [ $1 = '--remote' ] ; then
+function _repod_branches_list_all() {
+    if [ $1 = '--remote' ]; then
         repod checkout all-branch
     fi
-    
+
     git for-each-ref --sort=committerdate refs/heads/ \
         --format='%(color:green)%(committerdate:short)%(color:reset)|%(color:red)%(objectname:short)%(color:reset)|%(HEAD)%(color:yellow)%(refname:short)%(color:reset) | %(authorname)'
 }
 
-function _repod_update_help()
-{
+function _repod_update_help() {
     _repod_help
     _display_section
     echo -e "repod update\n    supported arguments:"
@@ -146,22 +140,21 @@ function _repod_update_help()
 }
 
 # =============================================================================
-function _repod_update_repos_all_folders()
-{
+function _repod_update_repos_all_folders() {
     cur_dir=${PWD}
 
-    for folder in ./* ; do
-        if [ -d $folder ] ; then
+    for folder in ./*; do
+        if [ -d $folder ]; then
             echo -e "${CYN}\r\n----------------------------"
             printf $(basename "$folder"${NOC})
             cd $folder
-            if [ -d ".git/" ] ; then
+            if [ -d ".git/" ]; then
                 git_status=$(git status)
-                if [[ $git_status = *"Changes not staged for commit"* ]] ; then
+                if [[ $git_status = *"Changes not staged for commit"* ]]; then
                     printf " ${RED}dirty${NOC}"
-                elif [[ $git_status = *"is ahead"* ]] ; then
+                elif [[ $git_status = *"is ahead"* ]]; then
                     printf " ${BLU}ahead${NOC}"
-                elif [[ $git_status = *"is behind"* ]] ; then
+                elif [[ $git_status = *"is behind"* ]]; then
                     printf " ${CYN}behind${NOC}"
                 fi
                 echo " "
@@ -184,8 +177,7 @@ function _repod_update_repos_all_folders()
 # 2. https://dj-zhou@github.com/dj-zhou/yocto-conf-template.git
 # 3. git@github.com:berkshiregrey/meta-bg
 # 4. git@github.com:berkshiregrey/meta-bg.git
-function _repod_switch_to()
-{
+function _repod_switch_to() {
     cur_dir=${PWD}
 
     target_host=$1
@@ -196,10 +188,10 @@ function _repod_switch_to()
     remote_v=$(git remote get-url origin)
     echo " $remote_v"
     _display_section
-        
+
     echo -e "\n switch to ${GRN}$target_host${NOC}\n"
-    if [[ $target_host = 'bitbucket' ]] ; then
-        if [[ "$remote_v" = *"https"* ]] ; then
+    if [[ $target_host = 'bitbucket' ]]; then
+        if [[ "$remote_v" = *"https"* ]]; then
             git remote set-url origin \
                 https://$bitbucket_username@bitbucket.org/$bitbucket_username/$repo_name
         else
@@ -207,8 +199,8 @@ function _repod_switch_to()
                 git@bitbucket.org:$bitbucket_username/$repo_name
         fi
     fi
-    if [[ $target_host = 'github' ]] ; then
-        if [[ "$remote_v" = *"https"* ]] ; then
+    if [[ $target_host = 'github' ]]; then
+        if [[ "$remote_v" = *"https"* ]]; then
             git remote set-url origin \
                 https://$github_username@github.com/$github_username/$repo_name
         else
@@ -216,8 +208,8 @@ function _repod_switch_to()
                 git@github.com:$github_username/$repo_name
         fi
     fi
-    if [[ $target_host = 'gitee' ]] ; then
-        if [[ "$remote_v" = *"https"* ]] ; then
+    if [[ $target_host = 'gitee' ]]; then
+        if [[ "$remote_v" = *"https"* ]]; then
             git remote set-url origin \
                 https://$gitee_username@gitee.com/$gitee_username/$repo_name
         else
@@ -230,39 +222,38 @@ function _repod_switch_to()
     echo ' remote url after switching:'
     remote_v=$(git remote get-url origin)
     echo " $remote_v"
-   _display_section
+    _display_section
 
     cur_dir=${PWD}
 }
 
 # =============================================================================
-function repod()
-{
+function repod() {
     # ------------------------------
-    if [ $# -eq 0 ] ; then
+    if [ $# -eq 0 ]; then
         _repod_help
         return
     fi
 
     # ------------------------------
-    if [ $1 = 'backup-to' ] ; then
-        if [ $# = 1 ] ; then
+    if [ $1 = 'backup-to' ]; then
+        if [ $# = 1 ]; then
             _repod_help
             return
         fi
-        if [ $2 = 'github' ] ; then
+        if [ $2 = 'github' ]; then
             _backup_to_github $3 $4 $5 $6
             return
         fi
-        if [ $2 = 'gitee' ] ; then
+        if [ $2 = 'gitee' ]; then
             _backup_to_gitee $3 $4 $5 $6
             return
         fi
     fi
 
     # ------------------------------
-    if [ $1 = 'switch-to' ] ; then
-        if [ $# = 1 ] ; then
+    if [ $1 = 'switch-to' ]; then
+        if [ $# = 1 ]; then
             _repod_help
             return
         fi
@@ -271,12 +262,12 @@ function repod()
     fi
 
     # ------------------------------
-    if [[ $1 = 'update' ]] ; then
-        if [ $# = 1 ] ; then
+    if [[ $1 = 'update' ]]; then
+        if [ $# = 1 ]; then
             _repod_update_help
             return
         fi
-        if [ $2 = '--all-sub-folders' ] ; then
+        if [ $2 = '--all-sub-folders' ]; then
             _repod_update_repos_all_folders $3 $4 $5 $6
             return
         fi
@@ -284,12 +275,12 @@ function repod()
     fi
 
     # ------------------------------
-    if [ $1 = 'checkout' ] ; then
-        if [ $# = 1 ] ; then
+    if [ $1 = 'checkout' ]; then
+        if [ $# = 1 ]; then
             _repod_help
             return
         fi
-        if [ $2 = 'all-branch' ] ; then
+        if [ $2 = 'all-branch' ]; then
             echo " checkout all remote branches"
             git branch -r | grep -v '\->' | while read remote; do git branch --track "${remote#origin/}" "$remote"; done
             git fetch --all
@@ -303,27 +294,26 @@ function repod()
     fi
 
     # ------------------------------
-    if [ $1 = 'branches' ] ; then
-        if [ $# = 1 ] ; then
+    if [ $1 = 'branches' ]; then
+        if [ $# = 1 ]; then
             _repod_help
             return
         fi
-        if [ $2 = 'list-all' ] ; then
+        if [ $2 = 'list-all' ]; then
             _repod_branches_list_all $3 $4 $5
             return
-        elif [ $2 = 'list' ] ; then
+        elif [ $2 = 'list' ]; then
             _repod_branches_list
             return
         fi
     fi
-    
+
     echo -e '\r\n repod : "'$1 '"command not supported\r\n'
     _repod_help
 }
 
 # =============================================================================
-function _repod()
-{
+function _repod() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -339,27 +329,27 @@ function _repod()
     declare -A ACTIONS
 
     # no space in front or after "="
-    ACTIONS[backup-to]+="github gitee "
-    ACTIONS[switch-to]+="bitbucket github gitee "
+    ACTIONS["backup-to"]+="github gitee "
+    ACTIONS["switch-to"]+="bitbucket github gitee "
     ACTIONS[checkout]+="all-branch "
     ACTIONS[branches]+="list-all "
-    ACTIONS[all-branch]=" "
+    ACTIONS["all-branch"]=" "
     ACTIONS[bitbucket]="--all "
     ACTIONS[github]="--all "
     ACTIONS[gitee]="--all "
     ACTIONS[--all]=" "
-    ACTIONS[list-all]="--local --remote "
+    ACTIONS["list-all"]="--local --remote "
     ACTIONS[--local]=" "
     ACTIONS[--remote]=" "
     ACTIONS[update]+="--all-sub-folders "
-    ACTIONS[--all-sub-folders]+=" "
-    
+    ACTIONS["--all-sub-folders"]+=" "
+
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
-    if [ ${ACTIONS[$3]+1} ] ; then
-        COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
+    if [ ${ACTIONS[$3]+1} ]; then
+        COMPREPLY=($(compgen -W "${ACTIONS[$3]}" -- $cur))
     else
-        COMPREPLY=( `compgen -W "${SERVICES[*]}" -- $cur` )
+        COMPREPLY=($(compgen -W "${SERVICES[*]}" -- $cur))
     fi
 }
 

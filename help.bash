@@ -1,9 +1,8 @@
 #!/bin/bash
 
 # =============================================================================
-function _dj_help_auto_mount()
-{
-    cat << eom
+function _dj_help_auto_mount() {
+    cat <<eom
 
  -----------------------------------------
   auto mount a disk:
@@ -30,9 +29,8 @@ eom
 }
 
 # =============================================================================
-function _dj_help_ffmpeg()
-{
-    cat << eom
+function _dj_help_ffmpeg() {
+    cat <<eom
 
  -----------------------------------------
   use ffmpeg to convert videos:
@@ -48,9 +46,8 @@ eom
 }
 
 # =============================================================================
-function _dj_help_jupyter()
-{
-    cat << eom
+function _dj_help_jupyter() {
+    cat <<eom
 
  -----------------------------------------
   1. convert juypter files to python scripts
@@ -61,17 +58,16 @@ eom
 }
 
 # =============================================================================
-function _dj_help_skill()
-{
-    if [ $1 = 'auto-mount' ] ; then
+function _dj_help_skill() {
+    if [ $1 = 'auto-mount' ]; then
         _dj_help_auto_mount
         return
     fi
-    if [ $1 = 'ffmpeg' ] ; then
+    if [ $1 = 'ffmpeg' ]; then
         _dj_help_ffmpeg
         return
     fi
-    if [ $1 = 'jupyter' ] ; then
+    if [ $1 = 'jupyter' ]; then
         _dj_help_jupyter
         return
     fi

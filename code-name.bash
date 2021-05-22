@@ -1,22 +1,19 @@
 #!/bin/bash
 
 # =============================================================================
-function _code_name_help()
-{
+function _code_name_help() {
     echo -e "-------------- code-name --------------------"
     echo -e "\r\n TODO\r\n"
 }
 
-function _code_name_compuer_name()
-{
+function _code_name_compuer_name() {
     echo -e "\r\n Computer code names: Types of Snakes\r\n"
     echo "  Anaconda Boa Cobra Copperhead Cottonmouth Garter "
     echo "  Kingsnake Mamba Python Rattler Sidewinder Taipan "
     echo "  Viper"
 }
 
-function _code_name_others()
-{
+function _code_name_others() {
     echo -e "\r\n Other code names to consider\r\n"
     echo "--------------"
     echo "Weather & Atmosphere:"
@@ -86,24 +83,23 @@ function _code_name_others()
     echo "  Outrigger Pirate-Ship Riverboat Sailboat Skipjack"
     echo "  Schooner Skiff Sloop Steamboat Tanker Trimaran Trawler"
     echo "  Tugboat U-boat Yacht Yawl"
-    
+
     echo "--------------"
     echo "Feared Water Animals:"
     echo "  Alligator Barracuda Crocodile Gator Great-White"
     echo "  Hammerhead Jaws Lionfish Mako Moray Orca Piranha"
     echo "  Shark Stingray"
-    
+
     echo "--------------"
     echo "Signs of the Zodiac:"
     echo "  Aquarius Aries Cancer Capricorn Gemini Libra Leo"
     echo "  Pisces Sagittarius Scorpio Taurus Virgo"
-    
+
     echo "--------------"
     echo "Venomous or Biting Animals (non-snake):"
     echo "  Abispa Andrena Black-Widow Cataglyphis Centipede"
     echo "  Cephalotes Formica Hornet Jellyfish Scorpion"
     echo "  Tarantula Yellowjacket Wasp"
-
 
     echo "--------------"
     echo "Greek & Roman Gods:"
@@ -112,8 +108,7 @@ function _code_name_others()
     echo "  Zeus"
 }
 
-function _code_name_stm32_dev()
-{
+function _code_name_stm32_dev() {
     echo -e "\r\n STM32 Development code names: Bladed Weapons\r\n"
     echo "  Axe Battle-Axe Bayonet Blade Crossbowe Dagger "
     echo "  Excalibur Halberd Hatchet Machete Saber Samurai "
@@ -121,36 +116,34 @@ function _code_name_stm32_dev()
 }
 
 # =============================================================================
-function code-name()
-{
+function code-name() {
     cur_dir=$PWD
-    
-    if [ $# = 0 ] ; then
+
+    if [ $# = 0 ]; then
         _code_name_help
         return
-    elif [ $1 = '--help' ] ; then
+    elif [ $1 = '--help' ]; then
         _code_name_help
         return
-    elif [ $1 = 'computer-name' ] ; then
+    elif [ $1 = 'computer-name' ]; then
         _code_name_compuer_name
         return
-    elif [ $1 = 'others' ] ; then
+    elif [ $1 = 'others' ]; then
         _code_name_others
         return
-    elif [ $1 = 'stm32-dev' ] ; then
+    elif [ $1 = 'stm32-dev' ]; then
         _code_name_stm32_dev
         return
     else
         _code_name_help
         return
     fi
-    
+
     cd ${cur_dir}
 }
 
 # =============================================================================
-function _code-name()
-{
+function _code-name() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -165,18 +158,17 @@ function _code-name()
     declare -A ACTIONS
 
     # no space in front or after "="
-    ACTIONS[computer-name]=" "
+    ACTIONS["computer-name"]=" "
     ACTIONS[others]=" "
-    ACTIONS[stm32-dev]=" "
+    ACTIONS["stm32-dev"]=" "
     ACTIONS[--help]=" "
 
-    
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
-    if [ ${ACTIONS[$3]+1} ] ; then
-        COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
+    if [ ${ACTIONS[$3]+1} ]; then
+        COMPREPLY=($(compgen -W "${ACTIONS[$3]}" -- $cur))
     else
-        COMPREPLY=( `compgen -W "${SERVICES[*]}" -- $cur` )
+        COMPREPLY=($(compgen -W "${SERVICES[*]}" -- $cur))
     fi
 }
 

@@ -62,71 +62,71 @@ function _terminal_format_user_short_path_no_space() {
 
 # =============================================================================
 function terminal {
-    if [ $# -eq 0 ] ; then
+    if [ $# -eq 0 ]; then
         _terminal_help
     else
-        echo '# ===========================================================' >> ~/.bashrc
-        echo '# (djtools) terminal format setup' >> ~/.bashrc
-        if [ ${1} = 'user@host' ] ; then
-            if [ $# = 1 ] ; then
+        echo '# ===========================================================' >>~/.bashrc
+        echo '# (djtools) terminal format setup' >>~/.bashrc
+        if [ ${1} = 'user@host' ]; then
+            if [ $# = 1 ]; then
                 _terminal_format_user_host_short_path
-                echo '_terminal_format_user_host_short_path' >> ~/.bashrc
-            elif [ $2 = 'full-path' ] ; then
+                echo '_terminal_format_user_host_short_path' >>~/.bashrc
+            elif [ $2 = 'full-path' ]; then
                 _terminal_format_user_host_full_path
-                echo '_terminal_format_user_host_full_path' >> ~/.bashrc
-                if [ $# = 3 ] && [ $3 = 'no-space' ] ; then
+                echo '_terminal_format_user_host_full_path' >>~/.bashrc
+                if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_user_host_full_path_no_space
-                echo '_terminal_format_user_host_full_path_no_space' >> ~/.bashrc
+                    echo '_terminal_format_user_host_full_path_no_space' >>~/.bashrc
                 fi
-            elif [ $2 = 'short-path' ] ;then
+            elif [ $2 = 'short-path' ]; then
                 _terminal_format_user_host_short_path
-                echo '_terminal_format_user_host_short_path' >> ~/.bashrc
-                if [ $# = 3 ] && [ $3 = 'no-space' ] ; then
+                echo '_terminal_format_user_host_short_path' >>~/.bashrc
+                if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_user_host_short_path_no_space
-                echo '_terminal_format_user_host_short_path_no_space' >> ~/.bashrc
+                    echo '_terminal_format_user_host_short_path_no_space' >>~/.bashrc
                 fi
             fi
-        elif [ ${1} = 'host' ] ; then
-            if [ $# = 1 ] ; then
+        elif [ ${1} = 'host' ]; then
+            if [ $# = 1 ]; then
                 _terminal_format_host_short_path
-                echo '_terminal_format_host_short_path' >> ~/.bashrc
-            elif [ $2 = 'full-path' ] ; then 
+                echo '_terminal_format_host_short_path' >>~/.bashrc
+            elif [ $2 = 'full-path' ]; then
                 _terminal_format_host_full_path
-                echo '_terminal_format_host_full_path' >> ~/.bashrc
-                if [ $# = 3 ] && [ $3 = 'no-space' ] ; then
+                echo '_terminal_format_host_full_path' >>~/.bashrc
+                if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_host_full_path_no_space
-                    echo '_terminal_format_host_full_path_no_space' >> ~/.bashrc
+                    echo '_terminal_format_host_full_path_no_space' >>~/.bashrc
                 fi
-            elif [ $2 = 'short-path' ] ;then
+            elif [ $2 = 'short-path' ]; then
                 _terminal_format_host_short_path
-                    echo '_terminal_format_host_short_path' >> ~/.bashrc
-                if [ $# = 3 ] && [ $3 = 'no-space' ] ; then
+                echo '_terminal_format_host_short_path' >>~/.bashrc
+                if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_host_short_path_no_space
-                    echo '_terminal_format_host_short_path_no_space' >> ~/.bashrc
+                    echo '_terminal_format_host_short_path_no_space' >>~/.bashrc
                 fi
             fi
-        elif [ ${1} = 'user' ] ; then
-            if [ $# = 1 ] ; then
+        elif [ ${1} = 'user' ]; then
+            if [ $# = 1 ]; then
                 _terminal_format_user_short_path
-                    echo '_terminal_format_user_short_path' >> ~/.bashrc
-            elif [ $2 = 'full-path' ] ; then 
+                echo '_terminal_format_user_short_path' >>~/.bashrc
+            elif [ $2 = 'full-path' ]; then
                 _terminal_format_user_full_path
-                if [ $# = 3 ] && [ $3 = 'no-space' ] ; then
+                if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_user_full_path_no_space
-                    echo '_terminal_format_user_full_path_no_space' >> ~/.bashrc
+                    echo '_terminal_format_user_full_path_no_space' >>~/.bashrc
                 fi
-            elif [ $2 = 'short-path' ] ;then 
+            elif [ $2 = 'short-path' ]; then
                 _terminal_format_user_short_path
-                    echo '_terminal_format_user_short_path' >> ~/.bashrc
-                if [ $# = 3 ] && [ $3 = 'no-space' ] ; then
+                echo '_terminal_format_user_short_path' >>~/.bashrc
+                if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_user_short_path_no_space
-                    echo '_terminal_format_user_short_path_no_space' >> ~/.bashrc
+                    echo '_terminal_format_user_short_path_no_space' >>~/.bashrc
                 fi
             fi
         else
             echo 'terminal: argument not supported.'
         fi
-        echo -e '\n' >> ~/.bashrc
+        echo -e '\n' >>~/.bashrc
     fi
 }
 
@@ -149,17 +149,17 @@ _terminal() {
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------
     ACTIONS[user@host]="full-path short-path " # must have a space in " "
-    ACTIONS[host]="full-path short-path " # must have a space in " "
-    ACTIONS[user]="full-path short-path " # must have a space in " "
+    ACTIONS[host]="full-path short-path "      # must have a space in " "
+    ACTIONS[user]="full-path short-path "      # must have a space in " "
 
-    ACTIONS[full-path]=" " # must have a space in " " 
-    ACTIONS[short-path]=" " # must have a space in " " 
+    ACTIONS["full-path"]=" "  # must have a space in " "
+    ACTIONS["short-path"]=" " # must have a space in " "
 
     local cur=${COMP_WORDS[COMP_CWORD]}
-    if [ ${ACTIONS[$3]+1} ] ; then
-        COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
+    if [ ${ACTIONS[$3]+1} ]; then
+        COMPREPLY=($(compgen -W "${ACTIONS[$3]}" -- $cur))
     else
-        COMPREPLY=( `compgen -W "${SERVICES[*]}" -- $cur` )
+        COMPREPLY=($(compgen -W "${SERVICES[*]}" -- $cur))
     fi
 }
 

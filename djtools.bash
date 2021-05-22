@@ -21,7 +21,7 @@ HWHT='\033[1;37m'
 
 # =============================================================================
 # by doing so, the system can find the whole tooklit
-djtools_path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+djtools_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 # add some global variables
 ubuntu_v=$(lsb_release -a)
 
@@ -38,12 +38,12 @@ source $djtools_path/mark-down.bash
 source $djtools_path/m.bash
 source $djtools_path/mirror.bash
 source $djtools_path/repod.bash
-source $djtools_path/resized.bash
 source $djtools_path/system.bash
 source $djtools_path/terminal-format.bash
 source $djtools_path/touchpad.bash
 source $djtools_path/version.bash
 source $djtools_path/unpack.bash
+source $djtools_path/window-tile.bash
 source $djtools_path/work-check.bash
 source $djtools_path/yocto/yocto.bash
 source $djtools_path/zephyr.bash

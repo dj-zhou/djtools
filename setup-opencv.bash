@@ -1,18 +1,16 @@
 #!/bin/bash
 
-
 # =============================================================================
 # may not be a good way to install opencv
 # recommend to install opencv-4.1.1
-function _dj_setup_opencv_2_4_13()
-{
+function _dj_setup_opencv_2_4_13() {
     cur_dir=$PWD
 
     echo -e "\n Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.11.2"
     echo -e "     dj setup qt-5.11.2\n\n"
     _press_enter_or_wait_s_continue 20
-    
+
     cd ~ && mkdir -p soft && cd soft/
 
     sudo rm -rf opencv-4.1.1 # otherwise, it will not going to clone into this folder
@@ -23,24 +21,23 @@ function _dj_setup_opencv_2_4_13()
     cd opencv-2.4.13.6
     mkdir build && cd build
     cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
-          -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON \
-          WITH_OPENCL=ON WITH_GDAL=ON WITH_IPP=ON BUILD_JASPER=ON BUILD_JPEG=ON \
-          BUILD_PNG=ON BUIILD_TIFF=ON WITH_OPENMP=ON ..
+        -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON \
+        WITH_OPENCL=ON WITH_GDAL=ON WITH_IPP=ON BUILD_JASPER=ON BUILD_JPEG=ON \
+        BUILD_PNG=ON BUIILD_TIFF=ON WITH_OPENMP=ON ..
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
 
     _ask_to_remove_a_folder opencv-2.4.13
     _ask_to_remove_a_file opencv-2.4.13.zip
 
     cd ${cur_dir}
-    echo -e "\n" 
+    echo -e "\n"
     echo " lib files *.so are installed in /usr/local/lib/"
     echo " header files are installded in /usr/local/include/opencv2/"
-    echo -e "\n" 
+    echo -e "\n"
 }
 
 # =============================================================================
-function _setup_opencv_dependencies()
-{
+function _setup_opencv_dependencies() {
     # Generic tools
     packages="build-essential cmake pkg-config unzip yasm git checkinstall "
     # Image I/O libs
@@ -80,14 +77,13 @@ function _setup_opencv_dependencies()
     # others
     packages+="libopencv-dev libjasper-dev libgstreamer-plugins-base0.10-dev "
     packages+="libgstreamer0.10-dev libqt4-dev "
-    
+
     _install_if_not_installed $packages
 
 }
 
 # =============================================================================
-function _dj_setup_opencv_3_4_13()
-{
+function _dj_setup_opencv_3_4_13() {
     _setup_opencv_dependencies
 
     cur_dir=$PWD
@@ -96,7 +92,7 @@ function _dj_setup_opencv_3_4_13()
 
     rm -rf opencv-3.4.13
     rm -rf opencv_contrib-3.4.13
-    
+
     opencv_url=https://github.com/opencv
     file=opencv-3.4.13.zip
     url_file=$opencv_url/opencv/archive/3.4.13.zip
@@ -104,7 +100,7 @@ function _dj_setup_opencv_3_4_13()
     file=opencv_contrib-3.4.13.zip
     url_file=$opencv_url/opencv_contrib/archive/3.4.13.zip
     _wget_if_not_exist $file "38ef3a805ea89677becca879bda70647" $url_file -O
-    
+
     unzip opencv-3.4.13.zip
     unzip opencv_contrib-3.4.13.zip
 
@@ -113,7 +109,7 @@ function _dj_setup_opencv_3_4_13()
     export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
     source /usr/local/bin/virtualenvwrapper.sh
     mkvirtualenv cv -p python3
-    
+
     cd opencv-3.4.13
     mkdir build && cd build
     cmake -D CMAKE_BUILD_TYPE=RELEASE \
@@ -142,12 +138,12 @@ function _dj_setup_opencv_3_4_13()
         -D OPENCV_DNN_CUDA=ON \
         -D CUDA_ARCH_BIN=7.5 \
         -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
-        -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include  ..
-    
+        -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include ..
+
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
-    
+
     cd ${cur_dir}
-    cat << eom
+    cat <<eom
     lib files *.so:
             /usr/local/lib/
     header files:
@@ -164,9 +160,8 @@ eom
 # however, this is a bad reference
 # notice: there is some manual work todo before actually automate this procedure
 # this does not work on Ubuntu 20.04!
-function _dj_setup_opencv_4_1_1()
-{
-    if [[ -d "/usr/local/include/opencv2" ]] ; then
+function _dj_setup_opencv_4_1_1() {
+    if [[ -d "/usr/local/include/opencv2" ]]; then
         echo "other version of opencv is installed, exit"
         return
     fi
@@ -186,29 +181,28 @@ function _dj_setup_opencv_4_1_1()
     git clone https://github.com/dj-zhou/opencv-4.1.1.git
     git clone https://github.com/dj-zhou/ippicv.git
 
-    if [ $# = 1 ] && [ $1 = 'with-contrib' ] ; then
+    if [ $# = 1 ] && [ $1 = 'with-contrib' ]; then
         git clone https://github.com/dj-zhou/opencv_contrib-4.1.1.git
     fi
-    
+
     cd opencv-4.1.1
     git checkout add-eigen3-include
     sudo rm -rf build && mkdir build && cd build
-    if [ $# = 1 ] && [ $1 = 'with-contrib' ] ; then
+    if [ $# = 1 ] && [ $1 = 'with-contrib' ]; then
         cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
-              -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON \
-              -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.1.1/modules ..
+            -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON \
+            -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.1.1/modules ..
     else
         cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
-              -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON ..
+            -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON ..
     fi
-    
+
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
-    
+
     sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
-    
 
     cd ${cur_dir}
-    cat << eom
+    cat <<eom
     lib files *.so are installed in
             /usr/local/lib/
     header files are installded in
@@ -223,9 +217,8 @@ eom
 
 # =============================================================================
 # https://medium.com/@sb.jaduniv/how-to-install-opencv-4-2-0-with-cuda-10-1-on-ubuntu-20-04-lts-focal-fossa-bdc034109df3
-function _dj_setup_opencv_4_2_0()
-{
-    if [[ -d "/usr/local/include/opencv2" ]] ; then
+function _dj_setup_opencv_4_2_0() {
+    if [[ -d "/usr/local/include/opencv2" ]]; then
         echo "other version of opencv is installed, exit"
         return
     fi
@@ -235,10 +228,10 @@ function _dj_setup_opencv_4_2_0()
     cur_dir=$PWD
 
     cd ~ && mkdir -p soft && cd soft/
-    
+
     rm -rf opencv-4.2.0
     rm -rf opencv_contrib-4.2.0
-    
+
     opencv_url=https://github.com/opencv
     file=opencv-4.2.0.zip
     url_file=$opencv_url/opencv/archive/4.2.0.zip
@@ -246,13 +239,13 @@ function _dj_setup_opencv_4_2_0()
     file=opencv_contrib-4.2.0.zip
     url_file=$opencv_url/opencv_contrib/archive/4.2.0.zip
     _wget_if_not_exist $file "4776354662667c85a91bcd19f6a13da7" $url_file -O
-    
+
     # some kind of virtual??
     export WORKON_HOME=$HOME/.virtualenvs
     export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
     source /usr/local/bin/virtualenvwrapper.sh
     mkvirtualenv cv -p python3
-    
+
     cd opencv-4.2.0
     mkdir build && cd build
     cmake -D CMAKE_BUILD_TYPE=RELEASE \
@@ -281,10 +274,10 @@ function _dj_setup_opencv_4_2_0()
         -D OPENCV_DNN_CUDA=ON \
         -D CUDA_ARCH_BIN=7.5 \
         -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
-        -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include  ..
-    
+        -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include ..
+
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
-    
+
     sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
 
     cd ${cur_dir}

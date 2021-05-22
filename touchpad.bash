@@ -5,7 +5,7 @@ _touchpad_help() {
     echo -e "\n touchpad usage:\n"
     echo "    touchpad thinkpad enable "
     echo "       -- enable the touchpad on ThinkPad laptops"
-    echo "    touchpad thinkpad disable " 
+    echo "    touchpad thinkpad disable "
     echo -e "       -- disable the touchpad on ThinkPad laptops\n"
 }
 
@@ -55,23 +55,23 @@ function _touchpad_roc_control() {
     # echo "str_len = " $str_len
     found_equal_pos=0
     found_space=0
-    for ((c=1;c<=$str_len;c++ )) ; do
+    for ((c = 1; c <= $str_len; c++)); do
         single_char=${touchpad:${c}-1:1}
         # echo "single_char = " $single_char
-        if [[ $single_char == '=' ]] && [[ $found_equal_pos == 0 ]] ; then
+        if [[ $single_char == '=' ]] && [[ $found_equal_pos == 0 ]]; then
             equal_pos=${c}
             found_equal_pos=1
         fi
         # it is not a space!!
-        if [[ $single_char == '	' ]] && [[ $found_equal_pos == 1 ]] && [[ $found_space == 0 ]] ; then
+        if [[ $single_char == '	' ]] && [[ $found_equal_pos == 1 ]] && [[ $found_space == 0 ]]; then
             first_space_after_equal=${c}
             found_space=1
         fi
     done
-    
+
     # echo "equal_pos = " $equal_pos
     echo "first_space_after_equal = " $first_space_after_equal
-    touchpadID=${touchpad:$equal_pos:${first_space_after_equal} - ${equal_pos}}
+    touchpadID=${touchpad:$equal_pos:${first_space_after_equal}-${equal_pos}}
     echo $touchpadID
     # enable or disable the ROC touchpad
     xinput set-prop $touchpadID "Device Enabled" $1
@@ -80,24 +80,24 @@ function _touchpad_roc_control() {
 # =============================================================================
 function touchpad {
     # --------------------------------
-    if [ $# = 0 ] ; then
+    if [ $# = 0 ]; then
         _touchpad_help
         return 1
     fi
     # --------------------------------
-    if [ $# = 1 ] ; then
+    if [ $# = 1 ]; then
         _touchpad_help
         return 1
     fi
     # --------------------------------
-    if [ $# = 2 ] ; then
-        if [ $1 = 'thinkpad' ] ; then
-            if [ $2 = 'enable' ] ; then
+    if [ $# = 2 ]; then
+        if [ $1 = 'thinkpad' ]; then
+            if [ $2 = 'enable' ]; then
                 _touchpad_thinkpad_control 1
                 echo ' '
                 echo 'Touch Pad on ThinkPad laptop is enabled '
                 echo ' '
-            elif [ $2 = 'disable' ] ; then
+            elif [ $2 = 'disable' ]; then
                 _touchpad_thinkpad_control 0
                 echo ' '
                 echo 'Touch Pad on ThinkPad laptop is disabled '
@@ -106,22 +106,22 @@ function touchpad {
                 echo 'touchpad thinkpad: argument not supported.'
             fi
         fi
-        if [ $1 = 'roc' ] || [ $1 = 'precision' ] ; then
-            if [ $2 = 'enable' ] ; then
+        if [ $1 = 'roc' ] || [ $1 = 'precision' ]; then
+            if [ $2 = 'enable' ]; then
                 _touchpad_roc_control 1
                 echo ' '
-                if [ $1 = 'roc' ] ; then
+                if [ $1 = 'roc' ]; then
                     echo 'Touch Pad on ROC Zephyrus laptop is enabled '
-                elif [ $1 = 'precision' ] ; then
+                elif [ $1 = 'precision' ]; then
                     echo 'Touch Pad on Dell Precision laptop is enabled '
                 fi
                 echo ' '
-            elif [ $2 = 'disable' ] ; then
+            elif [ $2 = 'disable' ]; then
                 _touchpad_roc_control 0
                 echo ' '
-                if [ $1 = 'roc' ] ; then
+                if [ $1 = 'roc' ]; then
                     echo 'Touch Pad on ROC Zephyrus laptop is disabled '
-                elif [ $1 = 'precision' ] ; then
+                elif [ $1 = 'precision' ]; then
                     echo 'Touch Pad on Dell Precision laptop is disabled '
                 fi
                 echo ' '
@@ -149,19 +149,19 @@ _touchpad() {
     declare -A ACTIONS
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------
-    ACTIONS[thinkpad]="enable disable " # must have a space in " " 
-    ACTIONS[roc]="enable disable " # must have a space in " " 
-    ACTIONS[precision]="enable disable " # must have a space in " " 
-    ACTIONS[enable]=" " # must have a space in " " 
-    ACTIONS[disable]=" " # must have a space in " " 
+    ACTIONS[thinkpad]="enable disable "  # must have a space in " "
+    ACTIONS[roc]="enable disable "       # must have a space in " "
+    ACTIONS[precision]="enable disable " # must have a space in " "
+    ACTIONS[enable]=" "                  # must have a space in " "
+    ACTIONS[disable]=" "                 # must have a space in " "
 
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
-    if [ ${ACTIONS[$3]+1} ] ; then
-        COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
+    if [ ${ACTIONS[$3]+1} ]; then
+        COMPREPLY=($(compgen -W "${ACTIONS[$3]}" -- $cur))
     else
-        COMPREPLY=( `compgen -W "${SERVICES[*]}" -- $cur` )
+        COMPREPLY=($(compgen -W "${SERVICES[*]}" -- $cur))
     fi
 }
 

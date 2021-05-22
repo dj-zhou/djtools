@@ -359,9 +359,9 @@ For other platform, the tools and so on are not setup yet.
 
 ### Other Commands
 
-#### `resized`
+#### `window-tile`
 
-Used to resize the windows to a pre-setup.
+Used to tile the windows to a pre-setup configuration.
 
 #### `keyremap`
 

@@ -33,7 +33,7 @@ function _yocto_setup_dev_env()
     packages+="groff g++ iputils-ping libegl1-mesa libgl1-mesa-dev "
     packages+="libglib2.0-dev libglu1-mesa-dev libsdl1.2-dev "
     packages+="libtool libx11-dev libxml-parser-perl make mtools parted "
-    packages+="pylint3 python python-gtk2 python-pysqlite2 python3 "
+    packages+="pv pylint3 python python-gtk2 python-pysqlite2 python3 "
     packages+="python3-git python3-jinja2 python3-pexpect python3-pip "
     packages+="screen sed socat subversion texi2html texinfo unzip "
     packages+="wget xmlto xsltproc xsltproc xterm xz-utils zstd "

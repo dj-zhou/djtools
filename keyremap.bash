@@ -23,14 +23,14 @@ _keyremap_disable() {
 
 # =============================================================================
 function keyremap {
-    if [ $# -eq 0 ] ; then
+    if [ $# -eq 0 ]; then
         _keyremap_enable
-    else 
-        if [ ${1} = 'enable' ] ; then
+    else
+        if [ ${1} = 'enable' ]; then
             _keyremap_enable
-        elif [ ${1} = 'disable' ] ; then
+        elif [ ${1} = 'disable' ]; then
             _keyremap_disable
-        elif [ ${1} = 'help' ] ; then
+        elif [ ${1} = 'help' ]; then
             _keyremap_help
         else
             echo " "
@@ -57,16 +57,16 @@ _keyremap() {
     declare -A ACTIONS
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------
-    ACTIONS[enable]=" " # must have a space in " " 
-    ACTIONS[disable]=" " # must have a space in " " 
-    ACTIONS[help]=" " # must have a space in " " 
+    ACTIONS[enable]=" "  # must have a space in " "
+    ACTIONS[disable]=" " # must have a space in " "
+    ACTIONS[help]=" "    # must have a space in " "
 
     # -------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
-    if [ ${ACTIONS[$3]+1} ] ; then
-        COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
+    if [ ${ACTIONS[$3]+1} ]; then
+        COMPREPLY=($(compgen -W "${ACTIONS[$3]}" -- $cur))
     else
-        COMPREPLY=( `compgen -W "${SERVICES[*]}" -- $cur` )
+        COMPREPLY=($(compgen -W "${SERVICES[*]}" -- $cur))
     fi
 }
 

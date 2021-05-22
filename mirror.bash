@@ -13,9 +13,9 @@ MYNAME="${SCRIPTNAME%.*}"
 LOGFILE="${CURRENT_DIR}/${SCRIPTNAME%.*}.log"
 REQUIRED_TOOLS="parted losetup tune2fs md5sum e2fsck resize2fs"
 ZIPTOOLS=("gzip xz")
-declare -A ZIP_PARALLEL_TOOL=( [gzip]="pigz" [xz]="xz" ) # parallel zip tool to use in parallel mode
-declare -A ZIP_PARALLEL_OPTIONS=( [gzip]="-f9" [xz]="-T0" ) # options for zip tools in parallel mode
-declare -A ZIPEXTENSIONS=( [gzip]="gz" [xz]="xz" ) # extensions of zipped files
+declare -A ZIP_PARALLEL_TOOL=([gzip]="pigz" [xz]="xz")    # parallel zip tool to use in parallel mode
+declare -A ZIP_PARALLEL_OPTIONS=([gzip]="-f9" [xz]="-T0") # options for zip tools in parallel mode
+declare -A ZIPEXTENSIONS=([gzip]="gz" [xz]="xz")          # extensions of zipped files
 
 # =============================================================================
 function _rpi_shrink_info() {
@@ -43,12 +43,12 @@ function _rpi_shrink_cleanup() {
 # =============================================================================
 function _rpi_shrink_log_variables() {
     if [ "$debug" = true ]; then
-        echo "Line $1" >> "$LOGFILE"
+        echo "Line $1" >>"$LOGFILE"
         shift
         local v var
         for var in "$@"; do
             eval "v=\$$var"
-            echo "$var: $v" >> "$LOGFILE"
+            echo "$var: $v" >>"$LOGFILE"
         done
     fi
 }
@@ -57,19 +57,19 @@ function _rpi_shrink_log_variables() {
 function _rpi_shrink_log_check_filesystem() {
     _rpi_shrink_info "Checking filesystem"
     sudo e2fsck -pf "$loopback"
-    (( $? < 4 )) && return
+    (($? < 4)) && return
 
     _rpi_shrink_info "Filesystem error detected!"
 
     _rpi_shrink_info "Trying to recover corrupted filesystem"
     sudo e2fsck -y "$loopback"
-    (( $? < 4 )) && return
+    (($? < 4)) && return
 
-if [[ $repair == true ]]; then
-    _rpi_shrink_info "Trying to recover corrupted filesystem - Phase 2"
-    sudo e2fsck -fy -b 32768 "$loopback"
-    (( $? < 4 )) && return
-fi
+    if [[ $repair == true ]]; then
+        _rpi_shrink_info "Trying to recover corrupted filesystem - Phase 2"
+        sudo e2fsck -fy -b 32768 "$loopback"
+        (($? < 4)) && return
+    fi
     _rpi_shrink_error $LINENO "Filesystem recoveries failed. Giving up..."
     exit 9
 
@@ -88,15 +88,14 @@ function _rpi_shrink_set_autoexpand() {
         return
     fi
 
-    if [[ -f "$mountdir/etc/rc.local" ]] && \
+    if [[ -f "$mountdir/etc/rc.local" ]] &&
         [[ "$(md5sum "$mountdir/etc/rc.local" | cut -d ' ' -f 1)" != "1c579c7d5b4292fd948399b6ece39009" ]]; then
-      echo "Creating new /etc/rc.local"
-    if [ -f "$mountdir/etc/rc.local" ]; then
-       sudo mv "$mountdir/etc/rc.local" "$mountdir/etc/rc.local.bak"
-    fi
+        echo "Creating new /etc/rc.local"
+        if [ -f "$mountdir/etc/rc.local" ]; then
+            sudo mv "$mountdir/etc/rc.local" "$mountdir/etc/rc.local.bak"
+        fi
 
-    
-cat <<\EOF1 > "$mountdir/etc/rc.local"
+        cat <<\EOF1 >"$mountdir/etc/rc.local"
 #!/bin/bash
 do_expand_rootfs() {
   ROOT_PART=$(mount | sed -n 's|^/dev/\(.*\) on / .*|\1|p')
@@ -157,8 +156,8 @@ if [[ -f /etc/rc.local.bak ]]; then
 fi
 exit 0
 EOF1
-    #####End no touch zone#####
-    chmod +x "$mountdir/etc/rc.local"
+        #####End no touch zone#####
+        chmod +x "$mountdir/etc/rc.local"
     fi
     sudo umount "$mountdir"
 }
@@ -166,7 +165,7 @@ EOF1
 # =============================================================================
 _rpi_shrink_help() {
     local _rpi_shrink_help
-    read -r -d '' _rpi_shrink_help << eom
+    read -r -d '' _rpi_shrink_help <<eom
 Usage: $0 [-adhrspvzZ] imagefile.img [newimagefile.img]
 
   -s         Don't expand filesystem when image is booted the first time
@@ -193,19 +192,19 @@ function _mirror_shrink() {
     ziptool=""
     while getopts ":adhprsvzZ" opt; do
         case "${opt}" in
-            a) parallel=true;;
-            d) debug=true;;
-            h) _rpi_shrink_help;;
-            p) prep=true;;
-            r) repair=true;;
-            s) should_skip_autoexpand=true ;;
-            v) verbose=true;;
-            z) ziptool="gzip";;
-            Z) ziptool="xz";;
-            *) _rpi_shrink_help;;
+        a) parallel=true ;;
+        d) debug=true ;;
+        h) _rpi_shrink_help ;;
+        p) prep=true ;;
+        r) repair=true ;;
+        s) should_skip_autoexpand=true ;;
+        v) verbose=true ;;
+        z) ziptool="gzip" ;;
+        Z) ziptool="xz" ;;
+        *) _rpi_shrink_help ;;
         esac
     done
-    shift $((OPTIND-1))
+    shift $((OPTIND - 1))
 
     if [ "$debug" = true ]; then
         _rpi_shrink_info "Creating log file $LOGFILE"
@@ -230,7 +229,7 @@ function _mirror_shrink() {
 
     # check ownership ----------------
     owner_ship=$(stat -c '%U' $img)
-    if [[ ! "$owner_ship" = "$USER" ]] ; then
+    if [[ ! "$owner_ship" = "$USER" ]]; then
         echo -e "file $img is$RED NOT$NOC owned by $USER, cannot shrink."
         return
     fi
@@ -252,9 +251,9 @@ function _mirror_shrink() {
     # check that what we need is installed
     for command in $REQUIRED_TOOLS; do
         command -v $command >/dev/null 2>&1
-        if (( $? != 0 )); then
+        if (($? != 0)); then
             _rpi_shrink_error $LINENO "$command is not installed."
-           return
+            return
         fi
     done
 
@@ -267,9 +266,9 @@ function _mirror_shrink() {
         fi
         _rpi_shrink_info "Copying $1 to $f..."
         cp --reflink=auto --sparse=always "$1" "$f"
-        if (( $? != 0 )); then
+        if (($? != 0)); then
             _rpi_shrink_error $LINENO "Could not copy file..."
-                return
+            return
         fi
         old_owner=$(stat -c %u:%g "$1")
         chown "$old_owner" "$f"
@@ -284,12 +283,12 @@ function _mirror_shrink() {
     beforesize="$(ls -lh "$img" | cut -d ' ' -f 5)"
     parted_output="$(parted -ms "$img" unit B print)"
     rc=$?
-    if (( $rc )); then
+    if (($rc)); then
         _rpi_shrink_error $LINENO "parted failed with rc $rc"
         _rpi_shrink_info "Possibly invalid image. Run 'parted $img unit B print' manually to investigate"
         return
     fi
-    
+
     partnum="$(echo "$parted_output" | tail -n 1 | cut -d ':' -f 1)"
     partstart="$(echo "$parted_output" | tail -n 1 | cut -d ':' -f 2 | tr -d 'B')"
     if [ -z "$(parted -s "$img" unit B print | grep "$partstart" | grep logical)" ]; then
@@ -300,12 +299,12 @@ function _mirror_shrink() {
     loopback="$(sudo losetup -f --show -o "$partstart" "$img")"
     tune2fs_output="$(sudo tune2fs -l "$loopback")"
     rc=$?
-    if (( $rc )); then
+    if (($rc)); then
         echo "$tune2fs_output"
         _rpi_shrink_error $LINENO "tune2fs failed. Unable to shrink this type of image"
         return
     fi
-    
+
     return
     currentsize="$(echo "$tune2fs_output" | grep '^Block count:' | tr -d ' ' | cut -d ':' -f 2)"
     blocksize="$(echo "$tune2fs_output" | grep '^Block size:' | tr -d ' ' | cut -d ':' -f 2)"
@@ -343,7 +342,7 @@ function _mirror_shrink() {
         _rpi_shrink_error $LINENO "resize2fs failed with rc $rc"
         return
     fi
-    minsize=$(cut -d ':' -f 2 <<< "$minsize" | tr -d ' ')
+    minsize=$(cut -d ':' -f 2 <<<"$minsize" | tr -d ' ')
     _rpi_shrink_log_variables $LINENO currentsize minsize
     if [[ $currentsize -eq $minsize ]]; then
         _rpi_shrink_error $LINENO "Image already shrunk to smallest size"
@@ -365,7 +364,7 @@ function _mirror_shrink() {
     _rpi_shrink_info "Shrinking filesystem"
     sudo resize2fs -p "$loopback" $minsize
     rc=$?
-    if (( $rc )); then
+    if (($rc)); then
         _rpi_shrink_error $LINENO "resize2fs failed with rc $rc"
         sudo mount "$loopback" "$mountdir"
         mv "$mountdir/etc/rc.local.bak" "$mountdir/etc/rc.local"
@@ -381,14 +380,14 @@ function _mirror_shrink() {
     _rpi_shrink_log_variables $LINENO partnewsize newpartend
     sudo parted -s -a minimal "$img" rm "$partnum"
     rc=$?
-    if (( $rc )); then
+    if (($rc)); then
         _rpi_shrink_error $LINENO "parted failed with rc $rc"
         return
     fi
 
     sudo parted -s "$img" unit B mkpart "$parttype" "$partstart" "$newpartend"
     rc=$?
-    if (( $rc )); then
+    if (($rc)); then
         _rpi_shrink_error $LINENO "parted failed with rc $rc"
         return
     fi
@@ -397,16 +396,16 @@ function _mirror_shrink() {
     _rpi_shrink_info "Shrinking image"
     endresult=$(parted -ms "$img" unit B print free)
     rc=$?
-    if (( $rc )); then
+    if (($rc)); then
         _rpi_shrink_error $LINENO "parted failed with rc $rc"
         return
     fi
 
-    endresult=$(tail -1 <<< "$endresult" | cut -d ':' -f 2 | tr -d 'B')
+    endresult=$(tail -1 <<<"$endresult" | cut -d ':' -f 2 | tr -d 'B')
     _rpi_shrink_log_variables $LINENO endresult
     truncate -s "$endresult" "$img"
     rc=$?
-    if (( $rc )); then
+    if (($rc)); then
         _rpi_shrink_error $LINENO "trunate failed with rc $rc"
         return
     fi
@@ -417,7 +416,7 @@ function _mirror_shrink() {
         envVarname="${MYNAME^^}_${ziptool^^}" # PISHRINK_GZIP or PISHRINK_XZ environment variables allow to override all options for gzip or xz
         [[ $parallel == true ]] && options="${ZIP_PARALLEL_OPTIONS[$ziptool]}"
         [[ -v $envVarname ]] && options="${!envVarname}" # if environment variable defined use these options
-        [[ $verbose == true ]] && options="$options -v" # add verbose flag if requested
+        [[ $verbose == true ]] && options="$options -v"  # add verbose flag if requested
 
         if [[ $parallel == true ]]; then
             parallel_tool="${ZIP_PARALLEL_TOOL[$ziptool]}"
@@ -446,9 +445,8 @@ function _mirror_shrink() {
 }
 
 # =============================================================================
-function _mirror_backup()
-{
-    if [ $# -le 1 ] ; then
+function _mirror_backup() {
+    if [ $# -le 1 ]; then
         echo " usage: rpi backup /dev/sda image.img"
         return
     fi
@@ -461,20 +459,19 @@ function _mirror_backup()
 }
 
 # =============================================================================
-function mirror()
-{
+function mirror() {
     # ------------------------------
-    if [ $# -eq 0 ] ; then
+    if [ $# -eq 0 ]; then
         echo "to implement"
         return
     fi
     # ------------------------------
-    if [ $1 = 'shrink' ] ; then
+    if [ $1 = 'shrink' ]; then
         _mirror_shrink $2
         return
     fi
     # ------------------------------
-    if [ $1 = 'backup' ] ; then
+    if [ $1 = 'backup' ]; then
         _mirror_backup $2 $3 $4
         return
     fi
@@ -482,8 +479,7 @@ function mirror()
 }
 
 # =============================================================================
-function _mirror()
-{
+function _mirror() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -498,25 +494,25 @@ function _mirror()
     # ------------------------------------------------------------------------
     shrink_list="$(ls | grep img) "
     ACTIONS[shrink]="$shrink_list "
-    for i in $shrink_list ; do
+    for i in $shrink_list; do
         ACTIONS[$i]=" "
     done
     # ------------------------------------------------------------------------
     backup_list="/dev/sda /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg "
     ACTIONS[backup]="$backup_list "
-    for i in $backup_list ; do
+    for i in $backup_list; do
         backup_file_lit="$(ls | grep img) "
         ACTIONS[$i]="$backup_file_lit"
-        for j in $backup_file_lit ; do
+        for j in $backup_file_lit; do
             ACTIONS[$j]=" "
         done
     done
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
-    if [ ${ACTIONS[$3]+1} ] ; then
-        COMPREPLY=( `compgen -W "${ACTIONS[$3]}" -- $cur` )
+    if [ ${ACTIONS[$3]+1} ]; then
+        COMPREPLY=($(compgen -W "${ACTIONS[$3]}" -- $cur))
     else
-        COMPREPLY=( `compgen -W "${SERVICES[*]}" -- $cur` )
+        COMPREPLY=($(compgen -W "${SERVICES[*]}" -- $cur))
     fi
 }
 
