@@ -84,7 +84,7 @@ function _dj_udev_uvc_video_capture() {
 
 # =============================================================================
 function _dj_udev_logitech_f710() {
-    rule_file=logitech-f710-x.rules # this is the X mode
+    rule_file=logitech-f710-x.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
@@ -94,7 +94,6 @@ function _dj_udev_logitech_f710() {
     string="${string}ATTRS{idVendor}==\"046d\", "
     string="${string}ATTRS{idProduct}==\"c21f\", "
     string="${string}ATTRS{manufacturer}==\"Logitech\", "
-    string="${string}ATTRS{product}==\"Wireless Gamepad F710\", "
     string="${string}MODE=\"666\", "
     string="${string}SYMLINK+=\"joy/f710\", "
     string="${string}GROUP=\"dialout\""
@@ -103,7 +102,7 @@ function _dj_udev_logitech_f710() {
     sudo service udev restart
 
     # the joystick can change its property -----------------------
-    rule_file=logitech-f710-d.rules # this is the D mode
+    rule_file=logitech-f710-d.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
@@ -113,7 +112,6 @@ function _dj_udev_logitech_f710() {
     string="${string}ATTRS{idVendor}==\"046d\", "
     string="${string}ATTRS{idProduct}==\"c219\", "
     string="${string}ATTRS{manufacturer}==\"Logitech\", "
-    string="${string}ATTRS{product}==\"Logitech Cordless RumblePad 2\", "
     string="${string}MODE=\"666\", "
     string="${string}SYMLINK+=\"joy/f710\", "
     string="${string}GROUP=\"dialout\""

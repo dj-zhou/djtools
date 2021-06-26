@@ -159,6 +159,23 @@ function _build_meson_native() {
 }
 
 # =============================================================================
+function _build_in_docker() {
+    if ! [ -f "build-docker.sh" ]; then
+        echo "no build file, exit."
+        return
+    fi
+    clean_tag="$1"
+    if [[ -z "$clean_tag" || "$clean_tag" = "all" ]]; then
+        ./build-docker.sh
+        return
+    fi
+    if [[ "$clean_tag" = "clean" ]]; then
+        echo -e "${GRN}rm -rf _bdocker*${NOC}"
+        rm -rf _bdocker*
+    fi
+}
+
+# =============================================================================
 # example of .project-stm32:
 # STM32F107VCT6
 # 256 FLASH (*1024)
@@ -204,7 +221,7 @@ function compile_makefile() {
 
 # =============================================================================
 function compile_cmakelist() {
-    echo -e "\n  use ${PRP}CMakeLists.txt${NOC} to build\n"
+    echo -e "\n  use ${PRP}CMakeLists.txt${NOC} to build/clean\n"
     cur_dir=${PWD}
     build_dir="_bnative.cmake"
     clean_tag=$1
@@ -215,14 +232,16 @@ function compile_cmakelist() {
         else
             cd "$build_dir"/ # do not run cmake ..
         fi
-        echo -e "${PRP}\n make -j$(cat /proc/cpuinfo | grep processor | wc -l)${NOC}\n"
+        echo -e "${PRP}make -j$(cat /proc/cpuinfo | grep processor | wc -l)${NOC}"
         make -j$(cat /proc/cpuinfo | grep processor | wc -l)
-    elif [ "$clean_tag" = "clean" ]; then
-        echo -e "${PRP}\n rm -rf bin/ "$build_dir"/ _bcross* _bnative*${NOC}\n"
-        rm -rf "$build_dir"/
+        cd $cur_dir
+        return
     fi
-
-    cd $cur_dir
+    if [ "$clean_tag" = "clean" ]; then
+        echo -e "${PRP}rm -rf "$build_dir"/${NOC}\n"
+        rm -rf "$build_dir"/
+        return
+    fi
 }
 
 # =============================================================================
@@ -244,6 +263,12 @@ function build() {
     # ------------------------------
     if [ $1 = 'cmake' ]; then
         compile_cmakelist $2 $3 $4 $5 $6
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'docker' ]; then
+        shift
+        _build_in_docker $@
         return
     fi
     # ------------------------------
@@ -287,6 +312,15 @@ function _build_makefile_exists() {
 }
 
 # =============================================================================
+function _build_build_docker_exists() {
+    if [[ -f "build-docker.sh" ]] && [[ -f "docker/build-in-container.sh" ]] && [[ -f "docker/Dockerfile" ]]; then
+        echo "docker "
+        return
+    fi
+    echo " "
+}
+
+# =============================================================================
 function _build() {
     COMPREPLY=()
 
@@ -294,6 +328,7 @@ function _build() {
     service=$(_build_meson_exists)
     service+=$(_build_cmakelists_exists)
     service+=$(_build_makefile_exists)
+    service+=$(_build_build_docker_exists)
     local SERVICES=("
         $service
     ")
@@ -317,6 +352,12 @@ function _build() {
     cmake_list="all clean "
     ACTIONS[cmake]="$cmake_list "
     for i in $cmake_list; do
+        ACTIONS[$i]=" "
+    done
+    # -----------------------------------------------------
+    docker_list="all clean "
+    ACTIONS[docker]="$docker_list "
+    for i in $docker_list; do
         ACTIONS[$i]=" "
     done
 

@@ -168,13 +168,23 @@ function _dj_setup_clang_format() {
 }
 
 # =============================================================================
-# LLVM clang 11.1.0 cannot work on Ubuntu 18.04, it needs libtinfo.so.6
+# Ubuntu 16.04: give up
+# Ubuntu 18.04: 11.1.0 (tested), https://github.com/llvm/llvm-project/releases/tag/llvmorg-11.1.0
+# Ubuntu 20.04: 12.0.0 (tested), https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.0
 
-# Ubuntu 16.04: xx (try 10.0.1)
-# Ubuntu 18.04: 10.0.1
-# Ubuntu 20.04: xx (todo)
-
-# todo: https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.0
+# most simplest vscode settings.json:
+# {
+#     "files.hotExit": "onExit",
+#     "files.autoSave": "afterDelay",
+#     "editor.detectIndentation": false,
+#     "editor.tabSize": 4,
+#     "editor.tabCompletion": "on",
+#     "editor.fontSize": 16,
+#     "Clang_format_style": "file",
+#     "C_Cpp.clang_format_path": "/opt/clang-llvm-11.1.0/bin/clang-format",
+#     "clang.executable": "/opt/clang-llvm-11.1.0/bin/clang",
+#     "editor.formatOnSave": true,
+# }
 function _dj_setup_clang_llvm() {
     cur_dir=${PWD}
 

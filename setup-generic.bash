@@ -105,7 +105,7 @@ function _create_anaconda_desktop_item() {
     sudo chmod +x $folder/$file
 
     echo -e "${YLW}if Anaconda is not installed to ~/.anaconda3, you need to revise${NOC}"
-    echo -e "${YLW} /usr/share/applications/$file accordingly.${NOC}"
+    echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
 }
 
 # =============================================================================
@@ -203,7 +203,7 @@ eom
     _install_if_not_installed $packages
 
     # -----------------------------------
-    echo -e "\n going to install Google Chrome\n"
+    echo -e "going to install Google Chrome\n"
     _press_enter_or_wait_s_continue 10
     cd ~ && mkdir -p soft/ && cd soft/
     google_ver=$(google-chrome --version)
@@ -218,16 +218,16 @@ eom
 
     # -----------------------------------
     # remove firefox
-    echo -e "\n going to remove firefox\n"
-    _press_enter_or_wait_s_continue 10
-    sudo apt-get purge firefox -y
-    rm -Rf ~/.mozilla/firefox/
+    # echo -e "going to remove firefox\n"
+    # _press_enter_or_wait_s_continue 10
+    # sudo apt-get purge firefox -y
+    # rm -Rf ~/.mozilla/firefox/
 
     # -----------------------------------
     gnome_v=$(version check gnome)
     # to display simplified Chinese: important, do not comment out!
     if [ ! "$gnome_v" = ' ' ]; then
-        echo -e "\n going to setup simplified Chinese support\n"
+        echo -e "going to setup simplified Chinese support\n"
         _press_enter_or_wait_s_continue 10
         gsettings set org.gnome.gedit.preferences.encodings \
             auto-detected "['CURRENT','GB18030','GBK','GB2312','UTF-8','UTF-16']"
@@ -236,19 +236,19 @@ eom
     # -----------------------------------
     # to disable the fixed dock (in dock setting, it is Auto-hide the Dock option)
     if [ ! "$gnome_v" = ' ' ]; then
-        echo -e "\n hide the Dock when any windows overlap with it\n"
+        echo -e "hide the Dock when any windows overlap with it\n"
         _press_enter_or_wait_s_continue 10
         gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     fi
     # -----------------------------------
     # to lock the screen from commands
     if [ ! "$gnome_v" = ' ' ]; then
-        echo -e "\n going to setup lock screen command\n"
+        echo -e "going to setup lock screen command\n"
         _press_enter_or_wait_s_continue 10
         _install_if_not_installed gnome-screensaver
     fi
     # -----------------------------------
-    echo -e "\n time & date control: \n you need to run the code:\n"
+    echo -e "time & date control: \n you need to run the code:\n"
     echo -e "    timedatectl set-local-rtc 1\n"
 
     cd $cur_dir
@@ -296,7 +296,7 @@ function _dj_setup_dropbox() {
         >dropbox.deb
     sudo dpkg -i dropbox.deb
 
-    echo -e "\n You can run the following command to setup the Dropbox"
+    echo -e "You can run the following command to setup the Dropbox"
     echo -e "   dropbox start -i\n"
 
     cd $cur_dir
@@ -307,10 +307,10 @@ function _dj_setup_eigen3() {
     cur_dir=${PWD}
     _install_if_not_installed mlocate # updatedb is in this package
     _install_if_not_installed libeigen3-dev
-    echo -e "\n sudo updatedb\n this may take a few minutes\n"
+    echo -e "sudo updatedb\n this may take a few minutes\n"
     sudo updatedb
 
-    echo -e "\n eigen3 is installed in: /usr/include/eigen3\n"
+    echo -e "eigen3 is installed in: /usr/include/eigen3\n"
     echo " if see error \"fatal error: Eigen/Core: No such file or directory\""
     echo -e " add \"-I/usr/include/eigen3\" to your Makefile\n"
 
@@ -321,7 +321,7 @@ function _dj_setup_eigen3() {
 function _dj_setup_foxit_reader() {
     cur_dir=${PWD}
 
-    echo -e "\n install Foxit Reader ..."
+    echo -e "install Foxit Reader ..."
     echo -e "  recommended location: /opt/foxitsoftware/foxitreader\n"
     _press_enter_or_wait_s_continue 10
 
@@ -343,7 +343,7 @@ function _dj_setup_foxit_reader() {
         echo 'a symbolic link "foxit" is generated in /usr/bin'
         sudo ln -sf $foxit_reader_location /usr/bin/foxit
     else
-        echo -e "\n FoxitReader not installed into a recommended location"
+        echo -e "FoxitReader not installed into a recommended location"
         echo -e "a symbolic link cannot be generated\n"
     fi
 
@@ -354,7 +354,7 @@ function _dj_setup_foxit_reader() {
 function _dj_setup_gcc_aarch64_linux() {
     cur_dir=${PWD}
 
-    echo -e "\n install gcc-aarch64-linux-gnu ...\n"
+    echo -e "install gcc-aarch64-linux-gnu ...\n"
     _press_enter_or_wait_s_continue 10
     # common
     _install_if_not_installed libssl-dev # needed for compiling the Linux Kernel for ARMv8
@@ -390,7 +390,7 @@ function _dj_setup_gcc_aarch64_linux() {
 function _dj_setup_gcc_arm_stm32() {
     cur_dir=${PWD}
 
-    echo -e "\n remove ${RED}gcc-arm-none-eabi${NOC}, and install ${GRN}gcc-arm-embedded${NOC} ...\n"
+    echo -e "remove ${RED}gcc-arm-none-eabi${NOC}, and install ${GRN}gcc-arm-embedded${NOC} ...\n"
     _press_enter_or_wait_s_continue 10
 
     cd ~ && mkdir -p soft/ && cd soft/
@@ -433,7 +433,7 @@ function _dj_setup_gcc_arm_stm32() {
         echo "sudo tar xjf ${filename} -C /usr/share/"
         sudo tar xjf ${filename} -C /usr/share/
 
-        echo -e "\n create symbolic links\n"
+        echo -e "create symbolic links\n"
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-gcc /usr/bin/arm-none-eabi-gcc
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-g++ /usr/bin/arm-none-eabi-g++
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-gdb /usr/bin/arm-none-eabi-gdb
@@ -448,7 +448,7 @@ function _dj_setup_gcc_arm_stm32() {
 function _dj_setup_gcc_arm_linux_gnueabi() {
     cur_dir=${PWD}
 
-    echo -e "\n install gcc-arm-linux-gnueabi ...\n"
+    echo -e "install gcc-arm-linux-gnueabi ...\n"
     _press_enter_or_wait_s_continue 10
     _install_if_not_installed libncurses5-dev
     _install_if_not_installed build-essential
@@ -491,7 +491,7 @@ function _dj_setup_gcc_arm_linux_gnueabi() {
 function _dj_setup_gcc_arm_linux_gnueabihf() {
     cur_dir=${PWD}
 
-    echo -e "\n install gcc-arm-linux-gnueabihf ...\n"
+    echo -e "install gcc-arm-linux-gnueabihf ...\n"
     _press_enter_or_wait_s_continue 10
     _install_if_not_installed libncurses5-dev
     _install_if_not_installed build-essential
@@ -543,7 +543,7 @@ function _dj_setup_git_lfs() {
 function _dj_setup_gitg_gitk() {
     cur_dir=${PWD}
 
-    echo -e "\n install gitg and gitk ...\n"
+    echo -e "install gitg and gitk ...\n"
     _press_enter_or_wait_s_continue 10 # to check the key pressed TODO
     _install_if_not_installed gitg
     _install_if_not_installed gitk
@@ -726,12 +726,8 @@ eom
 function _dj_setup_libiio() {
     cur_dir=${PWD}
     # install some software
-    if [[ "${ubuntu_v}" = *'18.04'* ]]; then
-        _install_if_not_installed libxml2-dev
-    fi
-    if [[ "${ubuntu_v}" = *'20.04'* ]]; then
-        _install_if_not_installed bison flex libxml2-dev
-    fi
+    _install_if_not_installed bison flex libxml2-dev
+
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf libiio
     git clone https://github.com/analogdevicesinc/libiio.git
@@ -958,7 +954,14 @@ eom
 # =============================================================================
 # testing
 function _dj_setup_meson() {
-    echo -e "\n install ${YLW}meson v0.57.0${NOC} and ${YLW}ninja v1.10.2${NOC} \n"
+    # cmake must be a newer than 3.10 to install meon v0.57.0
+    cmake_v=$(version check cmake)
+    anw=$(_version_if_ge_than $cmake_v "3.15")
+    if [ $anw = "no" ]; then
+        echo "cmake needs to be 3.15 or higher version, exit."
+        return
+    fi
+    echo -e "install ${YLW}meson v0.57.0${NOC} and ${YLW}ninja v1.10.2${NOC} \n"
     _press_enter_or_wait_s_continue 5
     # remove /usr/bin/meson
     sudo apt-get remove meson &>/dev/null
@@ -974,7 +977,7 @@ function _dj_setup_meson() {
 
     meson_path=$(grep "PATH:~/.local/bin" ~/.bashrc)
     if [ ! -z "$meson_path" ]; then
-        echo -e "\n ${YLW}meson ${GRN} path was set in ~/.bashrc${NOC}"
+        echo -e "${YLW}meson ${GRN} path was set in ~/.bashrc${NOC}"
     else
         echo -e '\n' >>~/.bashrc
         echo '# ===========================================================' >>~/.bashrc
@@ -1079,6 +1082,9 @@ function _dj_setup_nlohmann_json3_dev() {
     cmake ..
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
 
+    # don't forget to install
+    sudo make install
+
     cd $cur_dir
 }
 
@@ -1132,7 +1138,7 @@ function _dj_setup_nvtop() {
 function _dj_setup_qt_5_13_1() {
     cur_dir=$PWD
 
-    echo -e "\n install Qt 5.13.1 \n"
+    echo -e "install Qt 5.13.1 \n"
 
     # install serialport module
     _install_if_not_installed libqt5serialport5-dev
@@ -1145,7 +1151,7 @@ function _dj_setup_qt_5_13_1() {
     _wget_if_not_exist $filename "21c3b16f851697fa8da8009f73694373" $url
     chmod +x $filename
 
-    echo -e "\n It is recommended to install the Qt into ${HOME}/Qt5.13.1/"
+    echo -e "It is recommended to install the Qt into ${HOME}/Qt5.13.1/"
     _press_enter_or_wait_s_continue 10
 
     ./$filename
@@ -1156,7 +1162,7 @@ function _dj_setup_qt_5_13_1() {
     echo '# Qt5.13.1 setup (djtools)' >>~/.bashrc
     echo 'export PATH=~/Qt5.13.1/5.13.1/gcc_64/bin:$PATH' >>~/.bashrc
     echo 'export LD_LIBRARY_PATH=~/Qt5.13.1/5.13.1/gcc_64/lib:$LD_LIBRARY_PATH' >>~/.bashrc
-    echo -e "\n PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
+    echo -e "PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
 
     cd ${cur_dir}
 }
@@ -1179,7 +1185,7 @@ function _dj_setup_qt_5_14_2() {
     _wget_if_not_exist $filename "dce0588874fd369ce493ea5bc2a21d99" $url
     chmod +x $filename
 
-    echo -e "\n It is recommended to install the Qt into ${HOME}/Qt5.14.2/"
+    echo -e "It is recommended to install the Qt into ${HOME}/Qt5.14.2/"
     _press_enter_or_wait_s_continue 20
 
     ./$filename
@@ -1190,7 +1196,7 @@ function _dj_setup_qt_5_14_2() {
     echo '# Qt5.14.2 setup (djtools)' >>~/.bashrc
     echo 'export PATH=~/Qt5.14.2/5.14.2/gcc_64/bin:$PATH' >>~/.bashrc
     echo 'export LD_LIBRARY_PATH=~/Qt5.14.2/5.14.2/gcc_64/lib:$LD_LIBRARY_PATH' >>~/.bashrc
-    echo -e "\n PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
+    echo -e "PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
 
     cd ${cur_dir}
 }
@@ -1229,7 +1235,7 @@ function _dj_setup_saleae_logic() {
 # =============================================================================
 function _dj_setup_spdlog() { # static/shared
     static_shared=$1          # if empty, treat as dynamic
-    echo -e "\n ------------------------------"
+    echo -e "------------------------------"
     echo -e " ${GRN}which version are you going to install?${NOC}"
     echo -e " 1: v1.6.0"
     echo -e " 2: v1.6.1"
@@ -1252,7 +1258,7 @@ function _dj_setup_spdlog() { # static/shared
         version="v1.8.0"
         ;;
     *)
-        echo -e "\n ${YLW}wrong input, set to v1.7.0.${NOC}"
+        echo -e "${YLW}wrong input, set to v1.7.0.${NOC}"
         version="v1.7.0"
         ;;
     esac
@@ -1275,7 +1281,7 @@ function _dj_setup_spdlog() { # static/shared
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
-    echo -e "\n ---------------------------------------\n"
+    echo -e "---------------------------------------\n"
     if [ "$static_shared" = 'static' ]; then
         echo " spdlog is installed statically: "
         echo -e "     /usr/local/lib/libspdlog.a\n"
@@ -1284,7 +1290,7 @@ function _dj_setup_spdlog() { # static/shared
         echo -e "     /usr/local/lib/libspdlog.so\n"
         echo -e " you can run \"sudo ldconfig\" before running programs\n"
     fi
-    echo -e "\n ---------------------------------------\n"
+    echo -e "---------------------------------------\n"
 
     cd ${cur_dir}
 }
@@ -1319,6 +1325,7 @@ function _dj_setup_texlive() {
 }
 
 # =============================================================================
+# why this does not work with python3.9?
 function _dj_setup_typora() {
     wget -qO - https://typora.io/linux/public-key.asc | sudo apt-key add -
     # add Typora's repository
@@ -1338,7 +1345,7 @@ function _dj_setup_vscode() {
     # install dependency
     _install_if_not_installed curl
 
-    echo -e "\n install vscode ...\n"
+    echo -e "install vscode ...\n"
     curl -L "https://go.microsoft.com/fwlink/?LinkID=760868" >vscode.deb
     sudo dpkg -i vscode.deb
     sudo rm vscode.deb
@@ -1348,7 +1355,7 @@ function _dj_setup_vscode() {
 
 # =============================================================================
 function _dj_setup_windows_fonts() {
-    echo -e "\n going to support Windows fonts\n"
+    echo -e "going to support Windows fonts\n"
     _press_enter_or_wait_s_continue 10
     _install_if_not_installed ttf-mscorefonts-installer
     _install_if_not_installed msttcorefonts
@@ -1360,8 +1367,9 @@ function _dj_setup_windows_fonts() {
 # compile from the source code will install it to
 #   /usr/local/lib/libyaml-cpp.a
 # apt-get will install it to
-#  /usr/lib/ -----not tested yet!
-# shared library build seems not working!
+#  /usr/lib/x86_64-linux-gnu/
+# shared library build seems not working, error:
+# ./_bnative.cmake/yaml-demo: symbol lookup error: ./_bnative.cmake/yaml-demo: undefined symbol: _ZN4YAML6detail9node_data12empty_scalarB5cxx11Ev
 function _dj_setup_yaml_cpp() {
     cur_dir=$PWD
 
@@ -1369,7 +1377,12 @@ function _dj_setup_yaml_cpp() {
     sudo apt-get -y update
     _install_if_not_installed build-essential
 
-    dj setup cmake-3.19.5
+    cmake_v=$(version check cmake)
+    anw=$(_version_if_ge_than $cmake_v 3.20.5)
+    if [ "$anw" = 'no' ]; then
+        dj setup cmake-3.20.5
+    fi
+    # remove existing library, if there is
     sudo rm -rf /usr/local/lib/libyaml-cpp*
 
     yaml_v=$(_find_argument_after_option -v $1 $2 $3 $4 $5 $6 $7 $8)
@@ -1384,18 +1397,18 @@ function _dj_setup_yaml_cpp() {
     git checkout yaml-cpp-$yaml_v
     rm -rf build/ && mkdir build && cd build
 
-    # use shared library as default
-    if [[ "$yaml_v" = "0.6.2" ]]; then
-        cmake .. -DBUILD_SHARED_LIBS=ON
-    elif [[ "$yaml_v" = "0.6.3" ]]; then
-        cmake .. -DYAML_BUILD_SHARED_LIBS=ON
-    fi
+    # use static library as default, do not delete the below script
+    # if [[ "$yaml_v" = "0.6.2" ]]; then
+    #     cmake .. -DBUILD_SHARED_LIBS=ON
+    # elif [[ "$yaml_v" = "0.6.3" ]]; then
+    #     cmake .. -DYAML_BUILD_SHARED_LIBS=ON
+    # fi
     echo -e "version to be installed $YLW$yaml_v$NOC"
     _press_enter_or_wait_s_continue 5
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j4 # do not use all CPU threads
     sudo make install
 
-    echo -e "\n libyaml-cpp.so is installed in /usr/local/lib/"
+    echo -e "libyaml-cpp.so is installed in /usr/local/lib/"
     echo -e " header files are installed in /usr/local/include/yaml-cpp/"
     echo -e " pkg-config file installed to: /usr/local/lib/pkgconfig/yaml-cpp.pc\n"
 
@@ -1454,8 +1467,8 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'cmake-3.19.5' ]; then
-        _dj_setup_cmake_3_19_5
+    if [ $1 = 'cmake-3.20.5' ]; then
+        _dj_setup_cmake_3_20_5
         return
     fi
     # --------------------------
@@ -1465,12 +1478,16 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'container' ]; then
+        if [ $2 = 'dive' ]; then
+            _dj_setup_container_dive
+            return
+        fi
         if [ $2 = 'docker' ]; then
             _dj_setup_container_docker
             return
         fi
-        if [ $2 = 'dive' ]; then
-            _dj_setup_container_dive
+        if [ $2 = 'docker-compose' ]; then
+            _dj_setup_container_docker_compose
             return
         fi
         if [ $2 = 'lxd-4.0' ]; then

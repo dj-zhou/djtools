@@ -26,17 +26,17 @@ eom
 # =============================================================================
 function _yocto_setup_dev_env()
 {
-    packages="autoconf automake bmap-tools bsdmainutils build-essential "
-    packages+="chrpath coreutils cpio curl dblatex debianutils "
-    packages+="desktop-file-utils diffstat docbook-utils dosfstools "
-    packages+="dos2unix fop gawk gcc gcc-multilib git-core gnupg "
-    packages+="groff g++ iputils-ping libegl1-mesa libgl1-mesa-dev "
-    packages+="libglib2.0-dev libglu1-mesa-dev libsdl1.2-dev "
-    packages+="libtool libx11-dev libxml-parser-perl make mtools parted "
+    packages="autoconf automake binutils bmap-tools bsdmainutils build-essential "
+    packages+="ca-certificates ccache chrpath coreutils cpio curl dblatex "
+    packages+="debianutils desktop-file-utils diffstat docbook-utils dosfstools "
+    packages+="dos2unix file fop gawk gcc gcc-multilib git-core gnupg groff g++ "
+    packages+="g++-multilib  iputils-ping locales libc-dev libegl1-mesa libgl1-mesa-dev "
+    packages+="libglib2.0-dev libglu1-mesa-dev libsdl1.2-dev libtool "
+    packages+="libx11-dev libxml-parser-perl make mtools patch parted "
     packages+="pv pylint3 python python-gtk2 python-pysqlite2 python3 "
-    packages+="python3-git python3-jinja2 python3-pexpect python3-pip "
-    packages+="screen sed socat subversion texi2html texinfo unzip "
-    packages+="wget xmlto xsltproc xsltproc xterm xz-utils zstd "
+    packages+="python3-distutils python3-git python3-jinja2 python3-pexpect "
+    packages+="python3-pip screen sed ssh socat subversion texi2html texinfo "
+    packages+="unzip wget xmlto xsltproc xsltproc xterm xz-utils zstd "
     # dependencies needed for building documents
     packages+="fonts-liberation libfreetype6-dev libjpeg8-dev "
     packages+="python3-dev python3-sphinx texlive-fonts-recommended "
@@ -60,7 +60,7 @@ function _yocto_setup_dev_env()
 # =============================================================================
 function _save_current_env_variables()
 {
-    rm ~/.saved-env
+    rm -f ~/.saved-env
     export -p > ~/.saved-env
 }
 

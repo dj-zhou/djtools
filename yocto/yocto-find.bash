@@ -239,6 +239,13 @@ function _yocto_find_image_name() { # $tmp_dir $machine
     file_types="rootfs.wic.gz "
     file_types+="rootfs.wic.zst "
     file_types+="hddimg "
+
+    # no tmp/ directory, nothing was built
+    if ! [[ -d $tmp_dir/deploy/images/ ]]; then
+        echo " "
+        return
+    fi
+
     for f in $file_types; do
         potential_files=$(ls $tmp_dir/deploy/images/$machine/ | grep $f)
         for p in $potential_files; do
@@ -275,6 +282,13 @@ function _yocto_find_image_file_from_its_name() {
     file_types="rootfs.wic.gz "
     file_types+="rootfs.wic.zst "
     file_types+="hddimg "
+
+    # no tmp/ directory, nothing was built
+    if ! [[ -d $tmp_dir/deploy/images/ ]]; then
+        echo " "
+        return
+    fi
+
     for f in $file_types; do
         potential_files=$(ls $tmp_dir/deploy/images/$machine/$image_name* | grep $f)
         for p in $potential_files; do

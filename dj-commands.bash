@@ -21,9 +21,9 @@ function _dj_help() {
     echo "   clone-ssh     - use ssh protocol to clone a repo from github/gitee/bitbucket"
     echo "   udev          - udev rule setup for usb devices"
     echo "   work-check    - check work status of all repos in a folder"
-    echo -e "\n"
-    echo -e "\n   MORE IS COMMING\n"
-    echo -e " All commands support tab completion\n"
+    echo -e ""
+    echo -e "  MORE IS COMMING"
+    echo -e " All commands support tab completion"
 }
 
 # =============================================================================
@@ -31,7 +31,7 @@ function _dj_setup_boost() {
     cur_dir=${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
 
-    echo -e "${GRN}boost-1.74.0${NOC} is going to be installed\n"
+    echo -e "${GRN}boost-1.74.0${NOC} is going to be installed"
     _press_enter_to_continue
 
     rm -rf boost
@@ -50,12 +50,12 @@ function _dj_setup_boost() {
     sudo cp libboost_* /usr/local/lib/
 
     cat <<eom
- -----------------------------------------------------------------
+-----------------------------------------------------------------
     headers installed to:
         /usr/include/
     shared library is copied to:
         /usr/local/lib/
- -----------------------------------------------------------------
+-----------------------------------------------------------------
 
 eom
 
@@ -79,26 +79,26 @@ function _dj_setup_cli11() {
     sudo make install
 
     cat <<eom
- -----------------------------------------------------------------
+-----------------------------------------------------------------
     headers files installed to:
         /usr/local/include/CLI/
     *.cmake files installed to:
         /usr/local/lib/cmake/CLI11/
     package config file installed to:
         /usr/local/lib/pkgconfig/CLI11.pc
- -----------------------------------------------------------------
+-----------------------------------------------------------------
 
 eom
-
     cd $cur_dir
-
 }
 
 # =============================================================================
 # setting a fixed version is not a good idea, but ...
-function _dj_setup_cmake_3_19_5() {
-    v="3.19.5"
-    echo -e "\n ${GRN} install CMake $v ${NOC}"
+function _dj_setup_cmake_3_20_5() {
+    # install dependencies
+    _install_if_not_installed libssl-dev
+    v="3.20.5"
+    echo -e "${GRN} install CMake $v ${NOC}"
     _press_enter_or_wait_s_continue 5
 
     cur_dir=${PWD}
@@ -174,7 +174,7 @@ function _dj_setup_container_docker() {
     cur_dir=${PWD}
 
     # Install a few prerequisite packages
-    packages=" apt-transport-https ca-certificates curl software-properties-common "
+    packages="apt-transport-https ca-certificates curl software-properties-common "
     _install_if_not_installed $packages
 
     docker_url="https://download.docker.com/linux/ubuntu"
@@ -209,6 +209,17 @@ function _dj_setup_container_docker() {
 }
 
 # =============================================================================
+function _dj_setup_container_docker_compose() {
+
+    url="https://github.com/docker/compose/releases/download"
+    v="1.29.2"
+    echo "installing docker-compose v$v (version hardcoded)"
+    sudo curl -L "${url}/$v/docker-compose-$(uname -s)-$(uname -m)" \
+        -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+}
+
+# =============================================================================
 # https://github.com/wagoodman/dive
 # how to clone the repo and use its Makefile to install? -- don't know
 function _dj_setup_container_dive() {
@@ -221,12 +232,9 @@ function _dj_setup_container_dive() {
     wget $drive_url$dive_version"/dive_"$dive_version"_linux_amd64.deb"
     sudo dpkg -i dive_*.deb
 
-    echo -e "\n"
     echo "use the following command to check the docker image layouts"
     echo "  sudo dive <image-tag/hash>"
-    echo -e "\n"
     echo "you can find the image-tag/hash from command: sudo docker images -a"
-    echo -e "\n"
 
     # ----------------------------------------------
     cd $cur_dir
@@ -237,10 +245,7 @@ function _dj_setup_container_lxd_4_0() {
     _install_if_not_installed snapd
 
     sudo snap install lxd --channel=4.0/stable
-    echo -e "\n"
-    echo 'next step: '
-    echo ' sudo lxd init'
-    echo -e "\n"
+    echo 'next step: $ sudo lxd init'
 }
 
 # =============================================================================
@@ -263,14 +268,13 @@ function _dj_setup_pangolin() {
     make -j$(cat /proc/cpuinfo | grep processor | wc -l)
     sudo make install
 
-    echo -e "\n libpangolin.so is in path: ${GRN}/usr/local/lib/${NOC}"
-    echo -e " header files are in path: ${GRN}/usr/local/include/pangolin/${NOC}\n"
+    echo -e "libpangolin.so is in path: ${GRN}/usr/local/lib/${NOC}"
+    echo -e "header files are in path: ${GRN}/usr/local/include/pangolin/${NOC}"
 
-    echo -e "\n If you see error like this:"
-    echo "   Could not find GLEW"
-    echo " you should run the following commands first:"
-    echo "   dj setup glfw3"
-    echo -e "   dj setup gtest-glog\n"
+    echo -e "If you see error ${RED}: Could not find GLEW${NOC}"
+    echo "you should run the following commands:"
+    echo "   $ dj setup glfw3"
+    echo "   $ dj setup gtest-glog"
 
     cd $cur_dir
 }
@@ -286,9 +290,9 @@ function _dj_setup_pip() {
     sudo pip install --upgrade pip
     sudo pip3 install --upgrade pip
 
-    echo -e "\n check the pip/pip3 version by\n"
-    echo "   pip --version"
-    echo -e "   pip3 --version\n"
+    echo -e "check the pip/pip3 version by:"
+    echo "   $ pip --version"
+    echo "   $ pip3 --version"
 
     cd ${cur_dir}
 }
@@ -351,7 +355,7 @@ function _dj_setup_qemu() {
         # is this only for ARM? will fix it later if needed
         ../configure --target-list=arm-softmmu --audio-drv-list=
         make -j8 && sudo make install
-        echo -e "\n $CYN the installed qemu is probably for ARM only, check it later$NOC\n"
+        echo -e "$CYN the installed qemu is probably for ARM only, check it later$NOC"
     fi
 
     cd ${cur_dir}
@@ -382,8 +386,8 @@ function _create_stm32cubemx_desktop_item() {
 
     sudo chmod +x $folder/$file
 
-    echo -e "${YLW}if cubeMX is not installed to ~/soft/STM32CubeMX/, you need to revise${NOC}"
-    echo -e "${YLW} /usr/share/applications/$file accordingly.${NOC}"
+    echo -e "${YLW}if cubeMX is not installed to ~/soft/STM32CubeMX/, you need to revise file:${NOC}"
+    echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
 }
 
 # =============================================================================
@@ -409,15 +413,15 @@ function _dj_setup_stm32_cubemx() {
 # the version in the scripts
 # some test result must be list here
 # stlink-v2 software from https://github.com/stlink-org/stlink
-# Ubuntu 18.04: v1.6.1 works (test with projects to download binaries)
-# Ubuntu 20.04: v1.6.1 works
+# Ubuntu 18.04: v1.6.1 works (need to run st-flash twice to download the firmware)
+# Ubuntu 20.04: v1.7.0 works (fixed the bug in v1.6.1)
 #
 # stlink tests on Ubuntu 18.04
 # v1.6.0 failed
 function _dj_setup_stm32_tools() {
     cur_dir=$PWD
 
-    echo -e "\n install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
+    echo -e "install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
     _press_enter_or_wait_s_continue 10
 
     # install dependencies and some software ----------------
@@ -425,7 +429,7 @@ function _dj_setup_stm32_tools() {
     _install_if_not_installed $packages
 
     # install stlink ----------------
-    echo -e "\n install ${GRN}stlink${NOC}\n"
+    echo -e "install ${GRN}stlink${NOC}"
     _press_enter_or_wait_s_continue 10
 
     mkdir -p ~/soft && cd ~/soft
@@ -434,9 +438,9 @@ function _dj_setup_stm32_tools() {
 
     cd stlink
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
-        git checkout v1.6.1
+        git checkout v1.6.1 # need test v1.7.0 before switch to it
     elif [[ ${ubuntu_v} = *'20.04'* ]]; then
-        git checkout v1.6.1
+        git checkout v1.7.0
     else
         echo "${RED} NOT IMPLEMENTED YET${NOC}"
     fi
@@ -448,7 +452,7 @@ function _dj_setup_stm32_tools() {
     sudo ldconfig
 
     # install stm32flash ----------------
-    echo -e "\n install  stm32flash\n"
+    echo -e "install  stm32flash ..."
     _press_enter_or_wait_s_continue 10
     cd ~/soft/
     rm stm32-tools -rf
@@ -460,7 +464,7 @@ function _dj_setup_stm32_tools() {
     sudo make install
 
     # udev rule ----------------
-    echo -e "\n add serial port privilege to current user\n"
+    echo -e "add serial port privilege to current user ..."
     _press_enter_or_wait_s_continue 10
     sudo usermod -a -G dialout $(whoami)
     rule_file=stm32-tools.rules
@@ -469,8 +473,6 @@ function _dj_setup_stm32_tools() {
     echo 'KERNEL=="ttyACM[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
     sudo service udev restart
 
-    echo -e "\n"
-
     cd ${cur_dir}
 }
 
@@ -478,7 +480,7 @@ function _dj_setup_stm32_tools() {
 function _dj_setup_glfw3() {
     cur_dir=$PWD
 
-    echo -e "\n install glfw3 ...\n"
+    echo -e "install glfw3 ..."
 
     cd ~ && mkdir -p soft && cd soft/
 
@@ -504,11 +506,11 @@ function _dj_setup_google_repo() {
     _install_if_not_installed python
 
     if [ -f $djtools_path/tools/repo ]; then
-        echo -e "\n use repo from tools/ \n"
+        echo -e "use repo from tools/"
         sudo cp $djtools_path/tools/repo /bin/
         sudo chmod a+x /bin/repo
     else
-        echo -e "\n fetch from google \n"
+        echo -e "fetch from google "
         curl https://storage.googleapis.com/git-repo-downloads/repo >repo
         chmod a+x repo
         sudo mv repo /bin/
@@ -516,9 +518,9 @@ function _dj_setup_google_repo() {
 
     cat <<eom
 
- -----------------------------------------------------------------
+-----------------------------------------------------------------
   Google tool "repo" is installed into directory: /bin/
- -----------------------------------------------------------------
+-----------------------------------------------------------------
 
 eom
     cd ${cur_dir}
@@ -528,7 +530,7 @@ eom
 function _dj_setup_gtest() {
     cur_dir=$PWD
 
-    echo -e "\n install gtest ...\n"
+    echo -e "install gtest ..."
 
     # install gtest from source, v1.10
     cd ~ && mkdir -p soft && cd soft/
@@ -542,7 +544,7 @@ function _dj_setup_gtest() {
 
     cat <<eom
 
- -----------------------------------------------------------------
+-----------------------------------------------------------------
     gtest.a and gtest_main.a are installed to:
         /usr/local/lib/
     
@@ -552,7 +554,7 @@ function _dj_setup_gtest() {
     pkg-config file:
         /usr/local/lib/pkgconfig/gtest.pc
         /usr/local/lib/pkgconfig/gtest_main.pc
- -----------------------------------------------------------------
+-----------------------------------------------------------------
 
 eom
 
@@ -563,7 +565,7 @@ eom
 function _dj_setup_glog() {
     cur_dir=$PWD
 
-    echo -e "\n install glog ...\n"
+    echo -e "install glog ..."
 
     # install gtest from source
     cd ~ && mkdir -p soft && cd soft/
@@ -577,7 +579,7 @@ function _dj_setup_glog() {
 
     cat <<eom
 
- -----------------------------------------------------------------
+-----------------------------------------------------------------
     glog static library is installed to:
         /usr/local/lib/libglog.a
     
@@ -586,7 +588,7 @@ function _dj_setup_glog() {
 
     pkg-config file:
         none
- -----------------------------------------------------------------
+-----------------------------------------------------------------
 eom
 
     cd ${cur_dir}
@@ -595,14 +597,14 @@ eom
 # =============================================================================
 # instlal gnome, need more test
 function _dj_setup_gnome() {
-    echo -e "\n install gnome on Ubuntu\n"
+    echo -e "install gnome on Ubuntu"
     _press_enter_or_wait_s_continue 20
 
     _install_if_not_installed tasksel
     _install_if_not_installed gnome-session
     _install_if_not_installed ubuntu-desktop
 
-    echo -e "\n when log in, choose GNOME\n"
+    echo -e "when log in, choose GNOME"
 }
 
 # =============================================================================
@@ -629,26 +631,27 @@ function _dj_setup_grpc_1_29_1() {
 # make this function to install g++-9 on Ubuntu 18.04 as well!
 function _dj_setup_gpp_10() {
     # install g++10/gcc-10
-    echo -e "\n install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC} \n"
+    echo -e "install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC} "
     _press_enter_or_wait_s_continue 10
 
-    _install_if_not_installed gcc-10
-    _install_if_not_installed g++-10
-    if [[ ! -f /etc/apt/sources.list.d/ubuntu-toolchain-r*.list ]]; then
+    if ! compgen -G "/etc/apt/sources.list.d/ubuntu-toolchain-r*.list" >/dev/null; then
         sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get -y update
     fi
 
+    _install_if_not_installed gcc-10
+    _install_if_not_installed g++-10
+
     # install g++10/gcc-10
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
-        echo -e "\n install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} \n"
+        echo -e "install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} "
         _press_enter_or_wait_s_continue 10
         _install_if_not_installed gcc-9
         _install_if_not_installed g++-9
     fi
 
     # ----------------------
-    echo -e "run update-alternatives:\n"
+    echo -e "run update-alternatives:"
     for i in 4 5 6 7 8 9 10; do
         if [ -f /usr/bin/gcc-$i ]; then
             sudo update-alternatives --install \
@@ -659,9 +662,9 @@ function _dj_setup_gpp_10() {
                 /usr/bin/g++ g++ /usr/bin/g++-$i $i
         fi
     done
-    echo -e "\n-------------------\n"
+    echo -e "\n-------------------"
     sudo update-alternatives --config gcc
-    echo -e "\n-------------------\n"
+    echo -e "\n-------------------"
     sudo update-alternatives --config g++
 }
 
@@ -675,7 +678,7 @@ function _dj_setup_wubi() {
     _install_if_not_installed ibus-table-wubi
     if [[ ${ubuntu_v} = *'16.04'* ]]; then
         cat <<eom
- -----------------------------------------------------------------
+-----------------------------------------------------------------
 
         Follow the steps:
             1. log out and log in again;
@@ -685,13 +688,13 @@ function _dj_setup_wubi() {
                this step will show nothing
             4. add an input source:
                Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chinese (WuBi-Jidian-86-JiShuang-6.0)
- -----------------------------------------------------------------
+-----------------------------------------------------------------
 
 eom
     elif [[ ${ubuntu_v} = *'18.04'* || \
         ${ubuntu_v} = *'20.04'* ]]; then
-        echo -e "\n please follow the link below to finish the setup:"
-        echo -e " https://www.pinyinjoe.com/linux/ubuntu-18-gnome-chinese-setup.htm\n"
+        echo -e "please follow the link below to finish the setup:"
+        echo -e " https://www.pinyinjoe.com/linux/ubuntu-18-gnome-chinese-setup.htm"
     fi
     cd ${cur_dir}
 }
@@ -717,10 +720,10 @@ function _dj_setup_vtk_8_2_0() {
         -DVTK_QT_VERSION=5 -DVTK_Group_Qt=ON ..
     make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
 
-    echo -e "\n"
+    echo -e ""
     echo " the installed library seems to be in /usr/local/lib folder"
     echo " the installed header files seem to be in /usr/local/include/vtk-8.2/ folder"
-    echo -e "\n"
+    echo -e ""
 
     cd ${cur_dir}
 }
@@ -738,13 +741,13 @@ function _dj_search_package() {
     cur_dir=$PWD
 
     lib_to_find=$1
-    echo -e "\n run command:$GRN ldconfig -p | grep $lib_to_find$NOC, we get:"
+    echo -e "run command:$GRN ldconfig -p | grep $lib_to_find$NOC, we get:"
 
     ldconfig -p | grep $lib_to_find
 
-    echo -e "\n cd /usr/lib/x86_64-linux-gnu/pkgconfig"
+    echo -e "cd /usr/lib/x86_64-linux-gnu/pkgconfig"
     cd /usr/lib/x86_64-linux-gnu/pkgconfig
-    echo -e " ls | grep $lib_to_find\n"
+    echo -e " ls | grep $lib_to_find"
     ls | grep $lib_to_find
     cd $cur_dir
 }
@@ -752,7 +755,7 @@ function _dj_search_package() {
 # =============================================================================
 # to search some string in a project directory, excluding build/ and bin/
 function _dj_search_string() {
-    echo -e "\n run command:"
+    echo -e "run command:"
     echo -e "   $GRN grep -rI $1 .$NOC"
     echo -e " we get:"
     # how to use the variable in the below?? -- $excluded_dir does not work
@@ -766,8 +769,8 @@ function _dj_search_string() {
 function _dj_find_in_meson() { # term
     term=$1
     if [ -z "$term" ]; then
-        echo -e "\n usage:"
-        echo -e "   dj meson find <something>\n"
+        echo -e "usage:"
+        echo -e "   dj meson find <something>"
         return
     fi
     all_meson_build=$(find . -name meson.build)
@@ -799,7 +802,7 @@ function _dj_open_file() {
 function _dj_ssh_general_no_password() {
     if [ $# = 0 ]; then
         echo -e "usage:"
-        echo -e " dj ssh-general no-password username@ip_address\n"
+        echo -e " dj ssh-general no-password username@ip_address"
         return
     fi
     user_and_ip="$1"
@@ -810,7 +813,7 @@ function _dj_ssh_general_no_password() {
     # if ~/.ssh/id_rsa-general.pub does not exist, create one
     key_file=id_rsa-general
     if [ ! -f "$key_file" ]; then
-        printf "${HOME}/.ssh/${key_file}\n\n\n" | ssh-keygen
+        printf "${HOME}/.ssh/${key_file}\n\n" | ssh-keygen
     fi
 
     # just to create .ssh on target machine
@@ -832,7 +835,7 @@ function _dj_ssh_github_activate() {
     key_file=${HOME}/.ssh/id_rsa-github-$github_username
     if [ ! -f ${key_file} ]; then
         # ask if proceed (yes/no) --------------
-        echo -e "\n account $1 does not exist, do you want to create it? (yes/no)"
+        echo -e "account $1 does not exist, do you want to create it? (yes/no)"
         read asw
         if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (\
             $asw = 'No') || ($asw = 'no') ]]; then
@@ -842,7 +845,7 @@ function _dj_ssh_github_activate() {
             $asw = 'Yes') || ($asw = 'yes') ]]; then
             # proceed -------------
             echo -e "SSH key file ${GRN}${key_file}${NOC} not found, generate one automatically:"
-            printf "${key_file}\n\n\n" | ssh-keygen
+            printf "${key_file}\n\n" | ssh-keygen
             echo -e "\ncopy the following content into a new GitHub SSH Key (https://github.com/settings/keys, need login):"
             echo -e "${GRN}"
             cat ${key_file}.pub
@@ -880,7 +883,7 @@ function _dj_ssh_github_current_account() {
 
 # =============================================================================
 function _dj_setup_vim_env() {
-    echo -e "\n setup the vim as an IDE\n"
+    echo -e "setup the vim as an IDE"
     _press_enter_or_wait_s_continue 20
 
     cur_dir=$PWD
@@ -906,12 +909,12 @@ function _dj_setup_vim_env() {
     echo 'set rtp+=~/.vim/bundle/Vundle.vim' >>${VIMRC}
     echo -e 'call vundle#begin()\n' >>${VIMRC}
     echo '" let Vundle manage Vundle, required' >>${VIMRC}
-    printf "Plugin 'VundleVim/Vundle.vim'\n" >>${VIMRC}
-    printf "Plugin 'majutsushi/tagbar'\n" >>${VIMRC}
-    printf "Plugin 'scrooloose/nerdtree'\n" >>${VIMRC}
-    printf "Plugin 'w0rp/ale'\n" >>${VIMRC}
-    printf "Plugin 'Valloric/YouCompleteMe'\n" >>${VIMRC}
-    printf "Plugin 'ludovicchabant/vim-gutentags'\n\n" >>${VIMRC}
+    printf "Plugin 'VundleVim/Vundle.vim'" >>${VIMRC}
+    printf "Plugin 'majutsushi/tagbar'" >>${VIMRC}
+    printf "Plugin 'scrooloose/nerdtree'" >>${VIMRC}
+    printf "Plugin 'w0rp/ale'" >>${VIMRC}
+    printf "Plugin 'Valloric/YouCompleteMe'" >>${VIMRC}
+    printf "Plugin 'ludovicchabant/vim-gutentags'\n" >>${VIMRC}
     echo '" All of your Plugins must be added before the following line' >>${VIMRC}
     echo 'call vundle#end()         " required' >>${VIMRC}
     echo -e 'filetype plugin indent on " required\n\n' >>${VIMRC}
@@ -959,29 +962,29 @@ function _dj_setup_vim_env() {
     echo -e '\n' >>${VIMRC}
     echo '" ===========================================================' >>${VIMRC}
     echo '" ALE (Asynchronization Line Engine) setup' >>${VIMRC}
-    printf "let g:ale_sign_column_always = 1\n" >>${VIMRC}
-    printf "let g:ale_sign_error = '>>'\n" >>${VIMRC}
-    printf "let g:ale_sign_warning = '--'\n" >>${VIMRC}
-    printf "let g:ale_statusline_format = ['x %%d', 'z %%d', 'y OK']\n" >>${VIMRC}
-    printf "let g:ale_echo_msg_format = '[%%linter%%] %%code: %%%%s'\n" >>${VIMRC}
-    printf "let g:ale_lint_on_text_changed = 'normal'\n" >>${VIMRC}
-    printf "let g:ale_lint_on_insert_leave = 1\n" >>${VIMRC}
-    printf "let g:ale_c_gcc_options = '-Wall -O2 -std=c99'\n" >>${VIMRC}
-    printf "let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++20'\n" >>${VIMRC}
-    printf "let g:ale_c_cppcheck_options = ' '\n" >>${VIMRC}
-    printf "let g:ale_cpp_cppcheck_options = ' '\n" >>${VIMRC}
+    printf "let g:ale_sign_column_always = 1" >>${VIMRC}
+    printf "let g:ale_sign_error = '>>'" >>${VIMRC}
+    printf "let g:ale_sign_warning = '--'" >>${VIMRC}
+    printf "let g:ale_statusline_format = ['x %%d', 'z %%d', 'y OK']" >>${VIMRC}
+    printf "let g:ale_echo_msg_format = '[%%linter%%] %%code: %%%%s'" >>${VIMRC}
+    printf "let g:ale_lint_on_text_changed = 'normal'" >>${VIMRC}
+    printf "let g:ale_lint_on_insert_leave = 1" >>${VIMRC}
+    printf "let g:ale_c_gcc_options = '-Wall -O2 -std=c99'" >>${VIMRC}
+    printf "let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++20'" >>${VIMRC}
+    printf "let g:ale_c_cppcheck_options = ' '" >>${VIMRC}
+    printf "let g:ale_cpp_cppcheck_options = ' '" >>${VIMRC}
     echo -e '\n' >>${VIMRC}
     echo '" ===========================================================' >>${VIMRC}
     echo '" YouCompleteMe setup' >>${VIMRC}
-    printf "let g:ycm_server_python_interpreter='/usr/bin/python3'\n" >>${VIMRC}
+    printf "let g:ycm_server_python_interpreter='/usr/bin/python3'" >>${VIMRC}
     printf "let g:ycm_global_ycm_extra_conf='~/.vim/.ycm_extra_conf.py'" >>${VIMRC}
     echo -e '\n\n' >>${VIMRC}
     echo '" ===========================================================' >>${VIMRC}
     echo '" vim-gutentags setup' >>${VIMRC}
-    printf "let g:gutentags_project_root= ['.root', '.svn', '.git', '.hg',  '.project']\n" >>${VIMRC}
-    printf "let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']\n" >>${VIMRC}
-    printf "let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']\n" >>${VIMRC}
-    printf "let g:gutentags_ctags_extra_args += ['--c-kinds=+px']\n" >>${VIMRC}
+    printf "let g:gutentags_project_root= ['.root', '.svn', '.git', '.hg',  '.project']" >>${VIMRC}
+    printf "let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']" >>${VIMRC}
+    printf "let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']" >>${VIMRC}
+    printf "let g:gutentags_ctags_extra_args += ['--c-kinds=+px']" >>${VIMRC}
     echo -e '\n' >>${VIMRC}
     echo '" ===========================================================' >>${VIMRC}
     echo '" some other setup' >>${VIMRC}
@@ -992,9 +995,9 @@ function _dj_setup_vim_env() {
     echo -e ':set autowrite "auto save\n\n' >>${VIMRC}
 
     echo -e "\n\n to make effects of the plugins, start vim, and enter:"
-    echo -e " :PluginInstall\n"
+    echo -e " :PluginInstall"
     echo -e "YouCompleteMe needs to be compiled after the plugins are installed:"
-    echo -e "  dj setup you-complete-me\n"
+    echo -e "  dj setup you-complete-me"
 
     cd ${cur_dir}
 }
@@ -1010,7 +1013,7 @@ function _dj_setup_you_complete_me() {
         cp third_party/ycmd/examples/.ycm_extra_conf.py ~/.vim/
     else
         echo "You need to install the YouCompleteMe plugin for Vim by"
-        echo -e "dj setup vim-env\n"
+        echo -e "dj setup vim-env"
     fi
 
     cd ${cur_dir}
@@ -1104,10 +1107,17 @@ function dj() {
         return
     fi
     # ------------------------------
+    if [ $1 = 'pack' ]; then
+        shift 1
+        _dj_pack $@
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'replace' ]; then
         # ------------------------------
         if [[ $# -ge 2 ]]; then
-            _dj_replace $2 $3 $4 $5 $6 $7 $8
+            shift 1
+            _dj_replace $@
             return
         fi
         echo "dj replace: wrong argument, exit."
@@ -1117,7 +1127,8 @@ function dj() {
     if [ $1 = 'setup' ]; then
         # ------------------------------
         if [ $# -ge 2 ]; then
-            _dj_setup $2 $3 $4 $5 $6 $7
+            shift 1
+            _dj_setup $@
             return
         fi
         echo "dj setup: wrong argument, exit."
@@ -1127,7 +1138,8 @@ function dj() {
     if [ $1 = 'ssh-general' ]; then
         # ------------------------------
         if [ $2 = 'no-password' ]; then
-            _dj_ssh_general_no_password $3 $4 $5 $6 $7
+            shift 2
+            _dj_ssh_general_no_password $@
             return
         fi
         return
@@ -1136,7 +1148,8 @@ function dj() {
     if [ $1 = 'ssh-github' ]; then
         # ------------------------------
         if [ $2 = 'activate' ]; then
-            _dj_ssh_github_activate $3 $4 $5 $6 $7
+            shift 2
+            _dj_ssh_github_activate $@
             return
         fi
         # ------------------------------
@@ -1157,7 +1170,8 @@ function dj() {
     if [ $1 = 'udev' ]; then
         # ------------------------------
         if [ $# -ge 2 ]; then
-            _dj_udev $2 $3 $4 $5 $6 $7
+            shift 1
+            _dj_udev $@
             return
         fi
         _dj_udev_help
@@ -1166,15 +1180,23 @@ function dj() {
     # ------------------------------
     if [ $1 = 'udevadm' ]; then
         if [ $# -ge 2 ]; then
-            _dj_udevadm $2 $3 $4 $5 $6 $7
+            shift 1
+            _dj_udevadm $@
             return
         fi
         _dj_udevadm_help $2 $3
         return
     fi
     # ------------------------------
+    if [ $1 = 'unpack' ]; then
+        shift 1
+        _dj_unpack $@
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'work-check' ]; then
-        _dj_work_check $2 $3 $4 $5
+        shift 1
+        _dj_work_check $@
         return
     fi
     _dj_help
@@ -1193,6 +1215,7 @@ function _dj() {
         find
         help
         open
+        pack
         replace
         search
         setup
@@ -1200,6 +1223,7 @@ function _dj() {
         ssh-github
         udev
         udevadm
+        unpack
         work-check
     ")
 
@@ -1209,7 +1233,7 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     setup_list="adobe-pdf-reader anaconda arduino-1.8.13 baidu-netdisk boost clang-format clang-llvm "
-    setup_list+="cli11 cmake-3.19.5 computer container dj-gadgets devtools driver dropbox eigen3 "
+    setup_list+="cli11 cmake-3.20.5 computer container dj-gadgets devtools driver dropbox eigen3 "
     setup_list+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo glog gnome grpc-1.29.1 "
     setup_list+="gtest g++-10 i219-v kdiff3-meld lcm libcsv-3.0.2 libev-4.33 libgpiod libiio lib-serialport "
@@ -1223,7 +1247,7 @@ function _dj() {
         ACTIONS[$i]=" "
     done
     # special ones -----------------
-    ACTIONS[container]="docker dive lxd-4.0 "
+    ACTIONS[container]="dive docker docker-compose lxd-4.0 "
     ACTIONS[docker]=" "
     ACTIONS[dive]="  "
     ACTIONS["lxd-4.0"]=" "
@@ -1368,9 +1392,34 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    help_list="auto-mount ffmpeg jupyter "
+    help_list="apt_pkg auto-mount ffmpeg jupyter "
     ACTIONS[help]="$help_list "
     for i in $help_list; do
+        ACTIONS[$i]=" "
+    done
+
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    pack_list=" "
+    ACTIONS[pack]="$pack_list "
+    for i in $pack_list; do
+        ACTIONS[$i]=" "
+    done
+
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    unpack_list="tar.xz tar.gz "
+    ACTIONS[unpack]="$unpack_list "
+    # --------------------------------------------------------
+    tar_xz_list="$(ls . | grep tar.xz)"
+    ACTIONS[tar.xz]+="$tar_xz_list "
+    for i in $tar_xz_list; do
+        ACTIONS[$i]=" "
+    done
+    # --------------------------------------------------------
+    tar_gz_list="$(ls . | grep tar.gz)"
+    ACTIONS[tar.gz]+="$tar_gz_list "
+    for i in $tar_gz_list; do
         ACTIONS[$i]=" "
     done
 

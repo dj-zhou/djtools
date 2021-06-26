@@ -1,6 +1,29 @@
 #!/bin/bash
 
 # =============================================================================
+function _dj_help_apt_pkg_error() {
+   cat <<eom
+if see the error:
+
+---------------
+Traceback (most recent call last):
+  File "/usr/lib/command-not-found", line 28, in <module>
+    from CommandNotFound import CommandNotFound
+  File "/usr/lib/python3/dist-packages/CommandNotFound/CommandNotFound.py", line 19, in <module>
+    from CommandNotFound.db.db import SqliteDatabase
+  File "/usr/lib/python3/dist-packages/CommandNotFound/db/db.py", line 5, in <module>
+    import apt_pkg
+ModuleNotFoundError: No module named 'apt_pkg'
+---------------
+
+do this:
+$ cd /usr/lib/python3/dist-packages
+$ sudo cp apt_pkg.cpython-36m-x86_64-linux-gnu.so apt_pkg.so
+eom
+
+}
+
+# =============================================================================
 function _dj_help_auto_mount() {
     cat <<eom
 
@@ -59,6 +82,10 @@ eom
 
 # =============================================================================
 function _dj_help_skill() {
+    if [ $1 = 'apt_pkg' ]; then
+        _dj_help_apt_pkg_error
+        return
+    fi
     if [ $1 = 'auto-mount' ]; then
         _dj_help_auto_mount
         return

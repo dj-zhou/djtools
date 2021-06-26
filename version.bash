@@ -17,7 +17,7 @@ function _version_help() {
 }
 
 # =============================================================================
-_version_if_ge_than() { # current verion #  required version
+_version_if_ge_than() { # current version #  required version
     current_ver=$1
     current_ver=$(echo $1 | grep -o '[^-]*$')
     crr_ver_mjr=$(echo $current_ver | cut -d. -f1)
