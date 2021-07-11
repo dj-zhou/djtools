@@ -135,6 +135,14 @@ function _dj_setup_anaconda() {
 }
 
 # =============================================================================
+function _dj_setup_ansible() {
+    sudo apt update
+    sudo apt install software-properties-common
+    sudo add-apt-repository --yes --update ppa:ansible/ansible
+    sudo apt install ansible
+}
+
+# =============================================================================
 function _dj_setup_arduino_1_8_13() {
     cur_dir=${PWD}
 
@@ -198,7 +206,7 @@ eom
 
     _press_enter_or_wait_s_continue 10
     packages="ark cmake curl cutecom dconf-editor dconf-tools git "
-    packages+="git-lfs g++ htop libgtk2.0-dev lsb-core putty "
+    packages+="git-lfs g++ htop libgtk2.0-dev libncurses5-dev lsb-core putty "
     packages+="screen scrot terminator tree vlc vim wmctrl xclip yasm "
     _install_if_not_installed $packages
 
@@ -303,6 +311,8 @@ function _dj_setup_dropbox() {
 }
 
 # =============================================================================
+# why sometimes it is installed to /usr/include/eigen3, and sometimes it is
+# installed to /usr/local/include/eigen3 ??
 function _dj_setup_eigen3() {
     cur_dir=${PWD}
     _install_if_not_installed mlocate # updatedb is in this package
@@ -313,7 +323,78 @@ function _dj_setup_eigen3() {
     echo -e "eigen3 is installed in: /usr/include/eigen3\n"
     echo " if see error \"fatal error: Eigen/Core: No such file or directory\""
     echo -e " add \"-I/usr/include/eigen3\" to your Makefile\n"
+    sudo cp /usr/include/eigen3/ -r /usr/local/include/
 
+    cd $cur_dir
+}
+
+function _dj_setup_flamegraph() {
+    cur_dir=${PWD}
+
+    cd ~ && mkdir -p soft/ && cd soft/
+
+    _dj_setup_perf
+
+    rm -rf FlameGraph
+    git clone https://github.com/brendangregg/FlameGraph.git
+    sudo cp -r FlameGraph /usr/local/bin/ # OK, I know, this is not good
+
+    # create symbolic link
+    sudo rm -f /usr/bin/stackcollapse-perf.pl
+    sudo rm -f /usr/bin/flamegraph.pl
+    sudo ln -s /usr/local/bin/FlameGraph/stackcollapse-perf.pl /usr/bin/stackcollapse-perf.pl
+    sudo ln -s /usr/local/bin/FlameGraph/flamegraph.pl /usr/bin/flamegraph.pl
+
+    cat <<eom
+
+--------------------------------------------
+FlameGraph is installed, use it by:
+  $ dj flame-graph [perf.data]
+# a "perf.svg" file will be generated
+--------------------------------------------
+eom
+    cd $cur_dir
+}
+# =============================================================================
+# 7.1.3 is used in Yocto, however, it seems some code uses only 7.0.1 version natively.
+function _dj_setup_fmt() {
+    cur_dir=${PWD}
+
+    fmt_v="7.0.1"
+
+    # remove first ------------------
+    sudo rm -rf /usr/local/lib/libfmt.a
+    sudo rm -rf /usr/local/include/fmt/
+    sudo rm -rf /usr/local/lib/pkgconfig/fmt.pc
+    sudo rm -rf /usr/local/lib/cmake/fmt/
+
+    # --------------------
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm -rf fmt
+    git clone https://github.com/fmtlib/fmt.git
+    cd fmt
+    git checkout ${fmt_v}
+    rm -rf build && mkdir build && cd build
+    cmake ..
+    make -j$(nproc)
+    sudo make install
+
+    cat <<eom
+
+--------------------------------------------
+fmt is installed to:
+    /usr/local/lib/libfmt.a
+
+header files:
+    /usr/local/include/fmt/*.h
+
+pkg-config file:
+    /usr/local/lib/pkgconfig/fmt.pc
+
+cmake files:
+    /usr/local/lib/cmake/fmt/
+--------------------------------------------
+eom
     cd $cur_dir
 }
 
@@ -586,25 +667,26 @@ function _dj_setup_lcm() {
     git checkout 501bb446d42c9a57f9e5ddf3c41ba78f4735c9f2 # master on Dec. 1st, 2020
     mkdir build && cd build
     cmake ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
     sudo make install
     sudo ldconfig
 
     cat <<eom
 
-    --------------------------------------------
-    lcm is installed to:
-        /usr/local/lib/liblcm.so.1.4.0
-        /usr/local/lib/liblcm.so.1
-        /usr/local/lib/liblcm.so
-    
-    header file:
-        /usr/local/include/lcm/*.h
+--------------------------------------------
+lcm is installed to:
+    /usr/local/lib/liblcm.so.1.4.0
+    /usr/local/lib/liblcm.so.1
+    /usr/local/lib/liblcm.so
 
-    pkg-config file:
-        /usr/local/lib/pkgconfig/lcm.pc
-        /usr/local/lib/pkgconfig/lcm-java.pc
+header file:
+    /usr/local/include/lcm/*.h
 
+pkg-config file:
+    /usr/local/lib/pkgconfig/lcm.pc
+    /usr/local/lib/pkgconfig/lcm-java.pc
+
+--------------------------------------------
 eom
     cd $cur_dir
 }
@@ -622,20 +704,18 @@ function _dj_setup_libcsv_3_0_2() {
     sudo make install
 
     cat <<eom
-
-    --------------------------------------------
-    libcsv
-        /usr/local/lib/libcsv.a
-        /usr/local/lib/libcsv.la
-        /usr/local/lib/libcsv.so
-        /usr/local/lib/libcsv.so.3
-        /usr/local/lib/libcsv.so.3.0.2
+--------------------------------------------
+libcsv
+    /usr/local/lib/libcsv.a
+    /usr/local/lib/libcsv.la
+    /usr/local/lib/libcsv.so
+    /usr/local/lib/libcsv.so.3
+    /usr/local/lib/libcsv.so.3.0.2
     
-    header file:
-        /usr/local/include/csv.h
-
+header file:
+    /usr/local/include/csv.h
+--------------------------------------------
 eom
-
     cd $cur_dir
 }
 
@@ -698,27 +778,25 @@ function _dj_setup_libgpiod() {
     # install -------------
     cd $file_name
     ./configure
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
     sudo make install
     cd ~/soft
 
     cat <<eom
-
-    --------------------------------------------
-    libgpiod is installed to:
-        /usr/lib/x86_64-linux-gnu/libgpiod.a
-        /usr/lib/x86_64-linux-gnu/libgpiod.so
-        /usr/lib/x86_64-linux-gnu/libgpiod.so.1
-        /usr/lib/x86_64-linux-gnu/libgpiod.so.1.0.0
+--------------------------------------------
+libgpiod is installed to:
+    /usr/lib/x86_64-linux-gnu/libgpiod.a
+    /usr/lib/x86_64-linux-gnu/libgpiod.so
+    /usr/lib/x86_64-linux-gnu/libgpiod.so.1
+    /usr/lib/x86_64-linux-gnu/libgpiod.so.1.0.0
     
-    header file:
-        /usr/include/gpiod.h
+header file:
+    /usr/include/gpiod.h
 
-    pkg-config file:
-        /usr/lib/x86_64-linux-gnu/pkgconfig/libgpiod.pc
-
+pkg-config file:
+    /usr/lib/x86_64-linux-gnu/pkgconfig/libgpiod.pc
+--------------------------------------------
 eom
-
     cd $cur_dir
 }
 
@@ -740,26 +818,25 @@ function _dj_setup_libiio() {
         return
     fi
     mkdir build && cd build && cmake ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
     sudo make install
     cd ~/soft
 
     cat <<eom
-
-    --------------------------------------------
-    libiio is installed to:
-        /usr/lib/x86_64-linux-gnu/libiio.so.0.21
-        /lib/udev/rules.d/90-libiio.rules
-        /usr/bin/iio_info
-        ...
-        /usr/sbin/iiod
+--------------------------------------------
+libiio is installed to:
+    /usr/lib/x86_64-linux-gnu/libiio.so.0.21
+    /lib/udev/rules.d/90-libiio.rules
+    /usr/bin/iio_info
+    ...
+    /usr/sbin/iiod
     
-    header file:
-        /usr/include/iio.h
+header file:
+    /usr/include/iio.h
 
-    pkg-config file:
-        /usr/lib/x86_64-linux-gnu/pkgconfig/libiio.pc
-
+pkg-config file:
+    /usr/lib/x86_64-linux-gnu/pkgconfig/libiio.pc
+--------------------------------------------
 eom
     cd $cur_dir
 }
@@ -780,16 +857,17 @@ function _dj_setup_libserialport() {
 
     cat <<eom
 
-    --------------------------------------------
-    the library is installed:
-        /usr/local/lib/libserialport.la
-        /usr/local/lib/libserialport.so
-    
-    the header is:
-        /usr/local/include/libserialport.h
+--------------------------------------------
+the library is installed:
+    /usr/local/lib/libserialport.la
+    /usr/local/lib/libserialport.so
+   
+the header is:
+    /usr/local/include/libserialport.h
 
-    example code:
-        todo
+example code:
+    todo
+--------------------------------------------
 
 eom
     cd ~/soft/
@@ -833,39 +911,39 @@ function _dj_setup_matplot_xx() {
     else
         cmake .. -DBUILD_SHARED_LIBS=ON
     fi
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
     sudo make install
     sudo ldconfig
     if [ "$static_shared" = 'static' ]; then
         cat <<eom
 
-    --------------------------------------------
-    matplotplusplus is installed to:
-        /usr/local/lib/Matplot++/libnodesoup.a
-        /usr/local/lib/libmatplot.a
+--------------------------------------------
+matplotplusplus is installed to:
+    /usr/local/lib/Matplot++/libnodesoup.a
+    /usr/local/lib/libmatplot.a
 
-    header file:
-        /usr/local/include/matplot/matplot.h
-        etc.
+header file:
+    /usr/local/include/matplot/matplot.h
+    etc.
 
-    pkg-config file:
-        none
-    --------------------------------------------
+pkg-config file:
+    none
+--------------------------------------------
 eom
     else
         cat <<eom
 
-    --------------------------------------------
-    matplotplusplus is installed to:
-        /usr/local/lib/libmatplot.so
+--------------------------------------------
+matplotplusplus is installed to:
+    /usr/local/lib/libmatplot.so
 
-    header file:
-        /usr/local/include/matplot/matplot.h
-        etc.
+header file:
+    /usr/local/include/matplot/matplot.h
+    etc.
 
-    pkg-config file:
-        none
-    --------------------------------------------
+pkg-config file:
+    none
+--------------------------------------------
 
 eom
     fi
@@ -884,10 +962,10 @@ function _dj_setup_magic_enum() {
     git checkout $ver
     sudo cp include/magic_enum.hpp /usr/local/include/
 
-    echo -e "    --------------------------------------------------------"
+    echo -e "--------------------------------------------------------"
     echo -e "    The header of ${GRN}Magic Enum C++${NOC} ($ver) is installed as:"
     echo -e "       /usr/local/include/magic_enum.hpp"
-    echo -e "    --------------------------------------------------------"
+    echo -e "--------------------------------------------------------"
     cat <<eom
   __  __             _        ______                          _____
  |  \/  |           (_)      |  ____|                        / ____|_     _
@@ -910,12 +988,12 @@ function _dj_setup_mbed() {
     # install mbed-cli
     python3 -m pip install mbed-cli
     cat <<eom
-    --------------------------------------------
-    to check if mbed CLI installed correctly:
-    $ mbed --help
-    to upgrade mbed CLI:
-    $ python3 -m pip install -U mbed-cli
-    --------------------------------------------
+--------------------------------------------
+to check if mbed CLI installed correctly:
+  $ mbed --help
+to upgrade mbed CLI:
+  $ python3 -m pip install -U mbed-cli
+--------------------------------------------
 eom
     _press_enter_to_continue 10
     # install bash-completion for mbed
@@ -924,10 +1002,10 @@ eom
     cd mbed-cli/tools/bash_completion
     sudo cp mbed /usr/share/bash-completion/completions/
     cat <<eom
-    --------------------------------------------
-    mbed tab-completion is installed to
-        /usr/share/bash-completion/completions/mbed
-    --------------------------------------------
+--------------------------------------------
+mbed tab-completion is installed to
+    /usr/share/bash-completion/completions/mbed
+--------------------------------------------
 eom
     _press_enter_to_continue 10
 
@@ -954,14 +1032,24 @@ eom
 # =============================================================================
 # testing
 function _dj_setup_meson() {
-    # cmake must be a newer than 3.10 to install meon v0.57.0
+
+    meson_v="0.58.0" # use fixed version, released on July 7th, 2021
+    ninja_v="1.10.2" # use fixed version, released on Nov. 28th, 2020
+
+    # sanity check
     cmake_v=$(version check cmake)
-    anw=$(_version_if_ge_than $cmake_v "3.15")
+    anw=$(_version_if_ge_than $cmake_v "3.20")
     if [ $anw = "no" ]; then
-        echo "cmake needs to be 3.15 or higher version, exit."
+        echo "cmake needs to be 3.20 or higher version, exit."
         return
     fi
-    echo -e "install ${YLW}meson v0.57.0${NOC} and ${YLW}ninja v1.10.2${NOC} \n"
+    python3_v=$(version check python3)
+    anw=$(_version_if_ge_than $python3_v "3.7")
+    if [ $anw = "yes" ]; then
+        echo "I failed to use python3>3.6 to install meson v$meson_v."
+        return
+    fi
+    echo -e "install ${GRN}meson v$meson_v${NOC} and ${GRN}ninja v$ninja_v${NOC} \n"
     _press_enter_or_wait_s_continue 5
     # remove /usr/bin/meson
     sudo apt-get remove meson &>/dev/null
@@ -970,14 +1058,14 @@ function _dj_setup_meson() {
     _install_if_not_installed python3
 
     # use fixed version to install meson, and it is installed to ~/.local/bin
-    python3 -m pip install meson==0.57.0
+    python3 -m pip install meson==$meson_v
 
     # make sure ~/.local/bin is in the PATH variable
     # but not sure if it is in it for new installed Ubuntu ... will check
 
     meson_path=$(grep "PATH:~/.local/bin" ~/.bashrc)
     if [ ! -z "$meson_path" ]; then
-        echo -e "${YLW}meson ${GRN} path was set in ~/.bashrc${NOC}"
+        echo -e "${GRN}meson ${NOC}path was set in ~/.bashrc"
     else
         echo -e '\n' >>~/.bashrc
         echo '# ===========================================================' >>~/.bashrc
@@ -990,10 +1078,10 @@ function _dj_setup_meson() {
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf ninja
     git clone git://github.com/ninja-build/ninja.git && cd ninja
-    git checkout v1.10.2 # use fixed version, released on Nov. 28th, 2020
+    git checkout v$ninja_v
     mkdir build && cd build
     cmake ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
     sudo make install
     cd $cur_dir
 }
@@ -1024,26 +1112,24 @@ function _dj_setup_mongodb() {
         sudo systemctl enable --now mongod
 
         cat <<eom
+--------------------------------------------
+MongoDB istall:
+    mongodb-org-server - mongodb守护程序以及相应的初始化脚本和配置
+    mongodb-org-mongos - mongos守护程序
+    mongodb-org-shell  - mongo shell，它是MongoDB的交互式JavaScript接口。
+                         它用于执行命令行中的管理任务。
+    mongodb-org-tools  - 包含几个用于导入和导出数据，统计信息以及其他实用程序的MongoDB工具
 
-    --------------------------------------------
-    MongoDB istall:
-        mongodb-org-server - mongodb守护程序以及相应的初始化脚本和配置
-        mongodb-org-mongos - mongos守护程序
-        mongodb-org-shell  - mongo shell，它是MongoDB的交互式JavaScript接口。
-                             它用于执行命令行中的管理任务。
-        mongodb-org-tools  - 包含几个用于导入和导出数据，统计信息以及其他实用程序的MongoDB工具
-
-    Enable and start MongoDB Deamon program:
-        $ sudo systemctl enable --now mongod
-        $ sudo systemctl start mongod
+Enable and start MongoDB Deamon program:
+    $ sudo systemctl enable --now mongod
+    $ sudo systemctl start mongod
     
-    Check if MongoDB is running:
-        $ sudo service mongod status
+Check if MongoDB is running:
+    $ sudo service mongod status
         
-    Check if MongoDB is installed:
-        $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
-    --------------------------------------------
-
+Check if MongoDB is installed:
+    $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+--------------------------------------------
 eom
     else
         echo -e "\n${YLW} TO BE IMPLEMENTED${NOC}\n"
@@ -1080,7 +1166,7 @@ function _dj_setup_nlohmann_json3_dev() {
     git checkout v3.9.1 # use a fixed version at this moment
     rm build -rf && mkdir build && cd build
     cmake ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
 
     # don't forget to install
     sudo make install
@@ -1104,13 +1190,13 @@ function _dj_setup_nvidia() {
     fi
     cat <<eom
 
-    --------------------------------------------
-    Now you need to reboot the computer
-    and you can run:
-    $ nvidia-smi
-    or
-    $ cat /proc/driver/nvidia/gpus/{tab}/information
-    --------------------------------------------
+--------------------------------------------
+Now you need to reboot the computer
+and you can run:
+  $ nvidia-smi
+or
+  $ cat /proc/driver/nvidia/gpus/{tab}/information
+--------------------------------------------
 
 eom
 }
@@ -1127,7 +1213,7 @@ function _dj_setup_nvtop() {
         cd nvtop
         mkdir build && cd build
         cmake .. -DNVML_RETRIEVE_HEADER_ONLINE=True
-        make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+        make -j$(nproc)
         sudo make install
     fi
 
@@ -1278,7 +1364,7 @@ function _dj_setup_spdlog() { # static/shared
     else
         cmake .. -DSPDLOG_BUILD_SHARED="on"
     fi
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
     sudo make install
 
     echo -e "---------------------------------------\n"
@@ -1437,6 +1523,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'ansible' ]; then
+        _dj_setup_ansible
+        return
+    fi
+    # --------------------------
     if [ $1 = 'arduino-1.8.13' ]; then
         _dj_setup_arduino_1_8_13
         return
@@ -1527,6 +1618,16 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'flamegraph' ]; then
+        _dj_setup_flamegraph
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'fmt' ]; then
+        _dj_setup_fmt
+        return
+    fi
+    # --------------------------
     if [ $1 = 'foxit-pdf-reader' ]; then
         _dj_setup_foxit_reader
         return
@@ -1567,6 +1668,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'gnuplot' ]; then
+        _dj_setup_gnuplot
+        return
+    fi
+    # --------------------------
     if [ $1 = 'google-repo' ]; then
         _dj_setup_google_repo
         return
@@ -1587,8 +1693,8 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'grpc-1.29.1' ]; then
-        _dj_setup_grpc_1_29_1
+    if [ $1 = 'grpc' ]; then
+        _dj_setup_grpc
         return
     fi
     # --------------------------
@@ -1711,6 +1817,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'perf' ]; then
+        _dj_setup_perf
+        return
+    fi
+    # --------------------------
     if [ $1 = 'pycharm' ]; then
         _dj_setup_pycharm
         return
@@ -1750,7 +1861,12 @@ function _dj_setup() {
         _dj_setup_ros2_foxy $2 $3 $4
         return
     fi
-
+    # --------------------------
+    if [ $1 = 'rust' ]; then
+        shift
+        _dj_setup_rust $@
+        return
+    fi
     # --------------------------
     if [ $1 = 'saleae-logic' ]; then
         _dj_setup_saleae_logic

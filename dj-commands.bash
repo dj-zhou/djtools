@@ -75,7 +75,7 @@ function _dj_setup_cli11() {
     mkdir build
     cd build
     cmake ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
     sudo make install
 
     cat <<eom
@@ -119,7 +119,7 @@ function _dj_setup_cmake_3_20_5() {
     cd cmake-$v
     rm build -rf && mkdir build && cd build
     cmake ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
     sudo make install
 
     cd $cur_dir
@@ -148,6 +148,7 @@ function _dj_setup_dj_gadgets() {
     cur_dir=${PWD}
 
     cd ~ && mkdir -p workspace/ && cd workspace/
+    rm -rf dj-gadgets
     git clone https://dj-zhou@github.com/dj-zhou/dj-gadgets.git
     cd dj-gadgets
     make && sudo make install
@@ -265,7 +266,7 @@ function _dj_setup_pangolin() {
     git checkout 86eb4975fc4fc8b5d92148c2e370045ae9bf9f5d # it is on master
     rm -rf build/ && mkdir build && cd build
     cmake ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
     sudo make install
 
     echo -e "libpangolin.so is in path: ${GRN}/usr/local/lib/${NOC}"
@@ -295,6 +296,14 @@ function _dj_setup_pip() {
     echo "   $ pip3 --version"
 
     cd ${cur_dir}
+}
+
+# =============================================================================
+function _dj_setup_perf() {
+    _install_if_not_installed linux-tools-common linux-tools-generic linux-tools-$(uname -r)
+    _install_if_not_installed linux-tools-common linux-tools-generic
+
+    echo "check perf version: \$ perf --version"
 }
 
 # =============================================================================
@@ -438,7 +447,7 @@ function _dj_setup_stm32_tools() {
 
     cd stlink
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
-        git checkout v1.6.1 # need test v1.7.0 before switch to it
+        git checkout v1.7.0 # need test v1.7.0 before switch to it
     elif [[ ${ubuntu_v} = *'20.04'* ]]; then
         git checkout v1.7.0
     else
@@ -446,7 +455,7 @@ function _dj_setup_stm32_tools() {
     fi
     echo "sudo rm -rf /usr/local/bin/st-*"
     sudo rm -rf /usr/local/bin/st-*
-    make release -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make release -j$(nproc)
     cd build/Release/
     sudo make install
     sudo ldconfig
@@ -459,8 +468,8 @@ function _dj_setup_stm32_tools() {
     git clone https://github.com/dj-zhou/stm32-tools.git
     cd stm32-tools/stm32flash
     make clean
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
-    sudo rm /usr/local/bin/stm32flash
+    make -j$(nproc)
+    sudo rm -rf /usr/local/bin/stm32flash
     sudo make install
 
     # udev rule ----------------
@@ -487,12 +496,28 @@ function _dj_setup_glfw3() {
     # glfw3
     packages="build-essential cmake git xorg-dev libglu1-mesa-dev "
     _install_if_not_installed $packages
-    sudo rm -rf glfw3/
+    rm -rf glfw3/
     git clone https://github.com/dj-zhou/glfw3.git
     cd glfw3/
     mkdir build && cd build/
     cmake .. -DBUILD_SHARED_LIBS=ON
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+    make -j$(nproc)
+    sudo make install && sudo ldconfig
+
+    cd ${cur_dir}
+}
+
+# =============================================================================
+function _dj_setup_gnuplot() {
+    cur_dir=$PWD
+
+    cd ~ && mkdir -p soft && cd soft/
+    rm -rf gnuplot
+    git clone https://github.com/gnuplot/gnuplot.git
+    cd gnuplot
+    ./prepare
+    ./configure
+    make -j$(nproc)
     sudo make install && sudo ldconfig
 
     cd ${cur_dir}
@@ -540,7 +565,7 @@ function _dj_setup_gtest() {
     git checkout release-1.10.0 # a fixed version on Oct. 3rd, 2019
     rm build -rf && mkdir build && cd build
     cmake ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
+    make -j$(nproc) && sudo make install
 
     cat <<eom
 
@@ -575,7 +600,7 @@ function _dj_setup_glog() {
     git checkout v0.4.0 # a fixed version on March 21st, 2019
     rm build -rf && mkdir build && cd build
     cmake ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
+    make -j$(nproc) && sudo make install
 
     cat <<eom
 
@@ -609,12 +634,14 @@ function _dj_setup_gnome() {
 
 # =============================================================================
 # ninja is used to compile
-function _dj_setup_grpc_1_29_1() {
+function _dj_setup_grpc() {
     cur_dir=$PWD
 
+    grpv_v="1.38.0"
     cd ~ && mkdir -p soft && cd soft/
+    rm grpc -rf
     git clone https://github.com/grpc/grpc.git --recurse-submodules \
-        --shallow-submodules --depth 1 --branch v1.29.1
+        --shallow-submodules --depth 1 --branch v${grpv_v}
     cd grpc
     mkdir build && cd build
     cmake .. -GNinja
@@ -631,7 +658,7 @@ function _dj_setup_grpc_1_29_1() {
 # make this function to install g++-9 on Ubuntu 18.04 as well!
 function _dj_setup_gpp_10() {
     # install g++10/gcc-10
-    echo -e "install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC} "
+    echo -e "install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC}"
     _press_enter_or_wait_s_continue 10
 
     if ! compgen -G "/etc/apt/sources.list.d/ubuntu-toolchain-r*.list" >/dev/null; then
@@ -669,6 +696,19 @@ function _dj_setup_gpp_10() {
 }
 
 # =============================================================================
+function _dj_setup_rust() {
+    echo -e "install ${GRN}rust${NOC}"
+    curl https://sh.rustup.rs -sSf | sh
+    echo 'export PATH="$HOME/.cargo/bin:$PATH"' >>~/.bashrc
+    echo -e "You need to run ${GRN}\"source ~/.bashrc\"${NOC} manually."
+    echo -e "update rust by ${GRN}rustup update${NOC}"
+    echo -e "check rust version by ${GRN}rustc --version${NOC}"
+    echo -e "check cargo version by ${GRN}cargo --version${NOC}"
+    echo -e "uninstall rust by ${GRN}rustup self uninstall${NOC}"
+    echo -e "compile a rust program by (example) ${GRN}rustc main.rs${NOC}"
+}
+
+# =============================================================================
 # https://www.linuxbabe.com/desktop-linux/how-to-install-chinese-wubi-input-method-on-debian-8-gnome-desktop
 # tested on Ubuntu 16.04, 18.04 and 20.04
 function _dj_setup_wubi() {
@@ -679,15 +719,14 @@ function _dj_setup_wubi() {
     if [[ ${ubuntu_v} = *'16.04'* ]]; then
         cat <<eom
 -----------------------------------------------------------------
-
-        Follow the steps:
-            1. log out and log in again;
-            2. $ ibus-setup
-               then in the opened window: Input Method -> Add -> Chinese -> choose WuBi-Jidian-86-JiShuang
-            3. im-config -n ibus 
-               this step will show nothing
-            4. add an input source:
-               Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chinese (WuBi-Jidian-86-JiShuang-6.0)
+Follow the steps:
+    1. log out and log in again;
+    2. $ ibus-setup
+        then in the opened window: Input Method -> Add -> Chinese -> choose WuBi-Jidian-86-JiShuang
+    3. im-config -n ibus 
+        this step will show nothing
+    4. add an input source:
+        Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chinese (WuBi-Jidian-86-JiShuang-6.0)
 -----------------------------------------------------------------
 
 eom
@@ -718,7 +757,7 @@ function _dj_setup_vtk_8_2_0() {
         -DCMAKE_INSTALL_PREFIX=/usr/local -DVTK_RENDERING_BACKEND=OpenGL2 \
         -DQT5_DIR=$HOME/Qt5.14.2/5.14.2/gcc_64/lib/cmake/Qt5 \
         -DVTK_QT_VERSION=5 -DVTK_Group_Qt=ON ..
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l) && sudo make install
+    make -j$(nproc) && sudo make install
 
     echo -e ""
     echo " the installed library seems to be in /usr/local/lib folder"
@@ -1020,6 +1059,50 @@ function _dj_setup_you_complete_me() {
 }
 
 # =============================================================================
+function _dj_flame_grapah() {
+    if [ "$1" = 'clear' ]; then
+        sudo rm -f perf.data.old
+        sudo rm -f perf.folded
+        sudo rm -f perf.unfold
+        sudo rm -f perf.svg
+        return 0
+    fi
+    if [ "$1" = 'help' ]; then
+        echo "\$ perf record --call-graph dwarf <executable>"
+        echo "\$ perf record -e cpu-clock -g <executable>"
+        echo "manual: https://man7.org/linux/man-pages/man1/perf-record.1.html"
+        return 0
+    fi
+
+    # add options here
+    while getopts "f:" flag; do
+        case "${flag}" in
+        f) perf_data_file= "${OPTARG}" ;;
+        esac
+    done
+
+    # default files
+    if [ -z "${perf_data_file}" ]; then
+        perf_data_file="perf.data"
+    fi
+    if [ ! -f "${perf_data_file}" ]; then
+        echo "${perf_data_file} not found, exit."
+        return 1
+    fi
+    # need sudo??
+    sudo perf script -i ${perf_data_file} &>perf.unfold
+    stackcollapse-perf.pl perf.unfold &>perf.folded
+    flamegraph.pl perf.folded >perf.svg
+
+    if [ -f "perf.svg" ]; then
+        echo "perf.svg is generated, use browser to open it."
+    else
+        echo "perf.svg is not generated."
+    fi
+    return 0
+}
+
+# =============================================================================
 function dj() {
     # ------------------------------
     if [ $# -eq 0 ]; then
@@ -1048,6 +1131,12 @@ function dj() {
             return
         fi
         _dj_clone_help
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'flame-graph' ]; then
+        shift
+        _dj_flame_grapah $@
         return
     fi
     # ------------------------------
@@ -1211,6 +1300,7 @@ function _dj() {
     local SERVICES=("
         clone
         clone-ssh
+        flame-graph
         format
         find
         help
@@ -1232,14 +1322,14 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    setup_list="adobe-pdf-reader anaconda arduino-1.8.13 baidu-netdisk boost clang-format clang-llvm "
+    setup_list="adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost clang-format clang-llvm "
     setup_list+="cli11 cmake-3.20.5 computer container dj-gadgets devtools driver dropbox eigen3 "
-    setup_list+="foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
-    setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 google-repo glog gnome grpc-1.29.1 "
+    setup_list+="flamegraph fmt foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
+    setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
     setup_list+="gtest g++-10 i219-v kdiff3-meld lcm libcsv-3.0.2 libev-4.33 libgpiod libiio lib-serialport "
     setup_list+="libyaml-cpp mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev nvidia nvtop "
-    setup_list+="opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin pip pycharm python3.9 "
-    setup_list+="qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy saleae-logic spdlog slack "
+    setup_list+="opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf pip pycharm python3.9 "
+    setup_list+="qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rust saleae-logic spdlog slack "
     setup_list+="stm32-cubeMX stm32-tools sublime texlive typora vim-env vscode vtk-8.2.0 windows-fonts wubi "
     setup_list+="you-complete-me "
     ACTIONS[setup]="$setup_list "
@@ -1290,6 +1380,12 @@ function _dj() {
     ACTIONS[clone]="bitbucket github gitee "
     ACTIONS["clone-ssh"]="bitbucket github gitee "
 
+    # --------------------------------------------------------
+    flame_list="generate clear help "
+    ACTIONS["flame-graph"]="$flame_list "
+    for i in $flame_list; do
+        ACTIONS[$i]=" "
+    done
     # --------------------------------------------------------
     format_list="brush enable disable show "
     ACTIONS[format]="$format_list "

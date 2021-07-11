@@ -161,18 +161,17 @@ function yocto() {
     fi
     # ------------------------------
     if [ $1 = 'bake' ]; then
-        _yocto_bake_image $2 $3 $4 $5
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'build' ]; then
+        if [ $2 = 'image' ]; then
+            _yocto_bake_image $3 $4 $5
+            return
+        fi
         if [ $2 = 'plain-sdk' ]; then
             _yocto_build_plain_sdk $3 $4 $5 $6 $7
             return
         fi
-        _yocto_help
         return
     fi
+
     # ------------------------------
     if [ $1 = 'flash' ]; then
         _yocto_flash $2 $3 $4 $5 $6 $7 $8 $9 ${10}
@@ -246,7 +245,6 @@ function _yocto() {
     # All possible first values in command line
     local SERVICES=("
         bake
-        build
         flash
         list
         setup
@@ -257,22 +255,18 @@ function _yocto() {
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
-    bake_list="$(_yocto_find_meta_layers) "
+    bake_list="image plain-sdk "
     ACTIONS[bake]="$bake_list "
-    for i in $bake_list; do
-        image_list="$(_yocto_find_images_of_layer $i) "
-        ACTIONS[$i]="$image_list "
-        for j in $image_list; do
+    meta_layer_list="$(_yocto_find_meta_layers) "
+    ACTIONS[image]="$meta_layer_list "
+    for i in $meta_layer_list; do
+        image_recipe_list="$(_yocto_find_images_of_layer $i) "
+        ACTIONS[$i]="$image_recipe_list "
+        for j in $image_recipe_list; do
             ACTIONS[j]=" "
         done
     done
     # ------------------------------------------------------------------------
-    build_list="plain-sdk "
-    ACTIONS[build]="$build_list "
-    for i in $build_list; do
-        ACTIONS[$i]=" "
-    done
-    # ---------------------------
     setup_list="dev-env plain-sdk "
     ACTIONS[setup]="$setup_list "
     for i in $setup_list; do

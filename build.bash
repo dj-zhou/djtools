@@ -197,8 +197,8 @@ function compile_makefile() {
         make clean
         return
     fi
-    echo -e "\n${PRP}make -j$(cat /proc/cpuinfo | grep processor | wc -l) $clean_tag${NOC}\n"
-    make -j$(cat /proc/cpuinfo | grep processor | wc -l) $clean_tag
+    echo -e "\n${PRP}make -j$(nproc) $clean_tag${NOC}\n"
+    make -j$(nproc) $clean_tag
 
     # stm32 project dedicated scripts, can be moved into Makefile
     if [ -f .project-stm32 ] && [ -f bin/*.elf ]; then
@@ -232,8 +232,8 @@ function compile_cmakelist() {
         else
             cd "$build_dir"/ # do not run cmake ..
         fi
-        echo -e "${PRP}make -j$(cat /proc/cpuinfo | grep processor | wc -l)${NOC}"
-        make -j$(cat /proc/cpuinfo | grep processor | wc -l)
+        echo -e "${PRP}make -j$(nproc)${NOC}"
+        make -j$(nproc)
         cd $cur_dir
         return
     fi

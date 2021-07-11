@@ -1,0 +1,13 @@
+{
+    "files.hotExit": "onExit",
+    "files.autoSave": "afterDelay",
+    "editor.detectIndentation": false,
+    "editor.tabSize": 4,
+    "editor.tabCompletion": "on",
+    "editor.fontSize": 16,
+    "Clang_format_style": "file",
+    "C_Cpp.clang_format_path": "/opt/clang-llvm-12.0.0/bin/clang-format",
+    "clang.executable": "/opt/clang-llvm-12.0.0/bin/clang",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on"
+}
