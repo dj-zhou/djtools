@@ -199,7 +199,7 @@ function _yocto_setup_plain_sdk() #image-name
     # remove the existing sdk folder ---------
     if [ -d "$sdk_folder" ] ; then
         echo -e "${PRP}sudo rm \"$HOME/.$image_name-oesdk\" -r${NOC}\n"
-        sudo rm "$HOME/.$image_name-oesdk" -r
+        rm "$HOME/.$image_name-oesdk" -r
     fi
 
     # start to install the plain SDK ----------------------
