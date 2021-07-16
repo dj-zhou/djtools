@@ -1087,9 +1087,9 @@ function _dj_flame_grapah() {
     fi
     if [ ! -f "${perf_data_file}" ]; then
         echo "${perf_data_file} not found, exit."
-        echo "use command ${GRN}perf record -e cpu-clock -g <executable>${NOC}"
-        echo " or ${GRN}perf record --call-graph dwarf <executable>${NOC}"
-        echo " to generate perf.data."
+        echo -e "use command ${GRN}perf record -e cpu-clock -g <executable>${NOC}"
+        echo -e " or ${GRN}perf record --call-graph dwarf <executable>${NOC}"
+        echo -e " to generate perf.data."
         return 1
     fi
     # need sudo??
