@@ -54,8 +54,7 @@ function _dj_setup_clang_llvm() {
     # use command:
     #    split -b 10M file.tar.xz file.tar.xz
     # to get file.tar.xzaa, file.tar.xzab, etc, and then push into github repo
-    url=https://github.com/dj-zhou/${file}.git
-
+    url=https://github.com/dj-zhou/${repo}.git
     cd ~ && mkdir -p soft/ && cd soft/
     rm $repo -rf
     git clone $url
@@ -72,7 +71,7 @@ function _dj_setup_clang_llvm() {
 
     mkdir -p ~/.config/Code/User
 
-    echo "\nDo you want to apply the default vscode settings? [Yes/No]"
+    echo -e "\nDo you want to apply the default vscode settings? [Yes/No]"
     read asw
 
     if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (\
