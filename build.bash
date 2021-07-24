@@ -43,9 +43,9 @@ function _build_meson_use_oesdk() { # sdk_path
             meson . $sdk_output -Db_sanitize=none
             cd $sdk_output
             ninja
-            echo -e "\n ${PRP} build meson -cross${NOC}"
+            echo -e "${GRN}build meson -cross${NOC}"
             echo -e "    fresh build, contains $sdk_output/ directory."
-            echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
+            echo -e "    sdk location: ${GRN}$sdk_path${NOC}"
             cd $cur_dir
 
         # if the curent directory is $fb2_sdk_build_directory/, then
@@ -56,9 +56,9 @@ function _build_meson_use_oesdk() { # sdk_path
             meson . $sdk_output -Db_sanitize=none
             cd $sdk_output
             ninja
-            echo -e "\n ${PRP} build meson -cross${NOC}"
+            echo -e "${GRN}build meson -cross${NOC}"
             echo -e "    fresh build, in $sdk_output/ directory."
-            echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
+            echo -e "    sdk location: ${GRN}$sdk_path${NOC}"
 
         # if in a subdirectory of $sdk_output/
         elif [[ "$cur_dir" = *"$sdk_output"* ]]; then
@@ -68,9 +68,9 @@ function _build_meson_use_oesdk() { # sdk_path
             meson . $sdk_output -Db_sanitize=none
             cd $sdk_output
             ninja
-            echo -e "\n ${PRP} build meson -cross${NOC}"
+            echo -e "${GRN}build meson -cross${NOC}"
             echo -e "    fresh build, in $sdk_output/ sub-directory."
-            echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
+            echo -e "    sdk location: ${GRN}$sdk_path${NOC}"
             cd $cur_dir
 
         # if the current directory does not contain a $sdk_output/ directory,then
@@ -79,13 +79,13 @@ function _build_meson_use_oesdk() { # sdk_path
             meson . $sdk_output -Db_sanitize=none #  -Dprefix=/usr
             cd $sdk_output
             ninja
-            echo -e "\n ${PRP} build meson -cross${NOC}"
+            echo -e "${GRN}build meson -cross${NOC}"
             echo -e "    fresh build, have created the $sdk_output/ directory"
-            echo -e "    sdk location: $sdk_path\n"
+            echo -e "    sdk location: $sdk_path"
             cd $cur_dir
         else
-            echo -e "\n ${PRP} build meson -cross${NOC}"
-            echo -e "    fresh build, but no meson.build file found, no build, exit!! \n"
+            echo -e "${GRN} build meson -cross${NOC}"
+            echo -e "    fresh build, but no meson.build file found, no build, exit!!"
         fi
         _yocto_reset_env_variables
         rm -rf builddir # just a hack
@@ -103,17 +103,17 @@ function _build_meson_use_oesdk() { # sdk_path
     if [ -d $sdk_output ]; then
         cd $sdk_output
         ninja
-        echo -e "\n ${PRP} build meson -cross${NOC}"
-        echo -e "    with \"--conti\" option: contains $sdk_output/ directory"
-        echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
+        echo -e "${GRN}build meson -cross${NOC}"
+        echo -e "with \"--conti\" option: contains $sdk_output/ directory"
+        echo -e "sdk location: ${GRN}$sdk_path${NOC}"
         cd $cur_dir
 
     # just in the $sdk_output/ directory
     elif [ $directory_name = "$sdk_output" ]; then
         ninja
-        echo -e "\n ${PRP} build meson -cross${NOC}"
-        echo -e "    with \"--conti\" option: in $sdk_output/ directory"
-        echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
+        echo -e "${GRN} build meson -cross${NOC}"
+        echo -e "with \"--conti\" option: in $sdk_output/ directory"
+        echo -e "sdk location: ${GRN}$sdk_path${NOC}"
 
     # if the current path is ~/xx/$sdk_output/yy/zz --------
     elif [[ "$cur_dir" = *"$sdk_output"* ]]; then
@@ -122,12 +122,12 @@ function _build_meson_use_oesdk() { # sdk_path
         cd $sdk_build_path
         ninja
         cd $cur_dir
-        echo -e "\n ${PRP} build meson -cross${NOC}"
-        echo -e "    with \"--conti\" option: in $sdk_output/ sub-directory"
-        echo -e "    sdk location: ${GRN}$sdk_path${NOC}\n"
+        echo -e "${GRN}build meson -cross${NOC}"
+        echo -e "with \"--conti\" option: in $sdk_output/ sub-directory"
+        echo -e "    sdk location: ${GRN}$sdk_path${NOC}"
     else
-        echo -e "\n ${PRP} build meson -cross${NOC}"
-        echo -e "    not in $sdk_output/ or its sub directory, no build, exit!!\n"
+        echo -e "${GRN}build meson -cross${NOC}"
+        echo -e "not in $sdk_output/ or its sub directory, no build, exit!!"
     fi
     _yocto_reset_env_variables
     rm -rf builddir # just a hack
@@ -190,14 +190,14 @@ function _build_in_docker() {
 
 # =============================================================================
 function compile_makefile() {
-    echo -e "\n  use ${PRP}Makefile${NOC} to build\n"
+    echo -e "use ${GRN}Makefile${NOC} to build"
     clean_tag=$1
     if [ "$clean_tag" = "clean" ]; then
-        echo -e "\n${PRP} make clean${NOC}\n"
+        echo -e "${GRN}make clean${NOC}"
         make clean
         return
     fi
-    echo -e "\n${PRP}make -j$(nproc) $clean_tag${NOC}\n"
+    echo -e "${GRN}make -j$(nproc) $clean_tag${NOC}"
     make -j$(nproc) $clean_tag
 
     # stm32 project dedicated scripts, can be moved into Makefile
@@ -214,31 +214,31 @@ function compile_makefile() {
         bss_used=$(echo $bss_used | awk '{print $2}')
         ram_percentage=$(awk "BEGIN {print $((bss_used)) * 100  / $((ram_kb)) / 1024}" | awk '{printf("%d",$0);}')
         echo -e "${GRN}\n------------------------------------${NOC}"
-        echo -e " $micro_controller memory usage: FLASH: ${flash_percentage}%, RAM: ${ram_percentage}%\n"
+        echo -e "$micro_controllermemory usage: FLASH: ${flash_percentage}%, RAM: ${ram_percentage}%\n"
     fi
     return
 }
 
 # =============================================================================
 function compile_cmakelist() {
-    echo -e "\n  use ${PRP}CMakeLists.txt${NOC} to build/clean\n"
+    echo -e "use ${GRN}CMakeLists.txt${NOC} to build/clean"
     cur_dir=${PWD}
     build_dir="_bnative.cmake"
     clean_tag=$1
     if [[ -z "$clean_tag" || "$clean_tag" = "all" ]]; then
         if [ ! -d "$build_dir" ]; then
-            echo -e "${PRP}\n mkdir "$build_dir" && cd "$build_dir" && cmake ..${NOC}\n"
+            echo -e "${GRN}mkdir "$build_dir" && cd "$build_dir" && cmake ..${NOC}\n"
             mkdir "$build_dir" && cd "$build_dir" && cmake ..
         else
             cd "$build_dir"/ # do not run cmake ..
         fi
-        echo -e "${PRP}make -j$(nproc)${NOC}"
+        echo -e "${GRN}make -j$(nproc)${NOC}"
         make -j$(nproc)
         cd $cur_dir
         return
     fi
     if [ "$clean_tag" = "clean" ]; then
-        echo -e "${PRP}rm -rf "$build_dir"/${NOC}\n"
+        echo -e "${GRN}rm -rf "$build_dir"/${NOC}\n"
         rm -rf "$build_dir"/
         return
     fi
@@ -276,7 +276,7 @@ function build() {
         compile_makefile $2 $3 $4 $5 $6
         return
     fi
-    echo -e "\n ${PRP}build${NOC}: argument ${RED}$1${NOC} not supported.\n"
+    echo -e "${GRN}build${NOC}: argument ${RED}$1${NOC} not supported."
     return
 }
 

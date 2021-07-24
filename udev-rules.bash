@@ -65,7 +65,7 @@ function _dj_udev_show() {
 function _dj_udev_uvc_video_capture() {
     rule_file=uvc-video-capture.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+    echo -e "\nudev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
@@ -86,7 +86,7 @@ function _dj_udev_uvc_video_capture() {
 function _dj_udev_logitech_f710() {
     rule_file=logitech-f710-x.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+    echo -e "\nudev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     string="SUBSYSTEMS==\"usb\", "
     string="${string}KERNEL==\"js*\", "
@@ -104,7 +104,7 @@ function _dj_udev_logitech_f710() {
     # the joystick can change its property -----------------------
     rule_file=logitech-f710-d.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+    echo -e "\nudev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     string="SUBSYSTEMS==\"usb\", "
     string="${string}KERNEL==\"js*\", "
@@ -125,7 +125,7 @@ function _dj_udev_logitech_f710() {
 function _dj_udev_one_third_console() {
     rule_file=one-third-console.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+    echo -e "\nudev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
@@ -142,9 +142,9 @@ function _dj_udev_one_third_console() {
 
     sudo service udev restart
 
-    echo -e "\n if /dev/one-third/console can not be completed by tab,"
+    echo -e "\nif /dev/one-third/console can not be completed by tab,"
     echo -e "   you can edit the file ${GRN}/usr/share/bash-completion/completions/screen${NOC}"
-    echo -e "     add the term \"/dev/one-third/* to the line"
+    echo -e "   add the term \"/dev/one-third/* to the line"
     echo -e "        /dev/serial/by-id/* /dev/ttyUSB* /dev/ttyACM* 2>/dev/null)\" \n"
     echo -e "   or you can copy settings/screen-tab-completion as "
     echo -e "      /usr/share/bash-completion/completions/screen\n"
@@ -159,7 +159,7 @@ function _dj_udev_one_third_console() {
 function _dj_udev_ft4232h() {
     rule_file=ft4232h-serial.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+    echo -e "\nudev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     string="SUBSYSTEMS==\"usb\", ENV{.LOCAL_serial}=\"\$attr{serial}\"\n"
     string="${string}SUBSYSTEMS==\"usb\", ENV{.LOCAL_ifNum}=\"\$attr{bInterfaceNumber}\"\n"
@@ -186,7 +186,7 @@ function _dj_udev_ft4232h() {
 function _dj_udev_stlink_v2_1() {
     rule_file=st-link-v2-1.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "\n udev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
+    echo -e "\nudev rule file: "$rule_file" written to /etc/udev/rule.d/\n"
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
@@ -203,9 +203,9 @@ function _dj_udev_stlink_v2_1() {
 
     sudo service udev restart
 
-    echo -e "\n if /dev/st-link/vcp can not be completed by tab,"
+    echo -e "\nif /dev/st-link/vcp can not be completed by tab,"
     echo -e "   you can edit the file ${GRN}/usr/share/bash-completion/completions/screen${NOC}"
-    echo -e "     add the term \"/dev/one-third/* to the line"
+    echo -e "   add the term \"/dev/one-third/* to the line"
     echo -e "        /dev/serial/by-id/* /dev/ttyUSB* /dev/ttyACM* 2>/dev/null)\" \n"
     echo -e "   or you can copy settings/screen-tab-completion as "
     echo -e "      /usr/share/bash-completion/completions/screen\n"

@@ -15,7 +15,7 @@ function _dj_help() {
     echo " Email       : zhoudingjiang@gmail.com "
     echo " Create Date : Mar. 1st, 2020"
     echo "-----------------------------------------------------"
-    echo -e " \nFirst level commands:"
+    echo -e "\nFirst level commands:"
     echo "   setup         - to install some software"
     echo "   clone         - clone a repo from github/gitee/bitbucket"
     echo "   clone-ssh     - use ssh protocol to clone a repo from github/gitee/bitbucket"
@@ -23,7 +23,7 @@ function _dj_help() {
     echo "   work-check    - check work status of all repos in a folder"
     echo -e ""
     echo -e "  MORE IS COMMING"
-    echo -e " All commands support tab completion"
+    echo -e "All commands support tab completion"
 }
 
 # =============================================================================
@@ -234,7 +234,7 @@ function _dj_setup_container_dive() {
     sudo dpkg -i dive_*.deb
 
     echo "use the following command to check the docker image layouts"
-    echo "  sudo dive <image-tag/hash>"
+    echo "    \$ sudo dive <image-tag/hash>"
     echo "you can find the image-tag/hash from command: sudo docker images -a"
 
     # ----------------------------------------------
@@ -274,8 +274,8 @@ function _dj_setup_pangolin() {
 
     echo -e "If you see error ${RED}: Could not find GLEW${NOC}"
     echo "you should run the following commands:"
-    echo "   $ dj setup glfw3"
-    echo "   $ dj setup gtest-glog"
+    echo "   \$ dj setup glfw3"
+    echo "   \$ dj setup gtest-glog"
 
     cd $cur_dir
 }
@@ -292,8 +292,8 @@ function _dj_setup_pip() {
     sudo pip3 install --upgrade pip
 
     echo -e "check the pip/pip3 version by:"
-    echo "   $ pip --version"
-    echo "   $ pip3 --version"
+    echo "   \$ pip --version"
+    echo "   \$ pip3 --version"
 
     cd ${cur_dir}
 }
@@ -759,10 +759,8 @@ function _dj_setup_vtk_8_2_0() {
         -DVTK_QT_VERSION=5 -DVTK_Group_Qt=ON ..
     make -j$(nproc) && sudo make install
 
-    echo -e ""
-    echo " the installed library seems to be in /usr/local/lib folder"
-    echo " the installed header files seem to be in /usr/local/include/vtk-8.2/ folder"
-    echo -e ""
+    echo "the installed library seems to be in /usr/local/lib folder"
+    echo "the installed header files seem to be in /usr/local/include/vtk-8.2/ folder"
 
     cd ${cur_dir}
 }
@@ -786,7 +784,7 @@ function _dj_search_package() {
 
     echo -e "cd /usr/lib/x86_64-linux-gnu/pkgconfig"
     cd /usr/lib/x86_64-linux-gnu/pkgconfig
-    echo -e " ls | grep $lib_to_find"
+    echo -e " \$ ls | grep $lib_to_find"
     ls | grep $lib_to_find
     cd $cur_dir
 }
@@ -796,10 +794,10 @@ function _dj_search_package() {
 function _dj_search_string() {
     echo -e "run command:"
     echo -e "   $GRN grep -rI $1 .$NOC"
-    echo -e " we get:"
+    echo -e "we get:"
     # how to use the variable in the below?? -- $excluded_dir does not work
     # -I option ignores the search from binary files, that is perfect!
-    grep -rI --exclude-dir={build,bin,_bcross*,_bnative*,builddir,.git} $1 .
+    grep -rI --exclude-dir={build,bin,_bcross*,_bnative*,builddir,.git} "$1" .
 }
 
 # =============================================================================
@@ -841,7 +839,7 @@ function _dj_open_file() {
 function _dj_ssh_general_no_password() {
     if [ $# = 0 ]; then
         echo -e "usage:"
-        echo -e " dj ssh-general no-password username@ip_address"
+        echo -e "    dj ssh-general no-password username@ip_address"
         return
     fi
     user_and_ip="$1"
@@ -1087,6 +1085,9 @@ function _dj_flame_grapah() {
     fi
     if [ ! -f "${perf_data_file}" ]; then
         echo "${perf_data_file} not found, exit."
+        echo -e "use command ${GRN}perf record -e cpu-clock -g <executable>${NOC}"
+        echo -e "or ${GRN}perf record --call-graph dwarf <executable>${NOC}"
+        echo -e "to generate perf.data."
         return 1
     fi
     # need sudo??
@@ -1163,7 +1164,7 @@ function dj() {
         if [ $2 = 'string' ]; then
             # ------------------------------
             if [[ $# -ge 3 ]]; then
-                _dj_search_string $3 $4 $5 $6 $7 $8
+                _dj_search_string "$3" "$4" "$5" "$6" "$7" "$8"
                 return
             fi
         fi

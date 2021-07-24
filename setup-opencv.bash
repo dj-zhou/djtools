@@ -30,10 +30,8 @@ function _dj_setup_opencv_2_4_13() {
     _ask_to_remove_a_file opencv-2.4.13.zip
 
     cd ${cur_dir}
-    echo -e "\n"
     echo " lib files *.so are installed in /usr/local/lib/"
     echo " header files are installded in /usr/local/include/opencv2/"
-    echo -e "\n"
 }
 
 # =============================================================================
@@ -168,9 +166,9 @@ function _dj_setup_opencv_4_1_1() {
 
     cur_dir=$PWD
 
-    echo -e "\n Have you installed Qt? The openCV installation may need Qt"
+    echo -e "Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.14.2"
-    echo -e "     dj setup qt-5.14.2\n\n"
+    echo -e "    \$ dj setup qt-5.14.2\n"
     _press_enter_or_wait_s_continue 20
 
     _setup_opencv_dependencies

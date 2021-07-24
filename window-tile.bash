@@ -328,6 +328,25 @@ function window-tile() {
 }
 
 # =============================================================================
+# wmctrl -l
+# 0x0560001f  0 LT9P07ZM2 Figure 1
+# 0x0580001f  0 LT9P07ZM2 Figure 2
+# 0x05a0001f  0 LT9P07ZM2 Figure 3
+# 0x05c0001f  0 LT9P07ZM2 Figure 4
+# 0x05e0001f  0 LT9P07ZM2 Figure 5
+# 0x06c0001f  0 LT9P07ZM2 Figure 6
+function tilefigs() {
+    # count figure numbers
+    figure_count=$(wmctrl -l | grep Figure | wc | awk '{ print $1 }')
+    echo "total figures to tile: $figure_count"
+
+    # find the screen size
+    # if it is a single screen, tile figures in the screen (1920x1080     59.93*+)
+    # if it is two screens, tile figures in the left screen
+    screen_size=$(xrandr | grep '*')
+}
+
+# =============================================================================
 # auto tab completion
 function _window_tiled() {
     COMPREPLY=()

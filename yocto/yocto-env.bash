@@ -118,8 +118,8 @@ function _yocto_reset_env_variables()
 
     # just don't know why PATH cannot be recovered!
     unset PATH
-    export PATH=$PATH:$HOME/.local/bin
     export PATH=/usr/bin
+    export PATH=$PATH:$HOME/.local/bin
     export PATH=$PATH:/bin
     export PATH=$PATH:/usr/local/sbin
     export PATH=$PATH:/usr/local/bin
@@ -205,6 +205,6 @@ function _yocto_setup_plain_sdk() #image-name
     # start to install the plain SDK ----------------------
     tmp_var=$LD_LIBRARY_PATH
     unset LD_LIBRARY_PATH # this is important, why? not sure yet.
-    $sdk_source -d $sdk_folder
+    printf "y\n"| $sdk_source -d $sdk_folder
     LD_LIBRARY_PATH=$tmp_var
 }
