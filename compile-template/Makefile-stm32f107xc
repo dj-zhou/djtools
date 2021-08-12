@@ -10,14 +10,15 @@ LD_SCRIPT = $(LIB_PATH)/lds/STM32F107VCTx_FLASH.ld
 PRJ_OUT   = bin
 PRJ_NAME  = $(STM32Fx)-binary
 # ------------------------------------------
-CPU        = -mcpu=cortex-m3
-FPU        =
-FLOAT-ABI  = -mfloat-abi=soft
+
 
 ifneq (,$(findstring STM32F1,$(STM32Fx)))
-    LIB_SHARE   = f1-share
-	LIB_HAL     = f1-v1.8.4
-	STM32Family = STM32F1xx
+	CPU        = -mcpu=cortex-m3
+	FPU        =
+	FLOAT-ABI  = -mfloat-abi=soft
+    LIB_SHARE  = f1-share
+	LIB_HAL    = f1-v1.8.4
+	STM32Family= STM32F1xx
 else
     $(info not a STM32F1 family, you need to revise the Makefile)
 endif
@@ -129,10 +130,10 @@ clean:
 erase:
 	st-flash erase
 
-# -----------------------------------------------------------------------------
-debug: CFLAGS+= -D __DEBUG
+# -----------------
+debug: CFLAGS+= -D __DEBUG $(PRJ_INC)
 debug: CFLAGS+= -D MAKE_TYPE=\"DEBUG\"
-debug: $(PRJ_OUT)/$(PROJ).elf
+debug: $(PRJ_OUT)/$(PRJ_NAME).elf
 
 -include $(wildcard $(PRJ_OUT)/*.d)
 -include $(wildcard $(HAL_OUT)/*.d)
