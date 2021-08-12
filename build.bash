@@ -269,6 +269,11 @@ function compile_template() {
         cp $djtools_path/compile-template/.project-stm32f107xc ./.project-stm32
         return
     fi
+    if [ $1 = 'stm32f407zg' ]; then
+        cp $djtools_path/compile-template/Makefile-stm32f407zg ./Makefile
+        cp $djtools_path/compile-template/.project-stm32f407zg ./.project-stm32
+        return
+    fi
 }
 
 # =============================================================================
@@ -371,7 +376,7 @@ function _build() {
     declare -A ACTIONS
 
     # -----------------------------------------------------
-    template_list="cmake stm32f107xc "
+    template_list="cmake stm32f107xc stm32f407zg "
     ACTIONS[template]="$template_list "
     for i in $template_list; do
         ACTIONS[$i]=" "
