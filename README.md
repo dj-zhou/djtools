@@ -63,7 +63,7 @@ Meanwhile, there are three files generated in `~` directory:
 .GitHub-repos-dj-zhou
 ```
 
-You can put the names of repositories into theses files to enable the **tab completable** feature of  `dj clone` and `dj clone-ssh` commands.
+You can put the names of repositories into theses files to enable the **tab completable** feature of  `dj clone` and `dj ssh-clone` commands.
 
 ### `dj` Commands
 
@@ -93,12 +93,12 @@ since I have those listed in the `~/.GitHub-repos-dj-zhou`.
 
 The same rules applied to GiTee and BitBucket.
 
-#### `dj clone-ssh`
+#### `dj ssh-clone`
 
 A similar command to `dj clone`, with the difference that the repository is with ssh links. For example, the command
 
 ```bash
-dj clone-ssh github robotics-note
+dj ssh-clone github robotics-note
 ```
 
 is the same as

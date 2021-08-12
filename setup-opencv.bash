@@ -6,9 +6,9 @@
 function _dj_setup_opencv_2_4_13() {
     cur_dir=$PWD
 
-    echo -e "\n Have you installed Qt? The openCV installation may need Qt"
+    echo -e "Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.11.2"
-    echo -e "     dj setup qt-5.11.2\n\n"
+    echo -e "     dj setup qt-5.11.2"
     _press_enter_or_wait_s_continue 20
 
     cd ~ && mkdir -p soft && cd soft/
@@ -168,7 +168,7 @@ function _dj_setup_opencv_4_1_1() {
 
     echo -e "Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.14.2"
-    echo -e "    \$ dj setup qt-5.14.2\n"
+    echo -e "    \$ dj setup qt-5.14.2"
     _press_enter_or_wait_s_continue 20
 
     _setup_opencv_dependencies

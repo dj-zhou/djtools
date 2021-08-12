@@ -43,7 +43,7 @@ function _ask_to_remove_a_folder() {
 # =============================================================================
 function _ask_to_execute_cmd() {
     echo "command: "$1
-    echo -e '\n Do you want to execute command "'${1}'"?\n'
+    echo -e 'Do you want to execute command "'${1}'"?'
     read answer
     if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || (\
         $answer = 'No') || ($answer = 'no') ]]; then
@@ -79,7 +79,7 @@ function _write_to_file_width() {
 
 # =============================================================================
 function _press_enter_to_continue() {
-    echo -e ' Press [ENTER] to continue ...'
+    echo -e 'Press [ENTER] to continue ...'
     read answer
     echo $answer
 }
@@ -89,9 +89,9 @@ function _press_enter_or_wait_s_continue() {
     second=$1
     while [ 0 -lt $second ]; do
         if [ $second = '1' ]; then
-            echo -ne "\r  Press [ENTER] or wait $second second to continue ...    "
+            echo -ne "\rPress [ENTER] or wait $second second to continue ...    "
         else
-            echo -ne "\r  Press [ENTER] or wait $second seconds to continue ...   "
+            echo -ne "\rPress [ENTER] or wait $second seconds to continue ...   "
         fi
         read -s -N 1 -t 1 key
         if [ "$key" == $'\x0a' ]; then
@@ -104,7 +104,7 @@ function _press_enter_or_wait_s_continue() {
 
 # =============================================================================
 function _display_section() {
-    echo ' ----------------------------------------------------'
+    echo '----------------------------------------------------'
 }
 
 # =============================================================================
@@ -271,4 +271,40 @@ function _install_if_not_installed() {
         fi
     done
     cd $cur_dir_install && unset cur_dir_install
+}
+
+# =============================================================================
+function _verify_static_lib_installation() {
+    if [ ! -f "$2/$1" ]; then
+        echo -e "${RED}static library $1 is not found in $2${NOC}"
+    else
+        echo -e "static library $1 is installed to\n $2"
+    fi
+}
+
+# =============================================================================
+function _verify_header_files() {
+    if [ ! -d "$1" ]; then
+        echo -e "${RED}header files are not found{NOC}"
+    else
+        echo -e "header files are installed to\n $1"
+    fi
+}
+
+# =============================================================================
+function _verify_cmake_files() {
+    if [ ! -d "$1" ]; then
+        echo -e "${RED}cmake files are not found{NOC}"
+    else
+        echo -e "cmake files are installed to\n $1"
+    fi
+}
+
+# =============================================================================
+function _verify_pkgconfig_file() {
+    if [ ! -f "$2/$1" ]; then
+        echo -e "${RED}pkgconfig file $1 is not found in $2${NOC}"
+    else
+        echo -e "pkgconfig file $1 is installed to\n $2"
+    fi
 }

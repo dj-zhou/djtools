@@ -17,7 +17,7 @@ eom
 # =============================================================================
 # $1: zephyr project folder, the default is ~/zephyr-project
 function _zephyr_setup_sdk_0_11_4() {
-    echo -e "\n${PRP} zephyr setup sdk-0.11.4${NOC}"
+    echo -e "${PRP}zephyr setup sdk-0.11.4${NOC}"
     # argument parsing -------------------
     # determine Zephyr project folder
     if [ -n "$1" ]; then
@@ -31,7 +31,7 @@ function _zephyr_setup_sdk_0_11_4() {
     cur_dir=${PWD}
 
     # install dependencies ---------------------
-    echo -e "\n ${GRN} install dependencies ${NOC}"
+    echo -e "${GRN}install dependencies ${NOC}"
     _press_enter_or_wait_s_continue 5
     sudo apt-get -y update && sudo apt-get -y upgrade
     _install_if_not_installed git cmake ninja-build gperf
@@ -44,11 +44,11 @@ function _zephyr_setup_sdk_0_11_4() {
     cmake_v=$(version check cmake)
     anw=$(_version_if_ge_than cmake 3.20.5)
     if [ "$anw" = 'no' ]; then
-        dj setup cmake-3.20.5
+        dj setup cmake
     fi
 
     # install west ---------------------
-    echo -e "\n ${GRN} install ${YLW}west ${NOC}"
+    echo -e "${GRN}install ${YLW}west ${NOC}"
     _press_enter_or_wait_s_continue 5
     # the west installation can fail! any solution??
     pip3 install --user -U west
@@ -56,7 +56,7 @@ function _zephyr_setup_sdk_0_11_4() {
     # setup west path in ~/.bashrc ---------------------
     grep_west_path=$(grep "PATH:~/.local/bin" ~/.bashrc)
     if [ ! -z "$grep_west_path" ]; then
-        echo -e "\n ${YLW}west${GRN} path was set in ~/.bashrc${NOC}"
+        echo -e "${YLW}west${GRN} path was set in ~/.bashrc${NOC}"
     else
         echo -e '\n' >>~/.bashrc
         echo '# ===========================================================' >>~/.bashrc
@@ -65,17 +65,17 @@ function _zephyr_setup_sdk_0_11_4() {
     fi
 
     # find the Zephyr project path setting in ~/.bashrc ---------------------
-    echo -e "\n ${GRN}find the Zephyr project path setting in ~/.bashrc ${NOC}"
+    echo -e "${GRN}find the Zephyr project path setting in ~/.bashrc ${NOC}"
     _press_enter_or_wait_s_continue 5
     zephyr_proj_path_set_str=$(grep "export ZEPHYR_PROJECT_PATH" ~/.bashrc)
     if [ ! -z "$zephyr_proj_path_set_str" ]; then
-        echo -e "\n ${GRN}ZEPHYR_PROJECT_PATH was set in ~/.bashrc${NOC}"
+        echo -e "${GRN}ZEPHYR_PROJECT_PATH was set in ~/.bashrc${NOC}"
         # find the original path ---------------------
         pos=$(_find_a_char_in_str "$zephyr_proj_path_set_str" "=" 1)
         original_path=${zephyr_proj_path_set_str:$((pos + 1)):${#zephyr_proj_path_set_str}}
         # if the original path is different with intended path, delete it
         if [ "$original_path" != "$zephyr_proj_folder" ]; then
-            echo -e "\n ${RED}the original ZEPHYR_PROJECT_PATH is not${NOC} $zephyr_proj_folder"
+            echo -e "${RED}the original ZEPHYR_PROJECT_PATH is not${NOC} $zephyr_proj_folder"
             echo -e " ${RED}revise it, and delete${NOC} $original_path"
             sed -i "s|$original_path|$zephyr_proj_folder|g" ~/.bashrc
             rm -rf $original_path
@@ -90,27 +90,27 @@ function _zephyr_setup_sdk_0_11_4() {
     # delete zephyr project folder and start from scratch, or ---------------------
     # update it by using west
     if [ -d "$zephyr_proj_folder" ]; then
-        echo -e "\n ${GRN}Zephyr pojrect folder already exists, do you want to delete it? [Yes/No]${NOC}"
+        echo -e "${GRN}Zephyr pojrect folder already exists, do you want to delete it? [Yes/No]${NOC}"
         read asw
         if [[ ("$asw" = 'y') || ("$asw" = 'Y') || ("$asw" = 'YES') || (\
             "$asw" = 'Yes') || ("$asw" = 'yes') ]]; then
             # delete the zephyr project folder, and get it from scratch
-            echo -e "\n ${GRN}delete the Zephyr Project folder at $zephyr_proj_folder${NOC}"
+            echo -e "${GRN}delete the Zephyr Project folder at $zephyr_proj_folder${NOC}"
             echo -e " ${GRN}get it using ${YLW}west${GRN} from scratch${NOC}"
             sudo rm -rf $zephyr_proj_folder
         elif [[ ("$asw" = 'n') || ("$asw" = 'N') || ("$asw" = 'NO') || (\
             "$asw" = 'No') || ("$asw" = 'no') ]]; then
-            echo -e "\n ${GRN}DO NOT delete the Zephyr Project folder at $zephyr_proj_folder${NOC}"
+            echo -e "${GRN}DO NOT delete the Zephyr Project folder at $zephyr_proj_folder${NOC}"
             echo -e " ${GRN}upgrade it using ${YLW}west${NOC}"
         else
-            echo -e "\n ${RED}wrong answer, quit.${NOC}"
+            echo -e "${RED}wrong answer, quit.${NOC}"
             return
         fi
     fi
 
     # use west to initialize the zephyr --------------------
     # if west is freshly installed, it cannot find the west
-    echo -e "\n ${GRN}use ${YLW}west${GRN} to initialize the Zephyr Project folder${NOC}"
+    echo -e "${GRN}use ${YLW}west${GRN} to initialize the Zephyr Project folder${NOC}"
     _press_enter_or_wait_s_continue 10
     PATH="$PATH:~/.local/bin"
     west init $zephyr_proj_folder
@@ -121,7 +121,7 @@ function _zephyr_setup_sdk_0_11_4() {
     west zephyr-export
 
     # install some required package by pip3 --------------------
-    echo -e "\n ${GRN}install required Python3 packages${NOC}"
+    echo -e "${GRN}install required Python3 packages${NOC}"
     _press_enter_or_wait_s_continue 10
     pip3 install --user -r $zephyr_proj_folder/zephyr/scripts/requirements.txt
 
@@ -130,7 +130,7 @@ function _zephyr_setup_sdk_0_11_4() {
     cd ~ && mkdir -p soft/ && cd soft/
 
     # get the Zephyr SDK ---------------------------------
-    echo -e "\n ${GRN} get the Zephyr SDK${NOC}"
+    echo -e "${GRN} get the Zephyr SDK${NOC}"
     _press_enter_or_wait_s_continue 20
     zephyr_sdk=zephyr-sdk-$sdk_ver-setup.run
     if [ -f "$zephyr_sdk" ]; then
@@ -138,16 +138,16 @@ function _zephyr_setup_sdk_0_11_4() {
         echo "md5checksum = "$md5checksum
     fi
     if [[ "$md5checksum" = *"ca6cc42573f6548cf936b2a60df9a125"* ]]; then
-        echo -e "\n${GRN} file exists, no need to download again${NOC}"
+        echo -e "${GRN} file exists, no need to download again${NOC}"
     else
-        echo -e "\n${GRN} file does not exist, need to download it${NOC}"
+        echo -e "${GRN} file does not exist, need to download it${NOC}"
         sdk_rul=https://github.com/zephyrproject-rtos/sdk-ng/releases
         wget $sdk_rul/download/v$sdk_ver/$zephyr_sdk
     fi
     chmod +x $zephyr_sdk
 
     # choose a place to install ---------------------------------
-    echo -e "\n ------------------------------"
+    echo -e "------------------------------"
     echo -e " ${GRN}Which location are you going to install the Zephyr SDK?${NOC}"
     echo -e " 1: ~/zephyr-sdk-$sdk_ver"
     echo -e " 2: ~/.local/zephyr-sdk-$sdk_ver"
@@ -184,28 +184,28 @@ function _zephyr_setup_sdk_0_11_4() {
             zephyr_sdk_folder="/usr/local/zephyr-sdk-$sdk_ver"
             ;;
         *)
-            echo -e "\n ${RED}wrong input, try again.${NOC}"
+            echo -e "${RED}wrong input, try again.${NOC}"
             ;;
         esac
     done
 
     # remove the folder, if it exists ---------------------------------
     if [ -d $zephyr_sdk_folder ]; then
-        echo -e "\n ${YLW} remove $zephyr_sdk_folder${NOC}"
+        echo -e "${YLW}remove $zephyr_sdk_folder${NOC}"
         sudo rm $zephyr_sdk_folder -r
     fi
-    echo -e "\n ${GRN}install the Zephyr SDK ${NOC}"
+    echo -e "${GRN}install the Zephyr SDK ${NOC}"
     _press_enter_or_wait_s_continue 10
     ./$zephyr_sdk -- -d $zephyr_sdk_folder
 
     # install the default udev rule ---------------------------------
-    echo -e "\n ${GRN}setup udev rule${NOC}"
+    echo -e "${GRN}setup udev rule${NOC}"
     _press_enter_or_wait_s_continue 10
     udev_rule_path="sysroots/x86_64-pokysdk-linux/usr/share/openocd/contrib"
     sudo cp "${zephyr_sdk_folder}/$udev_rule_path/60-openocd.rules" /etc/udev/rules.d
     sudo udevadm control --reload
 
-    echo -e "\n ${GRN}reset ZEPHYR_SDK_PATH in ~/.bashrc${NOC}"
+    echo -e "${GRN}reset ZEPHYR_SDK_PATH in ~/.bashrc${NOC}"
     _press_enter_or_wait_s_continue 10
     zephyr_sdk_path_set_str=$(grep "export ZEPHYR_SDK_PATH" ~/.bashrc)
     if [ ! -z "$zephyr_sdk_path_set_str" ]; then
@@ -222,11 +222,11 @@ function _zephyr_setup_sdk_0_11_4() {
         echo 'export ZEPHYR_SDK_PATH='$zephyr_sdk_folder >>~/.bashrc
     fi
 
-    echo -e "\n ${GRN}try the following commands to verify installation${NOC}"
+    echo -e "${GRN}try the following commands to verify installation${NOC}"
     echo -e "  cd $zephyr_proj_folder/zephyr/"
     echo -e "  west build -p auto -b nucleo_f767zi samples/basic/blinky"
     echo -e "  west flash\n"
-    echo -e "\n ${GRN}or you can try tab-completable ${YLW}djtools${GRN} command:${NOC}"
+    echo -e "${GRN}or you can try tab-completable ${YLW}djtools${GRN} command:${NOC}"
     echo -e "  cd $zephyr_proj_folder/zephyr/samples/basic/blinky"
     echo -e "  zephyr build -b nucleo_f767zi"
     echo -e "  zephyr flash\n"
@@ -238,7 +238,7 @@ function _zephyr_setup_sdk_0_11_4() {
 
 # =============================================================================
 function _zephyr_build_help() {
-    echo -e "\n ------------ zephyr build (simplified tool) --------------"
+    echo -e "------------ zephyr build (simplified tool) --------------"
     echo "  maitainer: Dingjiang Zhou "
     echo -e " ----------------------------------------------------------\n"
     echo "supported commands:"
@@ -273,7 +273,7 @@ function _zephyr_build_old() {
             ninja -C build
             return
         fi
-        echo -e "\n no previous build, need a target board to build, for example:"
+        echo -e "no previous build, need a target board to build, for example:"
         echo -e " zephyr build -b nucleo_f767zi\n"
         return
     fi
@@ -287,7 +287,7 @@ function _zephyr_build_old() {
 }
 
 # =============================================================================
-# echo -e "\n Try the following commands to verify installation"
+# echo -e "Try the following commands to verify installation"
 #     echo -e "  cd $zephyr_proj_folder/zephyr/"
 #     echo -e "  west build -p auto -b nucleo_f767zi samples/basic/blinky\n"
 # the new build function: copy everything into $zephyr_proj_folder/zephyr/
@@ -297,7 +297,7 @@ function _zephyr_build_new() {
     # find the board --------------
     board=$(_find_argument_after_option -b $1 $2 $3 $4 $5 $6 $7 $8)
     if [ -z $board ]; then
-        echo -e "\n ${RED}target board is not assigned, exit.${NOC}\n"
+        echo -e "${RED}target board is not assigned, exit.${NOC}\n"
         echo " you can assign it by (tab-completable):"
         echo -e "   zephyr -build -b [board name]\n"
         return
@@ -305,7 +305,7 @@ function _zephyr_build_new() {
 
     # check environment --------------
     if [ -z $ZEPHYR_PROJECT_PATH ]; then
-        echo -e "\n ${RED}ZEPHYR_PROJECT_PATH is not set, exit.${NOC}\n"
+        echo -e "${RED}ZEPHYR_PROJECT_PATH is not set, exit.${NOC}\n"
         return
     fi
     project_path=${PWD}
@@ -328,12 +328,12 @@ function _zephyr_build_new() {
         prv_project=" "
     fi
     if [[ $prv_board != $board ]] || [[ $prv_project != $project_name ]]; then
-        echo -e "\n ${GRN}different board or project,${NOC} build from scratch ...\n"
+        echo -e "${GRN}different board or project,${NOC} build from scratch ...\n"
         rm -rf build/*
         # rm build/CMakeCache.txt
         # rm build/CMakeFiles -rf
     else
-        echo -e "\n same board and project ...\n"
+        echo -e "same board and project ...\n"
     fi
     # build
     west build -p auto -b $board $project_path
@@ -349,7 +349,7 @@ function _zephyr_build_new() {
 
 # =============================================================================
 function _zephyr_flash_help() {
-    echo -e "\n ------------ zephyr flash (simplified tool) --------------"
+    echo -e "------------ zephyr flash (simplified tool) --------------"
     echo "   maitainer: Dingjiang Zhou "
     echo -e " ----------------------------------------------------------\n"
     echo "supported commands:"
@@ -373,17 +373,17 @@ function _zephyr_flash() {
     if [ -f build/project-name.txt ]; then
         prv_project=$(cat build/project-name.txt)
     else
-        echo -e "\n ${RED}project not built, need to build ...${NOC}\n"
+        echo -e "${RED}project not built, need to build ...${NOC}\n"
         return
     fi
     if [[ $prv_project != $project_name ]]; then
-        echo -e "\n ${RED}different project, need to rebuild ...${NOC}\n"
+        echo -e "${RED}different project, need to rebuild ...${NOC}\n"
         cd ${project_path}
         return
     else
         # to flash --------
         board=$(cat build/board.txt)
-        echo -e "\n the build target board is ${GRN}${board}${NOC}\n"
+        echo -e "the build target board is ${GRN}${board}${NOC}\n"
         west flash
     fi
 
@@ -417,7 +417,7 @@ function zephyr() {
         return
     fi
 
-    echo -e '\r\n zephyr : "'$1 '"command not supported\r\n'
+    echo -e '\rzephyr : "'$1 '"command not supported\r\n'
     _zephyr_help
 
     # ------------------------------

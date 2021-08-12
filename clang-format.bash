@@ -1,6 +1,123 @@
 #!/bin/bash
 
 # =============================================================================
+function _dj_format_help() {
+    echo -e 'dj format help:'
+    echo ' example command 1:'
+    echo ' code replace <original> <new> .'
+    echo '     - to replace the text content of <original> to <new> in the current folder '
+    echo -e 'exmaple command 2:'
+    echo ' code replace <original> <new> <path to file>'
+    echo '     - to replace the text content of <original> to <new> in the file <path to file> '
+}
+
+# =============================================================================
+function _dj_format_clang_format_implement() {
+    if [ -z $1 ]; then
+        echo "need argument, supported: djz, bg"
+        return
+    fi
+    if [ $1 = 'djz' ]; then
+        echo ".clang-format in djz style"
+        cp $djtools_path/settings/.clang-format-dj .clang-format
+        return
+    fi
+    if [ $1 = 'bg' ]; then
+        echo ".clang-format in bg style"
+        cp $djtools_path/settings/.clang-format-bg .clang-format
+        return
+    fi
+}
+
+# =============================================================================
+function _dj_format_clang_format_show_camel() {
+    cat <<eom
+
+                    Camel Case
+ +-----------------------------------------------------------+
+ |          Code Element | Stype                             |
+ +-----------------------------------------------------------+
+ |             Namespace | under_scored                      |
+ |            Class name | CamelCase                         |
+ |         Function name | camelCase                         |
+ |     Parameters/Locals | under_scored                      |
+ |      Member Variables | under_socred_with_                |
+ | Enums and its mumbers | CamelCase                         |
+ |               Globals | g_under_scored                    |
+ |             Constants | UPPER_CASE                        |
+ |            File names | Match the case of the class name  |
+ +-----------------------------------------------------------+
+
+eom
+}
+
+# =============================================================================
+function _dj_replace() {
+    cur_dir=$PWD
+
+    if [ $# = 3 ]; then
+        if [ $3 = '.' ]; then
+            # find . -name "*.c", how to rule out .git folder?
+            find . -type f -not -path "./.git*" -print0 | xargs -0 sed -i "s/"$1"/"$2"/g"
+        elif [[ -f $3 ]]; then
+            echo $3" is a file "
+            sed -i "s/"$1"/"$2"/g" $3
+            return
+        else
+            echo -e "{PRP}dj replace${NOC}: not supported!"
+            return
+        fi
+    fi
+
+    cd ${cur_dir}
+}
+
+# =============================================================================
+# bug: it only works for files in current directory, not in the sub-directory
+function dj_clang_format_brush() {
+    format_style=$1
+    echo $format_style
+    if [ $format_style = 'file' ]; then
+        find . \
+            -name *.h -o -iname *.hpp -o -iname *.cpp -o -iname *.c |
+            xargs clang-format -style=file -i
+    elif [ $format_style = 'google' ]; then
+        find . \
+            -name *.h -o -iname *.hpp -o -iname *.cpp -o -iname *.c |
+            xargs clang-format -style=google -i
+    fi
+}
+
+# =============================================================================
+function _dj_format() {
+    if [ $1 = 'brush' ]; then
+        dj_clang_format_brush $2 $3 $4 $5
+        return
+    fi
+    if [ $1 = 'implement' ]; then
+        _dj_format_clang_format_implement $2 $3 $4 $5 $6 $7
+        return
+    fi
+    if [ $1 = 'show' ]; then
+        if [ $2 = 'camel' ]; then
+            _dj_format_clang_format_show_camel $3 $4 $5 $6 $7
+            return
+        fi
+        return
+    fi
+    if [ $1 = 'enable' ]; then
+        _clang_vscode_setting_json_format_on_save "true"
+        return
+    fi
+    if [ $1 = 'disable' ]; then
+        _clang_vscode_setting_json_format_on_save "false"
+        return
+    fi
+
+    cd ${cur_dir}
+}
+
+# =============================================================================
 function _dj_setup_clang_format() {
     cur_dir=${PWD}
 
@@ -8,7 +125,7 @@ function _dj_setup_clang_format() {
 
     cd $djtools_path
 
-    echo -e "\nDo you want to apply the default vscode settings? [Yes/No]\n"
+    echo -e "Do you want to apply the default vscode settings? [Yes/No]"
     read asw
 
     if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (\
@@ -33,7 +150,7 @@ function _dj_setup_clang_format() {
 function _dj_setup_clang_llvm() {
     cur_dir=${PWD}
 
-    echo -e "\nInstall LLVM clang (clang+llvm) on Ubuntu $(version check ubuntu)\n"
+    echo -e "Install LLVM clang (clang+llvm) on Ubuntu $(version check ubuntu)"
 
     _press_enter_or_wait_s_continue 5
 
@@ -71,7 +188,7 @@ function _dj_setup_clang_llvm() {
 
     mkdir -p ~/.config/Code/User
 
-    echo -e "\nDo you want to apply the default vscode settings? [Yes/No]"
+    echo -e "Do you want to apply the default vscode settings? [Yes/No]"
     read asw
 
     if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (\

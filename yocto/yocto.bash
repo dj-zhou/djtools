@@ -19,19 +19,19 @@ function _yocto_build_plain_sdk() { # image-file
     source ../poky/oe-init-build-env . &>/dev/null
     # must be in a build directory ---------------
     if [ $(_yocto_check_is_a_build_directory) = 'false' ]; then
-        echo -e "not in a valid bitbake build directory, exit!\n"
+        echo -e "not in a valid bitbake build directory, exit!"
         return
     fi
 
     # it can fail to find image name ------------------
     image_file=$(_yocto_find_image_file_from_its_name $1)
     if [ -z $image_file ]; then
-        echo -e "image is not built, need to build the image first, exit!\n"
+        echo -e "image is not built, need to build the image first, exit!"
         return
     fi
     # finally, build the plain-sdk ------------------
-    echo -e "\n is going to build the SDK with the command:"
-    echo -e "   ${PRP}bitbake -c populate_sdk $1${NOC}\n"
+    echo -e "build the SDK with the command:"
+    echo -e "${PRP}  bitbake -c populate_sdk $1${NOC}"
     _press_enter_or_wait_s_continue 5
     bitbake -c populate_sdk $1
 }
@@ -45,8 +45,8 @@ function _yocto_build_plain_sdk() { # image-file
 function _yocto_flash() { # block-device # image-file
     # argument check -------------------
     if [ $# -lt 1 ]; then
-        echo -e "\n usage:\n   yocto flash /dev/sdx <image name>"
-        echo -e "      or \n   yocto flash /dev/sdx -f [filename].wic.gz"
+        echo -e "usage:\n   yocto flash /dev/sdx <image name>"
+        echo -e "     or \n   yocto flash /dev/sdx -f [filename].wic.gz"
         return
     fi
     # check the device block ------------
@@ -54,7 +54,7 @@ function _yocto_flash() { # block-device # image-file
     dev=$(_verify_block_device $dev_str)
     if [ -z $dev ]; then
         echo -e "\n block device $dev_str not found, exit!!"
-        echo -e " you can use command \"lsblk\" to find it.\n"
+        echo -e " you can use command \"lsblk\" to find it."
         return
     fi
     echo -e "          SD card: ${GRN}$dev_str${NOC}"
@@ -68,13 +68,13 @@ function _yocto_flash() { # block-device # image-file
     if [[ -z "$image_file" || ! -f "$image_file" ]]; then
         # must be in a build folder --------------
         if [ $(_yocto_check_is_a_build_directory) = 'false' ]; then
-            echo -e "\n ${RED}not in a valid bitbake build directory, exit!${NOC}\n"
+            echo -e "${RED}not in a valid bitbake build directory, exit!${NOC}"
             return
         fi
         # find the machine -----------------
         machine=$(_yocto_find_MACHINE)
         if [ -z $machine ]; then
-            echo -e "\n ${RED} MACHINE not found, exit!!${NOC}"
+            echo -e "${RED}MACHINE not found, exit!!${NOC}"
             return
         fi
         echo -e "          machine: ${GRN}$machine${NOC}"
@@ -88,7 +88,7 @@ function _yocto_flash() { # block-device # image-file
         # if some other target use some other kind of file, update this ------
         image_file=$(_yocto_find_image_file_from_its_name $2)
         if [ -z "$image_file" ]; then
-            echo -e "image file not found, exit!\n"
+            echo -e "image file not found, exit!"
             return
         fi
         echo -e "       image name: ${GRN}$2${NOC}"
@@ -121,19 +121,19 @@ function _yocto_flash() { # block-device # image-file
     if [[ ${image_file} = *'wic.gz'* || ${image_file} = *'wic.zst'* ]]; then
         # try always run this before flashing ------------------
         echo -e "-----------------------------\n"
-        echo -e " run ${PRP}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
+        echo -e "run ${PRP}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
         _press_enter_or_wait_s_continue 2
         bitbake bmap-tools-native -caddto_recipe_sysroot
         if [[ -f "$bmap_file" ]]; then
             # the following command need to use a *.wic.bmap file in the same path
             # of the wic.gz file
-            echo -e "\n bmap file found, run command:"
-            echo -e " ${PRP}oe-run-native bmap-tools-native bmaptool copy <image> $dev${NOC}\n"
+            echo -e "bmap file found, run command:"
+            echo -e "${PRP}oe-run-native bmap-tools-native bmaptool copy <image> $dev${NOC}"
             _press_enter_or_wait_s_continue 4
             oe-run-native bmap-tools-native bmaptool copy $image_file $dev
         else
-            echo -e "\n bmap file ${YLW}NOT${NOC} found, run command:"
-            echo -e " sudo bmaptool copy -nobmap $image_file $dev\n"
+            echo -e "bmap file ${YLW}NOT${NOC} found, run command:"
+            echo -e "sudo bmaptool copy -nobmap $image_file $dev"
             _press_enter_or_wait_s_continue 4
             sudo bmaptool copy --nobmap $image_file $dev
         fi
@@ -141,8 +141,8 @@ function _yocto_flash() { # block-device # image-file
     fi
     # hddimg for upboard -------------
     if [[ "${image_file}" = *'hddimg'* ]]; then
-        echo -e "\nrun the command:"
-        echo -e "${PRP}  sudo dd bs=4M if=<image file> | pv | dd of=$dev${NOC}"
+        echo -e "run the command:"
+        echo -e "${PRP}sudo dd bs=4M if=<image file> | pv | dd of=$dev${NOC}"
         # sudo dd bs=4M if=$image_file of=$dev status=progress
         sudo dd bs=4M if=$image_file | pv | dd of=$dev
         sync
@@ -230,7 +230,7 @@ function yocto() {
         return
     fi
     # ------------------------------
-    echo -e "\n ${PRP}yocto${NOC}: argument ${RED}$1${NOC} not supported\n"
+    echo -e "${PRP}yocto${NOC}: argument ${RED}$1${NOC} not supported"
     _yocto_help
 
     # ------------------------------

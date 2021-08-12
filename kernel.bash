@@ -42,13 +42,13 @@ function _kernel_config_initramfs() {
 
     # this command has to be run in a linux kernel folder, otherwise, exit
     if [ ! -f Makefile ]; then
-        echo -e "\n kernel config initramfs: "
-        echo -e "   no Makefile found, probably not a Linux kernel folder, exit!\n"
+        echo -e "kernel config initramfs: "
+        echo -e "   no Makefile found, probably not a Linux kernel folder, exit!"
         return
     fi
     # find the kernel version
     kernel_version=$(_kernel_find_version Makefile)
-    echo -e "\n Linux kernel version: "$kernel_version"\n"
+    echo -e "Linux kernel version: "$kernel_version""
 
     # find the target folder
     target_folder=$(_find_argument_after_option -t $1 $2 $3 $4 $5 $6 $7 $8)
@@ -67,12 +67,12 @@ function _kernel_config_initramfs() {
     # echo "busybox_folder = "$busybox_folder
     # to check if the folder exists
     if [ ! -d "${busybox_folder}" ]; then
-        echo -e " busybox install folder: $busybox_folder not found, exit.\n"
+        echo -e " busybox install folder: $busybox_folder not found, exit."
         return
     fi
     # to check busybox version
     busybox_version=$(_kernel_find_version $busybox_folder/Makefile)
-    echo -e " busybox_version = "$busybox_version"\n"
+    echo -e " busybox_version = "$busybox_version""
 
     # find the busybox _install folder
     _install_folder=$(_find_argument_after_option -i $1 $2 $3 $4 $5 $6 $7 $8)
@@ -81,12 +81,12 @@ function _kernel_config_initramfs() {
     fi
     # echo ?"_install_folder = "$_install_folder
     if [ ! -d "$busybox_folder/$_install_folder" ]; then
-        echo -e "\n busybox may not be compiled, exit.\n"
+        echo -e "busybox may not be compiled, exit."
         return
     fi
 
     # start the configuration
-    echo -e "\n going to copy $busybox_folder/$_install_folder to the folder \n"
+    echo -e "going to copy $busybox_folder/$_install_folder to the folder"
     _press_enter_or_wait_s_continue 20
 
     cp $busybox_folder/$_install_folder -r .
@@ -95,7 +95,7 @@ function _kernel_config_initramfs() {
     mkdir -p etc/init.d/
 
     file="etc/init.d/rcS"
-    echo -e "\n going to creete file: $file \n"
+    echo -e "going to creete file: $file"
     _press_enter_or_wait_s_continue 20
 
     touch $file
@@ -112,7 +112,7 @@ function _kernel_config_initramfs() {
     chmod +x $file
 
     file="etc/fstab"
-    echo -e "\n going to creete file: $file \n"
+    echo -e "going to creete file: $file"
     _press_enter_or_wait_s_continue 20
 
     touch $file
@@ -123,7 +123,7 @@ function _kernel_config_initramfs() {
     echo "debugfs /sys/kernel/debug debugfs defaults 0 0" >>$file
 
     file="etc/inittab"
-    echo -e "\n going to creete file: $file \n"
+    echo -e "going to creete file: $file"
     _press_enter_or_wait_s_continue 20
 
     touch $file
@@ -132,7 +132,7 @@ function _kernel_config_initramfs() {
     echo "::askfirst:-/bin/sh" >>$file
     echo "::ctrlaltdel:/bin/umount -a -r" >>$file
 
-    echo -e "\n going to creete device nodes in dev/ \n"
+    echo -e "going to creete device nodes in dev/"
     _press_enter_or_wait_s_continue 20
 
     cd dev
@@ -143,7 +143,7 @@ function _kernel_config_initramfs() {
     sudo mknod console c 5 1
     sudo mknod null c 1 3
 
-    echo -e "\n going to copy the arm linux libraries into lib/ \n"
+    echo -e "going to copy the arm linux libraries into lib/"
     _press_enter_or_wait_s_continue 20
 
     cd ../
@@ -152,7 +152,7 @@ function _kernel_config_initramfs() {
     echo -e " next, you should config the Linux kernel by:"
     echo "   make vexpress_defconfig ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-"
     echo "   make menuconfig ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-"
-    echo -e " you should put \"_install\" into: General setup ---> \"Initramfs source file(s) \"\n"
+    echo -e " you should put \"_install\" into: General setup ---> \"Initramfs source file(s) \""
 
     cd $cur_dir
 }

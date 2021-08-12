@@ -18,7 +18,7 @@ function _dj_help() {
     echo -e "\nFirst level commands:"
     echo "   setup         - to install some software"
     echo "   clone         - clone a repo from github/gitee/bitbucket"
-    echo "   clone-ssh     - use ssh protocol to clone a repo from github/gitee/bitbucket"
+    echo "   ssh-clone     - use ssh protocol to clone a repo from github/gitee/bitbucket"
     echo "   udev          - udev rule setup for usb devices"
     echo "   work-check    - check work status of all repos in a folder"
     echo -e ""
@@ -70,7 +70,7 @@ function _dj_setup_cli11() {
     rm -rf CLI11/
     git clone https://github.com/CLIUtils/CLI11
     cd CLI11
-    git checkout v1.9.1         # v1.9.1 was released on June 20th, 2020.
+    git checkout v2.0.0         # v1.9.1 was released on Jul 14, 2021.
     git submodule update --init # gtest is a submodule of it
     mkdir build
     cd build
@@ -78,47 +78,29 @@ function _dj_setup_cli11() {
     make -j$(nproc)
     sudo make install
 
-    cat <<eom
------------------------------------------------------------------
-    headers files installed to:
-        /usr/local/include/CLI/
-    *.cmake files installed to:
-        /usr/local/lib/cmake/CLI11/
-    package config file installed to:
-        /usr/local/lib/pkgconfig/CLI11.pc
------------------------------------------------------------------
-
-eom
+    _verify_header_files /usr/local/include/CLI/
+    _verify_cmake_files /usr/local/lib/cmake/CLI11/
+    _verify_pkgconfig_file CLI11.pc /usr/local/lib/pkgconfig
     cd $cur_dir
 }
 
 # =============================================================================
 # setting a fixed version is not a good idea, but ...
-function _dj_setup_cmake_3_20_5() {
+function _dj_setup_cmake() {
     # install dependencies
     _install_if_not_installed libssl-dev
-    v="3.20.5"
-    echo -e "${GRN} install CMake $v ${NOC}"
+    v="v3.21.1"
+    echo -e "${GRN}install CMake $v ${NOC}"
     _press_enter_or_wait_s_continue 5
 
     cur_dir=${PWD}
 
-    # where did I got this? I cannot find the source -- do not delete
-    # sudo rm -rf /etc/apt/sources.list.d/kitware-latest.list
-    # wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc \
-    #     2>/dev/null | sudo apt-key add -
-    # sudo sh -c 'echo "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) main" \
-    #     >> /etc/apt/sources.list.d/kitware-latest.list'
-
     cd ~ && mkdir -p soft/ && cd soft/
-    file="cmake-$v.tar.gz"
-    url="https://github.com/Kitware/CMake/releases/download/v$v/$file"
-    _wget_if_not_exist $file "b05ac439a6f49c75a0faaeca4a2c3144" $url
-    rm -rf cmake-$v
-    tar zxvf cmake-$v.tar.gz
-    cd cmake-$v
-    rm build -rf && mkdir build && cd build
-    cmake ..
+    rm -rf CMake
+    git clone https://github.com/Kitware/CMake.git
+    cd CMake
+    git checkout $v
+    ./bootstrap --prefix=/usr/local
     make -j$(nproc)
     sudo make install
 
@@ -147,17 +129,30 @@ function _dj_setup_kdiff3_meld() {
 function _dj_setup_dj_gadgets() {
     cur_dir=${PWD}
 
-    cd ~ && mkdir -p workspace/ && cd workspace/
-    rm -rf dj-gadgets
+    cd ~ && mkdir -p soft/ && cd soft/
+    sudo rm -rf dj-gadgets
     git clone https://dj-zhou@github.com/dj-zhou/dj-gadgets.git
     cd dj-gadgets
-    make && sudo make install
+    sudo rm build -rf
+    mkdir build
+    cd build
+    cmake ..
+    make
+    sudo make install
+
+    # todo: check if CLI11 is installed, if not, install it
+    if [ ! -f /usr/local/lib/pkgconfig/CLI11.pc ]; then
+        dj setup cli11
+    fi
 
     # dj-file installation
-    cd dj-file/
-    ./install.sh
-
-    cd ~/workspace/
+    cd ../dj-file/
+    rm build -rf
+    mkdir build
+    cd build
+    cmake ..
+    make
+    sudo make install
 
     cd $cur_dir
 }
@@ -262,8 +257,7 @@ function _dj_setup_pangolin() {
     rm -rf Pangolin/
     git clone https://github.com/stevenlovegrove/Pangolin.git
     cd Pangolin
-    # this following commit is tested on Ubuntu 20.04, on Sept. 25th, 2020
-    git checkout 86eb4975fc4fc8b5d92148c2e370045ae9bf9f5d # it is on master
+    git checkout v0.6 # released on Apr 22, 2021, need test
     rm -rf build/ && mkdir build && cd build
     cmake ..
     make -j$(nproc)
@@ -272,7 +266,7 @@ function _dj_setup_pangolin() {
     echo -e "libpangolin.so is in path: ${GRN}/usr/local/lib/${NOC}"
     echo -e "header files are in path: ${GRN}/usr/local/include/pangolin/${NOC}"
 
-    echo -e "If you see error ${RED}: Could not find GLEW${NOC}"
+    echo -e "If you see error: ${RED}Could not find GLEW${NOC}"
     echo "you should run the following commands:"
     echo "   \$ dj setup glfw3"
     echo "   \$ dj setup gtest-glog"
@@ -567,21 +561,11 @@ function _dj_setup_gtest() {
     cmake ..
     make -j$(nproc) && sudo make install
 
-    cat <<eom
-
------------------------------------------------------------------
-    gtest.a and gtest_main.a are installed to:
-        /usr/local/lib/
-    
-    header files:
-        /usr/local/include/gtest/*
-
-    pkg-config file:
-        /usr/local/lib/pkgconfig/gtest.pc
-        /usr/local/lib/pkgconfig/gtest_main.pc
------------------------------------------------------------------
-
-eom
+    _verify_static_lib_installation libgtest.a /usr/local/lib/
+    _verify_static_lib_installation libgtest_main.a /usr/local/lib/
+    _verify_header_files /usr/local/include/gtest/
+    _verify_pkgconfig_file gtest.pc /usr/local/lib/pkgconfig/
+    _verify_pkgconfig_file gtest_main.pc /usr/local/lib/pkgconfig/
 
     cd ${cur_dir}
 }
@@ -602,19 +586,8 @@ function _dj_setup_glog() {
     cmake ..
     make -j$(nproc) && sudo make install
 
-    cat <<eom
-
------------------------------------------------------------------
-    glog static library is installed to:
-        /usr/local/lib/libglog.a
-    
-    header files:
-        /usr/local/include/glog/*
-
-    pkg-config file:
-        none
------------------------------------------------------------------
-eom
+    _verify_static_lib_installation libglog.a /usr/local/lib
+    _verify_header_files /usr/local/include/glog/
 
     cd ${cur_dir}
 }
@@ -720,13 +693,13 @@ function _dj_setup_wubi() {
         cat <<eom
 -----------------------------------------------------------------
 Follow the steps:
-    1. log out and log in again;
-    2. $ ibus-setup
-        then in the opened window: Input Method -> Add -> Chinese -> choose WuBi-Jidian-86-JiShuang
-    3. im-config -n ibus 
-        this step will show nothing
-    4. add an input source:
-        Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chinese (WuBi-Jidian-86-JiShuang-6.0)
+1. log out and log in again;
+2. $ ibus-setup
+    then in the opened window: Input Method -> Add -> Chinese -> choose WuBi-Jidian-86-JiShuang
+3. im-config -n ibus 
+    this step will show nothing
+4. add an input source:
+    Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chinese (WuBi-Jidian-86-JiShuang-6.0)
 -----------------------------------------------------------------
 
 eom
@@ -768,7 +741,7 @@ function _dj_setup_vtk_8_2_0() {
 # =============================================================================
 # call function in workspace-check.bash
 function _dj_work_check() {
-    _work_check $1 $2 $3 $4
+    _work_check $@
 }
 
 # =============================================================================
@@ -797,7 +770,7 @@ function _dj_search_string() {
     echo -e "we get:"
     # how to use the variable in the below?? -- $excluded_dir does not work
     # -I option ignores the search from binary files, that is perfect!
-    grep -rI --exclude-dir={build,bin,_bcross*,_bnative*,builddir,.git} "$1" .
+    grep -rI --exclude-dir={build,bin,_bcross*,_bnative*,builddir,.git,.cache} "$1" .
 }
 
 # =============================================================================
@@ -883,7 +856,7 @@ function _dj_ssh_github_activate() {
             # proceed -------------
             echo -e "SSH key file ${GRN}${key_file}${NOC} not found, generate one automatically:"
             printf "${key_file}\n\n" | ssh-keygen
-            echo -e "\ncopy the following content into a new GitHub SSH Key (https://github.com/settings/keys, need login):"
+            echo -e "copy the following content into a new GitHub SSH Key (https://github.com/settings/keys, need login):"
             echo -e "${GRN}"
             cat ${key_file}.pub
             echo -e "${NOC}"
@@ -1116,19 +1089,21 @@ function dj() {
         if [[ "$2" = 'bitbucket' ]] ||
             [[ "$2" = 'github' ]] ||
             [[ "$2" = 'gitee' ]]; then
-            _dj_clone_from $2 $3 $4 $5 $6 $7
+            shift
+            _dj_clone_from $@
             return
         fi
         _dj_clone_help
         return
     fi
     # ------------------------------
-    if [ $1 = 'clone-ssh' ]; then
+    if [ $1 = 'ssh-clone' ]; then
         # --------------------------
         if [[ "$2" = 'bitbucket' ]] ||
             [[ "$2" = 'github' ]] ||
             [[ "$2" = 'gitee' ]]; then
-            _dj_clone_ssh_from $2 $3 $4 $5 $6 $7
+            shift
+            _dj_clone_ssh_from $@
             return
         fi
         _dj_clone_help
@@ -1144,7 +1119,8 @@ function dj() {
     if [ $1 = 'format' ]; then
         # ------------------------------
         if [[ $# -ge 2 ]]; then
-            _dj_format $2 $3 $4 $5 $6 $7 $8
+            shift
+            _dj_format $@
             return
         fi
         echo "dj format: wrong argument, exit."
@@ -1156,7 +1132,8 @@ function dj() {
         if [ $2 = 'package' ]; then
             # ------------------------------
             if [[ $# -ge 3 ]]; then
-                _dj_search_package $3 $4 $5 $6 $7 $8
+                shift 2
+                _dj_search_package $@
                 return
             fi
         fi
@@ -1300,7 +1277,7 @@ function _dj() {
     # All possible first values in command line
     local SERVICES=("
         clone
-        clone-ssh
+        ssh-clone
         flame-graph
         format
         find
@@ -1324,7 +1301,7 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     setup_list="adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost clang-format clang-llvm "
-    setup_list+="cli11 cmake-3.20.5 computer container dj-gadgets devtools driver dropbox eigen3 "
+    setup_list+="cli11 cmake computer container dj-gadgets devtools driver dropbox eigen3 "
     setup_list+="flamegraph fmt foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
     setup_list+="gtest g++-10 i219-v kdiff3-meld lcm libcsv-3.0.2 libev-4.33 libgpiod libiio lib-serialport "
@@ -1379,7 +1356,7 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     ACTIONS[clone]="bitbucket github gitee "
-    ACTIONS["clone-ssh"]="bitbucket github gitee "
+    ACTIONS["ssh-clone"]="bitbucket github gitee "
 
     # --------------------------------------------------------
     flame_list="generate clear help "

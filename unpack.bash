@@ -17,7 +17,7 @@ function _dj_unpack_tar_gz() {
     folder=${tar_gz_file%".tar.gz"*}
     rm $folder -rf
     mkdir -p $folder
-    echo -e "unpack ${GRN}$tar_gz_file${NOC} to directory ${GRN}${folder}/${NOC}\n"
+    echo -e "unpack ${GRN}$tar_gz_file${NOC} to directory ${GRN}${folder}/${NOC}"
 
     _press_enter_or_wait_s_continue 10
     tar -xvf $tar_gz_file -C ./$folder
@@ -26,7 +26,7 @@ function _dj_unpack_tar_gz() {
 # =============================================================================
 function _dj_unpack() {
     if [ $# = 0 ]; then
-        echo -e "\n help: todo\n"
+        echo -e "help: todo"
         return
     fi
     # -------------------------------------------
@@ -42,6 +42,6 @@ function _dj_unpack() {
         return
     fi
 
-    echo -e "\n help: todo\n"
+    echo -e "help: todo"
 
 }

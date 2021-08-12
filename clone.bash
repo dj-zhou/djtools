@@ -23,7 +23,7 @@ function _dj_clone_help() {
     _dj_help
     cat <<eom
 
- ---------------------- dj clone/clone-ssh ------------------------
+ ---------------------- dj clone/ssh-clone ------------------------
  Second level commands:
     bitbuket - to clone repo from BitBucket
     github   - to clone repo from GitHub
@@ -31,7 +31,7 @@ function _dj_clone_help() {
 
  Third level argument:
     --add        - to add the $4 argument into a repo file in ~ directory
-                   such that the command "dj clone-ssh github" can tab-complete with
+                   such that the command "dj ssh-clone github" can tab-complete with
                    repo names
     <repo name>  - to clone a repo from a platform
  ------------------------------------------------------------------
@@ -78,13 +78,13 @@ function _dj_clone_from() { # platform, repo, etc
     platform=$1
     repo_name=$2
     if [[ -z $repo_name ]]; then
-        echo -e "\n ${PRP}dj clone $platform${NOC}: repo name not given\n"
+        echo -e "${PRP}dj clone $platform${NOC}: repo name not given"
         return
     fi
     uname=$(_dj_clone_find_username $platform)
     link=$(_dj_clone_find_link $platform)
     source_link=https://$uname@$link/$uname/$repo_name.git
-    echo -e "\n dj clone: ${GRN}$source_link${NOC}\n"
+    echo -e "dj clone: ${GRN}$source_link${NOC}"
 
     b_name=$(_find_argument_after_option -b $3 $4 $5 $6 $7 $8)
 
@@ -126,13 +126,13 @@ function _dj_clone_ssh_from() {
         fi
     fi
     if [[ -z $repo_name ]]; then
-        echo -e "\n ${PRP}dj clone-ssh $platform${NOC}: repo name not given\n"
+        echo -e "${PRP}dj ssh-clone $platform${NOC}: repo name not given"
         return
     fi
     uname=$(_dj_clone_find_username $platform)
     link=$(_dj_clone_find_link $platform)
     source_link=git@$link:$uname/$repo_name.git
-    echo -e "\n dj clone-ssh: ${GRN}$source_link${NOC}\n"
+    echo -e "dj ssh-clone: ${GRN}$source_link${NOC}"
 
     b_name=$(_find_argument_after_option -b $3 $4 $5 $6 $7 $8)
 

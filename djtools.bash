@@ -29,7 +29,6 @@ ubuntu_v=$(lsb_release -a)
 source $djtools_path/block-device.bash
 source $djtools_path/build.bash
 source $djtools_path/code-name.bash
-source $djtools_path/coding.bash
 source $djtools_path/dj-commands.bash
 source $djtools_path/funcs.bash
 source $djtools_path/keyremap.bash

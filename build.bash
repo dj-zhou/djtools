@@ -164,12 +164,12 @@ function _build_in_docker() {
         echo "no build file, exit."
         return
     fi
-    clean_tag="$1"
-    if [[ -z "$clean_tag" || "$clean_tag" = "all" ]]; then
+    target_tag="$1"
+    if [[ -z "$target_tag" || "$target_tag" = "all" ]]; then
         ./build-docker.sh
         return
     fi
-    if [[ "$clean_tag" = "clean" ]]; then
+    if [[ "$target_tag" = "clean" ]]; then
         echo -e "${GRN}rm -rf _bdocker*${NOC}"
         rm -rf _bdocker*
     fi
@@ -191,32 +191,38 @@ function _build_in_docker() {
 # =============================================================================
 function compile_makefile() {
     echo -e "use ${GRN}Makefile${NOC} to build"
-    clean_tag=$1
-    if [ "$clean_tag" = "clean" ]; then
+    target_tag=$1
+    if [ "$target_tag" = "clean" ]; then
         echo -e "${GRN}make clean${NOC}"
         make clean
         return
     fi
-    echo -e "${GRN}make -j$(nproc) $clean_tag${NOC}"
-    make -j$(nproc) $clean_tag
+    if [ "$target_tag" = "install" ]; then
+        echo -e "${GRN}sudo make install${NOC}"
+        sudo make install
+        return
+    fi
+
+    echo -e "${GRN}make -j$(nproc) $target_tag${NOC}"
+    make -j$(nproc) $target_tag
 
     # stm32 project dedicated scripts, can be moved into Makefile
-    if [ -f .project-stm32 ] && [ -f bin/*.elf ]; then
-        micro_controller=$(grep "STM32" .project-stm32 | awk '{print $1}')
-        flash_kb=$(grep "FLASH" .project-stm32 | awk '{print $1}')
-        ram_kb=$(grep "RAM" .project-stm32 | awk '{print $1}')
-        text_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $1}')
-        text_used=$(echo $text_used | awk '{print $2}')
-        data_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $2}')
-        data_used=$(echo $text_used | awk '{print $2}')
-        flash_percentage=$(awk "BEGIN {print ($((text_used))+$((data_used))) * 100  / $((flash_kb)) / 1024}" | awk '{printf("%d",$0);}')
-        bss_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $3}')
-        bss_used=$(echo $bss_used | awk '{print $2}')
-        ram_percentage=$(awk "BEGIN {print $((bss_used)) * 100  / $((ram_kb)) / 1024}" | awk '{printf("%d",$0);}')
-        echo -e "${GRN}\n------------------------------------${NOC}"
-        echo -e "$micro_controllermemory usage: FLASH: ${flash_percentage}%, RAM: ${ram_percentage}%\n"
+    if [ ! -f .project-stm32 ] && [ ! -f bin/*.elf ]; then
+        return
     fi
-    return
+    micro_controller=$(grep "STM32" .project-stm32 | awk '{print $1}')
+    flash_kb=$(grep "FLASH" .project-stm32 | awk '{print $1}')
+    ram_kb=$(grep "RAM" .project-stm32 | awk '{print $1}')
+    text_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $1}')
+    text_used=$(echo $text_used | awk '{print $2}')
+    data_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $2}')
+    data_used=$(echo $text_used | awk '{print $2}')
+    flash_percentage=$(awk "BEGIN {print ($((text_used))+$((data_used))) * 100  / $((flash_kb)) / 1024}" | awk '{printf("%d",$0);}')
+    bss_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $3}')
+    bss_used=$(echo $bss_used | awk '{print $2}')
+    ram_percentage=$(awk "BEGIN {print $((bss_used)) * 100  / $((ram_kb)) / 1024}" | awk '{printf("%d",$0);}')
+    echo -e "${GRN}\n------------------------------------${NOC}"
+    echo -e "${micro_controller} memory usage summary\nFLASH: ${flash_percentage}%, RAM: ${ram_percentage}%\n"
 }
 
 # =============================================================================
@@ -224,42 +230,36 @@ function compile_cmakelist() {
     echo -e "use ${GRN}CMakeLists.txt${NOC} to build/clean"
     cur_dir=${PWD}
     build_dir="_bnative.cmake"
-    clean_tag=$1
-    if [[ -z "$clean_tag" || "$clean_tag" = "all" ]]; then
+    target_tag=$1
+    if [[ -z "$target_tag" || "$target_tag" = "all" ]]; then
         if [ ! -d "$build_dir" ]; then
-            echo -e "${GRN}mkdir "$build_dir" && cd "$build_dir" && cmake ..${NOC}\n"
+            echo -e "${GRN}mkdir "$build_dir" && cd "$build_dir" && cmake ..${NOC}"
             mkdir "$build_dir" && cd "$build_dir" && cmake ..
         else
-            cd "$build_dir"/ # do not run cmake ..
+            echo -e "${GRN}cd $build_dir/ && cmake ..${NOC}"
+            cd "$build_dir"/ && cmake ..
         fi
         echo -e "${GRN}make -j$(nproc)${NOC}"
         make -j$(nproc)
         cd $cur_dir
         return
     fi
-    if [ "$clean_tag" = "clean" ]; then
-        echo -e "${GRN}rm -rf "$build_dir"/${NOC}\n"
+    if [ "$target_tag" = "clean" ]; then
+        echo -e "${GRN}rm -rf "$build_dir"/${NOC}"
         rm -rf "$build_dir"/
+        return
+    fi
+    if [ "$target_tag" = "install" ]; then
+        echo -e "${GRN}cd "$build_dir"/ && sudo make install${NOC}"
+        cd $build_dir
+        sudo make install
+        cd $cur_dir
         return
     fi
 }
 
 # =============================================================================
 function build() {
-    # ------------------------------
-    if [ $1 = 'meson' ]; then
-        # ------------------------------
-        if [ $2 = '-cross' ]; then
-            _build_meson_use_oesdk $3 $4 $5 $6 $7
-            return
-        fi
-        # ------------------------------
-        if [ $2 = '-native' ]; then
-            _build_meson_native $3 $4 $5 $6 $7
-            return
-        fi
-        return
-    fi
     # ------------------------------
     if [ $1 = 'cmake' ]; then
         compile_cmakelist $2 $3 $4 $5 $6
@@ -274,6 +274,20 @@ function build() {
     # ------------------------------
     if [ $1 = 'make' ]; then
         compile_makefile $2 $3 $4 $5 $6
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'meson' ]; then
+        # ------------------------------
+        if [ $2 = '-cross' ]; then
+            _build_meson_use_oesdk $3 $4 $5 $6 $7
+            return
+        fi
+        # ------------------------------
+        if [ $2 = '-native' ]; then
+            _build_meson_native $3 $4 $5 $6 $7
+            return
+        fi
         return
     fi
     echo -e "${GRN}build${NOC}: argument ${RED}$1${NOC} not supported."
@@ -349,7 +363,7 @@ function _build() {
     ACTIONS[--fresh]=" "
 
     # -----------------------------------------------------
-    cmake_list="all clean "
+    cmake_list="all clean install "
     ACTIONS[cmake]="$cmake_list "
     for i in $cmake_list; do
         ACTIONS[$i]=" "
@@ -362,7 +376,7 @@ function _build() {
     done
 
     # -----------------------------------------------------
-    make_list="all clean "
+    make_list="all clean install "
     ACTIONS[make]="$make_list "
     for i in $make_list; do
         ACTIONS[$i]=" "

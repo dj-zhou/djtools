@@ -2,14 +2,14 @@
 
 # =============================================================================
 function _system_help() {
-    echo -e '\n system help\n'
+    echo -e 'system help'
     echo ' exmaple command 1:'
     echo '   -- enable '
     echo '   -- disable '
     echo '   -- check '
     echo '   -- wallpaper '
     echo '   -- ubuntu-drivers '
-    echo -e "   -- MORE IS COMMING\n"
+    echo -e "   -- MORE IS COMMING"
 }
 
 # =============================================================================
@@ -21,33 +21,33 @@ function _system_enable_help() {
 
 # =============================================================================
 function _system_disable_help() {
-    echo -e "\n system disable <argument>"
+    echo -e "system disable <argument>"
     echo "   -- program-problem-detected : to disable an Ubuntu error report"
-    echo -e "   -- MORE IS COMMING\n"
+    echo -e "   -- MORE IS COMMING"
 }
 
 # =============================================================================
 function _system_check_help() {
-    echo -e "\n system check <argument>"
+    echo -e "system check <argument>"
     echo "   -- cpu-memory    : to check CPU and memory usage of a PID"
     echo "   -- nvidia-driver : to check nvidia driver"
     echo "   -- temperature   : to check CPU temperature"
     echo "   -- udev-rules    : to check udev rules"
-    echo -e "   -- MORE IS COMMING\n"
+    echo -e "   -- MORE IS COMMING"
 }
 
 # =============================================================================
 function _system_disable_program_problem_detected() {
     sudo rm -f /var/crash/*
     sudo sed -i "s/enabled=1/enabled=0/g" /etc/default/apport
-    echo -e "/etc/default/apport is revised to\n"
+    echo -e "/etc/default/apport is revised to:"
     cat /etc/default/apport
     echo -e '\n'
 }
 
 # =============================================================================
 function _system_disable_apt_dpkg_locks() {
-    echo -e "\n${RED} running this command with caution!!${NOC}\n"
+    echo -e "${RED}running this command with caution!!${NOC}"
 
     echo "sudo rm -f /var/lib/dpkg/lock-frontend"
     sudo rm -f /var/lib/dpkg/lock-frontend
@@ -73,9 +73,9 @@ function _system_disable_apt_dpkg_locks() {
 # =============================================================================
 function _system_check_cpu_memory() {
     if [ $# = 0 ]; then
-        echo -e "\n system check cpu-memory"
+        echo -e "system check cpu-memory"
         echo "    usage (example): "
-        echo -e "   system check cpu-memory \"./bin/main\"\n"
+        echo -e "   system check cpu-memory \"./bin/main\""
         return
     fi
     cmd=$1
@@ -142,14 +142,13 @@ function _system_wallpaper_random() {
     done <~/.bashrc
 
     if [ $wallpaper_folder_is_set = 0 ]; then
-        echo -e "\nwallpaper_folder is NOT set. please enter a path of the wallpapers: "
+        echo -e "variable ${GRN}wallpaper_folder${NOC} is NOT set. please enter a path of the wallpapers: "
         read answer
 
         echo '# ===========================================================' >>~/.bashrc
         echo '# (djtools) wallpaper setup' >>~/.bashrc
         echo 'wallpaper_folder='$answer >>~/.bashrc
         echo -e '\n' >>~/.bashrc
-        echo -e "\n"
     fi
     # _random_wallpaper # from funcs.bash
     cur_dir=${PWD}

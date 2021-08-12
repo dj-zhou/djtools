@@ -6,7 +6,7 @@ function _dj_setup_ros_melodic() {
 
     # only Uubntu 18.04 can install ros-melodic
     if [[ $ubuntu_v != *'Ubuntu 18.04'* ]]; then
-        echo -e "\n ROS Melodic can only be installed on Ubuntu 18.04\n"
+        echo -e "ROS Melodic can only be installed on Ubuntu 18.04"
         return
     fi
 
@@ -49,7 +49,7 @@ function _dj_setup_ros_melodic() {
     # echo 'export HOSTNAME:' >> ~/.bashrc
     echo 'export ROS_MASTER_URI=http://localhost:11311' >>~/.bashrc
     echo 'export ROS_IP=localhost' >>~/.bashrc
-    echo -e "\n ROS (1) settings are in ~/.bashrc.\n"
+    echo -e "ROS (1) settings are in ~/.bashrc."
 
     # setup workspace ---------------
     cat <<eom
@@ -73,7 +73,7 @@ function _dj_setup_ros_noetic() {
 
     # only Uubntu 18.04 can install ros-melodic
     if [[ $ubuntu_v != *'Ubuntu 20.04'* ]]; then
-        echo -e "\n ROS Noetic can only be installed on Ubuntu 20.04\n"
+        echo -e "ROS Noetic can only be installed on Ubuntu 20.04"
         return
     fi
 
@@ -116,7 +116,7 @@ function _dj_setup_ros_noetic() {
     # echo 'export HOSTNAME:' >> ~/.bashrc
     echo 'export ROS_MASTER_URI=http://localhost:11311' >>~/.bashrc
     echo 'export ROS_IP=localhost' >>~/.bashrc
-    echo -e "\n ROS (1) settings are in ~/.bashrc\n"
+    echo -e "ROS (1) settings are in ~/.bashrc"
 
     # setup workspace ---------------
     cat <<eom
@@ -141,7 +141,7 @@ function _dj_setup_ros2_foxy_from_deb_package() {
 
     # only Uubntu 20.04 can install ros2 Foxy Fitzroy
     if [[ $ubuntu_v != *'Ubuntu 20.04'* ]]; then
-        echo -e "\n ROS2 Foxy Fitzroy can only be installed on Ubuntu 20.04\n"
+        echo -e "ROS2 Foxy Fitzroy can only be installed on Ubuntu 20.04"
         return
     fi
 

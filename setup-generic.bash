@@ -515,11 +515,12 @@ function _dj_setup_gcc_arm_stm32() {
         sudo tar xjf ${filename} -C /usr/share/
 
         echo -e "create symbolic links\n"
+        sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-ar /usr/bin/arm-none-eabi-ar
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-gcc /usr/bin/arm-none-eabi-gcc
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-g++ /usr/bin/arm-none-eabi-g++
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-gdb /usr/bin/arm-none-eabi-gdb
-        sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-size /usr/bin/arm-none-eabi-size
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-objcopy /usr/bin/arm-none-eabi-objcopy
+        sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-size /usr/bin/arm-none-eabi-size
     fi
     cd $cur_dir
     unset cur_dir
@@ -1033,7 +1034,7 @@ eom
 # testing
 function _dj_setup_meson() {
 
-    meson_v="0.58.0" # use fixed version, released on July 7th, 2021
+    meson_v="0.58.2" # use fixed version, released on July 18th, 2021
     ninja_v="1.10.2" # use fixed version, released on Nov. 28th, 2020
 
     # sanity check
@@ -1466,7 +1467,7 @@ function _dj_setup_yaml_cpp() {
     cmake_v=$(version check cmake)
     anw=$(_version_if_ge_than $cmake_v 3.20.5)
     if [ "$anw" = 'no' ]; then
-        dj setup cmake-3.20.5
+        dj setup cmake
     fi
     # remove existing library, if there is
     sudo rm -rf /usr/local/lib/libyaml-cpp*
@@ -1489,24 +1490,15 @@ function _dj_setup_yaml_cpp() {
     # elif [[ "$yaml_v" = "0.6.3" ]]; then
     #     cmake .. -DYAML_BUILD_SHARED_LIBS=ON
     # fi
+    cmake ..
     echo -e "version to be installed $YLW$yaml_v$NOC"
     _press_enter_or_wait_s_continue 5
     make -j4 # do not use all CPU threads
     sudo make install
 
-    echo -e "libyaml-cpp.so is installed in /usr/local/lib/"
-    echo -e " header files are installed in /usr/local/include/yaml-cpp/"
-    echo -e " pkg-config file installed to: /usr/local/lib/pkgconfig/yaml-cpp.pc\n"
-
-    # ---------------------------------------------
-    # # a better way to install it
-    # sudo apt-get update
-    # sudo apt-get install libyaml-cpp-dev -y
-
-    # # to show the version
-    # sudo apt show libyaml-cpp-dev
-
-    # echo -e '\n if the version is NOT 0.5.2, it may have some problem.\n'
+    _verify_static_lib_installation libyaml-cpp.a /usr/local/lib
+    _verify_header_files /usr/local/include/yaml-cpp/
+    _verify_pkgconfig_file yaml-cpp.pc /usr/local/lib/pkgconfig
 
     cd ${cur_dir}
 }
@@ -1558,8 +1550,8 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'cmake-3.20.5' ]; then
-        _dj_setup_cmake_3_20_5
+    if [ $1 = 'cmake' ]; then
+        _dj_setup_cmake
         return
     fi
     # --------------------------
