@@ -70,7 +70,7 @@ function _dj_setup_cli11() {
     rm -rf CLI11/
     git clone https://github.com/CLIUtils/CLI11
     cd CLI11
-    git checkout v2.0.0         # v1.9.1 was released on Jul 14, 2021.
+    git checkout v2.0.0
     git submodule update --init # gtest is a submodule of it
     mkdir build
     cd build
@@ -89,7 +89,7 @@ function _dj_setup_cli11() {
 function _dj_setup_cmake() {
     # install dependencies
     _install_if_not_installed libssl-dev
-    v="v3.21.1"
+    v=$(_find_package_version cmake)
     echo -e "${GRN}install CMake $v ${NOC}"
     _press_enter_or_wait_s_continue 5
 
@@ -1348,8 +1348,6 @@ function _dj() {
     ACTIONS[spdlog]="static shared "
     ACTIONS[static]=" "
     ACTIONS[shared]=" "
-    ACTIONS["libyaml-cpp"]="-v "
-    ACTIONS[-v]="0.6.2 0.6.3 "
     ACTIONS[0.6.2]=" "
     ACTIONS[0.6.3]=" "
 

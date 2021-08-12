@@ -1472,10 +1472,8 @@ function _dj_setup_yaml_cpp() {
     # remove existing library, if there is
     sudo rm -rf /usr/local/lib/libyaml-cpp*
 
-    yaml_v=$(_find_argument_after_option -v $1 $2 $3 $4 $5 $6 $7 $8)
-    if [ -z $yaml_v ]; then
-        yaml_v="0.6.3"
-    fi
+    yaml_v=$(_find_package_version libyaml-cpp)
+
     cd ~ && mkdir -p soft/ && cd soft/
     rm yaml-cpp -rf
 
@@ -1485,7 +1483,7 @@ function _dj_setup_yaml_cpp() {
     rm -rf build/ && mkdir build && cd build
 
     cmake ..
-    echo -e "version to be installed $YLW$yaml_v$NOC"
+    echo -e "install libyaml-cpp version $GRN$yaml_v$NOC"
     _press_enter_or_wait_s_continue 5
     make -j4 # do not use all CPU threads
     sudo make install
