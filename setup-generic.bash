@@ -1484,12 +1484,6 @@ function _dj_setup_yaml_cpp() {
     git checkout yaml-cpp-$yaml_v
     rm -rf build/ && mkdir build && cd build
 
-    # use static library as default, do not delete the below script
-    # if [[ "$yaml_v" = "0.6.2" ]]; then
-    #     cmake .. -DBUILD_SHARED_LIBS=ON
-    # elif [[ "$yaml_v" = "0.6.3" ]]; then
-    #     cmake .. -DYAML_BUILD_SHARED_LIBS=ON
-    # fi
     cmake ..
     echo -e "version to be installed $YLW$yaml_v$NOC"
     _press_enter_or_wait_s_continue 5
