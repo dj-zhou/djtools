@@ -1,0 +1,40 @@
+cmake_minimum_required(VERSION 3.10)
+project(cmake-project)
+set(CMAKE_CXX_STANDARD 17)
+add_compile_options(
+  -Wall
+  -Wextra
+  -pedantic
+  -Werror
+  -Wformat=2
+  -Wduplicated-cond
+  -Wfloat-equal
+  -Wshadow
+  -Wconversion
+  -Wlogical-not-parentheses
+)
+
+# ------------------------------
+add_executable(
+  main
+  src/main.cpp
+)
+# target_link_libraries(
+#   main
+# )
+# install(TARGETS main RUNTIME DESTINATION bin)
+
+# ------------------------------
+# set(SRC_FILES
+#     src/xxx.c
+# )
+# set(HEADER_FILES
+#     inc/xxx.h
+# )
+
+# add_library(yyy STATIC "${SRC_FILES}")
+# set_target_properties(yyy PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
+# INSTALL(TARGETS yyy
+#     LIBRARY DESTINATION /usr/local/lib
+#     PUBLIC_HEADER DESTINATION /usr/local/include/yyy/
+# )

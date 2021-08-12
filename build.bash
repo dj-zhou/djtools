@@ -259,6 +259,19 @@ function compile_cmakelist() {
 }
 
 # =============================================================================
+function compile_template() {
+    if [ $1 = 'cmake' ]; then
+        cp $djtools_path/compile-template/CMakeLists.txt-native ./CMakeLists.txt
+        return
+    fi
+    if [ $1 = 'stm32f107xc' ]; then
+        cp $djtools_path/compile-template/Makefile-stm32f107xc ./Makefile
+        cp $djtools_path/compile-template/.project-stm32f107xc ./.project-stm32
+        return
+    fi
+}
+
+# =============================================================================
 function build() {
     # ------------------------------
     if [ $1 = 'cmake' ]; then
@@ -288,6 +301,12 @@ function build() {
             _build_meson_native $3 $4 $5 $6 $7
             return
         fi
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'template' ]; then
+        shift
+        compile_template $@
         return
     fi
     echo -e "${GRN}build${NOC}: argument ${RED}$1${NOC} not supported."
@@ -339,10 +358,11 @@ function _build() {
     COMPREPLY=()
 
     # All possible first values in command line
-    service=$(_build_meson_exists)
+    service="template"
+    service+=$(_build_build_docker_exists)
     service+=$(_build_cmakelists_exists)
     service+=$(_build_makefile_exists)
-    service+=$(_build_build_docker_exists)
+    service+=$(_build_meson_exists)
     local SERVICES=("
         $service
     ")
@@ -351,17 +371,11 @@ function _build() {
     declare -A ACTIONS
 
     # -----------------------------------------------------
-    meson_list="-cross -native "
-    ACTIONS[meson]="$meson_list "
-    oesdk_list="$(ls -a ${HOME}/ | grep oesdk | sed 's/-oesdk//g') "
-    ACTIONS[-cross]="$oesdk_list "
-    for i in $oesdk_list; do
-        ACTIONS[$i]="--conti --fresh "
+    template_list="cmake stm32f107xc "
+    ACTIONS[template]="$template_list "
+    for i in $template_list; do
+        ACTIONS[$i]=" "
     done
-    ACTIONS[-native]=" " # does not take --conti or --fresh option
-    ACTIONS[--conti]=" "
-    ACTIONS[--fresh]=" "
-
     # -----------------------------------------------------
     cmake_list="all clean install "
     ACTIONS[cmake]="$cmake_list "
@@ -381,6 +395,18 @@ function _build() {
     for i in $make_list; do
         ACTIONS[$i]=" "
     done
+
+    # -----------------------------------------------------
+    meson_list="-cross -native "
+    ACTIONS[meson]="$meson_list "
+    oesdk_list="$(ls -a ${HOME}/ | grep oesdk | sed 's/-oesdk//g') "
+    ACTIONS[-cross]="$oesdk_list "
+    for i in $oesdk_list; do
+        ACTIONS[$i]="--conti --fresh "
+    done
+    ACTIONS[-native]=" " # does not take --conti or --fresh option
+    ACTIONS[--conti]=" "
+    ACTIONS[--fresh]=" "
 
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
