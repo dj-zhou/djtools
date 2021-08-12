@@ -264,14 +264,17 @@ function compile_template() {
         cp $djtools_path/compile-template/CMakeLists.txt-native ./CMakeLists.txt
         return
     fi
-    if [ $1 = 'stm32f107xc' ]; then
-        cp $djtools_path/compile-template/Makefile-stm32f107xc ./Makefile
-        cp $djtools_path/compile-template/.project-stm32f107xc ./.project-stm32
-        return
-    fi
-    if [ $1 = 'stm32f407zg' ]; then
-        cp $djtools_path/compile-template/Makefile-stm32f407zg ./Makefile
-        cp $djtools_path/compile-template/.project-stm32f407zg ./.project-stm32
+    if [[ $1 = 'stm32f'* ]]; then
+        if [ ! -f $djtools_path/compile-template/Makefile-$1 ]; then
+            echo "Makefile for $1 does not exist, exit!"
+            return
+        fi
+        if [ ! -f $djtools_path/compile-template/.project-$1 ]; then
+            echo ".project-stm32 for $1 does not exist, exit!"
+            return
+        fi
+        cp $djtools_path/compile-template/Makefile-$1 ./Makefile
+        cp $djtools_path/compile-template/.project-$1 ./.project-stm32
         return
     fi
 }

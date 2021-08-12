@@ -20,7 +20,7 @@ ifneq (,$(findstring STM32F1,$(STM32Fx)))
 	LIB_HAL    = f1-v1.8.4
 	STM32Family= STM32F1xx
 else
-    $(info not a STM32F1 family, you need to revise the Makefile)
+    $(info not a STM32F1xx family device, you need to revise the Makefile)
 endif
 
 # =============================================================================
