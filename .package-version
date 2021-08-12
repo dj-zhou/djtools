@@ -1,3 +1,5 @@
 cli11 v2.0.0 # released on xxxx
 cmake 3.21.1
+fmt 7.0.1
 libyaml-cpp 0.6.3
+magic-enum v0.7.2

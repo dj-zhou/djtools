@@ -360,7 +360,7 @@ eom
 function _dj_setup_fmt() {
     cur_dir=${PWD}
 
-    fmt_v="7.0.1"
+    fmt_v=$(_find_package_version fmt)
 
     # remove first ------------------
     sudo rm -rf /usr/local/lib/libfmt.a
@@ -957,7 +957,7 @@ function _dj_setup_magic_enum() {
     cur_dir=${PWD}
     cd ~ && mkdir -p soft/ && cd soft/ && rm magic_enum -rf
 
-    ver="v0.7.2" # use static version number at this moment
+    ver=$(_find_package_version magic-enum)
     git clone https://github.com/Neargye/magic_enum
     cd magic_enum
     git checkout $ver
