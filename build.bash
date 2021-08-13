@@ -379,7 +379,8 @@ function _build() {
     declare -A ACTIONS
 
     # -----------------------------------------------------
-    template_list="cmake stm32f030r8 stm32f107xc stm32f407zg stm32f767zi "
+    template_list="cmake stm32f030r8 stm32f107xc stm32f303re stm32f407zg "
+    template_list+="stm32f407vg stm32f427vi stm32f767zi "
     ACTIONS[template]="$template_list "
     for i in $template_list; do
         ACTIONS[$i]=" "
