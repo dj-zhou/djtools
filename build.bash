@@ -264,17 +264,17 @@ function compile_template() {
         cp $djtools_path/compile-template/CMakeLists.txt-native ./CMakeLists.txt
         return
     fi
-    if [[ $1 = 'stm32f'* ]]; then
-        if [ ! -f $djtools_path/compile-template/Makefile-$1 ]; then
-            echo "Makefile for $1 does not exist, exit!"
+    if [ $1 = 'stm32' ]; then
+        if [ ! -f $djtools_path/compile-template/Makefile-stm32f$2 ]; then
+            echo "Makefile for $2 does not exist, exit!"
             return
         fi
-        if [ ! -f $djtools_path/compile-template/.project-$1 ]; then
-            echo ".project-stm32 for $1 does not exist, exit!"
+        if [ ! -f $djtools_path/compile-template/.project-stm32f$2 ]; then
+            echo ".project-stm32 for $2 does not exist, exit!"
             return
         fi
-        cp $djtools_path/compile-template/Makefile-$1 ./Makefile
-        cp $djtools_path/compile-template/.project-$1 ./.project-stm32
+        cp $djtools_path/compile-template/Makefile-stm32f$2 ./Makefile
+        cp $djtools_path/compile-template/.project-stm32f$2 ./.project-stm32
         return
     fi
 }
@@ -379,10 +379,15 @@ function _build() {
     declare -A ACTIONS
 
     # -----------------------------------------------------
-    template_list="cmake stm32f030r8 stm32f107xc stm32f303re stm32f407zg "
-    template_list+="stm32f407vg stm32f427vi stm32f746zg stm32f767zi "
+    template_list="cmake stm32 "
     ACTIONS[template]="$template_list "
     for i in $template_list; do
+        ACTIONS[$i]=" "
+    done
+    stm32_list="030r8 107xc 303re 407zg "
+    stm32_list+="407vg 427vi 746zg 767zi "
+    ACTIONS[stm32]="$stm32_list "
+    for i in $stm32_list; do
         ACTIONS[$i]=" "
     done
     # -----------------------------------------------------
