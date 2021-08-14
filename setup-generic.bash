@@ -400,22 +400,11 @@ function _dj_setup_fmt() {
     make -j$(nproc)
     sudo make install
 
-    cat <<eom
+    _verify_lib_installation libfmt.a /usr/local/lib
+    _verify_header_files /usr/local/include/fmt
+    _verify_pkgconfig_file fmt.pc /usr/local/lib/pkgconfig
+    _verify_cmake_files fmt-config.cmake /usr/local/lib/cmake/fmt
 
---------------------------------------------
-fmt is installed to:
-    /usr/local/lib/libfmt.a
-
-header files:
-    /usr/local/include/fmt/*.h
-
-pkg-config file:
-    /usr/local/lib/pkgconfig/fmt.pc
-
-cmake files:
-    /usr/local/lib/cmake/fmt/
---------------------------------------------
-eom
     cd $cur_dir
 }
 

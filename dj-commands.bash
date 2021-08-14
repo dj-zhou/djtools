@@ -160,7 +160,9 @@ function _dj_setup_dj_gadgets() {
 # =============================================================================
 # todo: for each package, yes (default) to intall, no to skip
 function _dj_setup_devtools() {
-    _install_if_not_installed libncurses5-dev
+    _install_if_not_installed \
+        libncurses5-dev \
+        libnl-genl-3-dev
 }
 
 # =============================================================================

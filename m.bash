@@ -33,13 +33,13 @@ function compile_make_build_etc() {
             rm -rf _bnative*
             return
         fi
-        echo -e "use ${PRP}meson.build${NOC} to build"
+        echo -e "use ${GRN}meson.build${NOC} to build"
         _build_meson_native
         return
     fi
     # ------------------------------
     if [ -f "make.sh" ]; then
-        echo -e "use ${PRP}make.sh${NOC} to build"
+        echo -e "use ${GRN}make.sh${NOC} to build"
         chmod +x make.sh
         ./make.sh $clean_tag
         return
