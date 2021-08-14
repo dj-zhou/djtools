@@ -58,6 +58,27 @@ eom
 }
 
 # =============================================================================
+function _dj_setup_abseil_cpp() {
+    cur_dir=${PWD} && cd ~ && mkdir -p soft/ && cd soft/
+
+    abseil_v="20210324.2"
+    rm abseil-cpp -rf
+    git clone git@github.com:abseil/abseil-cpp.git
+    cd abseil-cpp
+    git checkout $abseil_v
+    mkdir build && cd build && cmake ..
+    make -j$(nproc)
+    sudo make install
+
+    cd $cur_dir
+
+    _verify_static_lib_installation libabsl_base.a /usr/local/lib
+    _verify_pkgconfig_file absl_base.pc /usr/local/lib/pkgconfig
+    _verify_header_files /usr/local/include/absl/
+    _verify_cmake_files abslConfig.cmake /usr/local/lib/cmake/absl/
+}
+
+# =============================================================================
 function _dj_setup_adobe_pdf_reader() {
     cur_dir=${PWD}
 
@@ -1505,6 +1526,11 @@ function _dj_setup_yaml_cpp() {
 
 # =============================================================================
 function _dj_setup() {
+    # --------------------------
+    if [ $1 = 'abseil-cpp' ]; then
+        _dj_setup_abseil_cpp
+        return
+    fi
     if [ $1 = 'adobe-pdf-reader' ]; then
         _dj_setup_adobe_pdf_reader
         return

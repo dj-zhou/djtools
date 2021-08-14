@@ -285,7 +285,7 @@ function _verify_static_lib_installation() {
 # =============================================================================
 function _verify_header_files() {
     if [ ! -d "$1" ]; then
-        echo -e "${RED}header files are not found{NOC}"
+        echo -e "${RED}header files are not found${NOC}"
     else
         echo -e "header files are installed to\n $1"
     fi
@@ -293,8 +293,8 @@ function _verify_header_files() {
 
 # =============================================================================
 function _verify_cmake_files() {
-    if [ ! -d "$1" ]; then
-        echo -e "${RED}cmake files are not found{NOC}"
+    if [ ! -f "$2/$1" ]; then
+        echo -e "${RED}cmake file $1 is not found in $2${NOC}"
     else
         echo -e "cmake files are installed to\n $1"
     fi

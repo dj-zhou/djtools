@@ -1300,8 +1300,8 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    setup_list="adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost clang-format clang-llvm "
-    setup_list+="cli11 cmake computer container dj-gadgets devtools driver dropbox eigen3 "
+    setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost clang-format "
+    setup_list+="clang-llvm cli11 cmake computer container dj-gadgets devtools driver dropbox eigen3 "
     setup_list+="flamegraph fmt foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
     setup_list+="gtest g++-10 i219-v kdiff3-meld lcm libcsv-3.0.2 libev-4.33 libgpiod libiio lib-serialport "
