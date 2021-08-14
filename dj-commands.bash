@@ -561,8 +561,8 @@ function _dj_setup_gtest() {
     cmake ..
     make -j$(nproc) && sudo make install
 
-    _verify_static_lib_installation libgtest.a /usr/local/lib/
-    _verify_static_lib_installation libgtest_main.a /usr/local/lib/
+    _verify_lib_installation libgtest.a /usr/local/lib/
+    _verify_lib_installation libgtest_main.a /usr/local/lib/
     _verify_header_files /usr/local/include/gtest/
     _verify_pkgconfig_file gtest.pc /usr/local/lib/pkgconfig/
     _verify_pkgconfig_file gtest_main.pc /usr/local/lib/pkgconfig/
@@ -586,7 +586,7 @@ function _dj_setup_glog() {
     cmake ..
     make -j$(nproc) && sudo make install
 
-    _verify_static_lib_installation libglog.a /usr/local/lib
+    _verify_lib_installation libglog.a /usr/local/lib
     _verify_header_files /usr/local/include/glog/
 
     cd ${cur_dir}

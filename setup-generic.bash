@@ -72,7 +72,7 @@ function _dj_setup_abseil_cpp() {
 
     cd $cur_dir
 
-    _verify_static_lib_installation libabsl_base.a /usr/local/lib
+    _verify_lib_installation libabsl_base.a /usr/local/lib
     _verify_pkgconfig_file absl_base.pc /usr/local/lib/pkgconfig
     _verify_header_files /usr/local/include/absl/
     _verify_cmake_files abslConfig.cmake /usr/local/lib/cmake/absl/
@@ -785,40 +785,38 @@ function _dj_setup_libgpiod() {
     rm -rf libgpiod*
     if [[ "${ubuntu_v}" = *'18.04'* ]]; then
         libgpiod_v="1.4"
+        file_name=libgpiod-$libgpiod_v
+        link="https://mirrors.edge.kernel.org/pub/software/"
+        link="${link}libs/libgpiod/$file_name.tar.gz"
+
+        wget $link
+        tar -xvf $file_name.tar.gz
+
+        # install -------------
+        cd $file_name
+        ./configure
+        make -j$(nproc)
+        sudo make install
+
     elif [[ "${ubuntu_v}" = *'20.04'* ]]; then
-        libgpiod_v="1.6"
+        _install_if_not_installed autoconf-archive
+
+        rm libgpiod -rf
+        git clone git://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git
+        cd libgpiod
+        git checkout v1.6.3
+        ./autogen.sh --enable-tools=yes
+        make -j$(nproc)
+        sudo make install
+
+        _verify_lib_installation libgpiod.so /usr/local/lib
+        _verify_pkgconfig_file libgpiod.pc /usr/local/lib/pkgconfig
+        _verify_lib_installation gpiod.h /usr/local/include
     else
         echo "_dj_setup_libgpiod: todo"
         return
     fi
-    file_name=libgpiod-$libgpiod_v
-    link="https://mirrors.edge.kernel.org/pub/software/"
-    link="${link}libs/libgpiod/$file_name.tar.xz"
-    wget $link
-    tar -xvf $file_name.tar.xz
 
-    # install -------------
-    cd $file_name
-    ./configure
-    make -j$(nproc)
-    sudo make install
-    cd ~/soft
-
-    cat <<eom
---------------------------------------------
-libgpiod is installed to:
-    /usr/lib/x86_64-linux-gnu/libgpiod.a
-    /usr/lib/x86_64-linux-gnu/libgpiod.so
-    /usr/lib/x86_64-linux-gnu/libgpiod.so.1
-    /usr/lib/x86_64-linux-gnu/libgpiod.so.1.0.0
-    
-header file:
-    /usr/include/gpiod.h
-
-pkg-config file:
-    /usr/lib/x86_64-linux-gnu/pkgconfig/libgpiod.pc
---------------------------------------------
-eom
     cd $cur_dir
 }
 
@@ -1509,7 +1507,7 @@ function _dj_setup_yaml_cpp() {
     make -j4 # do not use all CPU threads
     sudo make install
 
-    _verify_static_lib_installation libyaml-cpp.a /usr/local/lib
+    _verify_lib_installation libyaml-cpp.a /usr/local/lib
     _verify_header_files /usr/local/include/yaml-cpp/
     _verify_pkgconfig_file yaml-cpp.pc /usr/local/lib/pkgconfig
 

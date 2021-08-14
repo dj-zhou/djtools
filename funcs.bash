@@ -274,11 +274,11 @@ function _install_if_not_installed() {
 }
 
 # =============================================================================
-function _verify_static_lib_installation() {
+function _verify_lib_installation() {
     if [ ! -f "$2/$1" ]; then
-        echo -e "${RED}static library $1 is not found in $2${NOC}"
+        echo -e "${RED}library $1 is not found in $2${NOC}"
     else
-        echo -e "static library $1 is installed to\n $2"
+        echo -e "library $1 is installed to\n $2"
     fi
 }
 
