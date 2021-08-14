@@ -61,7 +61,7 @@ eom
 function _dj_setup_abseil_cpp() {
     cur_dir=${PWD} && cd ~ && mkdir -p soft/ && cd soft/
 
-    abseil_v="20210324.2"
+    abseil_v=$(_find_package_version abseil-cpp)
     rm abseil-cpp -rf
     git clone git@github.com:abseil/abseil-cpp.git
     cd abseil-cpp
