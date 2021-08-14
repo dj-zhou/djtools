@@ -610,11 +610,11 @@ function _dj_setup_gnome() {
 function _dj_setup_grpc() {
     cur_dir=$PWD
 
-    grpv_v="1.38.0"
+    grpc_v=$(_find_package_version grpc)
     cd ~ && mkdir -p soft && cd soft/
     rm grpc -rf
     git clone https://github.com/grpc/grpc.git --recurse-submodules \
-        --shallow-submodules --depth 1 --branch v${grpv_v}
+        --shallow-submodules --depth 1 --branch v${grpc_v}
     cd grpc
     mkdir build && cd build
     cmake .. -GNinja
