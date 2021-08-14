@@ -308,3 +308,26 @@ function _verify_pkgconfig_file() {
         echo -e "pkgconfig file $1 is installed to\n $2"
     fi
 }
+
+# =============================================================================
+# find package version from the file .package-version
+function _find_package_version() {
+    set -eu
+    file="$djtools_path/.package-version"
+    package=$1
+    if [ -z "$package" ]; then
+        echo >&2 -e "${RED}error: package empty${NOC}"
+        return
+    fi
+    version=""
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == "$package"* ]]; then
+            version=$(echo $line | awk '{ print $2 }')
+        fi
+    done <$file
+    if [ -z "$version" ]; then
+        echo >&2 -e "${RED}error: package $package version not found, need to update .package-version${NOC}"
+        return
+    fi
+    echo $version
+}

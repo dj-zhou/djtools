@@ -381,7 +381,7 @@ eom
 function _dj_setup_fmt() {
     cur_dir=${PWD}
 
-    fmt_v="7.0.1"
+    fmt_v=$(_find_package_version fmt)
 
     # remove first ------------------
     sudo rm -rf /usr/local/lib/libfmt.a
@@ -978,7 +978,7 @@ function _dj_setup_magic_enum() {
     cur_dir=${PWD}
     cd ~ && mkdir -p soft/ && cd soft/ && rm magic_enum -rf
 
-    ver="v0.7.2" # use static version number at this moment
+    ver=$(_find_package_version magic-enum)
     git clone https://github.com/Neargye/magic_enum
     cd magic_enum
     git checkout $ver
@@ -1493,10 +1493,8 @@ function _dj_setup_yaml_cpp() {
     # remove existing library, if there is
     sudo rm -rf /usr/local/lib/libyaml-cpp*
 
-    yaml_v=$(_find_argument_after_option -v $1 $2 $3 $4 $5 $6 $7 $8)
-    if [ -z $yaml_v ]; then
-        yaml_v="0.6.3"
-    fi
+    yaml_v=$(_find_package_version libyaml-cpp)
+
     cd ~ && mkdir -p soft/ && cd soft/
     rm yaml-cpp -rf
 
@@ -1505,14 +1503,8 @@ function _dj_setup_yaml_cpp() {
     git checkout yaml-cpp-$yaml_v
     rm -rf build/ && mkdir build && cd build
 
-    # use static library as default, do not delete the below script
-    # if [[ "$yaml_v" = "0.6.2" ]]; then
-    #     cmake .. -DBUILD_SHARED_LIBS=ON
-    # elif [[ "$yaml_v" = "0.6.3" ]]; then
-    #     cmake .. -DYAML_BUILD_SHARED_LIBS=ON
-    # fi
     cmake ..
-    echo -e "version to be installed $YLW$yaml_v$NOC"
+    echo -e "install libyaml-cpp version $GRN$yaml_v$NOC"
     _press_enter_or_wait_s_continue 5
     make -j4 # do not use all CPU threads
     sudo make install
