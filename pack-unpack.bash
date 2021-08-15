@@ -24,9 +24,29 @@ function _dj_unpack_tar_gz() {
 }
 
 # =============================================================================
+function _dj_pack_tar_gz() {
+    filename=$(basename $1)
+    tar -czvf $filename.tar.gz $1
+}
+
+# =============================================================================
+function _dj_pack() {
+    if [ $# = 0 ]; then
+        echo -e "_dj_pack help: todo"
+        return
+    fi
+    # -------------------------------------------
+    if [ $1 = '-tar.gz' ]; then
+        shift 1
+        _dj_pack_tar_gz $@
+        return
+    fi
+}
+
+# =============================================================================
 function _dj_unpack() {
     if [ $# = 0 ]; then
-        echo -e "help: todo"
+        echo -e "_dj_unpack help: todo"
         return
     fi
     # -------------------------------------------

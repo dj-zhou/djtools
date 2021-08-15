@@ -1474,26 +1474,31 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    pack_list=" "
+    pack_list="-tar.gz "
     ACTIONS[pack]="$pack_list "
     for i in $pack_list; do
         ACTIONS[$i]=" "
     done
-
+    # --------------------------------------------------------
+    pack_tar_gz_list="$(ls .)"
+    ACTIONS["-tar.gz"]="$pack_tar_gz_list "
+    for i in $pack_tar_gz_list; do
+        ACTIONS[$i]=" "
+    done
     # --------------------------------------------------------
     # --------------------------------------------------------
     unpack_list="tar.xz tar.gz "
     ACTIONS[unpack]="$unpack_list "
     # --------------------------------------------------------
-    tar_xz_list="$(ls . | grep tar.xz)"
-    ACTIONS[tar.xz]+="$tar_xz_list "
-    for i in $tar_xz_list; do
+    unpack_tar_xz_list="$(ls . | grep tar.xz)"
+    ACTIONS[tar.xz]+="$unpack_tar_xz_list "
+    for i in $unpack_tar_xz_list; do
         ACTIONS[$i]=" "
     done
     # --------------------------------------------------------
-    tar_gz_list="$(ls . | grep tar.gz)"
-    ACTIONS[tar.gz]+="$tar_gz_list "
-    for i in $tar_gz_list; do
+    unpack_tar_gz_list="$(ls . | grep tar.gz)"
+    ACTIONS[tar.gz]+="$unpack_tar_gz_list "
+    for i in $unpack_tar_gz_list; do
         ACTIONS[$i]=" "
     done
 

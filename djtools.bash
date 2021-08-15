@@ -36,12 +36,12 @@ source $djtools_path/kernel.bash
 source $djtools_path/mark-down.bash
 source $djtools_path/m.bash
 source $djtools_path/mirror.bash
+source $djtools_path/pack-unpack.bash
 source $djtools_path/repod.bash
 source $djtools_path/system.bash
 source $djtools_path/terminal-format.bash
 source $djtools_path/touchpad.bash
 source $djtools_path/version.bash
-source $djtools_path/unpack.bash
 source $djtools_path/window-tile.bash
 source $djtools_path/work-check.bash
 source $djtools_path/yocto/yocto.bash
