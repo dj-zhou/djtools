@@ -70,12 +70,11 @@ function mark-down() {
         return
     fi
 
-    echo -e '\nrepo : "'$1 '"command not supported\n'
+    echo -e 'mark-down: "'$1 '"command not supported'
     _mark-down_help
 
     # ------------------------------
     cd $cur_dir
-    unset cur_dir
 }
 
 # =============================================================================
