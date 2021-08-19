@@ -277,6 +277,25 @@ function _dj_setup_pangolin() {
 }
 
 # =============================================================================
+function _dj_setup_picocom() {
+    cur_dir=${PWD}
+    cd ~ && mkdir -p soft/ && cd soft/
+
+    v=$(_find_package_version picocom)
+    rm -rf picocom
+    git clone git@github.com:npat-efault/picocom.git
+    cd picocom
+    git checkout $V
+    make
+    sudo cp picocom /usr/bin/
+
+    cd $cur_dir
+
+    echo "example of using picocom:"
+    echo "$ picocom /dev/ttyUSB0 -b 115200 -g file-$(TZ=UTC date +%FT%H%M%SZ).log"
+}
+
+# =============================================================================
 function _dj_setup_pip() {
     cur_dir=$PWD
 
@@ -1308,7 +1327,7 @@ function _dj() {
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
     setup_list+="gtest g++-10 i219-v kdiff3-meld lcm libcsv-3.0.2 libev-4.33 libgpiod libiio lib-serialport "
     setup_list+="libyaml-cpp mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev nvidia nvtop "
-    setup_list+="opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf pip pycharm python3.9 "
+    setup_list+="opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom pip pycharm python3.9 "
     setup_list+="qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rust saleae-logic spdlog slack "
     setup_list+="stm32-cubeMX stm32-tools sublime texlive typora vim-env vscode vtk-8.2.0 windows-fonts wubi "
     setup_list+="you-complete-me "

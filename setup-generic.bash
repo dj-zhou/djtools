@@ -1809,6 +1809,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'picocom' ]; then
+        _dj_setup_picocom
+        return
+    fi
+    # --------------------------
     if [ $1 = 'pip' ]; then
         _dj_setup_pip
         return
