@@ -379,14 +379,14 @@ function _build() {
     declare -A ACTIONS
 
     # -----------------------------------------------------
-    template_list="cmake stm32 "
+    template_list="--cmake --stm32 "
     ACTIONS[template]="$template_list "
     for i in $template_list; do
         ACTIONS[$i]=" "
     done
     stm32_list="030r8 107xc 303re 407zg "
     stm32_list+="407vg 427vi 746zg 767zi "
-    ACTIONS[stm32]="$stm32_list "
+    ACTIONS["--stm32"]="$stm32_list "
     for i in $stm32_list; do
         ACTIONS[$i]=" "
     done
