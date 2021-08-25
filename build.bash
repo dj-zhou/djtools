@@ -260,11 +260,11 @@ function compile_cmakelist() {
 
 # =============================================================================
 function compile_template() {
-    if [ $1 = 'cmake' ]; then
+    if [ $1 = '--cmake' ]; then
         cp $djtools_path/compile-template/CMakeLists.txt-native ./CMakeLists.txt
         return
     fi
-    if [ $1 = 'stm32' ]; then
+    if [ $1 = '--stm32' ]; then
         if [ ! -f $djtools_path/compile-template/Makefile-stm32f$2 ]; then
             echo "Makefile for $2 does not exist, exit!"
             return
