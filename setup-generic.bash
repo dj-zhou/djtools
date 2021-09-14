@@ -1047,14 +1047,14 @@ function _dj_setup_meson() {
 
     # sanity check
     cmake_v=$(version check cmake)
-    anw=$(_version_if_ge_than $cmake_v "3.20")
-    if [ $anw = "no" ]; then
+    anw=$(_version_if_ge_than "$cmake_v" "3.20")
+    if [ "$anw" = "no" ]; then
         echo "cmake needs to be 3.20 or higher version, exit."
         return
     fi
     python3_v=$(version check python3)
-    anw=$(_version_if_ge_than $python3_v "3.7")
-    if [ $anw = "yes" ]; then
+    anw=$(_version_if_ge_than "$python3_v" "3.7")
+    if [[ "$anw" = "yes" ]]; then
         echo "I failed to use python3>3.6 to install meson v$meson_v."
         return
     fi
