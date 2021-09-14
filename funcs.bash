@@ -202,9 +202,9 @@ function _find_a_char_in_str() {
 function _size_calculate() { # $fz_byte $output_control
     fz_byte=$1
     output_control=$2
-    if [ $output_control = 'true' ]; then
+    if [[ $output_control = 'true' ]]; then
         echo $fz_byte
-    elif [ $output_control = 'false' ]; then
+    elif [[ $output_control = 'false' ]]; then
         fz_kbyte=$(awk "BEGIN {print $((fz_byte)) / 1024}" | awk '{printf("%d",$0);}')
         fz_kbyte_int=${fz_kbyte%.*}
         fz_mbyte=$(awk "BEGIN {print $((fz_kbyte_int)) / 1024}" | awk '{printf("%d",$0);}')

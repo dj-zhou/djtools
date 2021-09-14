@@ -26,13 +26,11 @@ function _is_block_device_mounted() {
 # =============================================================================
 function _disk_size_help() {
     cat <<eom
-
     _disk_size: wrong usage, use it like:
        _disk_size sda true
        _disk_size /dev/sda true
        _disk_size sda false
        _disk_size /dev/sda false
-    
 eom
 }
 
@@ -42,16 +40,23 @@ eom
 # if the $2 is true, it only return the size in bytes
 # if the $2 is false, it will print necessary information
 function _disk_size() {
-    if [ $# -lt 2 ]; then
+    if [[ $# -lt 2 ]]; then
         _disk_size_help
         return
     fi
-    if [ -b "$1" ]; then
+    if [[ -b "$1" ]]; then
         disk_device=$1
-    elif [ -b "/dev/$1" ]; then
+    elif [[ -b "/dev/$1" ]]; then
         disk_device=/dev/$1
     fi
-    find_fz_byte=$(sudo fdisk -l $disk_device | grep "$disk_device")
+    # todo: the error "fdisk: cannot open /dev/sda: No such file or directory" is
+    # not handled
+    find_fz_byte=$(sudo fdisk -l $disk_device | grep "$disk_device" &>/dev/null)
+    if [ -z $find_fz_byte ]; then
+        echo -e "${RED}$disk_device error, return with nothing${NOC}" 1>&2 # to stderr
+        return
+    fi
+    echo "find_fz_byte=$find_fz_byte"
     fz_byte=$(echo $find_fz_byte | cut -d' ' -f5 | grep -o -E '[0-9]+' |
         awk 'NR==1 {print $1}')
     _size_calculate $fz_byte $2
