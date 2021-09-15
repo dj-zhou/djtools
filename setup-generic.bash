@@ -885,6 +885,32 @@ eom
 }
 
 # =============================================================================
+function _dj_setup_libsystemd() {
+
+    _install_if_not_installed libmount-dev libcap-dev
+    systemd_v=$(_find_package_version libsystemd)
+
+    echo -e "install ${GRN}libsystemd $systemd_v${NOC}"
+
+    cur_dir=${PWD}
+
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm -rf systemd/
+    git clone git@github.com:systemd/systemd.git
+    cd systemd
+    git checkout $systemd_v
+
+    ./configure
+    make -j$nproc
+    sudo make install
+
+    cd $cur_dir
+
+    _verify_lib_installation libsystemd.so /x86_64-linux-gnu
+    _verify_pkgconfig_file libsystemd.pc /usr/lib/x86_64-linux-gnu/pkgconfig
+}
+
+# =============================================================================
 function _dj_setup_mathpix() {
     _install_if_not_installed snapd
     sudo snap install mathpix-snipping-tool
@@ -1731,6 +1757,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'lib-serialport' ]; then
         _dj_setup_libserialport
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'libsystemd' ]; then
+        _dj_setup_libsystemd
         return
     fi
     # --------------------------
