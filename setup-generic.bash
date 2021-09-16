@@ -890,6 +890,10 @@ function _dj_setup_libsystemd() {
     _install_if_not_installed libmount-dev libcap-dev
     systemd_v=$(_find_package_version libsystemd)
 
+    if [[ "${ubuntu_v}" = *'18.04'* ]] && [[ "${systemd_v}" = *'248'* ]]; then
+        echo "just do not install it, it will break your system!"
+        return
+    fi
     echo -e "install ${GRN}libsystemd $systemd_v${NOC}"
 
     cur_dir=${PWD}
