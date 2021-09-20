@@ -58,8 +58,12 @@ function _yocto_flash() { # block-device # image-file
         return
     fi
     echo -e "          SD card: ${GRN}$dev_str${NOC}"
-    echo -e "             size: ${GRN}$(_disk_size $dev_str false)${NOC}"
-
+    card_size=$(_disk_size $dev_str false)
+    if [ -z $card_size]; then
+        echo -e "${RED}yocto flash aborted${NOC}"
+        return
+    fi
+    echo -e "             size: ${GRN}${card_size}${NOC}"
     source ../poky/oe-init-build-env . &>/dev/null
 
     # if -f option is used, image_file should be that after -f option
