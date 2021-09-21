@@ -160,16 +160,18 @@ function _dj_setup_clang_llvm() {
         echo "todo"
         return
     elif [[ ${ubuntu_v} = *'18.04'* ]]; then
-        echo "todo"
-        return
+        target_dir="clang-llvm-11.1.0"
+        repo="$target_dir-x86-64-ubuntu-1604"
+        folder_unpacked="clang+llvm-11.1.0-x86_64-linux-gnu-ubuntu-16.04" # this should be correct!
     elif [[ ${ubuntu_v} = *'20.04'* ]]; then
-        repo="clang-llvm-12.0.0-x86-64-ubuntu-2004"
+        target_dir="clang-llvm-12.0.0"
+        repo="$target_dir-x86-64-ubuntu-2004"
         folder_unpacked="clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04"
     fi
 
     # just move all things to dj-zhou github
     # use command:
-    #    split -b 10M file.tar.xz file.tar.xz
+    #    split -b 10M [file].tar.xz clang-llvm.tar.xz
     # to get file.tar.xzaa, file.tar.xzab, etc, and then push into github repo
     url=https://github.com/dj-zhou/${repo}.git
     cd ~ && mkdir -p soft/ && cd soft/
@@ -180,11 +182,11 @@ function _dj_setup_clang_llvm() {
 
     echo "untar the clang file ..."
     tar xf ${repo}.tar.xz
-    sudo rm -rf /opt/clang-llvm-12.0.0/
+    sudo rm -rf /opt/$target_dir/
 
-    echo "copy the clang files into /opt/ ..."
-    sudo mv ${folder_unpacked}/ clang-llvm-12.0.0/
-    sudo mv clang-llvm-12.0.0/ /opt/
+    echo "copy the clang files into /opt/$target_dir/ ..."
+    sudo mv ${folder_unpacked}/ $target_dir/
+    sudo mv $target_dir/ /opt/
 
     mkdir -p ~/.config/Code/User
 
@@ -196,7 +198,11 @@ function _dj_setup_clang_llvm() {
         echo "You can edit ~/.config/Code/User/settings.json manually."
     elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || (\
         $asw = 'Yes') || ($asw = 'yes') ]]; then
-        cp ${djtools_path}/settings/vscode-settings.json ~/.config/Code/User/settings.json
+        if [[ ${ubuntu_v} = *'18.04'* ]]; then
+            cp ${djtools_path}/settings/vscode-settings-1804.json ~/.config/Code/User/settings.json
+        elif [[ ${ubuntu_v} = *'20.04'* ]]; then
+            cp ${djtools_path}/settings/vscode-settings-2004.json ~/.config/Code/User/settings.json
+        fi
     else
         echo "wrong answer, not setting applied!"
         echo "You can edit ~/.config/Code/User/settings.json manually."

@@ -4,7 +4,7 @@
     "editor.detectIndentation": false,
     "editor.tabSize": 4,
     "editor.tabCompletion": "on",
-    "editor.fontSize": 16,
+    "editor.fontSize": 14,
     "Clang_format_style": "file",
     "C_Cpp.default.cppStandard": "c++20",
     "C_Cpp.clang_format_path": "/opt/clang-llvm-12.0.0/bin/clang-format",
