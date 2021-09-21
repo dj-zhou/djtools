@@ -64,7 +64,7 @@ eom
 
 # =============================================================================
 function _dj_setup_cli11() {
-    cur_dir=${PWD}
+    cur_dir_cli11=${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
 
     rm -rf CLI11/
@@ -81,7 +81,8 @@ function _dj_setup_cli11() {
     _verify_header_files /usr/local/include/CLI/
     _verify_cmake_files /usr/local/lib/cmake/CLI11/
     _verify_pkgconfig_file CLI11.pc /usr/local/lib/pkgconfig
-    cd $cur_dir
+
+    cd $cur_dir_cli11
 }
 
 # =============================================================================
