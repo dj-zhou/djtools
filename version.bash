@@ -269,6 +269,21 @@ function _version_check_python3() {
 }
 
 # =============================================================================
+function _version_check_systemd() {
+    file=/usr/lib/x86_64-linux-gnu/pkgconfig/libsystemd.pc
+    if [ ! -f $file ]; then
+        echo "libsystemd may not be installed correctly!"
+        return
+    fi
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"Version: "* ]]; then
+            version=$(echo $line | awk '{ print $2 }')
+        fi
+    done <$file
+    echo $version
+}
+
+# =============================================================================
 function _version_check_ubuntu() {
     v=$(lsb_release -a | awk '{ print $3 }')
     vv=$(echo $v | awk '{ print $3 }')
@@ -388,6 +403,11 @@ function version() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'systemd' ]; then
+            _version_check_systemd
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'ubuntu' ]; then
             _version_check_ubuntu
             return
@@ -471,7 +491,7 @@ function _version() {
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
     check_list+="cli11 cmake eigen3 gcc glog gtest g++ gnome magic-enum opencv "
-    check_list+="opengl python3 ubuntu yaml-cpp "
+    check_list+="opengl python3 systemd ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do
         ACTIONS[$i]=" "
