@@ -913,6 +913,16 @@ function _dj_ssh_github_current_account() {
 }
 
 # =============================================================================
+function _dj_ssh_github_config() { # name, email
+    name="$1"
+    email="$2"
+    echo "git config --local user.name \"$name\""
+    git config --local user.name "$name"
+    echo "git config --local user.email \"$email\""
+    git config --local user.email "$email"
+}
+
+# =============================================================================
 function _dj_setup_vim_env() {
     echo -e "setup the vim as an IDE"
     _press_enter_or_wait_s_continue 20
@@ -1246,6 +1256,12 @@ function dj() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'config' ]; then
+            shift 2
+            _dj_ssh_github_config "$@"
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'current-account' ]; then
             _dj_ssh_github_current_account
             return
@@ -1435,7 +1451,7 @@ function _dj() {
     ACTIONS["no-password"]=" "
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ssh_github_list="activate all-accounts current-account "
+    ssh_github_list="activate all-accounts config current-account "
     ACTIONS["ssh-github"]="$ssh_github_list"
     for i in $ssh_github_list; do
         ACTIONS[$i]=" "
