@@ -609,6 +609,7 @@ function _dj_setup_glog() {
     make -j$(nproc) && sudo make install
 
     _verify_lib_installation libglog.a /usr/local/lib
+    _verify_lib_installation libglog.so /usr/local/lib
     _verify_header_files /usr/local/include/glog/
 
     cd ${cur_dir}
