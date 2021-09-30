@@ -271,7 +271,8 @@ function _dj_setup_pangolin() {
     echo -e "If you see error: ${RED}Could not find GLEW${NOC}"
     echo "you should run the following commands:"
     echo "   \$ dj setup glfw3"
-    echo "   \$ dj setup gtest-glog"
+    echo "   \$ dj setup gtest"
+    echo "   \$ dj setup glog"
 
     cd $cur_dir
 }
@@ -572,12 +573,12 @@ function _dj_setup_gtest() {
 
     echo -e "install gtest ..."
 
-    # install gtest from source, v1.10
+    v=$(_find_package_version googletest)
     cd ~ && mkdir -p soft && cd soft/
     rm -rf googletest
     git clone https://github.com/google/googletest.git
     cd googletest
-    git checkout release-1.10.0 # a fixed version on Oct. 3rd, 2019
+    git checkout release-$v
     rm build -rf && mkdir build && cd build
     cmake ..
     make -j$(nproc) && sudo make install
@@ -597,12 +598,12 @@ function _dj_setup_glog() {
 
     echo -e "install glog ..."
 
-    # install gtest from source
+    v=$(_find_package_version glog)
     cd ~ && mkdir -p soft && cd soft/
     rm -rf glog
     git clone https://github.com/google/glog.git
     cd glog
-    git checkout v0.4.0 # a fixed version on March 21st, 2019
+    git checkout $v
     rm build -rf && mkdir build && cd build
     cmake ..
     make -j$(nproc) && sudo make install
