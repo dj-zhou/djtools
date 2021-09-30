@@ -914,6 +914,10 @@ function _dj_ssh_github_current_account() {
 
 # =============================================================================
 function _dj_ssh_github_config() { # name, email
+    if [ $# -eq 0 ]; then
+        echo "usage: dj ssh-github config \"<name>\" <email>"
+        return
+    fi
     name="$1"
     email="$2"
     echo "git config --local user.name \"$name\""
