@@ -278,7 +278,7 @@ function _verify_lib_installation() {
     if [ ! -f "$2/$1" ]; then
         echo -e "${RED}library $1 is not found in $2${NOC}"
     else
-        echo -e "library $1 is installed to\n $2"
+        echo -e "library ${GRN}$1${NOC} is installed to\n ${GRN}$2${NOC}"
     fi
 }
 
@@ -287,7 +287,7 @@ function _verify_header_files() {
     if [ ! -d "$1" ]; then
         echo -e "${RED}header files are not found${NOC}"
     else
-        echo -e "header files are installed to\n $1"
+        echo -e "header files are installed to\n ${GRN}$1${NOC}"
     fi
 }
 
@@ -296,7 +296,7 @@ function _verify_cmake_files() {
     if [ ! -f "$2/$1" ]; then
         echo -e "${RED}cmake file $1 is not found in $2${NOC}"
     else
-        echo -e "cmake files are installed to\n $1"
+        echo -e "cmake files are installed to\n ${GRN}$1${NOC}"
     fi
 }
 
@@ -305,7 +305,7 @@ function _verify_pkgconfig_file() {
     if [ ! -f "$2/$1" ]; then
         echo -e "${RED}pkgconfig file $1 is not found in $2${NOC}"
     else
-        echo -e "pkgconfig file $1 is installed to\n $2"
+        echo -e "pkgconfig file ${GRN}$1${NOC} is installed to\n ${GRN}$2${NOC}"
     fi
 }
 
@@ -330,4 +330,9 @@ function _find_package_version() {
         return
     fi
     echo $version
+}
+
+# =============================================================================
+function _echo_install() { # package # version
+    echo -e "install ${GRN}$1 $2${NOC}"
 }

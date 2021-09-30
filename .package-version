@@ -1,6 +1,6 @@
 abseil-cpp 20210324.2
 cli11 v2.0.0 # released on xxxx
-cmake 3.21.1
+cmake v3.21.3
 fmt 7.0.1
 grpc 1.38.0
 libyaml-cpp 0.6.3

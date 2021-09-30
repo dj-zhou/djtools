@@ -90,7 +90,8 @@ function _dj_setup_cmake() {
     # install dependencies
     _install_if_not_installed libssl-dev
     v=$(_find_package_version cmake)
-    echo -e "${GRN}install CMake $v ${NOC}"
+    _echo_install CMake $v
+
     _press_enter_or_wait_s_continue 5
 
     cur_dir=${PWD}
@@ -100,10 +101,11 @@ function _dj_setup_cmake() {
     git clone https://github.com/Kitware/CMake.git
     cd CMake
     git checkout $v
+
     ./bootstrap --prefix=/usr/local
     make -j$(nproc)
     sudo make install
-
+    echo -e "${GRN}cmake${NOC} is installed to ${GRN}/usr/local/bin${NOC}"
     cd $cur_dir
 }
 
