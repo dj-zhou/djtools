@@ -6,7 +6,7 @@ grpc 1.38.0
 libsystemd v248
 libyaml-cpp 0.6.3
 magic-enum v0.7.2
-meson v0.58.2 # released on July 18th, 2021
+meson v0.59.2 # released on Sep. 28th, 2021
 ninja v1.10.2 # released on Nov. 28th, 2020
 
 picocom 3.1 # released on March 1st, 2018
