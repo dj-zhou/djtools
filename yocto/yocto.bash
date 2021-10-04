@@ -42,6 +42,9 @@ function _yocto_build_plain_sdk() { # image-file
 # todo: let it work for upboard
 # notice: it must be in a build directory, and the build directory and poky directory
 # should be parallel.
+
+# bmaptool needs to be the one from the SDK (i.e. ~/.--oesdk/xx/yy/environment-setup-armv7vet2hf-neon-fb-linux-gnueabi)
+# however, in this script, we "source ../poky/oe-init-build-env ." and it still works fine
 function _yocto_flash() { # block-device # image-file
     # argument check -------------------
     if [ $# -lt 1 ]; then
@@ -53,14 +56,14 @@ function _yocto_flash() { # block-device # image-file
     dev_str=$1
     dev=$(_verify_block_device $dev_str)
     if [ -z $dev ]; then
-        echo -e "\n block device $dev_str not found, exit!!"
+        echo -e "\n block device $dev not found, exit!!"
         echo -e " you can use command \"lsblk\" to find it."
         return
     fi
-    echo -e "          SD card: ${GRN}$dev_str${NOC}"
-    card_size=$(_disk_size $dev_str false)
+    echo -e "          SD card: ${GRN}$dev${NOC}"
+    card_size=$(_disk_size $dev false)
     if [ -z $card_size]; then
-        echo -e "${RED}yocto flash aborted${NOC}"
+        echo -e "${RED}card size not obtained, abort yocto flash ${NOC}"
         return
     fi
     echo -e "             size: ${GRN}${card_size}${NOC}"
@@ -125,14 +128,14 @@ function _yocto_flash() { # block-device # image-file
     if [[ ${image_file} = *'wic.gz'* || ${image_file} = *'wic.zst'* ]]; then
         # try always run this before flashing ------------------
         echo -e "-----------------------------\n"
-        echo -e "run ${PRP}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
+        echo -e "run ${GRN}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
         _press_enter_or_wait_s_continue 2
         bitbake bmap-tools-native -caddto_recipe_sysroot
         if [[ -f "$bmap_file" ]]; then
             # the following command need to use a *.wic.bmap file in the same path
             # of the wic.gz file
             echo -e "bmap file found, run command:"
-            echo -e "${PRP}oe-run-native bmap-tools-native bmaptool copy <image> $dev${NOC}"
+            echo -e "${GRN}oe-run-native bmap-tools-native bmaptool copy <image> $dev${NOC}"
             _press_enter_or_wait_s_continue 4
             oe-run-native bmap-tools-native bmaptool copy $image_file $dev
         else
