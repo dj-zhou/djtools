@@ -99,7 +99,6 @@ function _press_enter_or_wait_s_continue() {
         fi
         second=$((second - 1))
     done
-    echo -e "\n"
 }
 
 # =============================================================================
@@ -278,7 +277,7 @@ function _verify_lib_installation() {
     if [ ! -f "$2/$1" ]; then
         echo -e "${RED}library $1 is not found in $2${NOC}"
     else
-        echo -e "library ${GRN}$1${NOC} is installed to\n ${GRN}$2${NOC}"
+        echo -e "     library file: ${GRN}$2/$1${NOC}"
     fi
 }
 
@@ -287,7 +286,7 @@ function _verify_header_files() {
     if [ ! -d "$1" ]; then
         echo -e "${RED}header files are not found${NOC}"
     else
-        echo -e "header files are installed to\n ${GRN}$1${NOC}"
+        echo -e "header files path: ${GRN}$1${NOC}"
     fi
 }
 
@@ -296,7 +295,7 @@ function _verify_cmake_files() {
     if [ ! -f "$2/$1" ]; then
         echo -e "${RED}cmake file $1 is not found in $2${NOC}"
     else
-        echo -e "cmake files are installed to\n ${GRN}$1${NOC}"
+        echo -e "       cmake file: ${GRN}$2/$1${NOC}"
     fi
 }
 
@@ -305,7 +304,7 @@ function _verify_pkgconfig_file() {
     if [ ! -f "$2/$1" ]; then
         echo -e "${RED}pkgconfig file $1 is not found in $2${NOC}"
     else
-        echo -e "pkgconfig file ${GRN}$1${NOC} is installed to\n ${GRN}$2${NOC}"
+        echo -e "   pkgconfig file: ${GRN}$2/$1${NOC}"
     fi
 }
 

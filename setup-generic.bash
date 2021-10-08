@@ -355,7 +355,7 @@ function _dj_setup_fmt() {
     make -j$(nproc)
     sudo make install
 
-    echo -e "\n fmt $fmt_v is installed:"
+    echo -e "\n${GRN}fmt $fmt_v${NOC} is installed."
 
     _verify_lib_installation libfmt.a /usr/local/lib
     _verify_header_files /usr/local/include/fmt
