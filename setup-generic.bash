@@ -335,6 +335,8 @@ function _dj_setup_fmt() {
     cur_dir=${PWD}
 
     fmt_v=$(_find_package_version fmt)
+    _echo_install fmt $fmt_v
+    _press_enter_or_wait_s_continue 5
 
     # remove first ------------------
     sudo rm -rf /usr/local/lib/libfmt.a
@@ -352,6 +354,8 @@ function _dj_setup_fmt() {
     cmake ..
     make -j$(nproc)
     sudo make install
+
+    echo -e "\n fmt $fmt_v is installed:"
 
     _verify_lib_installation libfmt.a /usr/local/lib
     _verify_header_files /usr/local/include/fmt
