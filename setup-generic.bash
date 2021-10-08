@@ -4,56 +4,9 @@
 function _dj_setup_help() {
     _dj_help
     cat <<eom
-  ------------------------------- dj setup --------------------------------
-    second level commands:"
-      baidu-netdisk    - to install the baidu netdisk tool
-      clang-format     - to install clang-format for use of vscode
-      computer         - to install lots of necessary software packages
-      dj-gadgets       - to install small gadget tools
-      dropbox          - to install dropbox
-      eigen3           - to install eigen3 library
-      foxit            - to install foxit pdf reader
-      g++-10           - to install compile g++ of version 10, then ask to 
-                         choose version
-      gitg-gitk        - to install gitg, gitk
-      git-lfs          - to install large file storage of git
-      glfw3            - to install glfw3"
-      gnome            - to install Gnome, for Ubuntu 20.04, etc
-      google-repo      - to install the repo utility developed by Google
-      grpc-1.29.1      - to install the gRPC, v1.29.1
-      i219-v           - to install Intel I219-V WiFi chipset driver
-      libev-4.33       - to install libev, v4.33
-      lib-serialport   - to install libserialport
-      lib-yamlcpp      - to install yaml-cpp
-      mathpix          - to install math latex equation tool mathpix
-      matplot++        - to install the matplotplusplus, a cpp graph plot library
-      opencv-4.1.1     - to install OpenCV version 4.1.1
-      pangolin         - to install openGL based visualization package
-      pip              - to install python software pip
-      qemu             - to install the emulation tool qemu
-      qt-5.13.1        - to install Qt version 5.13.1
-      qt-5.14.2        - to install Qt version 5.14.2
-      ros2-foxy        - to install ROS2 Foxy, with deb package, or from source
-      ros-melodic      - to install ROS Melodic with deb package on Ubuntu 18.04
-      slack            - to install Slack
-      spdlog           - to install spdlog
-      stm32tools       - to install stm32 tool
-      sublime          - to install sublime-text-3
-      typora           - to install Markdown editor typora
-      vscode           - to install VS Code
-      vtk-8.2.0        - to install visualization tool vtk-8.2.0
-      wubi             - to install Chinese wubi input method
-      YouCompleteMe    - to install a Vim plugin: YouCompleteMe
-
-      gcc-aarch64-linux-gnu   - to install the 64-bit arm compiler
-      gcc-arm-stm32           - to install micro controller development tool
-      gcc-arm-linux-gnueabi   - to install the 32-bit arm compiler
-      gcc-arm-linux-gnueabihf - to install the 32-bit arm compiler with hard
-                                float unit
-
-      MORE IS COMMING"
-  -------------------------------------------------------------------------
-
+------------------------------- dj setup --------------------------------
+    setup common used software and packages
+-------------------------------------------------------------------------
 eom
 }
 
@@ -1510,7 +1463,7 @@ function _dj_setup_yaml_cpp() {
     # remove existing library, if there is
     sudo rm -rf /usr/local/lib/libyaml-cpp*
 
-    yaml_v=$(_find_package_version libyaml-cpp)
+    yaml_v=$(_find_package_version yaml-cpp)
 
     cd ~ && mkdir -p soft/ && cd soft/
     rm yaml-cpp -rf
@@ -1522,6 +1475,7 @@ function _dj_setup_yaml_cpp() {
 
     cmake ..
     echo -e "install libyaml-cpp version $GRN$yaml_v$NOC"
+    _echo_install yaml-cpp $v
     _press_enter_or_wait_s_continue 5
     make -j4 # do not use all CPU threads
     sudo make install
@@ -1769,7 +1723,7 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'libyaml-cpp' ]; then
+    if [ $1 = 'yaml-cpp' ]; then
         _dj_setup_yaml_cpp $2
         return
     fi
