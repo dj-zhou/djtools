@@ -199,6 +199,58 @@ function _find_a_char_in_str() {
 }
 
 # =============================================================================
+# example:  str ($1) : hello world
+#         substr($2) : rld
+#             output : 8
+# if it does not find the sub string, return the length of str
+
+function _find_substr_index_in_str() {
+    str=$1
+    substr=$2
+    len_str=${#str}
+    len_substr=${#substr}
+    for ((c = 0; c <= $((len_str - len_substr)); c++)); do
+        str_small="${str:${c}:$len_substr}"
+        if [[ $str_small == $substr ]]; then
+            echo $c
+            return
+        fi
+    done
+    echo $len_str
+}
+
+# =============================================================================
+# str ch start
+
+# example: str ($1) : hello world
+#            ch($2) : o
+#         start($3) : 5
+#            output : 7
+
+function _find_ch_index_in_str_start_from() {
+    line=$1
+    ch=$2
+    if [ -n "$3" ]; then
+        start=$3
+    else
+        start=0
+    fi
+    len=${#line}
+    if [ $start -ge $len ]; then
+        echo $len
+        return
+    fi
+    for ((c = $start; c <= $len; c++)); do
+        single_char=${line:${c}:1}
+        if [[ $single_char == $ch ]]; then
+            echo $c
+            return
+        fi
+    done
+    echo $len
+}
+
+# =============================================================================
 function _size_calculate() { # $fz_byte $output_control
     fz_byte=$1
     output_control=$2
@@ -322,12 +374,31 @@ function _find_package_version() {
     version=""
     while IFS='' read -r line || [[ -n "$line" ]]; do
         if [[ $line == "$package"* ]]; then
+            # echo $line
+            if [[ ${ubuntu_v} == *'18.04'* && $line == *'1804'* ]]; then
+                pos1=$(_find_substr_index_in_str "$line" "1804")
+                pos2=$(_find_ch_index_in_str_start_from "$line" " " $((pos1 + 4)))
+                echo ${line:$((pos1 + 5)):$((pos2 - pos1 - 5))}
+                return
+            elif [[ ${ubuntu_v} == *'20.04'* && $line == *'2004'* ]]; then
+                pos1=$(_find_substr_index_in_str "$line" "2004")
+                pos2=$(_find_ch_index_in_str_start_from "$line" " " $((pos1 + 4)))
+                echo ${line:$((pos1 + 5)):$((pos2 - pos1 - 5))}
+                return
+            else
+                echo "to implement" >&2
+                return
+            fi
             version=$(echo $line | awk '{ print $2 }')
         fi
     done <$file
     if [ -z "$version" ]; then
         echo >&2 -e "${RED}error: package $package version not found, need to update .package-version${NOC}"
         return
+    fi
+    # if $version s like "1804:xxx", means version xxx is for Ubuntu version 18.04
+    if [[ $version = *"1804:"* ]]; then
+        echo $version
     fi
     echo $version
 }

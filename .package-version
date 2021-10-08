@@ -2,9 +2,10 @@ abseil-cpp 20210324.2
 cli11 v2.0.0 # released on xxxx
 cmake v3.21.3
 fmt 7.0.1
-glog v0.5.0 # released on March 21st, 2019
+glog v0.5.0       # released on March 21st, 2019
 googletest 1.11.0 # released on June 11, 2021
 grpc 1.38.0
+libgpiod 1804:1.4 2004:v1.6.3
 libsystemd v248
 libyaml-cpp 0.6.3
 magic-enum v0.7.2
