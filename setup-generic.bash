@@ -768,38 +768,31 @@ function _dj_setup_libiio() {
     # install some software
     _install_if_not_installed bison flex libxml2-dev
 
+    v=$(_find_package_version libiio)
+    _echo_install libiio $v
+
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf libiio
     git clone https://github.com/analogdevicesinc/libiio.git
     cd libiio
     if [[ "${ubuntu_v}" = *'18.04'* || \
         "${ubuntu_v}" = *'20.04'* ]]; then
-        git checkout 0.21
+        git checkout $v
     else
         echo -e "\n${YLW} TO BE IMPLEMENTED${NOC}\n"
         return
     fi
+
     mkdir build && cd build && cmake ..
     make -j$(nproc)
     sudo make install
-    cd ~/soft
 
-    cat <<eom
---------------------------------------------
-libiio is installed to:
-    /usr/lib/x86_64-linux-gnu/libiio.so.0.21
-    /lib/udev/rules.d/90-libiio.rules
-    /usr/bin/iio_info
-    ...
-    /usr/sbin/iiod
-    
-header file:
-    /usr/include/iio.h
+    _verify_lib_installation /libiio.so.0.21 /usr/lib/x86_64-linux-gnu/
+    _verify_lib_installation iio_info /usr/bin/
+    _verify_lib_installation iiod /usr/sbin/
+    _verify_pkgconfig_file libiio.pc /usr/lib/x86_64-linux-gnu/pkgconfig/
 
-pkg-config file:
-    /usr/lib/x86_64-linux-gnu/pkgconfig/libiio.pc
---------------------------------------------
-eom
+    echo "iio.h is installed to /usr/include/"
     cd $cur_dir
 }
 
