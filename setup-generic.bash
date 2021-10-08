@@ -1352,16 +1352,11 @@ function _dj_setup_spdlog() { # static/shared
     make -j$(nproc)
     sudo make install
 
-    echo -e "---------------------------------------\n"
     if [ "$static_shared" = 'static' ]; then
-        echo " spdlog is installed statically: "
-        echo -e "     /usr/local/lib/libspdlog.a\n"
+        _verify_lib_installation libspdlog.a /usr/local/lib/
     else
-        echo " spdlog is installed sharedally: "
-        echo -e "     /usr/local/lib/libspdlog.so\n"
-        echo -e " you can run \"sudo ldconfig\" before running programs\n"
+        _verify_lib_installation libspdlog.so /usr/local/lib/
     fi
-    echo -e "---------------------------------------\n"
 
     cd ${cur_dir}
 }
