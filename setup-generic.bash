@@ -1016,11 +1016,9 @@ eom
 
 # =============================================================================
 # testing
-function _dj_setup_meson() {
-
-    meson_v="0.58.2" # use fixed version, released on July 18th, 2021
-    ninja_v="1.10.2" # use fixed version, released on Nov. 28th, 2020
-
+function _dj_setup_meson_ninjia() {
+    meson_v=$(_find_package_version meson)
+    ninja_v=$(_find_package_version ninja)
     # sanity check
     cmake_v=$(version check cmake)
     anw=$(_version_if_ge_than "$cmake_v" "3.20")
@@ -1034,7 +1032,7 @@ function _dj_setup_meson() {
         echo "I failed to use python3>3.6 to install meson v$meson_v."
         return
     fi
-    echo -e "install ${GRN}meson v$meson_v${NOC} and ${GRN}ninja v$ninja_v${NOC} \n"
+    _echo_install meson $meson_v
     _press_enter_or_wait_s_continue 5
     # remove /usr/bin/meson
     sudo apt-get remove meson &>/dev/null
@@ -1042,7 +1040,7 @@ function _dj_setup_meson() {
     # install needed software
     _install_if_not_installed python3
 
-    # use fixed version to install meson, and it is installed to ~/.local/bin
+    # meson release: https://github.com/mesonbuild/meson/releases
     python3 -m pip install meson==$meson_v
 
     # make sure ~/.local/bin is in the PATH variable
@@ -1057,7 +1055,11 @@ function _dj_setup_meson() {
         echo '# (djtools) meson path setup' >>~/.bashrc
         echo -e 'export PATH=$PATH:~/.local/bin\n' >>~/.bashrc
     fi
+    echo -e "${GRN}meson${NOC} is installed to ${GRN}~/.local/bin${NOC}"
 
+    # ---------------------------------------------
+    _echo_install ninja $ninja_v
+    _press_enter_or_wait_s_continue 5
     # ninja is needed for meson, so install it as well
     cur_dir=${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
@@ -1068,6 +1070,7 @@ function _dj_setup_meson() {
     cmake ..
     make -j$(nproc)
     sudo make install
+    echo -e "${GRN}meson${NOC} is installed to ${GRN}/usr/local/bin${NOC}"
     cd $cur_dir
 }
 
@@ -1736,8 +1739,8 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'meson' ]; then
-        _dj_setup_meson
+    if [ $1 = 'meson-ninja' ]; then
+        _dj_setup_meson_ninjia
         return
     fi
     # --------------------------
