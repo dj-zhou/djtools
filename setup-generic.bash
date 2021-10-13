@@ -285,26 +285,34 @@ function _dj_setup_dropbox() {
 }
 
 # =============================================================================
-# why sometimes it is installed to /usr/include/eigen3, and sometimes it is
-# installed to /usr/local/include/eigen3 ??
+# Install a version from its source code
 function _dj_setup_eigen3() {
+    cur_dir=${PWD}
 
-    _echo_install eigen3 libeigen3-dev
+    eigen3_v=$(_find_package_version eigen3)
+    _echo_install eigen3 $eigen3_v
     _press_enter_or_wait_s_continue 5
 
-    _install_if_not_installed mlocate # updatedb is in this package
-    _install_if_not_installed libeigen3-dev
-
-    echo -e "running ${GRN}sudo updatedb${NOC}, this may take a few minutes"
-    sudo updatedb
-
     sudo rm -rf /usr/local/include/eigen3
-    sudo cp /usr/include/eigen3/ -r /usr/local/include/
+    sudo rm -rf /usr/include/eigen3
 
-    echo -e "\n${GRN}eigen3 $fmt_v${NOC} is installed."
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm -rf eigen*
+    wget https://gitlab.com/libeigen/eigen/-/archive/$eigen3_v/eigen-$eigen3_v.tar.gz
+    tar -xvf eigen-$eigen3_v.tar.gz
+
+    cd eigen-$eigen3_v
+    mkdir build && cd build && cmake ..
+    make -j$(nproc) && sudo make install
+
+    # just to prevent compiling error in the future
+    sudo cp /usr/local/include/eigen3/ -r /usr/include/
+
+    echo -e "\n${GRN}eigen3 $eigen3_v${NOC} is installed."
     _verify_header_files /usr/include/eigen3
     _verify_header_files /usr/local/include/eigen3
 
+    cd $cur_dir
 }
 
 # =============================================================================

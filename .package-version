@@ -1,6 +1,7 @@
 abseil-cpp 20210324.2
 cli11 v2.0.0 # released on xxxx
 cmake v3.21.3
+eigen3 3.3.9 # released on Dec. 4th, 2020
 fmt 8.0.1
 glog v0.5.0       # released on March 21st, 2019
 googletest 1.11.0 # released on June 11, 2021
