@@ -288,20 +288,26 @@ function _dj_setup_dropbox() {
 # why sometimes it is installed to /usr/include/eigen3, and sometimes it is
 # installed to /usr/local/include/eigen3 ??
 function _dj_setup_eigen3() {
-    cur_dir=${PWD}
+
+    _echo_install eigen3 libeigen3-dev
+    _press_enter_or_wait_s_continue 5
+
     _install_if_not_installed mlocate # updatedb is in this package
     _install_if_not_installed libeigen3-dev
-    echo -e "sudo updatedb\n this may take a few minutes\n"
+
+    echo -e "running ${GRN}sudo updatedb${NOC}, this may take a few minutes"
     sudo updatedb
 
-    echo -e "eigen3 is installed in: /usr/include/eigen3\n"
-    echo " if see error \"fatal error: Eigen/Core: No such file or directory\""
-    echo -e " add \"-I/usr/include/eigen3\" to your Makefile\n"
+    sudo rm -rf /usr/local/include/eigen3
     sudo cp /usr/include/eigen3/ -r /usr/local/include/
 
-    cd $cur_dir
+    echo -e "\n${GRN}eigen3 $fmt_v${NOC} is installed."
+    _verify_header_files /usr/include/eigen3
+    _verify_header_files /usr/local/include/eigen3
+
 }
 
+# =============================================================================
 function _dj_setup_flamegraph() {
     cur_dir=${PWD}
 
@@ -457,7 +463,7 @@ function _dj_setup_gcc_arm_stm32() {
     elif [[ "${ubuntu_v}" = *'16.04'* ]]; then
         echo "just do nothing"
     fi
-    if [[ "${ubuntu_v}" = *'18.04'* || \
+    if [[ "${ubuntu_v}" = *'18.04'* ||
         "${ubuntu_v}" = *'16.04'* ]]; then
         sudo apt-get remove gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
         sudo apt-add-repository ppa:team-gcc-arm-embedded/ppa
@@ -784,7 +790,7 @@ function _dj_setup_libiio() {
     rm -rf libiio
     git clone https://github.com/analogdevicesinc/libiio.git
     cd libiio
-    if [[ "${ubuntu_v}" = *'18.04'* || \
+    if [[ "${ubuntu_v}" = *'18.04'* ||
         "${ubuntu_v}" = *'20.04'* ]]; then
         git checkout $v
     else
@@ -1177,7 +1183,7 @@ function _dj_setup_nlohmann_json3_dev() {
 function _dj_setup_nvidia() {
     sudo apt-get purge nvidia*
     _install_if_not_installed libncurses5-dev
-    if [[ "${ubuntu_v}" = *'18.04'* || \
+    if [[ "${ubuntu_v}" = *'18.04'* ||
         "${ubuntu_v}" = *'20.04'* ]]; then
         if [[ ! -f /etc/apt/sources.list.d/graphics-drivers*.list ]]; then
             sudo add-apt-repository ppa:graphics-drivers/ppa
@@ -1202,7 +1208,7 @@ eom
 function _dj_setup_nvtop() {
     cur_dir=$PWD
 
-    if [[ "${ubuntu_v}" = *'18.04'* || \
+    if [[ "${ubuntu_v}" = *'18.04'* ||
         "${ubuntu_v}" = *'20.04'* ]]; then
         cd ~ && mkdir -p soft/ && cd soft/
         rm nvtop -rf

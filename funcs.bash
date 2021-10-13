@@ -45,10 +45,10 @@ function _ask_to_execute_cmd() {
     echo "command: "$1
     echo -e 'Do you want to execute command "'${1}'"?'
     read answer
-    if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || (\
+    if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || (
         $answer = 'No') || ($answer = 'no') ]]; then
         echo 'Command "'$1'" is NOT executed!'
-    elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || (\
+    elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || (
         $answer = 'Yes') || ($answer = 'yes') ]]; then
         echo 'Command "'$1'" is going to be executed!'
         $1
@@ -99,6 +99,7 @@ function _press_enter_or_wait_s_continue() {
         fi
         second=$((second - 1))
     done
+    echo " "
 }
 
 # =============================================================================
