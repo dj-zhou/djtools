@@ -729,8 +729,13 @@ function _dj_setup_libgpiod() {
     cur_dir=${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf libgpiod*
+
+    libgpiod_v=$(_find_package_version libgpiod)
+
+    _echo_install libgpiod $libgpiod_v
+    _press_enter_or_wait_s_continue 5
+    _
     if [[ "${ubuntu_v}" = *'18.04'* ]]; then
-        libgpiod_v="1.4"
         file_name=libgpiod-$libgpiod_v
         link="https://mirrors.edge.kernel.org/pub/software/"
         link="${link}libs/libgpiod/$file_name.tar.gz"
@@ -750,7 +755,7 @@ function _dj_setup_libgpiod() {
         rm libgpiod -rf
         git clone git://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git
         cd libgpiod
-        git checkout v1.6.3
+        git checkout $libgpiod_v
         ./autogen.sh --enable-tools=yes
         make -j$(nproc)
         sudo make install
