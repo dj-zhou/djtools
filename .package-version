@@ -5,6 +5,7 @@ fmt 8.0.1
 glog v0.5.0       # released on March 21st, 2019
 googletest 1.11.0 # released on June 11, 2021
 grpc 1.38.0
+lcm 501bb446d42c9a57f9e5ddf3c41ba78f4735c9f2 # master on Dec. 1st, 2020
 libiio 0.21
 libgpiod 1804:1.4 2004:v1.6.3
 libsystemd v248
