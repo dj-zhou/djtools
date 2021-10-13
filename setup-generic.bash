@@ -796,7 +796,7 @@ function _dj_setup_libiio() {
     make -j$(nproc)
     sudo make install
 
-    _verify_lib_installation /libiio.so.0.21 /usr/lib/x86_64-linux-gnu/
+    _verify_lib_installation /libiio.so /usr/lib/x86_64-linux-gnu/
     _verify_lib_installation iio_info /usr/bin/
     _verify_lib_installation iiod /usr/sbin/
     _verify_pkgconfig_file libiio.pc /usr/lib/x86_64-linux-gnu/pkgconfig/
@@ -1345,9 +1345,10 @@ function _dj_setup_spdlog() { # static/shared
         version="v1.7.0"
         ;;
     esac
-    echo "version = $version"
     cur_dir=$PWD
 
+    _echo_install spdlog $version
+    _press_enter_or_wait_s_continue 5
     cd ~ && mkdir -p soft && cd soft/
     rm spdlog -rf
 
@@ -1364,6 +1365,7 @@ function _dj_setup_spdlog() { # static/shared
     make -j$(nproc)
     sudo make install
 
+    echo "spdlog $version is installed."
     if [ "$static_shared" = 'static' ]; then
         _verify_lib_installation libspdlog.a /usr/local/lib/
     else
@@ -1452,10 +1454,12 @@ function _dj_setup_yaml_cpp() {
     cur_dir=$PWD
 
     # dependencies to install --------------
-    sudo apt-get -y update
+    echo "install build-essential"
+    sudo apt-get -y update &>/dev/null
     _install_if_not_installed build-essential
 
     cmake_v=$(version check cmake)
+
     anw=$(_version_if_ge_than $cmake_v 3.20.5)
     if [ "$anw" = 'no' ]; then
         dj setup cmake
@@ -1464,6 +1468,8 @@ function _dj_setup_yaml_cpp() {
     sudo rm -rf /usr/local/lib/libyaml-cpp*
 
     yaml_v=$(_find_package_version yaml-cpp)
+    _echo_install yaml-cpp $yaml_v
+    _press_enter_or_wait_s_continue 5
 
     cd ~ && mkdir -p soft/ && cd soft/
     rm yaml-cpp -rf
@@ -1474,12 +1480,11 @@ function _dj_setup_yaml_cpp() {
     rm -rf build/ && mkdir build && cd build
 
     cmake ..
-    echo -e "install libyaml-cpp version $GRN$yaml_v$NOC"
-    _echo_install yaml-cpp $v
     _press_enter_or_wait_s_continue 5
     make -j4 # do not use all CPU threads
     sudo make install
 
+    echo -e "\n${GRN}yaml-cpp $yaml_v${NOC} is installed."
     _verify_lib_installation libyaml-cpp.a /usr/local/lib
     _verify_header_files /usr/local/include/yaml-cpp/
     _verify_pkgconfig_file yaml-cpp.pc /usr/local/lib/pkgconfig
