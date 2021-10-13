@@ -702,12 +702,16 @@ eom
 #  /usr/local/lib
 # this setup works only for the host computer, don't know how to do it for
 # cross compilers
-function _dj_setup_libev_4_33() {
+function _dj_setup_libev() {
     cur_dir=${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
 
-    file="libev-4.33"
+    v=$(_find_package_version libev)
+    _echo_install libev $v
+    _press_enter_or_wait_s_continue 5
+
+    file="libev-$v"
     wget http://dist.schmorp.de/libev/$file.tar.gz
     tar -zxf $file.tar.gz
     cd $file
@@ -724,6 +728,10 @@ function _dj_setup_libev_4_33() {
         echo "LD_LIBRARY_PATH is not set, set it now"
         echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >>~/.bashrc
     fi
+
+    echo -e "\n${GRN}libev $v${NOC} is installed."
+    _verify_lib_installation libev.so /usr/local/lib/
+    _verify_lib_installation libev.a /usr/local/lib/
 
     cd ~/soft
 
@@ -1371,7 +1379,7 @@ function _dj_setup_spdlog() { # static/shared
     make -j$(nproc)
     sudo make install
 
-    echo "spdlog $version is installed."
+    echo -e "\n${GRN}spdlog $version${NOC} is installed."
     if [ "$static_shared" = 'static' ]; then
         _verify_lib_installation libspdlog.a /usr/local/lib/
     else
@@ -1709,8 +1717,8 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'libev-4.33' ]; then
-        _dj_setup_libev_4_33
+    if [ $1 = 'libev' ]; then
+        _dj_setup_libev
         return
     fi
     # --------------------------

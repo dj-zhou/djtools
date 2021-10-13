@@ -385,20 +385,18 @@ function _find_package_version() {
                 pos2=$(_find_ch_index_in_str_start_from "$line" " " $((pos1 + 4)))
                 echo ${line:$((pos1 + 5)):$((pos2 - pos1 - 5))}
                 return
+            # elif: other system: todo
             else
-                echo "to implement" >&2
+                version=$(echo $line | awk '{ print $2 }')
+                echo $version
                 return
             fi
-            version=$(echo $line | awk '{ print $2 }')
+
         fi
     done <$file
     if [ -z "$version" ]; then
         echo >&2 -e "${RED}error: package $package version not found, need to update .package-version${NOC}"
         return
-    fi
-    # if $version s like "1804:xxx", means version xxx is for Ubuntu version 18.04
-    if [[ $version = *"1804:"* ]]; then
-        echo $version
     fi
     echo $version
 }
