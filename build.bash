@@ -322,15 +322,22 @@ function build() {
 }
 
 # =============================================================================
-function _build_meson_exists() {
+function _build_main_meson_exists() {
     if [ -f "meson.build" ]; then
-        echo "meson "
+        find_main_meson=0
+        while IFS='' read -r line || [[ -n "$line" ]]; do
+            if [[ $line == *"meson_version:"* ]]; then
+                find_main_meson=1
+            fi
+        done <meson.build
+        if [ $find_main_meson = '1' ]; then
+            echo "meson "
+        else
+            echo " "
+        fi
         return
     fi
-    if [ -f "build.ninja" ]; then
-        echo "meson "
-        return
-    fi
+
     echo " "
 }
 
@@ -370,7 +377,7 @@ function _build() {
     service+=$(_build_build_docker_exists)
     service+=$(_build_cmakelists_exists)
     service+=$(_build_makefile_exists)
-    service+=$(_build_meson_exists)
+    service+=$(_build_main_meson_exists)
     local SERVICES=("
         $service
     ")
