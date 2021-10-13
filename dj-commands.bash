@@ -574,9 +574,10 @@ eom
 function _dj_setup_gtest() {
     cur_dir=$PWD
 
-    echo -e "install gtest ..."
-
     v=$(_find_package_version googletest)
+    _echo_install googletest $v
+    _press_enter_or_wait_s_continue 5
+
     cd ~ && mkdir -p soft && cd soft/
     rm -rf googletest
     git clone https://github.com/google/googletest.git
@@ -586,6 +587,7 @@ function _dj_setup_gtest() {
     cmake ..
     make -j$(nproc) && sudo make install
 
+    echo -e "\n${GRN}googletest $v${NOC} is installed."
     _verify_lib_installation libgtest.a /usr/local/lib/
     _verify_lib_installation libgtest_main.a /usr/local/lib/
     _verify_header_files /usr/local/include/gtest/
@@ -729,7 +731,7 @@ Follow the steps:
 -----------------------------------------------------------------
 
 eom
-    elif [[ ${ubuntu_v} = *'18.04'* || \
+    elif [[ ${ubuntu_v} = *'18.04'* ||
         ${ubuntu_v} = *'20.04'* ]]; then
         echo -e "please follow the link below to finish the setup:"
         echo -e " https://www.pinyinjoe.com/linux/ubuntu-18-gnome-chinese-setup.htm"
@@ -873,11 +875,11 @@ function _dj_ssh_github_activate() {
         # ask if proceed (yes/no) --------------
         echo -e "account $1 does not exist, do you want to create it? (yes/no)"
         read asw
-        if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (\
+        if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (
             $asw = 'No') || ($asw = 'no') ]]; then
             echo 'Canceled and exit!'
             return
-        elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || (\
+        elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || (
             $asw = 'Yes') || ($asw = 'yes') ]]; then
             # proceed -------------
             echo -e "SSH key file ${GRN}${key_file}${NOC} not found, generate one automatically:"
