@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# todo
-# ROS (1)
-# openCV
-
 # =============================================================================
 function _version_help() {
     echo -e "\n ---------------------  version ------------------------"
@@ -124,8 +120,10 @@ function _version_check_eigen3() {
 
     files="/usr/local/include/eigen3/Eigen/src/Core/util/Macros.h "
     files+="/usr/include/eigen3/Eigen/src/Core/util/Macros.h "
+    file_is_found=0
     for file in $files; do
         if [[ -f "$file" ]]; then
+            file_is_found=1
             while IFS='' read -r line || [[ -n "$line" ]]; do
                 if [[ $line == *"define EIGEN_WORLD_VERSION"* ]]; then
                     world_version=$(echo $line | awk '{ print $3 }')
@@ -141,6 +139,24 @@ function _version_check_eigen3() {
             return
         fi
     done
+    if [ $file_is_found='0' ]; then
+        echo "opencv is not installed."
+    fi
+}
+
+# =============================================================================
+function _version_check_fmt() {
+    file="/usr/local/lib/pkgconfig/fmt.pc"
+    if [ ! -f $file ]; then
+        echo "fmt may not be installed correctly!"
+        return
+    fi
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"Version: "* ]]; then
+            version=$(echo $line | awk '{ print $2 }')
+        fi
+    done <$file
+    echo $version
 }
 
 # =============================================================================
@@ -158,7 +174,7 @@ function _version_check_gcc() {
 function _version_check_glog() {
     file=/usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc
     if [ ! -f $file ]; then
-        echo "glog may not installed correctly!"
+        echo "glog may not be installed correctly!"
         echo "note: source code installation does not have a libglog.pc file"
         return
     fi
@@ -173,7 +189,7 @@ function _version_check_glog() {
 # =============================================================================
 # I could only find /usr/local/lib/pkgconfig/gtest.pc to check its version
 function _version_check_gtest() {
-    file=/usr/local/lib/pkgconfig/gtest.pc
+    file="/usr/local/lib/pkgconfig/gtest.pc"
     if [ ! -f $file ]; then
         echo "gtest may not installed correctly!"
         return
@@ -191,8 +207,6 @@ function _version_check_gpp() {
     v=$(g++ --version | awk '{ print $4 }')
     vv=$(echo $v | awk '{ print $1 }')
     echo $vv
-    unset v
-    unset vv
 }
 
 # =============================================================================
@@ -200,26 +214,28 @@ function _version_check_gnome() {
     v=$(gnome-shell --version | awk '{ print $3 }')
     # return the version value
     echo $v
-    unset v
 }
 
 # =============================================================================
 function _version_check_magic_enum() {
     file="/usr/local/include/magic_enum.hpp"
-    if [[ -f "$file" ]]; then
-        while IFS='' read -r line || [[ -n "$line" ]]; do
-            if [[ $line == *"define MAGIC_ENUM_VERSION_MAJOR"* ]]; then
-                major_version=$(echo $line | awk '{ print $3 }')
-            fi
-            if [[ $line == *"define MAGIC_ENUM_VERSION_MINOR"* ]]; then
-                minor_version=$(echo $line | awk '{ print $3 }')
-            fi
-            if [[ $line == *"define MAGIC_ENUM_VERSION_PATCH"* ]]; then
-                patch_version=$(echo $line | awk '{ print $3 }')
-            fi
-        done <$file
-        echo $major_version.$minor_version.$patch_version
+    if [ ! -f $file ]; then
+        echo "magic-enum may not be installed!"
+        return
     fi
+
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"define MAGIC_ENUM_VERSION_MAJOR"* ]]; then
+            major_version=$(echo $line | awk '{ print $3 }')
+        fi
+        if [[ $line == *"define MAGIC_ENUM_VERSION_MINOR"* ]]; then
+            minor_version=$(echo $line | awk '{ print $3 }')
+        fi
+        if [[ $line == *"define MAGIC_ENUM_VERSION_PATCH"* ]]; then
+            patch_version=$(echo $line | awk '{ print $3 }')
+        fi
+    done <$file
+    echo $major_version.$minor_version.$patch_version
 }
 
 # =============================================================================
@@ -230,9 +246,11 @@ function _version_check_opencv() {
     # #define CV_VERSION_REVISION 13
 
     files="/usr/local/include/opencv2/core/version.hpp "
-    files+="/usr/include/opencv2/core/version.hpp "
+    files+="/usr/include/opencv2/core/version.hpp"
+    file_is_found=0
     for file in $files; do
         if [[ -f "$file" ]]; then
+            file_is_found=1
             while IFS='' read -r line || [[ -n "$line" ]]; do
                 if [[ $line == *"define CV_VERSION_MAJOR"* ]]; then
                     major_version=$(echo $line | awk '{ print $3 }')
@@ -248,8 +266,9 @@ function _version_check_opencv() {
             return
         fi
     done
-    unset file
-    unset files
+    if [ $file_is_found='0' ]; then
+        echo "opencv is not installed."
+    fi
 }
 
 # =============================================================================
@@ -262,7 +281,7 @@ function _version_check_opengl() {
 function _version_check_python3() {
     anw=$(_check_if_package_installed python3)
     if [[ "$anw" = "no" ]]; then
-        echo "python3 not installed"
+        echo "python3 is not installed"
         return
     fi
     echo $(python3 --version | awk '{ print $2 }')
@@ -288,8 +307,6 @@ function _version_check_ubuntu() {
     v=$(lsb_release -a | awk '{ print $3 }')
     vv=$(echo $v | awk '{ print $3 }')
     echo $vv
-    unset v
-    unset vv
 }
 
 # =============================================================================
@@ -358,6 +375,11 @@ function version() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'fmt' ]; then
+            _version_check_fmt
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'gcc' ]; then
             _version_check_gcc
             return
@@ -418,7 +440,7 @@ function version() {
             return
         fi
         # ------------------------------
-        echo -e "\n version check: $2: argument not supported\n"
+        echo -e " version check: $2: argument not supported"
         return
     fi
     # ------------------------------
@@ -467,10 +489,10 @@ function version() {
             sudo update-alternatives --config aarch64-linux-gnu-gcc
             return
         fi
-        echo -e "\n version swap: $2: argument not supported\n"
+        echo -e "version swap: $2: argument not supported"
         return
     fi
-    echo -e '\r\n version : "'$1 '"command not supported\r\n'
+    echo -e 'version : "'$1 '"command not supported'
     _version_help
 }
 
@@ -490,7 +512,7 @@ function _version() {
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
-    check_list+="cli11 cmake eigen3 gcc glog gtest g++ gnome magic-enum opencv "
+    check_list+="cli11 cmake eigen3 fmt gcc glog gtest g++ gnome magic-enum opencv "
     check_list+="opengl python3 systemd ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do
