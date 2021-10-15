@@ -24,11 +24,11 @@ function _dj_git_see() {
         return
     fi
     if [ $1 = '-name' ]; then
-        git for-each-ref --format='%(authorname) %(refname) %09 %(committerdate) ' | grep "$2"
+        git for-each-ref --format='%(committerdate) %09 | %(authorname) | %(refname)' | grep "$2"
         return
     fi
     if [ $1 = '-email' ]; then
-        git for-each-ref --format='%(authoremail) %(refname) %09 %(committerdate) ' | grep "$2"
+        git for-each-ref --format=' %(committerdate) %09 | %(authoremail) | %(refname)' | grep "$2"
         return
     fi
 
