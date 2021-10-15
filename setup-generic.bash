@@ -642,34 +642,26 @@ function _dj_setup_lcm() {
     cur_dir=${PWD}
 
     _install_if_not_installed default-jdk
+
+    v=$(_find_package_version lcm)
+    _echo_install lcm $v
+
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf lcm
     git clone https://github.com/lcm-proj/lcm.git
     cd lcm
-    git checkout 501bb446d42c9a57f9e5ddf3c41ba78f4735c9f2 # master on Dec. 1st, 2020
+    git checkout $v
     mkdir build && cd build
     cmake ..
     make -j$(nproc)
     sudo make install
     sudo ldconfig
 
-    cat <<eom
+    echo "lcm $v is installed."
+    _verify_lib_installation liblcm.so /usr/local/lib
+    _verify_header_files /usr/local/include/lcm/
+    _verify_pkgconfig_file lcm-java.pc /usr/local/lib/pkgconfig
 
---------------------------------------------
-lcm is installed to:
-    /usr/local/lib/liblcm.so.1.4.0
-    /usr/local/lib/liblcm.so.1
-    /usr/local/lib/liblcm.so
-
-header file:
-    /usr/local/include/lcm/*.h
-
-pkg-config file:
-    /usr/local/lib/pkgconfig/lcm.pc
-    /usr/local/lib/pkgconfig/lcm-java.pc
-
---------------------------------------------
-eom
     cd $cur_dir
 }
 
