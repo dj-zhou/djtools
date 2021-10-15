@@ -24,12 +24,13 @@ function _dj_git_see() {
         return
     fi
     if [ $1 = '-name' ]; then
-        git for-each-ref --format='%(committerdate) %09 | %(authorname) | %(refname)' | grep "$2"
+        git for-each-ref --format='%(committerdate:relative) %09 | %(authorname) | %(refname)' | grep "$2"
         return
     fi
     if [ $1 = '-email' ]; then
-        git for-each-ref --format=' %(committerdate) %09 | %(authoremail) | %(refname)' | grep "$2"
+        git for-each-ref --format=' %(committerdate:relative) %09 | %(authoremail) | %(refname)' | grep "$2"
         return
     fi
-
 }
+
+# git for-each-ref --sort=committerdate --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'
