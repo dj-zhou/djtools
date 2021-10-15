@@ -920,20 +920,6 @@ function _dj_ssh_github_current_account() {
 }
 
 # =============================================================================
-function _dj_ssh_github_config() { # name, email
-    if [ $# -eq 0 ]; then
-        echo "usage: dj ssh-github config \"<name>\" <email>"
-        return
-    fi
-    name="$1"
-    email="$2"
-    echo "git config --local user.name \"$name\""
-    git config --local user.name "$name"
-    echo "git config --local user.email \"$email\""
-    git config --local user.email "$email"
-}
-
-# =============================================================================
 function _dj_setup_vim_env() {
     echo -e "setup the vim as an IDE"
     _press_enter_or_wait_s_continue 20
@@ -1165,7 +1151,7 @@ function dj() {
             _dj_format $@
             return
         fi
-        echo "dj format: wrong argument, exit."
+        echo "dj format: argument not supported, exit."
         return
     fi
     # ------------------------------
@@ -1187,7 +1173,7 @@ function dj() {
                 return
             fi
         fi
-        echo "dj search: wrong argument, exit."
+        echo "dj search: argument not supported, exit."
         return
     fi
     # ------------------------------
@@ -1197,7 +1183,7 @@ function dj() {
             _dj_help_skill $2
             return
         fi
-        echo 'dj help: wrong argument, exit.'
+        echo 'dj help: argument not supported, exit.'
         return
     fi
     # ------------------------------
@@ -1207,7 +1193,22 @@ function dj() {
             _dj_find_in_meson $3 $4 $5 $6
             return
         fi
-        echo 'dj find: wrong argument, exit.'
+        echo 'dj find: argument not supported, exit.'
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'git' ]; then
+        if [ $2 = 'config' ]; then
+            shift 2
+            _dj_git_config "$@"
+            return
+        fi
+        if [ $2 = 'see' ]; then
+            shift 2
+            _dj_git_see "$@"
+            return
+        fi
+        echo 'dj git: argument not supported, exit.'
         return
     fi
     # ------------------------------
@@ -1229,7 +1230,7 @@ function dj() {
             _dj_replace $@
             return
         fi
-        echo "dj replace: wrong argument, exit."
+        echo "dj replace: argument not supported, exit."
         return
     fi
     # ------------------------------
@@ -1240,7 +1241,7 @@ function dj() {
             _dj_setup $@
             return
         fi
-        echo "dj setup: wrong argument, exit."
+        echo "dj setup: argument not supported, exit."
         return
     fi
     # ------------------------------
@@ -1267,18 +1268,12 @@ function dj() {
             return
         fi
         # ------------------------------
-        if [ $2 = 'config' ]; then
-            shift 2
-            _dj_ssh_github_config "$@"
-            return
-        fi
-        # ------------------------------
         if [ $2 = 'current-account' ]; then
             _dj_ssh_github_current_account
             return
         fi
         # ------------------------------
-        echo "dj ssh-github: wrong argument, exit."
+        echo "dj ssh-github: argument not supported, exit."
         return
     fi
     # ------------------------------
@@ -1329,6 +1324,7 @@ function _dj() {
         flame-graph
         format
         find
+        git
         help
         open
         pack
@@ -1462,7 +1458,7 @@ function _dj() {
     ACTIONS["no-password"]=" "
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ssh_github_list="activate all-accounts config current-account "
+    ssh_github_list="activate all-accounts current-account "
     ACTIONS["ssh-github"]="$ssh_github_list"
     for i in $ssh_github_list; do
         ACTIONS[$i]=" "
@@ -1510,6 +1506,18 @@ function _dj() {
         ACTIONS[$i]=" "
     done
 
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    git_list="config see "
+    ACTIONS[git]="$git_list "
+    for i in $git_list; do
+        ACTIONS[$i]=" "
+    done
+    see_list="-name -email"
+    ACTIONS[see]="$see_list "
+    for i in $see_list; do
+        ACTIONS[$i]=" "
+    done
     # --------------------------------------------------------
     # --------------------------------------------------------
     help_list="apt_pkg auto-mount ffmpeg jupyter "

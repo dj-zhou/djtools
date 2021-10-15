@@ -32,6 +32,7 @@ source $djtools_path/code-name.bash
 source $djtools_path/djfile.bash
 source $djtools_path/dj-commands.bash
 source $djtools_path/funcs.bash
+source $djtools_path/git.bash
 source $djtools_path/keyremap.bash
 source $djtools_path/kernel.bash
 source $djtools_path/mark-down.bash
