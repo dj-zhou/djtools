@@ -30,10 +30,10 @@ function _yocto_setup_dev_env()
     packages+="ca-certificates ccache chrpath coreutils cpio curl dblatex "
     packages+="debianutils desktop-file-utils diffstat docbook-utils dosfstools "
     packages+="dos2unix file fop gawk gcc gcc-multilib git gnupg groff g++ "
-    packages+="g++-multilib  iputils-ping locales libc6-dev libegl1-mesa libgl1-mesa-dev "
-    packages+="libglib2.0-dev libglu1-mesa-dev libsdl1.2-dev libtool "
-    packages+="libx11-dev libxml-parser-perl make mtools patch parted "
-    packages+="pv pylint3 python python-gtk2 python-pysqlite2 python3 "
+    packages+="g++-multilib iputils-ping locales lib32ncurses5 lib32z1 libc6-dev "
+    packages+="libegl1-mesa libgl1-mesa-dev libglib2.0-dev libglu1-mesa-dev "
+    packages+="libsdl1.2-dev libtool libx11-dev libxml-parser-perl make mtools "
+    packages+="patch parted pv pylint3 python python-gtk2 python-pysqlite2 python3 "
     packages+="python3-distutils python3-git python3-jinja2 python3-pexpect "
     packages+="python3-pip screen sed ssh socat subversion texi2html texinfo "
     packages+="unzip wget xmlto xsltproc xsltproc xterm xz-utils zstd "
@@ -44,7 +44,7 @@ function _yocto_setup_dev_env()
     for package in $packages ; do
         _install_if_not_installed $package
     done
-
+ 
     if [[ "${ubuntu_v}" != *'20.04'* ]] ; then
         packages="libstdc++-5-dev python-git "
         for package in $packages ; do

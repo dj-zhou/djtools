@@ -6,6 +6,7 @@ source $djtools_path/yocto/yocto-find.bash
 # =============================================================================
 function _yocto_bake_image() { # meta-layer #image-name
     source ../poky/oe-init-build-env . &>/dev/null
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lib32:/usr/lib32:/usr/lib/i386-linux-gnu
     bitbake $2
 }
 
