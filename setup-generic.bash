@@ -1703,6 +1703,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'g++-11' ]; then
+        _dj_setup_gpp_11
+        return
+    fi
+    # --------------------------
     if [ $1 = 'i219-v' ]; then
         _dj_setup_i219_v $2
         return

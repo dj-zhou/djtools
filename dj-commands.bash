@@ -667,13 +667,13 @@ function _dj_setup_gpp_10() {
         sudo apt-get -y update
     fi
 
-    _install_if_not_installed gcc-10
-    _install_if_not_installed g++-10
+    sudo apt-get install -y gcc-10
+    sudo apt-get install -y g++-10
 
-    # install g++10/gcc-10
+    # install g++9/gcc-9
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
         echo -e "install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} "
-        _press_enter_or_wait_s_continue 10
+        _press_enter_or_wait_s_continue 5
         _install_if_not_installed gcc-9
         _install_if_not_installed g++-9
     fi
@@ -681,6 +681,54 @@ function _dj_setup_gpp_10() {
     # ----------------------
     echo -e "run update-alternatives:"
     for i in 4 5 6 7 8 9 10; do
+        if [ -f /usr/bin/gcc-$i ]; then
+            sudo update-alternatives --install \
+                /usr/bin/gcc gcc /usr/bin/gcc-$i $i
+        fi
+        if [ -f /usr/bin/g++-$i ]; then
+            sudo update-alternatives --install \
+                /usr/bin/g++ g++ /usr/bin/g++-$i $i
+        fi
+    done
+    echo -e "\n-------------------"
+    sudo update-alternatives --config gcc
+    echo -e "\n-------------------"
+    sudo update-alternatives --config g++
+}
+
+# =============================================================================
+function _dj_setup_gpp_11() {
+    # install g++10/gcc-10
+    echo -e "install ${GRN}gcc-11${NOC}, ${GRN}g++-11${NOC}"
+    _press_enter_or_wait_s_continue 5
+
+    if ! compgen -G "/etc/apt/sources.list.d/ubuntu-toolchain-r*.list" >/dev/null; then
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get -y update
+    fi
+
+    sudo apt-get install -y gcc-11
+    sudo apt-get install -y g++-11
+
+    # install g++10/gcc-10
+    if [[ ${ubuntu_v} = *'18.04'* ]]; then
+        echo -e "install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} "
+        _press_enter_or_wait_s_continue 5
+        _install_if_not_installed gcc-10
+        _install_if_not_installed g++-10
+    fi
+
+    # install g++9/gcc-9
+    if [[ ${ubuntu_v} = *'18.04'* ]]; then
+        echo -e "install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} "
+        _press_enter_or_wait_s_continue 5
+        _install_if_not_installed gcc-9
+        _install_if_not_installed g++-9
+    fi
+
+    # ----------------------
+    echo -e "run update-alternatives:"
+    for i in 4 5 6 7 8 9 10 11; do
         if [ -f /usr/bin/gcc-$i ]; then
             sudo update-alternatives --install \
                 /usr/bin/gcc gcc /usr/bin/gcc-$i $i
@@ -1352,7 +1400,7 @@ function _dj() {
     setup_list+="clang-llvm cli11 cmake computer container dj-gadgets devtools driver dropbox eigen3 "
     setup_list+="flamegraph fmt foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
-    setup_list+="gtest g++-10 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio lib-serialport "
+    setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio lib-serialport "
     setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev "
     setup_list+="nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom pip "
     setup_list+="pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rust saleae-logic "
