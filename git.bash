@@ -24,13 +24,29 @@ function _dj_git_see() {
         return
     fi
     if [ $1 = '-name' ]; then
-        git for-each-ref --format='%(committerdate:relative) %09 | %(authorname) | %(refname)' | grep "$2"
-        return
+        all_branches=$(git for-each-ref --format='%(committerdate) | %(authorname) | %(refname)' | grep "$2")
+        total_lines=$(echo -e "$all_branches" | wc -l)
+
+        while IFS= read -r line; do
+            if [[ "$line" = *"remotes"* ]]; then
+                if [ "${line:9:1}" = " " ]; then
+                    newline="${line:0:7} 0"
+                    for i in $(seq 8 ${#line}); do
+                        newline="${newline}${line:${i}:1}"
+                    done
+                    echo "$newline"
+                else
+                    echo "$line"
+                fi
+            fi
+        done <<<"$all_branches"
     fi
     if [ $1 = '-email' ]; then
-        git for-each-ref --format=' %(committerdate:relative) %09 | %(authoremail) | %(refname)' | grep "$2"
+        git for-each-ref --format='%(committerdate) %09 | %(authoremail) | %(refname)' | grep "$2"
         return
     fi
 }
 
 # git for-each-ref --sort=committerdate --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(color:red)%(objectname:short)%(color:reset) - %(contents:subject) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'
+# Thu Oct 7 07:11:14 2021 -0400
+# Thu Oct  07:11:14 2021 -0400
