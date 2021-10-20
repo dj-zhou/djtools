@@ -16,8 +16,12 @@ function _dj_git_config() { # name, email
 
 # =============================================================================
 function _dj_git_see_show_result() {
+    count=0
     while IFS= read -r line; do
         # only shows the remote branches
+        if [[ "$line" = *"HEAD"* ]]; then
+            continue
+        fi
         if [[ "$line" = *"remotes"* ]]; then
             # to align the date, e.g., to revise "Thu Sep 9 xx:xx:xx" to "Thu Sep 09 xx:xx:xx"
             if [ "${line:9:1}" = " " ]; then
@@ -29,8 +33,10 @@ function _dj_git_see_show_result() {
             else
                 echo "$line"
             fi
+            count=$((count + 1))
         fi
     done <<<"$1"
+    echo "total branches: $count"
 }
 
 # =============================================================================
