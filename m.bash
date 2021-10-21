@@ -31,6 +31,9 @@ function compile_make_build_etc() {
         if [ "$clean_tag" = 'clean' ]; then
             rm -rf _bcross*
             rm -rf _bnative*
+            if [ -d subprojects ]; then
+                rm subprojects/*/ -rf # this includes .git/ dirctory, really?
+            fi
             return
         fi
         echo -e "use ${GRN}meson.build${NOC} to build"
