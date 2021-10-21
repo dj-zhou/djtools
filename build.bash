@@ -207,7 +207,7 @@ function compile_makefile() {
     make -j$(nproc) $target_tag
 
     # stm32 project dedicated scripts, can be moved into Makefile
-    if [ ! -f .project-stm32 ] && [ ! -f bin/*.elf ]; then
+    if [ ! -f .project-stm32 ] || [ ! -f bin/*.elf ]; then
         return
     fi
     micro_controller=$(grep "STM32" .project-stm32 | awk '{print $1}')
