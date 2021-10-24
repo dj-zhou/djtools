@@ -1,5 +1,5 @@
 abseil-cpp 20210324.2
-cli11 v2.0.0 # released on xxxx
+cli11 2.1.1 # (no "v" in front!) released Sep. 29th, 2021
 cmake v3.21.3
 eigen3 3.3.9 # released on Dec. 4th, 2020
 fmt 8.0.1

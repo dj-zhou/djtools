@@ -65,22 +65,44 @@ eom
 # =============================================================================
 function _dj_setup_cli11() {
     cur_dir_cli11=${PWD}
+
+    v=$(_find_package_version cli11)
+    _echo_install CLI11 v$v
+    _press_enter_or_wait_s_continue 5
+
+    # remove some exisiting files to prevent error
+    # v2.1.1 does not have CLI11.pc file installed, but >=v2.0.0 has!
+    sudo rm -rf /usr/local/lib/pkgconfig/CLI11.pc
+    sudo rm -rf /usr/local/lib/cmake/CLI11/CLI11Config.cmake
+    sudo rm -rf /usr/local/lib/cmake/CLI11/CLI11ConfigVersion.cmake
+
     cd ~ && mkdir -p soft/ && cd soft/
 
     rm -rf CLI11/
     git clone https://github.com/CLIUtils/CLI11
     cd CLI11
-    git checkout v2.0.0
-    git submodule update --init # gtest is a submodule of it
+    git checkout v$v
+    # gtest is a submodule of it
+    git submodule update --init
     mkdir build
     cd build
     cmake ..
     make -j$(nproc)
     sudo make install
 
-    _verify_header_files /usr/local/include/CLI/
-    _verify_cmake_files /usr/local/lib/cmake/CLI11/
-    _verify_pkgconfig_file CLI11.pc /usr/local/lib/pkgconfig
+    echo -e "\n${GRN}CLI11 $v${NOC} is installed."
+    anw=$(_version_if_ge_than $v "1.9.1")
+    if [ "$anw" = "no" ]; then
+        _verify_header_files /usr/local/include/CLI/
+        _verify_cmake_files CLI11Config.cmake /usr/local/lib/cmake/CLI11/
+        _verify_cmake_files CLI11ConfigVersion.cmake /usr/local/lib/cmake/CLI11/
+        _verify_pkgconfig_file CLI11.pc /usr/local/lib/pkgconfig
+    else
+        _verify_header_files /usr/local/include/CLI/
+        _verify_cmake_files CLI11Config.cmake /usr/local/share/cmake/CLI11/
+        _verify_cmake_files CLI11ConfigVersion.cmake /usr/local/share/cmake/CLI11/
+        _verify_pkgconfig_file CLI11.pc /usr/local/share/pkgconfig
+    fi
 
     cd $cur_dir_cli11
 }

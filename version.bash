@@ -91,17 +91,24 @@ function _version_check_aarch64_linux_gnu_gcc() {
 
 # =============================================================================
 function _version_check_cli11() {
-    file=/usr/local/lib/pkgconfig/CLI11.pc
-    if [ ! -f $file ]; then
-        echo "cli11 may not installed correctly!"
-        return
-    fi
-    while IFS='' read -r line || [[ -n "$line" ]]; do
-        if [[ $line == *"Version: "* ]]; then
-            version=$(echo $line | awk '{ print $2 }')
+    files="/usr/local/lib/pkgconfig/CLI11.pc "
+    files+="/usr/local/share/pkgconfig/CLI11.pc "
+    file_is_found=0
+    for file in $files; do
+        if [[ -f "$file" ]]; then
+            while IFS='' read -r line || [[ -n "$line" ]]; do
+                if [[ $line == *"Version: "* ]]; then
+                    version=$(echo $line | awk '{ print $2 }')
+                    file_is_found=1
+                fi
+            done <$file
+            echo $version
+            return
         fi
-    done <$file
-    echo $version
+    done
+    if [ $file_is_found='0' ]; then
+        echo "opencv is not installed."
+    fi
 }
 
 # =============================================================================
