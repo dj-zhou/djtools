@@ -852,7 +852,7 @@ function _dj_search_string() {
 # =============================================================================
 # to find something in a meson file
 # only works in . directory
-function _dj_find_in_meson() { # term
+function _dj_search_in_meson() { # term
     term=$1
     if [ -z "$term" ]; then
         echo -e "usage:"
@@ -1221,7 +1221,13 @@ function dj() {
                 return
             fi
         fi
-        echo "dj search: argument not supported, exit."
+        # ------------------------------
+        if [ $2 = '-in-meson' ]; then
+            shift 2
+            _dj_search_in_meson "$@"
+            return
+        fi
+        echo "dj search: wrong argument, exit."
         return
     fi
     # ------------------------------
@@ -1232,16 +1238,6 @@ function dj() {
             return
         fi
         echo 'dj help: argument not supported, exit.'
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'find' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ] && [ $2 = '-in-meson' ]; then
-            _dj_find_in_meson $3 $4 $5 $6
-            return
-        fi
-        echo 'dj find: argument not supported, exit.'
         return
     fi
     # ------------------------------
@@ -1371,7 +1367,6 @@ function _dj() {
         ssh-clone
         flame-graph
         format
-        find
         git
         help
         open
@@ -1540,7 +1535,7 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    search_list="package string "
+    search_list="package string -in-meson "
     ACTIONS[search]="$search_list "
     for i in $search_list; do
         ACTIONS[$i]=" "
@@ -1548,12 +1543,6 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    find_list="-in-meson "
-    ACTIONS[find]="$find_list "
-    for i in $find_list; do
-        ACTIONS[$i]=" "
-    done
-
     # --------------------------------------------------------
     # --------------------------------------------------------
     git_list="config see "
