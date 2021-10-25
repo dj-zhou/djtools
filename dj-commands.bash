@@ -1182,32 +1182,6 @@ function dj() {
         return
     fi
     # ------------------------------
-    if [ $1 = 'clone' ]; then
-        # --------------------------
-        if [[ "$2" = 'bitbucket' ]] ||
-            [[ "$2" = 'github' ]] ||
-            [[ "$2" = 'gitee' ]]; then
-            shift
-            _dj_clone_from $@
-            return
-        fi
-        _dj_clone_help
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'ssh-clone' ]; then
-        # --------------------------
-        if [[ "$2" = 'bitbucket' ]] ||
-            [[ "$2" = 'github' ]] ||
-            [[ "$2" = 'gitee' ]]; then
-            shift
-            _dj_clone_ssh_from $@
-            return
-        fi
-        _dj_clone_help
-        return
-    fi
-    # ------------------------------
     if [ $1 = 'flame-graph' ]; then
         shift
         _dj_flame_grapah $@
@@ -1272,6 +1246,19 @@ function dj() {
         if [ $2 = 'see' ]; then
             shift 2
             _dj_git_see "$@"
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'ssh-clone' ]; then
+            # --------------------------
+            if [[ "$3" = 'bitbucket' ]] ||
+                [[ "$3" = 'github' ]] ||
+                [[ "$3" = 'gitee' ]]; then
+                shift 2
+                _dj_git_ssh_clone_from $@
+                return
+            fi
+            _dj_clone_help
             return
         fi
         echo 'dj git: argument not supported, exit.'
@@ -1385,8 +1372,6 @@ function _dj() {
 
     # All possible first values in command line
     local SERVICES=("
-        clone
-        ssh-clone
         flame-graph
         format
         git
@@ -1463,7 +1448,6 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     ACTIONS[clone]="bitbucket github gitee "
-    ACTIONS["ssh-clone"]="bitbucket github gitee "
 
     # --------------------------------------------------------
     flame_list="generate clear help "
@@ -1489,29 +1473,6 @@ function _dj() {
 
     # --------------------------------------------------------
     ACTIONS[replace]=" "
-
-    # --------------------------------------------------------
-    bitbucket_repos="$(_dj_clone_repo_list bitbucket) "
-    ACTIONS[bitbucket]+="$bitbucket_repos "
-    ACTIONS[bitbucket]+="--add "
-    for i in $bitbucket_repos; do
-        ACTIONS[$i]=" "
-    done
-    # --------------------------------------------------------
-    github_repos="$(_dj_clone_repo_list github) "
-    ACTIONS[github]+="$github_repos "
-    ACTIONS[github]+="--add "
-    for i in $github_repos; do
-        ACTIONS[$i]=" "
-    done
-    # --------------------------------------------------------
-    gitee_repos="$(_dj_clone_repo_list gitee) "
-    ACTIONS[gitee]+="$gitee_repos "
-    ACTIONS[gitee]+="--add "
-    for i in $gitee_repos; do
-        ACTIONS[$i]=" "
-    done
-    ACTIONS[--add]=" "
 
     # --------------------------------------------------------
     # --------------------------------------------------------
@@ -1567,7 +1528,7 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     # --------------------------------------------------------
-    git_list="config see "
+    git_list="config see ssh-clone "
     ACTIONS[git]="$git_list "
     for i in $git_list; do
         ACTIONS[$i]=" "
@@ -1577,6 +1538,30 @@ function _dj() {
     for i in $see_list; do
         ACTIONS[$i]=" "
     done
+    ACTIONS["ssh-clone"]="bitbucket github gitee "
+    # --------------------------------------------------------
+    bitbucket_repos="$(_dj_clone_repo_list bitbucket) "
+    ACTIONS[bitbucket]+="$bitbucket_repos "
+    ACTIONS[bitbucket]+="--add "
+    for i in $bitbucket_repos; do
+        ACTIONS[$i]=" "
+    done
+    # --------------------------------------------------------
+    github_repos="$(_dj_clone_repo_list github) "
+    ACTIONS[github]+="$github_repos "
+    ACTIONS[github]+="--add "
+    for i in $github_repos; do
+        ACTIONS[$i]=" "
+    done
+    # --------------------------------------------------------
+    gitee_repos="$(_dj_clone_repo_list gitee) "
+    ACTIONS[gitee]+="$gitee_repos "
+    ACTIONS[gitee]+="--add "
+    for i in $gitee_repos; do
+        ACTIONS[$i]=" "
+    done
+    ACTIONS[--add]=" "
+
     # --------------------------------------------------------
     # --------------------------------------------------------
     help_list="apt_pkg auto-mount ffmpeg jupyter "
