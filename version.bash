@@ -107,7 +107,7 @@ function _version_check_cli11() {
         fi
     done
     if [ $file_is_found='0' ]; then
-        echo "opencv is not installed."
+        echo "cli11 is not installed."
     fi
 }
 

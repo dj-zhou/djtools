@@ -165,9 +165,14 @@ function _dj_setup_dj_gadgets() {
     make
     sudo make install
 
-    # todo: check if CLI11 is installed, if not, install it
-    if [ ! -f /usr/local/lib/pkgconfig/CLI11.pc ]; then
+    # check depenency
+    v=$(version check cli11)
+    if [ "$v" = "cli11 is not installed" ]; then
         dj setup cli11
+    fi
+
+    if [ ! -f /usr/local/lib/libmatplot.* ]; then
+        dj setup matplot++
     fi
 
     # dj-file installation
