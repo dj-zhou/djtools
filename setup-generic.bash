@@ -892,13 +892,19 @@ function _dj_setup_mathpix() {
 # =============================================================================
 # this might need a higher version of g++ to compile (>= 9.3?)
 function _dj_setup_matplot_xx() {
-    static_shared=$1
     cur_dir=${PWD}
+
+    static_shared=$1
+
+    v=$(_find_package_version matplotplusplus)
+    _echo_install matplot++ $v
+    _press_enter_or_wait_s_continue 5
+
     # dependency ------
     _install_if_not_installed gnuplot
     _install_if_not_installed libfftw3-dev
 
-    # removed pre-installed files ------
+    # removed previously installed files ------
     sudo rm -f /usr/local/lib/Matplot++/libnodesoup.a
     sudo rm -f /usr/local/lib/libmatplot.a
     sudo rm -f /usr/local/lib/libmatplot.so
@@ -909,8 +915,7 @@ function _dj_setup_matplot_xx() {
     rm -rf matplotplusplus
     git clone https://github.com/alandefreitas/matplotplusplus.git
     cd matplotplusplus
-    # used a fixed commit, revise later ------
-    git checkout d83e3f1010fce3a09578efff4a20b4509ae8fa35
+    git checkout $v
 
     # compile and install ------
     mkdir build && cd build
@@ -923,37 +928,13 @@ function _dj_setup_matplot_xx() {
     sudo make install
     sudo ldconfig
     if [ "$static_shared" = 'static' ]; then
-        cat <<eom
+        _verify_header_files /usr/local/include/matplot/
+        _verify_lib_installation libmatplot.a /usr/local/lib/
+        _verify_lib_installation libnodesoup.a /usr/local/lib/Matplot++/
 
---------------------------------------------
-matplotplusplus is installed to:
-    /usr/local/lib/Matplot++/libnodesoup.a
-    /usr/local/lib/libmatplot.a
-
-header file:
-    /usr/local/include/matplot/matplot.h
-    etc.
-
-pkg-config file:
-    none
---------------------------------------------
-eom
     else
-        cat <<eom
-
---------------------------------------------
-matplotplusplus is installed to:
-    /usr/local/lib/libmatplot.so
-
-header file:
-    /usr/local/include/matplot/matplot.h
-    etc.
-
-pkg-config file:
-    none
---------------------------------------------
-
-eom
+        _verify_header_files /usr/local/include/matplot/
+        _verify_lib_installation libmatplot.so /usr/local/lib/
     fi
 
     cd $cur_dir

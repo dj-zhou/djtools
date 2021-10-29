@@ -12,6 +12,7 @@ libiio 0.21
 libgpiod 1804:1.4 2004:v1.6.3
 libsystemd v248
 magic-enum v0.7.2
+matplotplusplus c088749434154c230ee7547c6871d65e58876dc6 # latest greatest master on Sep 18th, 2021
 meson v0.59.2 # released on Sep. 28th, 2021
 ninja v1.10.2 # released on Nov. 28th, 2020
 picocom 3.1   # released on March 1st, 2018
