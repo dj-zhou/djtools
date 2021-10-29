@@ -15,7 +15,7 @@ function _dj_git_config() { # name, email
 }
 
 # =============================================================================
-function _dj_git_see_show_result() {
+function _dj_git_search_show_result() {
     count=0
     while IFS= read -r line; do
         # only shows the remote branches
@@ -43,19 +43,19 @@ function _dj_git_see_show_result() {
 # options:
 #   1. --name
 #   2. --email
-function _dj_git_see() {
+function _dj_git_search() {
     if [ $# -le 1 ]; then
-        echo "usage: dj git see -name/-email [name/email]"
+        echo "usage: dj git search -name/-email [name/email]"
         return
     fi
     if [ $1 = '-name' ]; then
         all_branches=$(git for-each-ref --format='%(committerdate) | %(authorname) | %(refname)' | grep "$2")
-        _dj_git_see_show_result "$all_branches"
+        _dj_git_search_show_result "$all_branches"
         return
     fi
     if [ $1 = '-email' ]; then
         all_branches=$(git for-each-ref --format='%(committerdate) | %(authoremail) | %(refname)' | grep "$2")
-        _dj_git_see_show_result "$all_branches"
+        _dj_git_search_show_result "$all_branches"
         return
     fi
 }
