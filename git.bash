@@ -40,12 +40,16 @@ function _dj_git_search_show_result() {
 }
 
 # =============================================================================
-# options:
-#   1. --name
-#   2. --email
+function _dj_git_search_string() {
+    str="$1"
+    git log --oneline | grep "$str"
+    echo -e "you can run ${GRN}git show [commit]${NOC} to see the detail of a commit"
+}
+
+# =============================================================================
 function _dj_git_search() {
     if [ $# -le 1 ]; then
-        echo "usage: dj git search -name/-email [name/email]"
+        echo "usage: dj git search -name/-email/-string [name/email/string]"
         return
     fi
     if [ $1 = '-name' ]; then
@@ -56,6 +60,10 @@ function _dj_git_search() {
     if [ $1 = '-email' ]; then
         all_branches=$(git for-each-ref --format='%(committerdate) | %(authoremail) | %(refname)' | grep "$2")
         _dj_git_search_show_result "$all_branches"
+        return
+    fi
+    if [ $1 = '-string' ]; then
+        _dj_git_search_string "$2"
         return
     fi
 }

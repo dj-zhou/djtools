@@ -1535,7 +1535,7 @@ function _dj() {
     for i in $git_list; do
         ACTIONS[$i]=" "
     done
-    search_list="-name -email"
+    search_list="-name -email -string "
     ACTIONS[search]="$search_list "
     for i in $search_list; do
         ACTIONS[$i]=" "
