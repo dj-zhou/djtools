@@ -1574,8 +1574,8 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'dj-gadgets' ]; then
-        _dj_setup_dj_gadgets
+    if [ $1 = 'gadgets' ]; then
+        _dj_setup_gadgets
         return
     fi
     # --------------------------
