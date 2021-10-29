@@ -845,24 +845,26 @@ function _dj_work_check() {
 # =============================================================================
 # to search a library use: ldconfig -p | grep xxxx
 # once this command get extended, we add sub command to "dj search"
-function _dj_search_package() {
+function _dj_grep_package() {
     cur_dir=$PWD
 
     lib_to_find=$1
-    echo -e "run command:$GRN ldconfig -p | grep $lib_to_find$NOC, we get:"
+    echo -e "run: ${GRN}ldconfig -p | grep $lib_to_find${NOC}:"
 
     ldconfig -p | grep $lib_to_find
 
-    echo -e "cd /usr/lib/x86_64-linux-gnu/pkgconfig"
-    cd /usr/lib/x86_64-linux-gnu/pkgconfig
-    echo -e " \$ ls | grep $lib_to_find"
-    ls | grep $lib_to_find
+    # pkgconfig file cannot also be in /usr/local/lib/pkgconfig/, so, this is not general
+    # fix it in the future
+    # echo -e "cd /usr/lib/x86_64-linux-gnu/pkgconfig"
+    # cd /usr/lib/x86_64-linux-gnu/pkgconfig
+    # echo -e " \$ ls | grep $lib_to_find"
+    # ls | grep $lib_to_find
     cd $cur_dir
 }
 
 # =============================================================================
 # to search some string in a project directory, excluding build/ and bin/
-function _dj_search_string() {
+function _dj_grep_string() {
     echo -e "run command:"
     echo -e "   $GRN grep -rI $1 .$NOC"
     echo -e "we get:"
@@ -874,7 +876,7 @@ function _dj_search_string() {
 # =============================================================================
 # to find something in a meson file
 # only works in . directory
-function _dj_search_in_meson() { # term
+function _dj_grep_in_meson() { # term
     term=$1
     if [ -z "$term" ]; then
         echo -e "usage:"
@@ -1199,13 +1201,13 @@ function dj() {
         return
     fi
     # ------------------------------
-    if [ $1 = 'search' ]; then
+    if [ $1 = 'grep' ]; then
         # ------------------------------
         if [ $2 = 'package' ]; then
             # ------------------------------
             if [[ $# -ge 3 ]]; then
                 shift 2
-                _dj_search_package $@
+                _dj_grep_package $@
                 return
             fi
         fi
@@ -1213,17 +1215,17 @@ function dj() {
         if [ $2 = 'string' ]; then
             # ------------------------------
             if [[ $# -ge 3 ]]; then
-                _dj_search_string "$3" "$4" "$5" "$6" "$7" "$8"
+                _dj_grep_string "$3" "$4" "$5" "$6" "$7" "$8"
                 return
             fi
         fi
         # ------------------------------
         if [ $2 = '-in-meson' ]; then
             shift 2
-            _dj_search_in_meson "$@"
+            _dj_grep_in_meson "$@"
             return
         fi
-        echo "dj search: wrong argument, exit."
+        echo "dj grep: wrong argument, exit."
         return
     fi
     # ------------------------------
@@ -1243,9 +1245,9 @@ function dj() {
             _dj_git_config "$@"
             return
         fi
-        if [ $2 = 'see' ]; then
+        if [ $2 = 'search' ]; then
             shift 2
-            _dj_git_see "$@"
+            _dj_git_search "$@"
             return
         fi
         # ------------------------------
@@ -1375,11 +1377,11 @@ function _dj() {
         flame-graph
         format
         git
+        grep
         help
         open
         pack
         replace
-        search
         setup
         ssh-general
         ssh-github
@@ -1518,9 +1520,9 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    search_list="package string -in-meson "
-    ACTIONS[search]="$search_list "
-    for i in $search_list; do
+    grep_list="package string -in-meson "
+    ACTIONS[grep]="$grep_list "
+    for i in $grep_list; do
         ACTIONS[$i]=" "
     done
 
@@ -1528,14 +1530,14 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     # --------------------------------------------------------
-    git_list="config see ssh-clone "
+    git_list="config search ssh-clone "
     ACTIONS[git]="$git_list "
     for i in $git_list; do
         ACTIONS[$i]=" "
     done
-    see_list="-name -email"
-    ACTIONS[see]="$see_list "
-    for i in $see_list; do
+    search_list="-name -email -string "
+    ACTIONS[search]="$search_list "
+    for i in $search_list; do
         ACTIONS[$i]=" "
     done
     ACTIONS["ssh-clone"]="bitbucket github gitee "
