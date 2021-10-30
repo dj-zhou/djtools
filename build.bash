@@ -6,6 +6,8 @@
 # on Ubuntu 18.04, the SDK .appolo-image-wandboard-poky-2.6.4-oesdk does not work!
 # it still says native build (meson/ninja)
 function _build_meson_use_oesdk() { # sdk_path
+
+    echo -e "Cross build using ${GRN}Meson${NOC} ..."
     if [ $# -lt 1 ]; then
         echo "build meson -cross: need the sdk path."
         return
@@ -138,6 +140,9 @@ function _build_meson_use_oesdk() { # sdk_path
 # now, it does not take --fresh or --conti option, but it runs a taking --conti option
 function _build_meson_native() {
     cur_dir=${PWD}
+
+    echo -e "use ${GRN}Meson${NOC} to build natively ..."
+
     proj_dir="_bnative.meson"
     if [ -f "meson.build" ]; then
         if [ ! -d "$proj_dir" ]; then
@@ -160,13 +165,18 @@ function _build_meson_native() {
 
 # =============================================================================
 function _build_in_docker() {
-    if ! [ -f "build-docker.sh" ]; then
-        echo "no build file, exit."
+    echo -e "use ${GRN}Docker container${NOC} to build/clean ..."
+    if ! [ -f "build-in-docker" ]; then
+        echo "no build-in-docker file, exit."
+        return
+    fi
+    if ! [ -f "docker/Dockerfile" ]; then
+        echo "no docker/Dockerfile file, exit."
         return
     fi
     target_tag="$1"
     if [[ -z "$target_tag" || "$target_tag" = "all" ]]; then
-        ./build-docker.sh
+        ./build-in-docker
         return
     fi
     if [[ "$target_tag" = "clean" ]]; then
@@ -190,7 +200,7 @@ function _build_in_docker() {
 
 # =============================================================================
 function compile_makefile() {
-    echo -e "use ${GRN}Makefile${NOC} to build"
+    echo -e "use ${GRN}Makefile${NOC} to build/clean/install ..."
     target_tag=$1
     if [ "$target_tag" = "clean" ]; then
         echo -e "${GRN}make clean${NOC}"
@@ -227,7 +237,7 @@ function compile_makefile() {
 
 # =============================================================================
 function compile_cmakelist() {
-    echo -e "use ${GRN}CMakeLists.txt${NOC} to build/clean"
+    echo -e "use ${GRN}CMakeLists.txt${NOC} to build/clean/install ..."
     cur_dir=${PWD}
     build_dir="_bnative.cmake"
     target_tag=$1
@@ -250,6 +260,11 @@ function compile_cmakelist() {
         return
     fi
     if [ "$target_tag" = "install" ]; then
+        if [ ! -d "$build_dir" ]; then
+            echo -e "${GRN}mkdir "$build_dir" && cd "$build_dir" && cmake ..${NOC}"
+            mkdir "$build_dir" && cd "$build_dir" && cmake ..
+            cd ..
+        fi
         echo -e "${GRN}cd "$build_dir"/ && sudo make install${NOC}"
         cd $build_dir
         sudo make install
@@ -361,7 +376,7 @@ function _build_makefile_exists() {
 
 # =============================================================================
 function _build_build_docker_exists() {
-    if [[ -f "build-docker.sh" ]] && [[ -f "docker/build-in-container.sh" ]] && [[ -f "docker/Dockerfile" ]]; then
+    if [[ -f "build-in-docker" ]] && [[ -f "docker/build" ]] && [[ -f "docker/Dockerfile" ]]; then
         echo "docker "
         return
     fi
