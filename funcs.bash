@@ -151,6 +151,25 @@ function _if_option_exist() {
 }
 
 # =============================================================================
+# index starts from 1
+# example: _find_option_index -s hello world aa bb -s 100 -t 10
+# we want to search "-s" in arguments "hello world aa bb -s 100 -t 10"
+# so the return value is 5
+function _find_option_index() {
+    index=0
+    to_match="$1"
+    shift 1
+    for var in "$@"; do
+        index=$((index + 1))
+        if [ $var = "$to_match" ]; then
+            echo "$index"
+            return
+        fi
+    done
+    echo "0"
+}
+
+# =============================================================================
 # argument 1: the string
 # argument 2: the character
 function _count_a_char_in_str() {
