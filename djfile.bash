@@ -31,6 +31,11 @@ function djfile() {
         dj-file --meson
         return
     fi
+    # ------------------------------
+    if [ $1 = '--version' ]; then
+        dj-file --version
+        return
+    fi
 
     echo -e 'djfile: "'$1 '"command not supported'
     djfile_help
@@ -50,6 +55,7 @@ function _djfile() {
         --help
         --makefile
         --meson
+        --version
     ")
 
     # declare an associative array for options
@@ -60,6 +66,7 @@ function _djfile() {
     ACTIONS["--help"]=" "
     ACTIONS["--makefile"]=" "
     ACTIONS["--meson"]=" "
+    ACTIONS["--version"]=" "
 
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

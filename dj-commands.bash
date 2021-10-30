@@ -151,7 +151,7 @@ function _dj_setup_kdiff3_meld() {
 }
 
 # =============================================================================
-function _dj_setup_dj_gadgets() {
+function _dj_setup_gadgets() {
     cur_dir=${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
@@ -799,7 +799,7 @@ Follow the steps:
 1. log out and log in again;
 2. $ ibus-setup
     then in the opened window: Input Method -> Add -> Chinese -> choose WuBi-Jidian-86-JiShuang
-3. im-config -n ibus 
+3. im-config -n ibus
     this step will show nothing
 4. add an input source:
     Settings -> Keyboard -> Input Sources -> Others -> Chinese -> Chinese (WuBi-Jidian-86-JiShuang-6.0)
@@ -1402,8 +1402,8 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost clang-format "
-    setup_list+="clang-llvm cli11 cmake computer container dj-gadgets devtools driver dropbox eigen3 "
-    setup_list+="flamegraph fmt foxit-pdf-reader gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
+    setup_list+="clang-llvm cli11 cmake computer container devtools driver dropbox eigen3 "
+    setup_list+="flamegraph fmt foxit-pdf-reader gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
     setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio lib-serialport "
     setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev "
