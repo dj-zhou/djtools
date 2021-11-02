@@ -484,13 +484,13 @@ function _dj_setup_gcc_arm_stm32() {
         echo -e "\n"
     elif [[ "${ubuntu_v}" = *'20.04'* ]]; then
         sudo apt remove gcc-arm-none-eabi
-        compiler_date="9-2020"
-        compiler_q="q2"
-        url="https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm"
-        file="gcc-arm-none-eabi-${compiler_date}-${compiler_q}-update"
+        file="gcc-arm-none-eabi-10.3-2021.10"
         filename="${file}-x86_64-linux.tar.bz2"
+        url="https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm"
+        link="${url}/10.3-2021.10/${filename}"
+
         # check if the file exists --------------------
-        _wget_if_not_exist $filename "2b9eeccc33470f9d3cda26983b9d2dc6" ${url}/${compiler_date}${compiler_q}/${filename}
+        _wget_if_not_exist $filename "2383e4eb4ea23f248d33adc70dc3227e" ${url}/${compiler_date}${compiler_q}/${filename}
 
         echo "sudo tar xjf ${filename} -C /usr/share/"
         sudo tar xjf ${filename} -C /usr/share/
