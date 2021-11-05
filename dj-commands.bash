@@ -1286,7 +1286,7 @@ function dj() {
     # ------------------------------
     if [ $1 = 'python3' ]; then
         shift 1
-        _dj_python3"$@"
+        _dj_python3 "$@"
         return
     fi
     # ------------------------------
@@ -1494,9 +1494,8 @@ function _dj() {
     ACTIONS[open]=" "
     # --------------------------------------------------------
     # --------------------------------------------------------
-    python3_cmds="pip-install "
+
     ACTIONS["python3"]="$python3_cmds"
-    pip_install_list="numpy "
     ACTIONS["pip-install"]="$pip_install_list"
     for i in $pip_install_list; do
         ACTIONS[$i]=" "
