@@ -261,11 +261,11 @@ function compile_cmakelist() {
     fi
     if [ "$target_tag" = "install" ]; then
         if [ ! -d "$build_dir" ]; then
-            echo -e "${GRN}mkdir "$build_dir" && cd "$build_dir" && cmake ..${NOC}"
-            mkdir "$build_dir" && cd "$build_dir" && cmake ..
+            echo -e "${GRN}mkdir "$build_dir" && cd "$build_dir" && cmake .. && make -j$(nproc)${NOC}"
+            mkdir "$build_dir" && cd "$build_dir" && cmake .. && make -j$(nproc)
             cd ..
         fi
-        echo -e "${GRN}cd "$build_dir"/ && sudo make install${NOC}"
+        echo -e "${GRN}cd "$build_dir" && sudo make install${NOC}"
         cd $build_dir
         sudo make install
         cd $cur_dir
