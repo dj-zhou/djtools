@@ -354,6 +354,27 @@ function _dj_setup_perf() {
 }
 
 # =============================================================================
+function _dj_setup_plotjuggler() {
+    _install_if_not_installed qtbase5-dev libqt5svg5-dev libqt5websockets5-dev \
+        libqt5opengl5-dev libqt5x11extras5-dev
+
+    v=$(_find_package_version plotjuggler)
+    cur_dir=$PWD
+    cd ~ && mkdir -p soft && cd soft
+
+    rm -rf PlotJuggler
+    git clone https://github.com/facontidavide/PlotJuggler.git
+    cd PlotJuggler
+    git checkout $v
+    mkdir build && cd build
+    cmake ..
+    make -j$(nproc)
+    sudo make install
+
+    cd $cur_dir
+}
+
+# =============================================================================
 function _dj_setup_pycharm() {
     _install_if_not_installed snap
 
@@ -1416,8 +1437,8 @@ function _dj() {
     setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio lib-serialport "
     setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev "
     setup_list+="nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom pip "
-    setup_list+="pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rust saleae-logic "
-    setup_list+="spdlog slack stm32-cubeMX stm32-tools sublime texlive typora vim-env vscode vtk-8.2.0 "
+    setup_list+="plotjuggler pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rust "
+    setup_list+="saleae-logic spdlog slack stm32-cubeMX stm32-tools sublime texlive typora vim-env vscode vtk-8.2.0 "
     setup_list+="windows-fonts wubi yaml-cpp you-complete-me "
     ACTIONS[setup]="$setup_list "
     for i in $setup_list; do

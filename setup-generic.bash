@@ -1803,6 +1803,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'perf' ]; then
+        _dj_setup_perf
+        return
+    fi
+    # --------------------------
     if [ $1 = 'picocom' ]; then
         _dj_setup_picocom
         return
@@ -1813,8 +1818,8 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'perf' ]; then
-        _dj_setup_perf
+    if [ $1 = 'plotjuggler' ]; then
+        _dj_setup_plotjuggler
         return
     fi
     # --------------------------

@@ -16,4 +16,5 @@ matplotplusplus c088749434154c230ee7547c6871d65e58876dc6 # latest greatest maste
 meson v0.59.2 # released on Sep. 28th, 2021
 ninja v1.10.2 # released on Nov. 28th, 2020
 picocom 3.1   # released on March 1st, 2018
+plotjuggler 3.3.3 # released on October 30th, 2021
 yaml-cpp 0.6.3
