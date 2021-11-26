@@ -5,6 +5,7 @@ source $djtools_path/clone.bash
 source $djtools_path/help.bash
 source $djtools_path/setup-generic.bash
 source $djtools_path/setup-opencv.bash
+source $djtools_path/python3-tools.bash
 source $djtools_path/setup-ros.bash
 source $djtools_path/udev-rules.bash
 
@@ -1283,6 +1284,12 @@ function dj() {
         return
     fi
     # ------------------------------
+    if [ $1 = 'python3' ]; then
+        shift 1
+        _dj_python3 "$@"
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'replace' ]; then
         # ------------------------------
         if [[ $# -ge 2 ]]; then
@@ -1385,6 +1392,7 @@ function _dj() {
         grep
         help
         open
+        python3
         pack
         replace
         setup
@@ -1485,6 +1493,13 @@ function _dj() {
     # --------------------------------------------------------
     ACTIONS[open]=" "
 
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    ACTIONS["python3"]="$_python3_cmds "
+    ACTIONS["install"]="$_install_list "
+    for i in $_install_list; do
+        ACTIONS[$i]=" "
+    done
     # --------------------------------------------------------
     # --------------------------------------------------------
     ACTIONS["ssh-general"]="no-password "
