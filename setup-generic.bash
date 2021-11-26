@@ -164,8 +164,8 @@ function _dj_setup_computer() {
 
     # -----------------------------------
     cat <<eom
-    
-    going to install the following packages: 
+
+    going to install the following packages:
        ark cmake curl cutecom dconf-editor dconf-tools git
        git-lfs g++ htop kate libgtk2.0-dev lsb-core putty
        screen scrot terminator tree vlc vim wmctrl xclip yasm
@@ -484,13 +484,13 @@ function _dj_setup_gcc_arm_stm32() {
         echo -e "\n"
     elif [[ "${ubuntu_v}" = *'20.04'* ]]; then
         sudo apt remove gcc-arm-none-eabi
-        compiler_date="9-2020"
-        compiler_q="q2"
-        url="https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm"
-        file="gcc-arm-none-eabi-${compiler_date}-${compiler_q}-update"
+        file="gcc-arm-none-eabi-10.3-2021.10"
         filename="${file}-x86_64-linux.tar.bz2"
+        url="https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm"
+        link="${url}/10.3-2021.10/${filename}"
+
         # check if the file exists --------------------
-        _wget_if_not_exist $filename "2b9eeccc33470f9d3cda26983b9d2dc6" ${url}/${compiler_date}${compiler_q}/${filename}
+        _wget_if_not_exist $filename "2383e4eb4ea23f248d33adc70dc3227e" ${link}
 
         echo "sudo tar xjf ${filename} -C /usr/share/"
         sudo tar xjf ${filename} -C /usr/share/
@@ -685,7 +685,7 @@ libcsv
     /usr/local/lib/libcsv.so
     /usr/local/lib/libcsv.so.3
     /usr/local/lib/libcsv.so.3.0.2
-    
+
 header file:
     /usr/local/include/csv.h
 --------------------------------------------
@@ -839,7 +839,7 @@ function _dj_setup_libserialport() {
 the library is installed:
     /usr/local/lib/libserialport.la
     /usr/local/lib/libserialport.so
-   
+
 the header is:
     /usr/local/include/libserialport.h
 
@@ -1115,10 +1115,10 @@ MongoDB istall:
 Enable and start MongoDB Deamon program:
     $ sudo systemctl enable --now mongod
     $ sudo systemctl start mongod
-    
+
 Check if MongoDB is running:
     $ sudo service mongod status
-        
+
 Check if MongoDB is installed:
     $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
 --------------------------------------------
