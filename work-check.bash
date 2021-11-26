@@ -45,26 +45,26 @@ function _work_check() {
 
     CURRENT_DATE_TIME=$(date +"%Y%m%d-%I%M%S")
     OUTPUT_FILE="${HOME}/work-check-${HOSTNAME}-${CURRENT_DATE_TIME}.txt"
-    echo -e '\c' >$OUTPUT_FILE
-    echo -ne "--------------------------------------------------------------------------------------------\n" >>$OUTPUT_FILE
-    echo -ne "----- Tool      : Work Check ------------------------------------------------------------------------\n" >>$OUTPUT_FILE
-    echo -ne "----- Command   : dj work-check <path> --------------------------------------------------------------\n" >>$OUTPUT_FILE
-    echo -ne "----- Developer : Dingjiang Zhou --------------------------------------------------------------------\n" >>$OUTPUT_FILE
-    echo -ne "----- Date      : Mar, 15th, 2020 -------------------------------------------------------------------\n" >>$OUTPUT_FILE
-    echo -ne "--------------------------------------------------------------------------------------------\n" >>$OUTPUT_FILE
-    echo -ne "\nWorking Directory : "$workspace_path"\n" >>$OUTPUT_FILE
-    echo -ne "Computer Hostname : "$HOSTNAME"\n" >>$OUTPUT_FILE
-    echo -ne "Computer Username : "$USER"\n" >>$OUTPUT_FILE
-    echo -ne "Work Check Time   : "$(date)"\n\n" >>$OUTPUT_FILE
-    $(_write_to_file_width "Commit Time" 24 $OUTPUT_FILE)
-    $(_write_to_file_width "Source" 15 $OUTPUT_FILE)
-    $(_write_to_file_width "Status" $status_width $OUTPUT_FILE)
-    $(_write_to_file_width "Folder/Repo" $package_width $OUTPUT_FILE)
-    $(_write_to_file_width "Branch" $branch_width $OUTPUT_FILE)
-    $(_write_to_file_width "Tag" $tag_width $OUTPUT_FILE)
-    $(_write_to_file_width "Commit" 15 $OUTPUT_FILE)
-    $(_write_to_file_width "Commit Message" 50 $OUTPUT_FILE)
-    echo -ne "\n" >>$OUTPUT_FILE
+    echo -e '\c' >"$OUTPUT_FILE"
+    echo -ne "--------------------------------------------------------------------------------------------\n" >>"$OUTPUT_FILE"
+    echo -ne "----- Tool      : Work Check ------------------------------------------------------------------------\n" >>"$OUTPUT_FILE"
+    echo -ne "----- Command   : dj work-check <path> --------------------------------------------------------------\n" >>"$OUTPUT_FILE"
+    echo -ne "----- Developer : Dingjiang Zhou --------------------------------------------------------------------\n" >>"$OUTPUT_FILE"
+    echo -ne "----- Date      : Mar, 15th, 2020 -------------------------------------------------------------------\n" >>"$OUTPUT_FILE"
+    echo -ne "--------------------------------------------------------------------------------------------\n" >>"$OUTPUT_FILE"
+    echo -ne "\nWorking Directory : "$workspace_path"\n" >>"$OUTPUT_FILE"
+    echo -ne "Computer Hostname : "$HOSTNAME"\n" >>"$OUTPUT_FILE"
+    echo -ne "Computer Username : "$USER"\n" >>"$OUTPUT_FILE"
+    echo -ne "Work Check Time   : "$(date)"\n\n" >>"$OUTPUT_FILE"
+    $(_write_to_file_width "Commit Time" 24 "$OUTPUT_FILE")
+    $(_write_to_file_width "Source" 15 "$OUTPUT_FILE")
+    $(_write_to_file_width "Status" $status_width "$OUTPUT_FILE")
+    $(_write_to_file_width "Folder/Repo" $package_width "$OUTPUT_FILE")
+    $(_write_to_file_width "Branch" $branch_width "$OUTPUT_FILE")
+    $(_write_to_file_width "Tag" $tag_width "$OUTPUT_FILE")
+    $(_write_to_file_width "Commit" 15 "$OUTPUT_FILE")
+    $(_write_to_file_width "Commit Message" 50 "$OUTPUT_FILE")
+    echo -ne "\n" >>"$OUTPUT_FILE"
 
     for folder in $workspace_path/*; do
         if [[ -d $folder ]]; then
@@ -73,6 +73,7 @@ function _work_check() {
             path=$workspace_path/$repo
             if [ -x "$path" ]; then
                 cd $workspace_path/$repo
+                git fetch -p &>/dev/null
                 # --------------------------------------------------------
                 git_source=$(_work_check_git_source)
                 # --------------------------------------------------------
@@ -100,6 +101,9 @@ function _work_check() {
                     elif [[ $git_status = *"is behind"* ]]; then
                         git_status_str="behind"
                         printf " ${CYN}behind${NOC}"
+                    elif [[ $git_status = *"upstream is gone"* ]]; then
+                        git_status_str="upstream-gone"
+                        printf " ${CYN}upstream-gone${NOC}"
                     else
                         git_status_str="    "
                     fi
@@ -120,29 +124,29 @@ function _work_check() {
                 fi
                 printf "\r\n"
                 # --------------------------------------------------------
-                $(_write_to_file_width "$date_time" 24 $OUTPUT_FILE)
-                $(_write_to_file_width "$git_source" 15 $OUTPUT_FILE)
-                $(_write_to_file_width "$git_status_str" $status_width $OUTPUT_FILE)
-                $(_write_to_file_width "$repo" $package_width $OUTPUT_FILE)
-                $(_write_to_file_width "$b_name" $branch_width $OUTPUT_FILE)
-                $(_write_to_file_width "$t_name" $tag_width $OUTPUT_FILE)
-                $(_write_to_file_width "$branch_commit_value" 15 $OUTPUT_FILE)
-                $(_write_to_file_width "$commit_str" 50 $OUTPUT_FILE)
-                echo -ne "\n" >>$OUTPUT_FILE
+                $(_write_to_file_width "$date_time" 24 "$OUTPUT_FILE")
+                $(_write_to_file_width "$git_source" 15 "$OUTPUT_FILE")
+                $(_write_to_file_width "$git_status_str" $status_width "$OUTPUT_FILE")
+                $(_write_to_file_width "$repo" $package_width "$OUTPUT_FILE")
+                $(_write_to_file_width "$b_name" $branch_width "$OUTPUT_FILE")
+                $(_write_to_file_width "$t_name" $tag_width "$OUTPUT_FILE")
+                $(_write_to_file_width "$branch_commit_value" 15 "$OUTPUT_FILE")
+                $(_write_to_file_width "$commit_str" 50 "$OUTPUT_FILE")
+                echo -ne "\n" >>"$OUTPUT_FILE"
             else
-                echo >>$OUTPUT_FILE
+                echo >>"$OUTPUT_FILE"
             fi
         fi
     done
 
-    echo -ne "\n" >>$OUTPUT_FILE
-    echo -ne "\n" >>$OUTPUT_FILE
-    echo -ne "\n" >>$OUTPUT_FILE
+    echo -ne "\n" >>"$OUTPUT_FILE"
+    echo -ne "\n" >>"$OUTPUT_FILE"
+    echo -ne "\n" >>"$OUTPUT_FILE"
 
     cd $workspace_path/
-    echo -ne "+-----------------------------------------------+\n" >>$OUTPUT_FILE
-    echo -ne "|--------------- git simple diff ---------------|\n" >>$OUTPUT_FILE
-    echo -ne "+-----------------------------------------------+\n" >>$OUTPUT_FILE
+    echo -ne "+-----------------------------------------------+\n" >>"$OUTPUT_FILE"
+    echo -ne "|--------------- git simple diff ---------------|\n" >>"$OUTPUT_FILE"
+    echo -ne "+-----------------------------------------------+\n" >>"$OUTPUT_FILE"
     for folder in $workspace_path/*; do
         if [[ -d $folder ]]; then
             cd $folder/
@@ -151,12 +155,14 @@ function _work_check() {
                 repo=$(basename "$folder")
                 # echo $repo
                 if [ -x "$path" ]; then
-                    cd $workspace_path/$repo
+                    cd "$workspace_path/$repo"
                     branch_diff=$(git diff | awk 'NR==1')
-                    echo -ne "\n+------ $repo ------+\n" >>$OUTPUT_FILE
-                    echo -ne "$branch_diff\n" >>$OUTPUT_FILE
+                    if [[ ! -z $branch_diff ]]; then
+                        echo -ne "\n+------ $repo ------+\n" >>"$OUTPUT_FILE"
+                        echo -ne "$branch_diff\n" >>"$OUTPUT_FILE"
+                    fi
                 else
-                    echo >>$OUTPUT_FILE
+                    echo >>"$OUTPUT_FILE"
                 fi
                 # echo $(basename "$folder")": not a supported git repo"
             fi
@@ -164,32 +170,36 @@ function _work_check() {
         fi
     done
 
-    echo -ne "\n" >>$OUTPUT_FILE
-    echo -ne "\n" >>$OUTPUT_FILE
-    echo -ne "\n" >>$OUTPUT_FILE
+    echo -ne "\n" >>"$OUTPUT_FILE"
+    echo -ne "\n" >>"$OUTPUT_FILE"
+    echo -ne "\n" >>"$OUTPUT_FILE"
 
-    cd $workspace_path/
-    echo -ne "+-----------------------------------------------+\n" >>$OUTPUT_FILE
-    echo -ne "|---------- git detailed local change ----------|\n" >>$OUTPUT_FILE
-    echo -ne "+-----------------------------------------------+\n" >>$OUTPUT_FILE
-    for folder in $workspace_path/*; do
-        if [[ -d $folder ]]; then
-            cd $folder
-            git_source=$(_work_check_git_source)
-            if [[ $git_source != "----" ]]; then
-                repo=$(basename "$folder")
-                if [ -x "$path" ]; then
-                    cd $workspace_path/$repo
-                    branch_diff=$(git diff)
-                    echo -ne "\n+------ $repo ------+\n" >>$OUTPUT_FILE
-                    echo -ne "$branch_diff\n" >>$OUTPUT_FILE
-                else
-                    echo >>$OUTPUT_FILE
-                fi
-            fi
-            cd $workspace_path/
-        fi
-    done
+    # get detailed difference
+    # this part is buggy, so comment it out, do not delete
+    # cd $workspace_path/
+    # echo -ne "+-----------------------------------------------+\n" >>"$OUTPUT_FILE"
+    # echo -ne "|-------------- git detailed diff --------------|\n" >>"$OUTPUT_FILE"
+    # echo -ne "+-----------------------------------------------+\n" >>"$OUTPUT_FILE"
+    # for folder in $workspace_path/*; do
+    #     if [[ -d "$folder" ]]; then
+    #         cd "$folder"
+    #         git_source=$(_work_check_git_source)
+    #         if [[ "$git_source" != "----" ]]; then
+    #             repo=$(basename "$folder")
+    #             if [ -x "$path" ]; then
+    #                 cd "$workspace_path/$repo"
+    #                 branch_diff="$(git diff)"
+    #                 if [[ ! -z "$branch_diff" ]]; then
+    #                     echo -ne "\n+------ $repo ------+\n" >>"$OUTPUT_FILE"
+    #                     echo -ne "$branch_diff\n" >>"$OUTPUT_FILE"
+    #                 fi
+    #             else
+    #                 echo >>"$OUTPUT_FILE"
+    #             fi
+    #         fi
+    #         cd $workspace_path/
+    #     fi
+    # done
 
     cd ${cur_dir}
 }
