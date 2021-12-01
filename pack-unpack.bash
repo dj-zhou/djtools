@@ -24,6 +24,7 @@ function _dj_unpack_tar_gz() {
 }
 
 # =============================================================================
+# todo: use `*`, or multiple files
 function _dj_pack_tar_gz() {
     filename=$(basename $1)
     tar -czvf $filename.tar.gz $1
