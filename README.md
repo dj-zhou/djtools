@@ -1,9 +1,9 @@
-# djtools
+## djtools
 ### Introduction
 
-This is a **tab-completable** toolsets  contain some useful scripts for installing software, checking daily work, checking status on repos, building projects, dealing with mirrors, simplifying Yocto BitBake commands, and so on.
+This is a **tab-completable** toolsets  contain some useful scripts for installing packages, checking daily work, checking status on repos, building projects, dealing with mirrors, simplifying Yocto BitBake commands, and so on.
 
-Supported system: Ubuntu 16.04/18.04/20.04. Note that Ubuntu 16.04 is not fully tested, and Ubuntu 20.04 is under test.
+Supported system: Ubuntu 18.04/20.04. Note that Ubuntu 18.04 is not fully tested, and Ubuntu 20.04 is under test.
 
 ### Installation
 
@@ -18,29 +18,20 @@ The output is as the following:
 
 ```bash
 /home/robot/workspace/djtools
-
 djtools installation ...
- 
 Do you have a BitBucket username? [Yes/No]
 y
-
 Please enter your BitBucket username
 sky-Hawk
-
 Do you have a GitHub username? [Yes/No]
 y
-
 Please enter your GitHub username:
 dj-zhou
-
 Do you have a GiTee username? [Yes/No]
 y
-
 Please enter your GiTee username:
-dj-zhou
- 
+d-zhou
 If bitbucket/github/gitee usernames set wrong, you can still edit them in ~/.bashrc
- 
 djtools installation finished.
 ```
 
@@ -63,114 +54,45 @@ Meanwhile, there are three files generated in `~` directory:
 .GitHub-repos-dj-zhou
 ```
 
-You can put the names of repositories into theses files to enable the **tab completable** feature of  `dj clone` and `dj ssh-clone` commands.
+You can put the names of repositories into theses files to enable the **tab completable** feature of  `dj git ssh-clone` commands.
 
 ### `dj` Commands
 
-#### `dj clone`
+#### `dj flame-graph`
 
-Used to clone the repositories from **BitBucket/GitHub/GiTee**. A specific branch can be cloned.
+A tool used to generate flame graph, assisting `perf` tools.
 
-The tab-completion feature requires to add the repository names into a hard-coded file. For example, you can create a file `.GitHub-repos-<github username>` in home directory, then the command:
+#### `dj format`
 
-```bash
-dj clone github <tab> <tab>
-```
+* `brush`: apply clang format according to `file` (`.clang-format` file) or `google` (Google style)
+* `implement`: to implement a `.clang-format` file to the current path. For example, `dj format implement djz` will copy the file `.clang-format-dj` from the `djtools` folder to the current folder, and rename it to `.clang-format`.
+* `show`: to show different coding style, for example, `camel` (to add more).
 
-will list the repository names for selection. Take my GitHub account for example, I have tab-completion after `github` as:
+#### `dj git`
 
-```bash
-$ dj clone github 
-algorithm-note       dj-lib-cpp           one-third-demo       stl-practise
-avr-gcc              djtools              one-third-stm32      stm32-embedded-demo
-can-analyzer         embedded-debug-gui   opencv-4.1.1         stm32-lib
-cpp-practise         glfw3                pads-clear-up        stm32tools
-cv                   math-for-ml-note     pangolin             tutorials
-dj-gadgets           matplotlib-cpp       robotics-note        yaml-cpp
-```
+* `config`: to configure a repository with name and email address, locally.
+* `search`: to list all remote branches by using the author's name, or email address, or to search some commit that with specific string in the commit message.
+* `ssh-clone`: to clone repository using ssh, for example, the command `dj git ssh-clone github robotics-note` is the same as `git clone git@github.com:dj-zhou/robotics-note.git`, because we have setup the GitHub account as `dj-zhou`.
 
-since I have those listed in the `~/.GitHub-repos-dj-zhou`.
+#### `dj grep`
 
-The same rules applied to GiTee and BitBucket.
+* `in-meson`: to find specific content in all `meson.build` files in current directory.
+* `package`: run `ldconfig` command to see the package relationships.
+* `string`: to search some string in all files in current directory, avoid those directories: `build`, `bin`, `_bcross*`, `_bnative*`, `builddir`, `.git`, `.cache`.
 
-#### `dj ssh-clone`
+#### `dj help`
 
-A similar command to `dj clone`, with the difference that the repository is with ssh links. For example, the command
+Show some help information for some specific commands.
 
-```bash
-dj ssh-clone github robotics-note
-```
+#### `dj open`
 
-is the same as
+#### `dj pack`
 
-```bash
-git clone git@github.com:dj-zhou/robotics-note.git
-```
+(TODO): to pack files using `tar.gz`, or other formats.
 
-#### `dj setup`
+`dj python3`
 
-Used to install software, including `gcc-arm-stm32,` etc. The list will be extended without notification. By table completion, you can see the full installation list:
-
-```bash
-$ dj setup 
-adobe-pdf-reader         gnome                    pangolin
-arduino-1.8.13           google-repo              pip
-baidu-netdisk            grpc-1.29.1              qemu
-clang-format             gtest-glog               qt-5.13.1
-clang-llvm               i219-v                   qt-5.14.2
-cmake                    kdiff3-meld              ros2-foxy
-computer                 lcm                      ros-melodic
-container                libev-4.33               ros-noetic
-devtools                 libgpiod                 saleae-logic
-dj-gadgets               libiio                   slack
-dropbox                  lib-serialport           spdlog
-eigen3                   libyaml-cpp              stm32-cubeMX
-foxit-pdf-reader         mathpix                  stm32-tools
-g++-10                   matplot++                sublime
-gcc-aarch64-linux-gnu    mbed                     typora
-gcc-arm-linux-gnueabi    mongodb                  vim-env
-gcc-arm-linux-gnueabihf  nvidia                   vscode
-gcc-arm-stm32            nvtop                    vtk-8.2.0
-gitg-gitk                opencv-2.4.13            wubi
-git-lfs                  opencv-4.1.1             you-complete-me
-glfw3                    opencv-4.2.0             
-```
-
-#### `dj ssh`
-
-SSH related commands.
-
-```bash
-dj ssh nopassword user@ip
-```
-
-This command is used to copy the ssh key to a remote computer such that you will no need to enter password every time when ssh to it.
-
-#### `dj udev`
-
-Used to setup some udev for USB to serial ports, and  video capture card, FT4232H, etc.
-
-```bash
-~ $ dj udev 
---dialout          logitech-f710      --show             uvc-video-capture
-ft4232h            one-third-console  stlink-v2.1  
-```
-
-#### `dj work-check`
-
-Used to check if the repositories have been pushed, for example, the following code 
-
-```bash
-dj work-check .
-```
-
-will check all the folders (possibly repositories) in the current folder (`.`), and tell if the repo is <span style="color:red">dirty</span>,  <span style="color:cyan">ahead</span> or <span style="color:blue">ahead</span>. Meanwhile, it will write those information: commit time, source (github/bitbucket/gitee, etc), status (dirty/ahead/behind), branch name, the tag, commit value, commit message, to a text file in the home directory. For example: `work-check-dj-dell-20200709-121415.txt`.
-
-It is recommended to run this command to see if there is some work have not been finished, committed or pushed.
-
-#### `dj meson`
-
-`dj meson find` is used to find some contents in the `meson.build` files in a project. It is very useful if the project has multiple `meson.build` files.
+* `install`: to install python3 related packages natively.
 
 #### `dj replace`
 
@@ -182,117 +104,115 @@ dj replace <original> <new> <path to file or folder>
 
 It is useful to replace the name of a global variable in a folder.
 
-#### `dj formrat`
+#### `dj setup`
 
-Used to implement a `.clang-format` file to the current path. For example:
-
-```bash
-coding clang-format implement djz
-```
-
-will copy the file `.clang-format-dj` from the `djtools` folder to the current folder, and rename it to `.clang-format`.
-
-It can also be used to show the naming convention in programming:
+Used to install packages, including `gcc-arm-stm32,` etc. The list will be extended without notification. By table completion, you can see the full installation list:
 
 ```bash
-coding clang-format show
+$ dj setup 
+abseil-cpp               glfw3                    pangolin
+adobe-pdf-reader         glog                     perf
+anaconda                 gnome                    picocom
+ansible                  gnuplot                  pip
+arduino-1.8.13           google-repo              plotjuggler
+baidu-netdisk            grpc                     pycharm
+boost                    gtest                    python3.9
+clang-format             i219-v                   qemu
+clang-llvm               kdiff3-meld              qt-5.13.1
+cli11                    lcm                      qt-5.14.2
+cmake                    libcsv-3.0.2             ros2-foxy
+computer                 libev                    ros-melodic
+container                libgpiod                 ros-noetic
+devtools                 libiio                   rust
+driver                   lib-serialport           saleae-logic
+dropbox                  libsystemd               slack
+eigen3                   magic-enum               spdlog
+flamegraph               mathpix                  stm32-cubeMX
+fmt                      matplot++                stm32-tools
+foxit-pdf-reader         mbed                     sublime
+g++-10                   meson                    texlive
+g++-11                   mongodb                  typora
+gadgets                  nlohmann-json3-dev       vim-env
+gcc-aarch64-linux-gnu    nvidia                   vscode
+gcc-arm-linux-gnueabi    nvtop                    vtk-8.2.0
+gcc-arm-linux-gnueabihf  opencv-2.4.13            windows-fonts
+gcc-arm-stm32            opencv-3.4.13            wubi
+gitg-gitk                opencv-4.1.1             yaml-cpp
+git-lfs                  opencv-4.2.0             you-complete-me        
 ```
 
-### `repod` Commands
+The versions of most of the packages are listed in file `path/to/djtools/.package-version`.
 
-#### `repod branches`
+#### `dj ssh-general`
 
-Branched related commands. For example, to list all local or remote branches:
+* `no-password`: to copy the host ssh file to a target to avoid using password in the future.
+
+#### `dj ssh-github`
+
+GitHub related commands:
+
+* `activate`: to activate one account;
+* `all-accounts`: to show all available accounts;
+* `current-account`: to show current active account.
+
+#### `dj udev`
+
+Used to setup some udev for USB to serial ports, and  video capture card, FT4232H, etc.
 
 ```bash
-repod branches list-all --local
-repod branches list-all --remote
+~ $ dj udev 
+--dialout          logitech-f710      --show             uvc-video-capture
+ft4232h            one-third-console  stlink-v2.1  
 ```
 
-#### `repod checkout`
+#### `dj udevadm`
 
-Used to checkout all branches:
+To run `udevadm` command to show detail of some USB device, that is the same as running this command:
 
 ```bash
-repod checkout all-branch
+udevadm info -a -n [usb device]
 ```
 
-Todo: when a branch checked out out is older, pull it; when the upstream of a branch checked out is gone, delete it.
+#### `dj work-check`
 
-#### `repod update`
+Used to check if the repositories have been pushed, for example, the following command 
 
-This command works in a folder that contains multiple repos. It is similar to `dj work-check` command, but gives more information. For example, in `~/workspace`, I run `repod update --all-sub-folders`, the output is (with color):
-
-```text
-----------------------------
-djtools dirty 
-
-----------------------------
-one-third-demo 
-
-----------------------------
-one-third-stm32 
-
-----------------------------
-tutorials dirty 
+```bash
+dj work-check .
 ```
+
+will check all the folders (possibly repositories) in the current folder (`.`), and tell if the repo is <span style="color:red">dirty</span>,  <span style="color:blue">ahead</span> or <span style="color:cyan">behind</span>, or <span style="color:yellow">upstream-gone</span>, Meanwhile, it will write those information: commit time, source (github/bitbucket/gitee, etc), status (dirty/ahead/behind), branch name, the tag, commit value, commit message, to a text file in the home directory. For example: `work-check-dj-dell-20200709-121415.txt`.
+
+It is recommended to run this command to see if there is some work have not been finished, committed or pushed.
 
 ### `system` Commands
 
-#### `system check`
-
-Used to check some system information. For example, temperature, udev rules, cpu-memory, and so on.
-
-#### `system enable`
-
-Used to enable something, not implemented yet.
-
-#### `system disable`
-
-Used to disable something, for example:
-
-```bash
-system disable program-problem-detected
-```
-
-#### `system wallpaper`
-
-Used to setup the wallpaper:
-
-```bash
-system wallpaper random
-```
-
-This command will leave settings in the `~/.bashrc` file.
+* `check`:  used to check some system information. For example, temperature, udev rules, cpu-memory, and so on.
+* `enable`: used to enable something, not implemented yet.
+* `disable`: used to disable something, for example: `system disable program-problem-detected`.
+* `wallpaper`: used to setup the wallpaper: `system wallpaper random`, this command will leave settings in the `~/.bashrc` file.
 
 ### `yocto` Commands
 
 #### `yocto bake`
 
-To bitbake an image defined in some meta layer. The command is valid only in a Yocto Build directory. Take [yocto-up-board](https://github.com/dj-zhou/yocto-up-board) as an example:
+To bitbake an image defined in some meta layer. The command is valid only in a Yocto Build directory. Take [yocto-image-builder](https://github.com/dj-zhou/yocto-image-builder) as an example:
 
 ```bash
-cd yocto-up-board/up-board
-mamba@asus-rog: up-board $ yocto bake <tab tab>
-meta-intel           meta-up-board        openembedded-core    
-meta-openembedded    meta-virtualization  poky                 
-mamba@asus-rog: up-board $ yocto bake meta-up-board upboard- <tab tab>
-upboard-image-base        upboard-image-secureboot  
-upboard-image-sato        upboard-robotics-image    
+~$ cd yocto-image-builder/wandboard-imx6qp-revd1
+viper@x299: wandboard-imx6qp-revd1 $ yocto bake 
+image      plain-sdk  
+viper@x299: wandboard-imx6qp-revd1 $ yocto bake image 
+meta-freescale           meta-freescale-distro    meta-zhou
+meta-freescale-3rdparty  meta-openembedded        poky
+viper@x299: wandboard-imx6qp-revd1 $ yocto bake image meta-zhou appolo-image   
 ```
 
-#### `yocto build`
-
-It is used tot build a plain SDK. If there are multiple images in the build directory, you will need to choose one image:
-
-```bash
-mamba@asus-rog: up-board $ yocto build plain-sdk upboard-
-upboard-image-base      upboard-robotics-image  
-```
+You can also bitbake a plain-sdk once an image is built.
 
 #### `yocto flash`
 
-Used to flash the image to the SD card. For ARM based Yocto images, it will flash the `wic` iamge file to a SD card:
+Used to flash the image to the SD card. For ARM based Yocto images, it will flash the `wic` image file to a SD card:
 
 ```bash
 yocto flash /dev/sda appolo-image
@@ -324,23 +244,27 @@ It is used to setup the development environment, or the plain-sdk.
 It is used to  list a specific distro, image, machine, or recipe. For example:
 
 ```bash
-mamba@asus-rog: yocto-up-board $ yocto show recipe-bb eigen
+viper@x299: yocto-image-builder $ yocto show recipe-bb eigen
 
 ---------------------------------------
 meta-openembedded
-./meta-oe/recipes-support/libeigen/libeigen_3.3.7.bb
+./meta-oe/recipes-support/libeigen/libeigen_3.4.0.bb
+
+---------------------------------------
+meta-zhou
+./recipes-support/libeigen/libeigen_3.3.7.bb
 ```
 
-hence we know the `libeigen` upstream is defined in `meta-openembedded` layer.
+hence we know the `libeigen` upstream is defined in `meta-openembedded` and `meta-zhou` layer.
 
 ### `zephyr` Commands
 
 #### `zephyr setup`
 
-Used to setup the Zephyr SDK. For example, for SDK version 0.11.3, you can run:
+Used to setup the Zephyr SDK. For example, for SDK version 0.11.4, you can run:
 
 ```bash
-zephyr setup sdk-0.11.3
+zephyr setup sdk-0.11.4
 ```
 
 #### `zephyr build`
@@ -356,17 +280,3 @@ zephyr flash stm32
 ```
 
 For other platform, the tools and so on are not setup yet.
-
-### Other Commands
-
-#### `window-tile`
-
-Used to tile the windows to a pre-setup configuration.
-
-#### `keyremap`
-
-Used to remap the **alt** and the **ctrl** keys.
-
-#### `touchpad`
-
-Used to enable or disable the touchpad on some (brands of) computers.

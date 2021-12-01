@@ -103,7 +103,7 @@ function _work_check() {
                         printf " ${CYN}behind${NOC}"
                     elif [[ $git_status = *"upstream is gone"* ]]; then
                         git_status_str="upstream-gone"
-                        printf " ${CYN}upstream-gone${NOC}"
+                        printf " ${YLW}upstream-gone${NOC}"
                     else
                         git_status_str="    "
                     fi

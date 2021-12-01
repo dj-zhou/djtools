@@ -39,7 +39,6 @@ source $djtools_path/mark-down.bash
 source $djtools_path/m.bash
 source $djtools_path/mirror.bash
 source $djtools_path/pack-unpack.bash
-source $djtools_path/repod.bash
 source $djtools_path/system.bash
 source $djtools_path/terminal-format.bash
 source $djtools_path/touchpad.bash

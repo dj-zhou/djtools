@@ -911,6 +911,10 @@ function _dj_grep_in_meson() { # term
         return
     fi
     all_meson_build=$(find . -name meson.build)
+    if [ -z "$all_meson_build" ]; then
+        echo "no meson.build file found, exit."
+        return
+    fi
     for file in $all_meson_build; do
         find_term=$(grep -rn "$term" "$file")
         if [ ! -z "$find_term" ]; then
@@ -1247,7 +1251,7 @@ function dj() {
             fi
         fi
         # ------------------------------
-        if [ $2 = '-in-meson' ]; then
+        if [ $2 = 'in-meson' ]; then
             shift 2
             _dj_grep_in_meson "$@"
             return
@@ -1498,8 +1502,16 @@ function _dj() {
         ACTIONS[$i]=" "
     done
     ACTIONS[format]+="implement "
-    ACTIONS[brush]+="google file "
-    ACTIONS[implement]="djz bg "
+    brush_list="google file "
+    ACTIONS[brush]="$brush_list"
+    for i in $brush_list; do
+        ACTIONS[$i]=" "
+    done
+    implement_list="djz bg "
+    ACTIONS[implement]="$implement_list"
+    for i in $implement_list; do
+        ACTIONS[$i]=" "
+    done
     # -----------------
     show_list="camel "
     ACTIONS[show]="$show_list "
@@ -1561,7 +1573,7 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    grep_list="package string -in-meson "
+    grep_list="package string in-meson "
     ACTIONS[grep]="$grep_list "
     for i in $grep_list; do
         ACTIONS[$i]=" "
