@@ -30,17 +30,18 @@ function _dj_help() {
 # =============================================================================
 function _dj_setup_boost() {
     cur_dir=${PWD}
+
+    v=$(_find_package_version boost)
+    _echo_install boost $v
+    _press_enter_or_wait_s_continue 5
+
+    _install_if_not_installed python-dev libxml2-dev libxslt-dev
     cd ~ && mkdir -p soft/ && cd soft/
-
-    echo -e "${GRN}boost-1.74.0${NOC} is going to be installed"
-    _press_enter_to_continue
-
     rm -rf boost
     git clone https://github.com/boostorg/boost.git
 
     cd boost
-    # checkout a specific version
-    git checkout boost-1.74.0
+    git checkout boost-$v
     # clone the submodules! this takes long though
     git submodule update --init --recursive
     # install is simple
@@ -50,15 +51,8 @@ function _dj_setup_boost() {
     echo -e "${PRP}sudo cp libboost_* /usr/local/lib/${NOC}"
     sudo cp libboost_* /usr/local/lib/
 
-    cat <<eom
------------------------------------------------------------------
-    headers installed to:
-        /usr/include/
-    shared library is copied to:
-        /usr/local/lib/
------------------------------------------------------------------
-
-eom
+    _verify_header_files /usr/include/ # this is not accurate
+    _verify_lib_installation libboost_.so /usr/local/lib/
 
     cd $cur_dir
 }

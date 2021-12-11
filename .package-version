@@ -1,4 +1,5 @@
 abseil-cpp 20210324.2
+boost 1.78.0
 cli11 2.1.1 # (no "v" in front!) released Sep. 29th, 2021
 cmake v3.21.3
 eigen3 3.3.9 # released on Dec. 4th, 2020
