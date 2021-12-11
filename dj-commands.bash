@@ -35,9 +35,9 @@ function _dj_setup_boost() {
     _echo_install boost $v
     _press_enter_or_wait_s_continue 5
 
-    _install_if_not_installed python-dev libxml2-dev libxslt-dev
+    _install_if_not_installed python3-dev libxml2-dev
     cd ~ && mkdir -p soft/ && cd soft/
-    rm -rf boost
+    sudo rm -rf boost
     git clone https://github.com/boostorg/boost.git
 
     cd boost
@@ -46,13 +46,11 @@ function _dj_setup_boost() {
     git submodule update --init --recursive
     # install is simple
     ./bootstrap.sh --prefix=/usr/local
-    ./b2
-
-    echo -e "${PRP}sudo cp libboost_* /usr/local/lib/${NOC}"
-    sudo cp libboost_* /usr/local/lib/
+    sudo ./b2 install
 
     _verify_header_files /usr/include/ # this is not accurate
-    _verify_lib_installation libboost_.so /usr/local/lib/
+    _verify_lib_installation libboost_atomic.so /usr/local/lib/
+    _verify_lib_installation libboost_timer.so /usr/local/lib/
 
     cd $cur_dir
 }
