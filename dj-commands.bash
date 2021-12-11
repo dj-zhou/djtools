@@ -31,6 +31,13 @@ function _dj_help() {
 function _dj_setup_boost() {
     cur_dir=${PWD}
 
+    gpp_v=$(version check g++)
+    anw=$(_version_if_ge_than $gpp_v "10.1.0")
+    if [ "$anw" = "no" ]; then
+        echo "run \"version swap g++\" to use higher version of g++ (>=10.1.0)"
+        echo "run \"version swap gcc\" to use higher version of gcc (>=10.1.0)"
+        return
+    fi
     v=$(_find_package_version boost)
     _echo_install boost $v
     _press_enter_or_wait_s_continue 5
