@@ -117,7 +117,7 @@ function _code_name_stm32_dev() {
 
 # =============================================================================
 function code-name() {
-    cur_dir=$PWD
+    pushd_quiet ${PWD}
 
     if [ $# = 0 ]; then
         _code_name_help
@@ -139,7 +139,7 @@ function code-name() {
         return
     fi
 
-    cd ${cur_dir}
+    popd_quiet
 }
 
 # =============================================================================

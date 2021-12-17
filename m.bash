@@ -13,8 +13,8 @@
 # make.sh            no build directory, it all depends on how make.sh is written
 
 function compile_make_build_etc() {
+    pushd_quiet ${PWD}
     clean_tag=$1
-    cur_dir=${PWD}
 
     # ------------------------------
     if [ -f "Makefile" ]; then
@@ -48,7 +48,8 @@ function compile_make_build_etc() {
         return
     fi
     echo -e "(djtools) m/mc: ${RED}build method not defined${NOC}"
-    cd $cur_dir
+
+    popd_quiet
 }
 
 # =============================================================================

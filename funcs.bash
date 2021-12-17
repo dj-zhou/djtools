@@ -424,3 +424,13 @@ function _find_package_version() {
 function _echo_install() { # package # version
     echo -e "install ${GRN}$1 $2${NOC}"
 }
+
+# =============================================================================
+function pushd_quiet() { # directory
+    pushd $1 &>/dev/null
+}
+
+# =============================================================================
+function popd_quiet() {
+    popd &>/dev/null
+}

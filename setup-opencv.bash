@@ -4,7 +4,7 @@
 # may not be a good way to install opencv
 # recommend to install opencv-4.1.1
 function _dj_setup_opencv_2_4_13() {
-    cur_dir=$PWD
+    pushd_quiet ${PWD}
 
     echo -e "Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.11.2"
@@ -29,9 +29,10 @@ function _dj_setup_opencv_2_4_13() {
     _ask_to_remove_a_folder opencv-2.4.13
     _ask_to_remove_a_file opencv-2.4.13.zip
 
-    cd ${cur_dir}
     echo " lib files *.so are installed in /usr/local/lib/"
     echo " header files are installded in /usr/local/include/opencv2/"
+
+    popd_quiet
 }
 
 # =============================================================================
@@ -50,10 +51,10 @@ function _setup_opencv_dependencies() {
     # Cameras programming interface libs
     packages+="libdc1394-22 libdc1394-22-dev libxine2-dev libv4l-dev v4l-utils "
 
-    cur_dir=$PWD
+    pushd_quiet ${PWD}
     cd /usr/include/linux
     sudo ln -s -f ../libv4l1-videodev.h videodev.h
-    cd $cur_dir
+    popd_quiet
 
     # GTK lib for the graphical user functionalities coming from OpenCV highghui module
     packages+="libgtk-3-dev "
@@ -82,9 +83,9 @@ function _setup_opencv_dependencies() {
 
 # =============================================================================
 function _dj_setup_opencv_3_4_13() {
-    _setup_opencv_dependencies
+    pushd_quiet ${PWD}
 
-    cur_dir=$PWD
+    _setup_opencv_dependencies
 
     cd ~ && mkdir -p soft && cd soft/
 
@@ -140,7 +141,6 @@ function _dj_setup_opencv_3_4_13() {
 
     make -j$(nproc) && sudo make install
 
-    cd ${cur_dir}
     cat <<eom
     lib files *.so:
             /usr/local/lib/
@@ -150,6 +150,8 @@ function _dj_setup_opencv_3_4_13() {
     pkg-config file:
         /usr/local/lib/pkgconfig/opencv.pc
 eom
+
+    popd_quiet
 }
 
 # =============================================================================
@@ -159,12 +161,12 @@ eom
 # notice: there is some manual work todo before actually automate this procedure
 # this does not work on Ubuntu 20.04!
 function _dj_setup_opencv_4_1_1() {
+    pushd_quiet ${PWD}
+
     if [[ -d "/usr/local/include/opencv2" ]]; then
         echo "other version of opencv is installed, exit"
         return
     fi
-
-    cur_dir=$PWD
 
     echo -e "Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.14.2"
@@ -199,31 +201,31 @@ function _dj_setup_opencv_4_1_1() {
 
     sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
 
-    cd ${cur_dir}
     cat <<eom
     lib files *.so are installed in
             /usr/local/lib/
     header files are installded in
             /usr/local/include/opencv4/
             in which there is another directory opencv2/
-    
+
     example code or template project can be seen from:
     https://github.com/dj-zhou/opencv4-demo/001-imread-imshow
-
 eom
+
+    popd_quiet
 }
 
 # =============================================================================
 # https://medium.com/@sb.jaduniv/how-to-install-opencv-4-2-0-with-cuda-10-1-on-ubuntu-20-04-lts-focal-fossa-bdc034109df3
 function _dj_setup_opencv_4_2_0() {
+    pushd_quiet ${PWD}
+
     if [[ -d "/usr/local/include/opencv2" ]]; then
         echo "other version of opencv is installed, exit"
         return
     fi
 
     _setup_opencv_dependencies
-
-    cur_dir=$PWD
 
     cd ~ && mkdir -p soft && cd soft/
 
@@ -278,5 +280,5 @@ function _dj_setup_opencv_4_2_0() {
 
     sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
 
-    cd ${cur_dir}
+    popd_quiet
 }

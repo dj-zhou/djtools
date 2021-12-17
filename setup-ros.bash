@@ -2,7 +2,7 @@
 
 # =============================================================================
 function _dj_setup_ros_melodic() {
-    cur_dir=$PWD
+    pushd_quiet ${PWD}
 
     # only Uubntu 18.04 can install ros-melodic
     if [[ $ubuntu_v != *'Ubuntu 18.04'* ]]; then
@@ -53,23 +53,21 @@ function _dj_setup_ros_melodic() {
 
     # setup workspace ---------------
     cat <<eom
-
-    ---------------------------------------------
-    You can run those now:
-      $ source ~/.bashrc
-      $ mkdir -p ~/catkin_ws/src
-      $ cd ~/catkin_ws
-      $ catkin_make
-    ---------------------------------------------
-
+---------------------------------------------
+You can run those now:
+  $ source ~/.bashrc
+  $ mkdir -p ~/catkin_ws/src
+  $ cd ~/catkin_ws
+  $ catkin_make
+---------------------------------------------
 eom
 
-    cd ${cur_dir}
+    popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_ros_noetic() {
-    cur_dir=$PWD
+    pushd_quiet ${PWD}
 
     # only Uubntu 18.04 can install ros-melodic
     if [[ $ubuntu_v != *'Ubuntu 20.04'* ]]; then
@@ -120,24 +118,22 @@ function _dj_setup_ros_noetic() {
 
     # setup workspace ---------------
     cat <<eom
-
-    ---------------------------------------------
-    You can run those now:
-      $ source ~/.bashrc
-      $ mkdir -p ~/catkin_ws/src
-      $ cd ~/catkin_ws
-      $ catkin_make
-    ---------------------------------------------
-
+---------------------------------------------
+You can run those now:
+  $ source ~/.bashrc
+  $ mkdir -p ~/catkin_ws/src
+  $ cd ~/catkin_ws
+  $ catkin_make
+---------------------------------------------
 eom
 
-    cd ${cur_dir}
+    popd_quiet
 }
 
 # =============================================================================
 # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
 function _dj_setup_ros2_foxy_from_deb_package() {
-    cur_dir=$PWD
+    pushd_quiet ${PWD}
 
     # only Uubntu 20.04 can install ros2 Foxy Fitzroy
     if [[ $ubuntu_v != *'Ubuntu 20.04'* ]]; then
@@ -186,25 +182,22 @@ function _dj_setup_ros2_foxy_from_deb_package() {
     fi
 
     cat <<eom
+---------------------------------------------
+Try ROS2:
+    1. in one terminal, run commands:
+    $ source /opt/ros/foxy/setup.bash
+    $ ros2 run demo_nodes_cpp talker
+    2. in a new terminal, run commands:
+    $ source /opt/ros/foxy/setup.bash
+    $ ros2 run demo_nodes_py listener
+---------------------------------------------
 
-    ---------------------------------------------
-    Try ROS2:
-        1. in one terminal, run commands:
-        source /opt/ros/foxy/setup.bash
-        ros2 run demo_nodes_cpp talker
-
-        2. in a new terminal, run commands:
-        source /opt/ros/foxy/setup.bash
-        ros2 run demo_nodes_py listener
-    ---------------------------------------------
-    
-    Other references:
-    https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/#install-additional-rmw-implementations-optional
-    https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/#install-additional-packages-using-ros-1-packages
-
+Other references:
+https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/#install-additional-rmw-implementations-optional
+https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/#install-additional-packages-using-ros-1-packages
 eom
 
-    cd ${cur_dir}
+    popd_quiet
 }
 
 # =============================================================================

@@ -2,7 +2,7 @@
 
 # =============================================================================
 function djfile() {
-    cur_dir=${PWD}
+    pushd_quiet ${PWD}
 
     # ------------------------------
     if [ $# -eq 0 ]; then
@@ -40,9 +40,7 @@ function djfile() {
     echo -e 'djfile: "'$1 '"command not supported'
     djfile_help
 
-    # ------------------------------
-    cd $cur_dir
-    unset cur_dir
+    popd_quiet
 }
 
 # =============================================================================

@@ -53,7 +53,7 @@ eom
 
 # =============================================================================
 function _dj_replace() {
-    cur_dir=$PWD
+    pushd_quiet ${PWD}
 
     if [ $# = 3 ]; then
         if [ $3 = '.' ]; then
@@ -69,7 +69,7 @@ function _dj_replace() {
         fi
     fi
 
-    cd ${cur_dir}
+    popd_quiet
 }
 
 # =============================================================================
@@ -90,6 +90,8 @@ function dj_clang_format_brush() {
 
 # =============================================================================
 function _dj_format() {
+    pushd_quiet ${PWD}
+
     if [ $1 = 'brush' ]; then
         dj_clang_format_brush $2 $3 $4 $5
         return
@@ -114,12 +116,12 @@ function _dj_format() {
         return
     fi
 
-    cd ${cur_dir}
+    popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_clang_format() {
-    cur_dir=${PWD}
+    pushd_quiet ${PWD}
 
     _install_if_not_installed clang-format
 
@@ -128,10 +130,10 @@ function _dj_setup_clang_format() {
     echo -e "Do you want to apply the default vscode settings? [Yes/No]"
     read asw
 
-    if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (\
+    if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (
         $asw = 'No') || ($asw = 'no') ]]; then
         echo "You can edit ~/.config/Code/User/settings.json manually."
-    elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || (\
+    elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || (
         $asw = 'Yes') || ($asw = 'yes') ]]; then
         cp ${djtools_path}/settings/vscode-settings.json ~/.config/Code/User/settings.json
     else
@@ -139,7 +141,7 @@ function _dj_setup_clang_format() {
         echo "You can edit ~/.config/Code/User/settings.json manually."
     fi
 
-    cd $cur_dir
+    popd_quiet
 }
 
 # =============================================================================
@@ -148,7 +150,7 @@ function _dj_setup_clang_format() {
 # Ubuntu 20.04: 12.0.0 (tested), https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.0
 
 function _dj_setup_clang_llvm() {
-    cur_dir=${PWD}
+    pushd_quiet ${PWD}
 
     echo -e "Install LLVM clang (clang+llvm) on Ubuntu $(version check ubuntu)"
 
@@ -193,10 +195,10 @@ function _dj_setup_clang_llvm() {
     echo -e "Do you want to apply the default vscode settings? [Yes/No]"
     read asw
 
-    if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (\
+    if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (
         $asw = 'No') || ($asw = 'no') ]]; then
         echo "You can edit ~/.config/Code/User/settings.json manually."
-    elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || (\
+    elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || (
         $asw = 'Yes') || ($asw = 'yes') ]]; then
         if [[ ${ubuntu_v} = *'18.04'* ]]; then
             cp ${djtools_path}/settings/vscode-settings-1804.json ~/.config/Code/User/settings.json
@@ -208,5 +210,5 @@ function _dj_setup_clang_llvm() {
         echo "You can edit ~/.config/Code/User/settings.json manually."
     fi
 
-    cd $cur_dir
+    popd_quiet
 }
