@@ -814,9 +814,13 @@ function _dj_setup_libiio() {
 
 # =============================================================================
 function _dj_setup_libserialport() {
-    cur_dir=${PWD}
+    pushd "${PWD}" &>/dev/null
 
     cd ~ && mkdir -p soft/ && cd soft/
+
+    v=$(_find_package_version libserialport)
+    _echo_install libserialport $v
+    _press_enter_or_wait_s_continue 5
 
     rm -rf libserialport/
     git clone git://sigrok.org/libserialport.git
@@ -824,26 +828,16 @@ function _dj_setup_libserialport() {
     cd libserialport
     ./autogen.sh
     ./configure
-    make && sudo make install
+    make -j4 && sudo make install
 
-    cat <<eom
+    # check if library installed correctly
+    _verify_lib_installation libserialport.a /usr/local/lib/
+    _verify_lib_installation libserialport.la /usr/local/lib/
+    _verify_lib_installation libserialport.so /usr/local/lib/
+    _verify_pkgconfig_file libserialport.pc /usr/local/lib/pkgconfig
+    _verify_header_files libserialport.h /usr/local/include
 
---------------------------------------------
-the library is installed:
-    /usr/local/lib/libserialport.la
-    /usr/local/lib/libserialport.so
-
-the header is:
-    /usr/local/include/libserialport.h
-
-example code:
-    todo
---------------------------------------------
-
-eom
-    cd ~/soft/
-
-    cd $cur_dir
+    popd &>/dev/null
 }
 
 # =============================================================================
@@ -1734,7 +1728,7 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'lib-serialport' ]; then
+    if [ $1 = 'libserialport' ]; then
         _dj_setup_libserialport
         return
     fi
