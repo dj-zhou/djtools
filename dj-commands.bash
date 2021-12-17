@@ -310,10 +310,14 @@ function _dj_setup_pangolin() {
 
 # =============================================================================
 function _dj_setup_picocom() {
-    cur_dir=${PWD}
+    pushd "${PWD}" &>/dev/null
+
     cd ~ && mkdir -p soft/ && cd soft/
 
     v=$(_find_package_version picocom)
+    _echo_install picocom $v
+    _press_enter_or_wait_s_continue 5
+
     rm -rf picocom
     git clone git@github.com:npat-efault/picocom.git
     cd picocom
@@ -321,10 +325,7 @@ function _dj_setup_picocom() {
     make
     sudo cp picocom /usr/bin/
 
-    cd $cur_dir
-
-    echo "example of using picocom:"
-    echo "$ picocom /dev/ttyUSB0 -b 115200 -g file-$(TZ=UTC date +%FT%H%M%SZ).log"
+    popd &>/dev/null
 }
 
 # =============================================================================
@@ -499,7 +500,7 @@ function _dj_setup_stm32_tools() {
     cur_dir=$PWD
 
     echo -e "install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
 
     # install dependencies and some software ----------------
     packages="libusb-1.0.0-dev gtk+-3.0 cu cutecom putty screen cmake "
@@ -507,7 +508,7 @@ function _dj_setup_stm32_tools() {
 
     # install stlink ----------------
     echo -e "install ${GRN}stlink${NOC}"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
 
     mkdir -p ~/soft && cd ~/soft
     rm stlink -rf
@@ -1442,8 +1443,8 @@ function _dj() {
     setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev "
     setup_list+="nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom pip "
     setup_list+="plotjuggler pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rust "
-    setup_list+="saleae-logic spdlog slack stm32-cubeMX stm32-tools sublime texlive typora vim-env vscode vtk-8.2.0 "
-    setup_list+="windows-fonts wubi yaml-cpp you-complete-me "
+    setup_list+="saleae-logic serial-console spdlog slack stm32-cubeMX stm32-tools sublime texlive typora vim-env "
+    setup_list+="vscode vtk-8.2.0 windows-fonts wubi yaml-cpp you-complete-me "
     ACTIONS[setup]="$setup_list "
     for i in $setup_list; do
         ACTIONS[$i]=" "
@@ -1619,7 +1620,7 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    help_list="apt_pkg auto-mount ffmpeg jupyter "
+    help_list="apt_pkg auto-mount cu ffmpeg jupyter pipocom screen "
     ACTIONS[help]="$help_list "
     for i in $help_list; do
         ACTIONS[$i]=" "

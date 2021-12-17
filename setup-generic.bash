@@ -167,21 +167,14 @@ function _dj_setup_computer() {
 
     going to install the following packages:
        ark cmake curl cutecom dconf-editor dconf-tools git
-       git-lfs g++ htop kate libgtk2.0-dev lsb-core putty
-       screen scrot terminator tree vlc vim wmctrl xclip yasm
-
-    how to use cu and screen:
-        cu: cu -l /dev/ttyUSB0 -s 115200 [ENTER]
-        screen: screen /dev/ttyUSB0 115200 [ENTER]
-    exit methods for cu and screen:
-        cu: input ~. and then [ENTER]
-        screen: press Ctrl+A and then \, and [y]
+       git-lfs g++ htop kate libgtk2.0-dev lsb-core
+       scrot terminator tree vlc vim wmctrl xclip yasm
 eom
 
     _press_enter_or_wait_s_continue 10
     packages="ark cmake curl cutecom dconf-editor dconf-tools git "
-    packages+="git-lfs g++ htop libgtk2.0-dev libncurses5-dev lsb-core putty "
-    packages+="screen scrot terminator tree vlc vim wmctrl xclip yasm "
+    packages+="git-lfs g++ htop libgtk2.0-dev libncurses5-dev lsb-core "
+    packages+="scrot terminator tree vlc vim wmctrl xclip yasm "
     _install_if_not_installed $packages
 
     # -----------------------------------
@@ -1307,7 +1300,24 @@ function _dj_setup_saleae_logic() {
     rm -rf logic
     mv "$file" logic
     sudo ln -sf ${HOME}/soft/logic/Logic /usr/bin/logic
+
     cd ${cur_dir}
+}
+
+# =============================================================================
+function _dj_setup_serial_console() {
+    pushd "${PWD}" &>/dev/null
+
+    _install_if_not_installed cu screen cutecom putty screen
+
+    echo "install picocom:"
+    _dj_setup_picocom &>/dev/null
+
+    _dj_help_cu
+    _dj_help_screen
+    _dj_help_pipocom
+
+    popd &>/dev/null
 }
 
 # =============================================================================
@@ -1550,6 +1560,10 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'container' ]; then
+        if [ $# -lt 2 ]; then
+            echo "dj setup container: need argument"
+            return
+        fi
         if [ $2 = 'dive' ]; then
             _dj_setup_container_dive
             return
@@ -1585,7 +1599,8 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'driver' ]; then
-        _dj_setup_driver $2 $3 $4 $5
+        shift 1
+        _dj_setup_driver $@
         return
     fi
     # --------------------------
@@ -1871,6 +1886,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'saleae-logic' ]; then
         _dj_setup_saleae_logic
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'serial-console' ]; then
+        _dj_setup_serial_console
         return
     fi
     # --------------------------
