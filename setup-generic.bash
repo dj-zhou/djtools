@@ -1310,14 +1310,15 @@ function _dj_setup_serial_console() {
 
     _install_if_not_installed cu screen cutecom putty screen
 
-    echo "install picocom:"
-    _dj_setup_picocom &>/dev/null
+    _dj_setup_picocom
 
     _dj_help_cu
     _dj_help_screen
     _dj_help_pipocom
 
     popd &>/dev/null
+
+    _udev_screen_tab_completion
 }
 
 # =============================================================================
