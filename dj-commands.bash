@@ -30,37 +30,77 @@ function _dj_help() {
 # =============================================================================
 function _dj_setup_boost() {
     cur_dir=${PWD}
+
+    gpp_v=$(version check g++)
+    anw=$(_version_if_ge_than $gpp_v "10.1.0")
+    if [ "$anw" = "no" ]; then
+        echo "run \"version swap g++\" to use higher version of g++ (>=10.1.0)"
+        echo "run \"version swap gcc\" to use higher version of gcc (>=10.1.0)"
+        return
+    fi
+    v=$(_find_package_version boost)
+    _echo_install boost $v
+    _press_enter_or_wait_s_continue 5
+
+    _install_if_not_installed python3-dev libxml2-dev
     cd ~ && mkdir -p soft/ && cd soft/
-
-    echo -e "${GRN}boost-1.74.0${NOC} is going to be installed"
-    _press_enter_to_continue
-
-    rm -rf boost
+    sudo rm -rf boost
     git clone https://github.com/boostorg/boost.git
 
     cd boost
-    # checkout a specific version
-    git checkout boost-1.74.0
+    git checkout boost-$v
     # clone the submodules! this takes long though
     git submodule update --init --recursive
     # install is simple
     ./bootstrap.sh --prefix=/usr/local
-    ./b2
+    sudo ./b2 install
 
-    echo -e "${PRP}sudo cp libboost_* /usr/local/lib/${NOC}"
-    sudo cp libboost_* /usr/local/lib/
-
-    cat <<eom
------------------------------------------------------------------
-    headers installed to:
-        /usr/include/
-    shared library is copied to:
-        /usr/local/lib/
------------------------------------------------------------------
-
-eom
+    _verify_header_files /usr/include/ # this is not accurate
+    _verify_lib_installation libboost_atomic.so /usr/local/lib/
+    _verify_lib_installation libboost_timer.so /usr/local/lib/
 
     cd $cur_dir
+}
+
+# =============================================================================================
+function _create_can_analyzer_desktop_item() {
+    folder="/usr/share/applications"
+
+    # copy the icon file
+    sudo cp $djtools_path/settings/can-analyzer.xpm $folder
+
+    file="can-analyzer.desktop"
+    touch $file
+
+    echo '[Desktop Entry]' >>$file
+    echo 'Encoding=UTF-8' >>$file
+    echo 'Name=can-analyzer' >>$file
+    echo 'Comment=can-analyzer' >>$file
+    echo 'Exec=bash -c "cd '$HOME'/soft/can-analyzer/ && ./CANAnalysis"' >>$file
+    echo 'Icon='$folder'/can-analyzer.xpm' >>$file
+    echo 'StartupNotify=false' >>$file
+    echo 'Type=Application' >>$file
+    echo 'Categories=Application;Development;' >>$file
+
+    sudo rm -rf $folder/$file
+    sudo mv $file $folder
+
+    sudo chmod +x $folder/$file
+
+    echo -e "${YLW}if cubeMX is not installed to ~/soft/can-analyzer/, you need to revise file:${NOC}"
+    echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
+}
+
+# =============================================================================
+# note
+function _dj_setup_can_analyzer() {
+    cur_dir=$PWD
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm can-analyzer -rf
+    git clone https://github.com/dj-zhou/can-analyzer.git
+    chmod +x can-analyzer/CANAnalysis
+    cd ${cur_dir}
+    _create_can_analyzer_desktop_item
 }
 
 # =============================================================================
@@ -310,10 +350,14 @@ function _dj_setup_pangolin() {
 
 # =============================================================================
 function _dj_setup_picocom() {
-    cur_dir=${PWD}
+    pushd "${PWD}" &>/dev/null
+
     cd ~ && mkdir -p soft/ && cd soft/
 
     v=$(_find_package_version picocom)
+    _echo_install picocom $v
+    _press_enter_or_wait_s_continue 5
+
     rm -rf picocom
     git clone git@github.com:npat-efault/picocom.git
     cd picocom
@@ -321,10 +365,7 @@ function _dj_setup_picocom() {
     make
     sudo cp picocom /usr/bin/
 
-    cd $cur_dir
-
-    echo "example of using picocom:"
-    echo "$ picocom /dev/ttyUSB0 -b 115200 -g file-$(TZ=UTC date +%FT%H%M%SZ).log"
+    popd &>/dev/null
 }
 
 # =============================================================================
@@ -500,7 +541,7 @@ function _dj_setup_stm32_tools() {
     pushd_quiet ${PWD}
 
     echo -e "install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
 
     # install dependencies and some software ----------------
     packages="libusb-1.0.0-dev gtk+-3.0 cu cutecom putty screen cmake "
@@ -508,7 +549,7 @@ function _dj_setup_stm32_tools() {
 
     # install stlink ----------------
     echo -e "install ${GRN}stlink${NOC}"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
 
     mkdir -p ~/soft && cd ~/soft
     rm stlink -rf
@@ -1436,16 +1477,16 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost clang-format "
-    setup_list+="clang-llvm cli11 cmake computer container devtools driver dropbox eigen3 "
+    setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost can-analyzer "
+    setup_list+="clang-format clang-llvm cli11 cmake computer container devtools driver dropbox eigen3 "
     setup_list+="flamegraph fmt foxit-pdf-reader gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
-    setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio lib-serialport "
+    setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio libserialport "
     setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson mongodb nlohmann-json3-dev "
     setup_list+="nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom pip "
     setup_list+="plotjuggler pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rust "
-    setup_list+="saleae-logic spdlog slack stm32-cubeMX stm32-tools sublime texlive typora vim-env vscode vtk-8.2.0 "
-    setup_list+="windows-fonts wubi yaml-cpp you-complete-me "
+    setup_list+="saleae-logic serial-console spdlog slack stm32-cubeMX stm32-tools sublime texlive typora vim-env "
+    setup_list+="vscode vtk-8.2.0 windows-fonts wubi yaml-cpp you-complete-me "
     ACTIONS[setup]="$setup_list "
     for i in $setup_list; do
         ACTIONS[$i]=" "
@@ -1621,7 +1662,7 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    help_list="apt_pkg auto-mount ffmpeg jupyter "
+    help_list="apt_pkg auto-mount cu ffmpeg jupyter pipocom screen "
     ACTIONS[help]="$help_list "
     for i in $help_list; do
         ACTIONS[$i]=" "

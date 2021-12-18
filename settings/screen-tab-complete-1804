@@ -28,7 +28,7 @@ _screen()
     if ((cword == 1)); then
         if [[ $cur == /dev* ]]; then
             COMPREPLY=( $(compgen -W "$(shopt -s nullglob; printf '%s\n' \
-                /dev/serial/by-id/* /dev/ttyUSB* /dev/one-third/* /dev/ttyACM* 2>/dev/null)" \
+                /dev/serial/by-id/* /dev/ttyUSB* /dev/one-third/* /dev/st-link/* /dev/ttyACM* 2>/dev/null)" \
                 -- "$cur") )
             return
         fi
