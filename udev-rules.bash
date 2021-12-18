@@ -128,7 +128,7 @@ function _udev_screen_tab_completion() {
         echo -e "${PRP}sudo cp ${djtools_path}/settings/screen-tab-complete /usr/share/bash-completion/completions/screen${NOC}"
         sudo cp ${djtools_path}/settings/screen-tab-complete /usr/share/bash-completion/completions/screen
     else
-        echo "todo"
+        echo "_udev_screen_tab_completion: todo"
     fi
 }
 
