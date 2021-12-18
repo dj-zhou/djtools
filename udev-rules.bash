@@ -124,9 +124,9 @@ function _dj_udev_logitech_f710() {
 function _udev_screen_tab_completion() {
     echo "apply tab-completion feature for screen (use CTRL+C to cancel):"
     _press_enter_or_wait_s_continue 10
-    if [[ "${ubuntu_v}" = *'18.04'* ]]; then
-        echo -e "${PRP}sudo cp ${djtools_path}/settings/screen-tab-complete-1804 /usr/share/bash-completion/completions/screen${NOC}"
-        sudo cp ${djtools_path}/settings/screen-tab-complete-1804 /usr/share/bash-completion/completions/screen
+    if [[ "${ubuntu_v}" = *'18.04'* || "${ubuntu_v}" = *'20.04'* ]]; then
+        echo -e "${PRP}sudo cp ${djtools_path}/settings/screen-tab-complete /usr/share/bash-completion/completions/screen${NOC}"
+        sudo cp ${djtools_path}/settings/screen-tab-complete /usr/share/bash-completion/completions/screen
     else
         echo "todo"
     fi
