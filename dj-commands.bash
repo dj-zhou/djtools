@@ -30,35 +30,34 @@ function _dj_help() {
 # =============================================================================
 function _dj_setup_boost() {
     cur_dir=${PWD}
+
+    gpp_v=$(version check g++)
+    anw=$(_version_if_ge_than $gpp_v "10.1.0")
+    if [ "$anw" = "no" ]; then
+        echo "run \"version swap g++\" to use higher version of g++ (>=10.1.0)"
+        echo "run \"version swap gcc\" to use higher version of gcc (>=10.1.0)"
+        return
+    fi
+    v=$(_find_package_version boost)
+    _echo_install boost $v
+    _press_enter_or_wait_s_continue 5
+
+    _install_if_not_installed python3-dev libxml2-dev
     cd ~ && mkdir -p soft/ && cd soft/
-
-    echo -e "${GRN}boost-1.74.0${NOC} is going to be installed"
-    _press_enter_to_continue
-
-    rm -rf boost
+    sudo rm -rf boost
     git clone https://github.com/boostorg/boost.git
 
     cd boost
-    # checkout a specific version
-    git checkout boost-1.74.0
+    git checkout boost-$v
     # clone the submodules! this takes long though
     git submodule update --init --recursive
     # install is simple
     ./bootstrap.sh --prefix=/usr/local
-    ./b2
+    sudo ./b2 install
 
-    echo -e "${PRP}sudo cp libboost_* /usr/local/lib/${NOC}"
-    sudo cp libboost_* /usr/local/lib/
-
-    cat <<eom
------------------------------------------------------------------
-    headers installed to:
-        /usr/include/
-    shared library is copied to:
-        /usr/local/lib/
------------------------------------------------------------------
-
-eom
+    _verify_header_files /usr/include/ # this is not accurate
+    _verify_lib_installation libboost_atomic.so /usr/local/lib/
+    _verify_lib_installation libboost_timer.so /usr/local/lib/
 
     cd $cur_dir
 }
