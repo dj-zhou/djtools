@@ -1529,6 +1529,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'can-analyzer' ]; then
+        _dj_setup_can_analyzer
+        return
+    fi
+    # --------------------------
     if [ $1 = 'clang-format' ]; then
         _dj_setup_clang_format
         return

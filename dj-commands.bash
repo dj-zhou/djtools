@@ -62,6 +62,47 @@ function _dj_setup_boost() {
     cd $cur_dir
 }
 
+# =============================================================================================
+function _create_can_analyzer_desktop_item() {
+    folder="/usr/share/applications"
+
+    # copy the icon file
+    sudo cp $djtools_path/settings/can-analyzer.xpm $folder
+
+    file="can-analyzer.desktop"
+    touch $file
+
+    echo '[Desktop Entry]' >>$file
+    echo 'Encoding=UTF-8' >>$file
+    echo 'Name=can-analyzer' >>$file
+    echo 'Comment=can-analyzer' >>$file
+    echo 'Exec=bash -c "cd '$HOME'/soft/can-analyzer/ && ./CANAnalysis"' >>$file
+    echo 'Icon='$folder'/can-analyzer.xpm' >>$file
+    echo 'StartupNotify=false' >>$file
+    echo 'Type=Application' >>$file
+    echo 'Categories=Application;Development;' >>$file
+
+    sudo rm -rf $folder/$file
+    sudo mv $file $folder
+
+    sudo chmod +x $folder/$file
+
+    echo -e "${YLW}if cubeMX is not installed to ~/soft/can-analyzer/, you need to revise file:${NOC}"
+    echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
+}
+
+# =============================================================================
+# note
+function _dj_setup_can_analyzer() {
+    cur_dir=$PWD
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm can-analyzer -rf
+    git clone https://github.com/dj-zhou/can-analyzer.git
+    chmod +x can-analyzer/CANAnalysis
+    cd ${cur_dir}
+    _create_can_analyzer_desktop_item
+}
+
 # =============================================================================
 function _dj_setup_cli11() {
     cur_dir_cli11=${PWD}
@@ -1434,8 +1475,8 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost clang-format "
-    setup_list+="clang-llvm cli11 cmake computer container devtools driver dropbox eigen3 "
+    setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost can-analyzer "
+    setup_list+="clang-format clang-llvm cli11 cmake computer container devtools driver dropbox eigen3 "
     setup_list+="flamegraph fmt foxit-pdf-reader gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
     setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio libserialport "
