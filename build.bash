@@ -280,16 +280,16 @@ function compile_template() {
         return
     fi
     if [ $1 = '--stm32' ]; then
-        if [ ! -f $djtools_path/compile-template/Makefile-stm32f$2 ]; then
+        if [ ! -f $djtools_path/compile-template/Makefile-stm32$2 ]; then
             echo "Makefile for $2 does not exist, exit!"
             return
         fi
-        if [ ! -f $djtools_path/compile-template/.project-stm32f$2 ]; then
+        if [ ! -f $djtools_path/compile-template/.project-stm32$2 ]; then
             echo ".project-stm32 for $2 does not exist, exit!"
             return
         fi
-        cp $djtools_path/compile-template/Makefile-stm32f$2 ./Makefile
-        cp $djtools_path/compile-template/.project-stm32f$2 ./.project-stm32
+        cp $djtools_path/compile-template/Makefile-stm32$2 ./Makefile
+        cp $djtools_path/compile-template/.project-stm32$2 ./.project-stm32
         return
     fi
 }
@@ -406,8 +406,9 @@ function _build() {
     for i in $template_list; do
         ACTIONS[$i]=" "
     done
-    stm32_list="030r8 107xc 303re 407zg "
-    stm32_list+="407vg 427vi 746zg 767zi "
+    stm32_list="f030r8 f107xc f303re f407zg "
+    stm32_list+="f407vg f427vi f746zg f767zi "
+    stm32_list+="h750vb "
     ACTIONS["--stm32"]="$stm32_list "
     for i in $stm32_list; do
         ACTIONS[$i]=" "
