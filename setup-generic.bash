@@ -1127,6 +1127,13 @@ eom
 }
 
 # =============================================================================
+function _dj_stup_network_tools() {
+    sudo apt update &>/dev/null
+    echo -e "going to install ${GRN}nethogs${NOC}"
+    _install_if_not_installed nethogs
+}
+
+# =============================================================================
 function _dj_setup_nlohmann_json3_dev() {
     pushd_quiet ${PWD}
 
@@ -1784,6 +1791,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'mongodb' ]; then
         _dj_setup_mongodb
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'network-tools' ]; then
+        _dj_stup_network_tools
         return
     fi
     # --------------------------
