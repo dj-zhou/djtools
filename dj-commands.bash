@@ -104,6 +104,13 @@ function _dj_setup_can_analyzer() {
 }
 
 # =============================================================================
+function _dj_setup_can_dev_tools() {
+    sudo apt update &>/dev/null
+    echo -e "going to install ${GRN}can-utils${NOC}"
+    _install_if_not_installed can-utils
+}
+
+# =============================================================================
 function _dj_setup_cli11() {
     cur_dir_cli11=${PWD}
 
@@ -1478,7 +1485,7 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost can-analyzer "
-    setup_list+="clang-format clang-llvm cli11 cmake computer container devtools driver dropbox eigen3 "
+    setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container devtools driver dropbox eigen3 "
     setup_list+="flamegraph fmt foxit-pdf-reader gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
     setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio libserialport "

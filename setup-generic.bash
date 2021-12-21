@@ -1550,6 +1550,12 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'can-dev-tools' ]; then
+        _dj_setup_can_dev_tools
+        return
+    fi
+
+    # --------------------------
     if [ $1 = 'clang-format' ]; then
         _dj_setup_clang_format
         return
@@ -1599,16 +1605,6 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'kdiff3-meld' ]; then
-        _dj_setup_kdiff3_meld
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'gadgets' ]; then
-        _dj_setup_gadgets
-        return
-    fi
-    # --------------------------
     if [ $1 = 'devtools' ]; then
         _dj_setup_devtools
         return
@@ -1642,6 +1638,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'foxit-pdf-reader' ]; then
         _dj_setup_foxit_reader
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'gadgets' ]; then
+        _dj_setup_gadgets
         return
     fi
     # --------------------------
@@ -1722,6 +1723,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'i219-v' ]; then
         _dj_setup_i219_v $2
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'kdiff3-meld' ]; then
+        _dj_setup_kdiff3_meld
         return
     fi
     # --------------------------
