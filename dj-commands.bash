@@ -942,12 +942,11 @@ function _dj_grep_package() {
 # =============================================================================
 # to search some string in a project directory, excluding build/ and bin/
 function _dj_grep_string() {
-    echo -e "run command:"
-    echo -e "   $GRN grep -rI $1 .$NOC"
-    echo -e "we get:"
+    echo -e "${GRN}grep -rIn \"$1\" .${NOC}:"
     # how to use the variable in the below?? -- $excluded_dir does not work
     # -I option ignores the search from binary files, that is perfect!
-    grep -rI --exclude-dir={build,bin,_bcross*,_bnative*,builddir,.git,.cache} "$1" .
+    grep -rIn --exclude-dir={build,bin,_b*,builddir,.git,.cache} \
+        --exclude='*.lst' "$1" .
 }
 
 # =============================================================================
@@ -1296,7 +1295,8 @@ function dj() {
         if [ $2 = 'string' ]; then
             # ------------------------------
             if [[ $# -ge 3 ]]; then
-                _dj_grep_string "$3" "$4" "$5" "$6" "$7" "$8"
+                shift 2
+                _dj_grep_string "$@"
                 return
             fi
         fi
