@@ -1127,6 +1127,13 @@ eom
 }
 
 # =============================================================================
+function _dj_stup_network_tools() {
+    sudo apt update &>/dev/null
+    echo -e "going to install ${GRN}nethogs${NOC}"
+    _install_if_not_installed nethogs
+}
+
+# =============================================================================
 function _dj_setup_nlohmann_json3_dev() {
     pushd_quiet ${PWD}
 
@@ -1543,6 +1550,12 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'can-dev-tools' ]; then
+        _dj_setup_can_dev_tools
+        return
+    fi
+
+    # --------------------------
     if [ $1 = 'clang-format' ]; then
         _dj_setup_clang_format
         return
@@ -1592,16 +1605,6 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'kdiff3-meld' ]; then
-        _dj_setup_kdiff3_meld
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'gadgets' ]; then
-        _dj_setup_gadgets
-        return
-    fi
-    # --------------------------
     if [ $1 = 'devtools' ]; then
         _dj_setup_devtools
         return
@@ -1635,6 +1638,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'foxit-pdf-reader' ]; then
         _dj_setup_foxit_reader
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'gadgets' ]; then
+        _dj_setup_gadgets
         return
     fi
     # --------------------------
@@ -1718,6 +1726,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'kdiff3-meld' ]; then
+        _dj_setup_kdiff3_meld
+        return
+    fi
+    # --------------------------
     if [ $1 = 'lcm' ]; then
         _dj_setup_lcm
         return
@@ -1784,6 +1797,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'mongodb' ]; then
         _dj_setup_mongodb
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'network-tools' ]; then
+        _dj_stup_network_tools
         return
     fi
     # --------------------------
