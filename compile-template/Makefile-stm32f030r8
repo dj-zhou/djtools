@@ -26,7 +26,7 @@ ifneq (,$(findstring STM32F0,$(STM32Fx)))
     FPU        =
     FLOAT-ABI  = -mfloat-abi=soft
     LIB_SHARE  = f0-share
-    LIB_HAL    = f0-v1.11.1
+    LIB_HAL    = f0-v1.11.3
     STM32Family= STM32F0xx
 else
     $(info not a STM32F0xx family device, you need to revise the Makefile)
@@ -104,7 +104,7 @@ $(PRJ_OUT)/%.o: %.c Makefile | $(PRJ_OUT)
 $(PRJ_OUT)/%.o: %.s Makefile | $(PRJ_OUT)
 	$(AS) -c $(CFLAGS) $< -o $@
 
-$(PRJ_OUT)/$(PRJ_NAME).elf: $(PRJ_OBJS) 
+$(PRJ_OUT)/$(PRJ_NAME).elf: $(PRJ_OBJS)
 	$(CC) $(PRJ_OBJS) $(LDFLAGS) -o $(PRJ_OUT)/$(PRJ_NAME).elf
 	$(CP) -O ihex $(PRJ_OUT)/$(PRJ_NAME).elf $(PRJ_OUT)/$(PRJ_NAME).hex
 	$(CP) -O binary -S $(PRJ_OUT)/$(PRJ_NAME).elf $(PRJ_OUT)/$(PRJ_NAME).bin
@@ -118,7 +118,7 @@ hal: $(HAL_OUT)/lib$(STM32Fx).a
 $(HAL_OUT)/%.o: %.c Makefile | $(HAL_OUT)
 	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(HAL_OUT)/$(notdir $(<:.c=.lst)) $< -o $@
 
-$(HAL_OUT)/lib$(STM32Fx).a: $(HAL_OBJS) 
+$(HAL_OUT)/lib$(STM32Fx).a: $(HAL_OBJS)
 	$(AR) -r $@ $(HAL_OBJS)
 
 $(HAL_OUT):
