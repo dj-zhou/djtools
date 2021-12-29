@@ -358,7 +358,7 @@ function _dj_setup_fmt() {
     cd fmt
     git checkout ${fmt_v}
     rm -rf build && mkdir build && cd build
-    cmake ..
+    cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
     make -j$(nproc)
     sudo make install
 
