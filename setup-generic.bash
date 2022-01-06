@@ -1175,15 +1175,21 @@ function _dj_setup_nlohmann_json3_dev() {
 function _dj_setup_nodejs() {
     pushd_quiet ${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-    v=$(_find_package_version nodejs)
-    _echo_install nodejs $v
+    nvm_v=$(_find_package_version nvm)
+    _echo_install nvm $nvm_v
     _press_enter_or_wait_s_continue 5
 
-    nvm install $v
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_v/install.sh | bash
+    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" ||
+        printf %s "${XDG_CONFIG_HOME}/nvm")"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+    nodejs_v=$(_find_package_version nodejs)
+    _echo_install nodejs $nodejs_v
+    _press_enter_or_wait_s_continue 5
+
+    nvm install $nodejs_v
 
     popd_quiet
 }
