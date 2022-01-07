@@ -356,8 +356,28 @@ function _dj_setup_pangolin() {
 }
 
 # =============================================================================
+function _dj_setup_cutecom() {
+    pushd_quiet "${PWD}"
+
+    v=$(_find_package_version cutecom)
+    _echo_install cutecom $v
+    _press_enter_or_wait_s_continue 5
+
+    cd ~ && mkdir -p soft/ && cd soft/
+    rm -rf cutecom
+    git clone https://gitlab.com/cutecom/cutecom.git
+    cd cutecom
+    git checkout $v
+    cmake .
+    make -j$(nproc)
+    sudo make install
+
+    popd_quiet
+}
+
+# =============================================================================
 function _dj_setup_picocom() {
-    pushd "${PWD}" &>/dev/null
+    pushd_quiet "${PWD}"
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -372,7 +392,7 @@ function _dj_setup_picocom() {
     make
     sudo cp picocom /usr/bin/
 
-    popd &>/dev/null
+    popd_quiet
 }
 
 # =============================================================================
@@ -551,8 +571,11 @@ function _dj_setup_stm32_tools() {
     _press_enter_or_wait_s_continue 5
 
     # install dependencies and some software ----------------
-    packages="libusb-1.0.0-dev gtk+-3.0 cu cutecom putty screen cmake "
+    packages="libusb-1.0.0-dev gtk+-3.0 cu putty screen cmake "
     _install_if_not_installed $packages
+
+    # install cutecom from source ----------------
+    _dj_setup_cutecom
 
     # install stlink ----------------
     echo -e "install ${GRN}stlink${NOC}"
@@ -1485,7 +1508,7 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost can-analyzer "
-    setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container devtools driver dropbox eigen3 "
+    setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools driver dropbox eigen3 "
     setup_list+="flamegraph fmt foxit-pdf-reader gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
     setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio libserialport "

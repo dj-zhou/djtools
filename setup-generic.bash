@@ -164,15 +164,14 @@ function _dj_setup_computer() {
 
     # -----------------------------------
     cat <<eom
-
-    going to install the following packages:
-       ark cmake curl cutecom dconf-editor dconf-tools git
-       git-lfs g++ htop kate libgtk2.0-dev lsb-core
+going to install the following packages:
+       ark cmake curl dconf-editor dconf-tools git
+       git-lfs g++ htop libgtk2.0-dev lsb-core
        scrot terminator tree vlc vim wmctrl xclip yasm
 eom
 
     _press_enter_or_wait_s_continue 10
-    packages="ark cmake curl cutecom dconf-editor dconf-tools git "
+    packages="ark cmake curl dconf-editor dconf-tools git "
     packages+="git-lfs g++ htop libgtk2.0-dev libncurses5-dev lsb-core "
     packages+="scrot terminator tree vlc vim wmctrl xclip yasm "
     _install_if_not_installed $packages
@@ -1343,8 +1342,9 @@ function _dj_setup_saleae_logic() {
 function _dj_setup_serial_console() {
     pushd "${PWD}" &>/dev/null
 
-    _install_if_not_installed cu screen cutecom putty screen
+    _install_if_not_installed cu screen putty screen
 
+    _dj_setup_cutecom
     _dj_setup_picocom
 
     _dj_help_cu
@@ -1627,6 +1627,12 @@ function _dj_setup() {
             _dj_setup_container_lxd_4_0
             return
         fi
+        return
+    fi
+
+    # --------------------------
+    if [ $1 = 'cutecom' ]; then
+        _dj_setup_cutecom
         return
     fi
     # --------------------------
