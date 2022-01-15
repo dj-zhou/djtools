@@ -406,9 +406,8 @@ function _build() {
     for i in $template_list; do
         ACTIONS[$i]=" "
     done
-    stm32_list="f030r8 f107xc f303re f407zg "
-    stm32_list+="f407vg f427vi f746zg f767zi "
-    stm32_list+="h750vb "
+    stm32_list="f030r8 f103rb f107xc f303re f407zg "
+    stm32_list+="f407vg f427vi f746zg f767zi h750vb "
     ACTIONS["--stm32"]="$stm32_list "
     for i in $stm32_list; do
         ACTIONS[$i]=" "
