@@ -942,20 +942,9 @@ function _dj_setup_magic_enum() {
     git checkout $ver
     sudo cp include/magic_enum.hpp /usr/local/include/
 
-    echo -e "--------------------------------------------------------"
-    echo -e "    The header of ${GRN}Magic Enum C++${NOC} ($ver) is installed as:"
-    echo -e "       /usr/local/include/magic_enum.hpp"
-    echo -e "--------------------------------------------------------"
-    cat <<eom
-  __  __             _        ______                          _____
- |  \/  |           (_)      |  ____|                        / ____|_     _
- | \  / | __ _  __ _ _  ___  | |__   _ __  _   _ _ __ ___   | |   _| |_ _| |_
- | |\/| |/ _\ |/ _\ | |/ __| |  __| | '_ \| | | | '_ \ _  \ | |  |_   _|_   _|
- | |  | | (_| | (_| | | (__  | |____| | | | |_| | | | | | | | |____|_|   |_|
- |_|  |_|\__,_|\__, |_|\___| |______|_| |_|\__,_|_| |_| |_|  \_____|
-                __/ | https://github.com/Neargye/magic_enum
-               |___ / version 0.7.2
-eom
+    echo -e "${GRN}magic_enum $ver${NOC} is installed:"
+    _verify_header_files magic_enum.hpp /usr/local/include/
+    head -n 8 /usr/local/include/magic_enum.hpp
 
     popd_quiet
 }
