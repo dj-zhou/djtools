@@ -32,6 +32,12 @@ function djfile() {
         return
     fi
     # ------------------------------
+    if [ $1 = '--stm32' ]; then
+        shift 1
+        dj-file --stm32 $@
+        return
+    fi
+    # ------------------------------
     if [ $1 = '--version' ]; then
         dj-file --version
         return
@@ -52,6 +58,7 @@ function _djfile() {
         --cmake
         --help
         --makefile
+        --stm32
         --meson
         --version
     ")
@@ -63,6 +70,12 @@ function _djfile() {
     ACTIONS["--cmake"]=" "
     ACTIONS["--help"]=" "
     ACTIONS["--makefile"]=" "
+    ACTIONS["--stm32"]="-t "
+    stm32_list="f030r8 f103rb f107xc f303re f407vg f407zg f427vi f746zg f767zi h750vb "
+    ACTIONS["-t"]="$stm32_list "
+    for i in $stm32_list; do
+        ACTIONS[$i]=" "
+    done
     ACTIONS["--meson"]=" "
     ACTIONS["--version"]=" "
 
