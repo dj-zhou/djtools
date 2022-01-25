@@ -968,8 +968,7 @@ function _dj_grep_string() {
     echo -e "${GRN}grep -rIn \"$1\" .${NOC}:"
     # how to use the variable in the below?? -- $excluded_dir does not work
     # -I option ignores the search from binary files, that is perfect!
-    grep -rIn --exclude-dir={build,bin,_b*,builddir,.git,.cache} \
-        --exclude='*.lst' "$1" .
+     grep -rIn --include *.h --include *.c --include *.hpp --include *.cpp "$1" .
 }
 
 # =============================================================================
