@@ -979,7 +979,7 @@ function _dj_grep_string() {
         --include Makefile* \
         --include meson.build \
         --include CMakeLists.txt \
-        --exclude-dir={build,subprojects,bin,_b*,builddir,.git,.cache} \
+        --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
         --exclude='*.lst' \
         "$1" .
 }
