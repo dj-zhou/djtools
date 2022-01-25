@@ -341,7 +341,7 @@ function _build_main_meson_exists() {
     if [ -f "meson.build" ]; then
         find_main_meson=0
         while IFS='' read -r line || [[ -n "$line" ]]; do
-            if [[ $line == *"meson_version:"* ]]; then # this option is not necessray for meson project
+            if [[ $line == *"project("* ]]; then
                 find_main_meson=1
             fi
         done <meson.build
