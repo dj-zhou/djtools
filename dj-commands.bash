@@ -833,7 +833,7 @@ function _dj_setup_gpp_11() {
 
     # install g++10/gcc-10
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
-        echo -e "install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} "
+        echo -e "install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC} "
         _press_enter_or_wait_s_continue 5
         _install_if_not_installed gcc-10
         _install_if_not_installed g++-10
