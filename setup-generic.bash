@@ -1115,10 +1115,21 @@ eom
 }
 
 # =============================================================================
+
 function _dj_stup_network_tools() {
-    sudo apt update &>/dev/null
-    echo -e "going to install ${GRN}nethogs${NOC}"
-    _install_if_not_installed nethogs
+    echo -e "install ${GRN}nethogs${NOC}, ${GRN}iptraf${NOC}"
+    _install_if_not_installed nethogs iptraf
+
+    echo -e "install ${GRN}mNet-Assist${NOC}"
+    pushd_quiet ${PWD}
+    cd ~ && mkdir -p soft && cd soft
+    rm -rf m-net-assist
+    git clone https://github.com/dj-zhou/m-net-assist.git
+    cd m-net-assist
+    # does it support new Ubuntu system?
+    sudo dpkg -i mNetAssist-release-amd64.deb
+
+    popd_quiet
 }
 
 # =============================================================================
