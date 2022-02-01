@@ -833,7 +833,7 @@ function _dj_setup_gpp_11() {
 
     # install g++10/gcc-10
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
-        echo -e "install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} "
+        echo -e "install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC} "
         _press_enter_or_wait_s_continue 5
         _install_if_not_installed gcc-10
         _install_if_not_installed g++-10
@@ -968,8 +968,20 @@ function _dj_grep_string() {
     echo -e "${GRN}grep -rIn \"$1\" .${NOC}:"
     # how to use the variable in the below?? -- $excluded_dir does not work
     # -I option ignores the search from binary files, that is perfect!
-    grep -rIn --exclude-dir={build,bin,_b*,builddir,.git,.cache} \
-        --exclude='*.lst' "$1" .
+    grep -rIn \
+        --include *.bash \
+        --include *.c \
+        --include *.cpp \
+        --include *.h \
+        --include *.hpp \
+        --include *.sh \
+        --include *.py \
+        --include Makefile* \
+        --include meson.build \
+        --include CMakeLists.txt \
+        --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+        --exclude='*.lst' \
+        "$1" .
 }
 
 # =============================================================================
