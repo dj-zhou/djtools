@@ -52,7 +52,7 @@ function _disk_size() {
     # todo: the error "fdisk: cannot open /dev/sda: No such file or directory" is
     # not handled
     find_fz_byte=$(sudo fdisk -l $disk_device | grep "$disk_device")
-    if [ -z $find_fz_byte ]; then
+    if [[ -z "$find_fz_byte" ]]; then
         echo -e "${RED}$disk_device error, return with nothing${NOC}" 1>&2 # to stderr
         return
     fi
