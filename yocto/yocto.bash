@@ -63,7 +63,7 @@ function _yocto_flash() { # block-device # image-file
     fi
     echo -e "          SD card: ${GRN}$dev${NOC}"
     card_size=$(_disk_size $dev false)
-    if [ -z $card_size]; then
+    if [[ -z "$card_size" ]]; then
         echo -e "${RED}card size not obtained, abort yocto flash ${NOC}"
         return
     fi
@@ -111,11 +111,11 @@ function _yocto_flash() { # block-device # image-file
     fi
     # show its file size --------------
     image_size=$(stat -c %s $image_file)
-    echo -e "       image size: ${GRN}$(_size_calculate $image_size false)${NOC}"
+    echo -e "  image file size: ${GRN}$(_size_calculate $image_size false)${NOC}"
 
     # shows its creation time --------------
     creation_time=$(stat -c %y $image_file)
-    echo -e "    creation time: ${GRN}$creation_time${NOC}"
+    echo -e "image create time: ${GRN}$creation_time${NOC}"
 
     # wic image should have a bmap file --------------
     bmap_file=$(_yocto_find_bmap_file $image_file)
