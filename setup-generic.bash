@@ -1352,9 +1352,18 @@ function _dj_setup_rpi_pico() {
     popd_quiet
     cat <<eom
 download the firmware:
-1. connect Raspberry Pi Pico to the laptop
-2. $ cd path/to/pico-examples/build/blink
-3. $ sudo cp blink.uf2 /media/$(whoami)/RPI-RP2/
+1. hold on BOOTSEL button
+2. connect Raspberry Pi Pico to the laptop (still hold the BOOTSEL button)
+3. $ cd path/to/pico-examples/build/blink
+4. $ sudo cp blink.uf2 /media/$(whoami)/RPI-RP2/
+5. release BOOTSEL button
+6. unplug the USB cable and plug the cable in again
+
+workaround to unplugging and plugging usb cable:
+1. connect PIN 30 (RUN) to a RESET button to LOW (OV)
+2. press and hold RESET button and then push and hold BOOTSEL button
+3. release RESET and then release BOOTSEL button
+4. now, the raspberry pi pico is in bootloader mode, we can cp blink.uf2 to it
 eom
 }
 
