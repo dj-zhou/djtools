@@ -42,7 +42,7 @@ function _zephyr_setup_sdk_0_11_4() {
 
     # install latest CMake ---------------------
     cmake_v=$(version check cmake)
-    anw=$(_version_if_ge_than cmake 3.20.5)
+    anw=$(_version_if_ge_than $cmake_v 3.20.5)
     if [ "$anw" = 'no' ]; then
         dj setup cmake
     fi
@@ -92,13 +92,13 @@ function _zephyr_setup_sdk_0_11_4() {
     if [ -d "$zephyr_proj_folder" ]; then
         echo -e "${GRN}Zephyr pojrect folder already exists, do you want to delete it? [Yes/No]${NOC}"
         read asw
-        if [[ ("$asw" = 'y') || ("$asw" = 'Y') || ("$asw" = 'YES') || (\
+        if [[ ("$asw" = 'y') || ("$asw" = 'Y') || ("$asw" = 'YES') || (
             "$asw" = 'Yes') || ("$asw" = 'yes') ]]; then
             # delete the zephyr project folder, and get it from scratch
             echo -e "${GRN}delete the Zephyr Project folder at $zephyr_proj_folder${NOC}"
             echo -e " ${GRN}get it using ${YLW}west${GRN} from scratch${NOC}"
             sudo rm -rf $zephyr_proj_folder
-        elif [[ ("$asw" = 'n') || ("$asw" = 'N') || ("$asw" = 'NO') || (\
+        elif [[ ("$asw" = 'n') || ("$asw" = 'N') || ("$asw" = 'NO') || (
             "$asw" = 'No') || ("$asw" = 'no') ]]; then
             echo -e "${GRN}DO NOT delete the Zephyr Project folder at $zephyr_proj_folder${NOC}"
             echo -e " ${GRN}upgrade it using ${YLW}west${NOC}"

@@ -1309,14 +1309,20 @@ function _dj_setup_qt_5_14_2() {
 # =============================================================================
 function _dj_setup_rpi_pico() {
     pushd_quiet ${PWD}
-    cd ~
-    mkdir -p rpi-pico && cd rpi-pico
 
     # install dependencies
     _install_if_not_installed libnewlib-arm-none-eabi \
         libstdc++-arm-none-eabi-newlib \
         build-essential
 
+    # make sure cmake is greater than v3.13
+    cmake_v=$(version check cmake)
+    anw=$(_version_if_ge_than $cmake_v 3.13.0)
+    if [ "$anw" = 'no' ]; then
+        dj setup cmake
+    fi
+
+    cd ~ && mkdir -p rpi-pico && cd rpi-pico
     # setup sdk
     v=$(_find_package_version pico-sdk)
     rm -rf pico-sdk
@@ -1344,6 +1350,12 @@ function _dj_setup_rpi_pico() {
     make -j$(nproc)
 
     popd_quiet
+    cat <<eom
+download the firmware:
+1. connect Raspberry Pi Pico to the laptop
+2. $ cd path/to/pico-examples/build/blink
+3. $ sudo cp blink.uf2 /media/$(whoami)/RPI-RP2/
+eom
 }
 
 # =============================================================================
