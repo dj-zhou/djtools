@@ -1307,6 +1307,42 @@ function _dj_setup_qt_5_14_2() {
 }
 
 # =============================================================================
+function _dj_setup_rpi_pico() {
+    pushd_quiet ${PWD}
+    cd ~
+    mkdir -p rpi-pico && cd rpi-pico
+
+    # setup sdk
+    v=$(_find_package_version pico-sdk)
+    rm -rf pico-sdk
+    git clone https://github.com/raspberrypi/pico-sdk.git
+    cd pico-sdk
+    git checkout $v
+    git submodule update --init
+
+    # clone examples
+    cd ..
+    v=$(_find_package_version pico-examples)
+    rm -rf pico-examples
+    git clone https://github.com/raspberrypi/pico-examples.git
+    cd pico-examples
+    git checkout $v
+
+    # setup env
+    echo -e '\n' >>~/.bashrc
+    echo '# ===========================================================' >>~/.bashrc
+    echo '# (djtools) pico-sdk setup' >>~/.bashrc
+    echo "export PICO_SDK_PATH=$HOME/rpi-pico/pico-sdk" >>~/.bashrc
+
+    # build pico-examples
+
+    mkdir build && cd build && cmake ..
+    make -j$(nproc)
+
+    popd_quiet
+}
+
+# =============================================================================
 function _dj_setup_slack() {
     pushd_quiet ${PWD}
 
@@ -1938,6 +1974,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'ros2-foxy' ]; then
         _dj_setup_ros2_foxy $2 $3 $4
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'rpi-pico' ]; then
+        _dj_setup_rpi_pico
         return
     fi
     # --------------------------
