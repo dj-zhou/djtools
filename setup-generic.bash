@@ -1312,6 +1312,11 @@ function _dj_setup_rpi_pico() {
     cd ~
     mkdir -p rpi-pico && cd rpi-pico
 
+    # install dependencies
+    _install_if_not_installed libnewlib-arm-none-eabi \
+        libstdc++-arm-none-eabi-newlib \
+        build-essential
+
     # setup sdk
     v=$(_find_package_version pico-sdk)
     rm -rf pico-sdk
@@ -1335,7 +1340,6 @@ function _dj_setup_rpi_pico() {
     echo "export PICO_SDK_PATH=$HOME/rpi-pico/pico-sdk" >>~/.bashrc
 
     # build pico-examples
-
     mkdir build && cd build && cmake ..
     make -j$(nproc)
 
