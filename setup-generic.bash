@@ -1340,12 +1340,23 @@ function _dj_setup_rpi_pico() {
     git checkout $v
 
     # setup env
-    echo -e '\n' >>~/.bashrc
-    echo '# ===========================================================' >>~/.bashrc
-    echo '# (djtools) pico-sdk setup' >>~/.bashrc
-    echo "export PICO_SDK_PATH=$HOME/rpi-pico/pico-sdk" >>~/.bashrc
 
+    installed=0
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"export PICO_SDK_PATH"* ]]; then
+            echo -e "pico-sdk has already been setup, exit."
+            echo -e "you can still revise ~/.bashrc for manual setup."
+            installed=1
+        fi
+    done <~/.bashrc
+    if [[ $installed = '0' ]]; then
+        echo -e '\n' >>~/.bashrc
+        echo '# ===========================================================' >>~/.bashrc
+        echo '# (djtools) pico-sdk setup' >>~/.bashrc
+        echo "export PICO_SDK_PATH=$HOME/rpi-pico/pico-sdk" >>~/.bashrc
+    fi
     # build pico-examples
+    export PICO_SDK_PATH=$HOME/rpi-pico/pico-sdk
     mkdir build && cd build && cmake ..
     make -j$(nproc)
 
