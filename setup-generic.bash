@@ -1375,6 +1375,9 @@ workaround to unplugging and plugging usb cable:
 2. press and hold RESET button and then push and hold BOOTSEL button
 3. release RESET and then release BOOTSEL button
 4. now, the raspberry pi pico is in bootloader mode, we can cp blink.uf2 to it
+
+using swd:
+https://www.electronicshub.org/programming-raspberry-pi-pico-with-swd/
 eom
 }
 
