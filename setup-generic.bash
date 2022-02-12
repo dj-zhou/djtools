@@ -1307,6 +1307,81 @@ function _dj_setup_qt_5_14_2() {
 }
 
 # =============================================================================
+function _dj_setup_rpi_pico() {
+    pushd_quiet ${PWD}
+
+    # install dependencies
+    _install_if_not_installed libnewlib-arm-none-eabi \
+        libstdc++-arm-none-eabi-newlib \
+        build-essential
+
+    # make sure cmake is greater than v3.13
+    cmake_v=$(version check cmake)
+    anw=$(_version_if_ge_than $cmake_v 3.13.0)
+    if [ "$anw" = 'no' ]; then
+        dj setup cmake
+    fi
+
+    cd ~ && mkdir -p rpi-pico && cd rpi-pico
+    # setup sdk
+    v=$(_find_package_version pico-sdk)
+    rm -rf pico-sdk
+    git clone https://github.com/raspberrypi/pico-sdk.git
+    cd pico-sdk
+    git checkout $v
+    git submodule update --init
+
+    # clone examples
+    cd ..
+    v=$(_find_package_version pico-examples)
+    rm -rf pico-examples
+    git clone https://github.com/raspberrypi/pico-examples.git
+    cd pico-examples
+    git checkout $v
+
+    # setup env
+
+    installed=0
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"export PICO_SDK_PATH"* ]]; then
+            echo -e "pico-sdk has already been setup, exit."
+            echo -e "you can still revise ~/.bashrc for manual setup."
+            installed=1
+        fi
+    done <~/.bashrc
+    if [[ $installed = '0' ]]; then
+        echo -e '\n' >>~/.bashrc
+        echo '# ===========================================================' >>~/.bashrc
+        echo '# (djtools) pico-sdk setup' >>~/.bashrc
+        echo "export PICO_SDK_PATH=$HOME/rpi-pico/pico-sdk" >>~/.bashrc
+    fi
+    # build pico-examples
+    export PICO_SDK_PATH=$HOME/rpi-pico/pico-sdk
+    mkdir build && cd build && cmake ..
+    make -j$(nproc)
+
+    popd_quiet
+    cat <<eom
+download the firmware:
+1. hold on BOOTSEL button
+2. connect Raspberry Pi Pico to the laptop (still hold the BOOTSEL button)
+3. $ cd path/to/pico-examples/build/blink
+4. $ sudo cp blink.uf2 /media/$(whoami)/RPI-RP2/
+5. release BOOTSEL button
+6. unplug the USB cable and plug the cable in again
+
+workaround to unplugging and plugging usb cable:
+1. connect PIN 30 (RUN) to a RESET button to LOW (OV)
+2. press and hold RESET button and then push and hold BOOTSEL button
+3. release RESET and then release BOOTSEL button
+4. now, the raspberry pi pico is in bootloader mode, we can cp blink.uf2 to it
+
+using swd:
+https://www.electronicshub.org/programming-raspberry-pi-pico-with-swd/
+eom
+}
+
+# =============================================================================
 function _dj_setup_slack() {
     pushd_quiet ${PWD}
 
@@ -1938,6 +2013,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'ros2-foxy' ]; then
         _dj_setup_ros2_foxy $2 $3 $4
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'rpi-pico' ]; then
+        _dj_setup_rpi_pico
         return
     fi
     # --------------------------
