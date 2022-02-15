@@ -449,3 +449,16 @@ function pushd_quiet() { # directory
 function popd_quiet() {
     popd &>/dev/null
 }
+
+# =============================================================================
+function _show_and_run() {
+    # show
+    printf >&2 "run:"
+    for arg in "$@"; do
+        arg="${arg%\'/\'\\\'\'}"
+        printf >&2 " '%s'" "$arg"
+    done
+    printf >&2 "\n"
+    # run
+    $@
+}
