@@ -963,25 +963,14 @@ function _dj_grep_package() {
 }
 
 # =============================================================================
-# to search some string in a project directory, excluding build/ and bin/
 function _dj_grep_string() {
     echo -e "${GRN}grep -rIn \"$1\" .${NOC}:"
-    # how to use the variable in the below?? -- $excluded_dir does not work
     # -I option ignores the search from binary files, that is perfect!
-    grep -rIn \
-        --include *.bash \
-        --include *.c \
-        --include *.cpp \
-        --include *.h \
-        --include *.hpp \
-        --include *.sh \
-        --include *.py \
-        --include Makefile* \
-        --include meson.build \
-        --include CMakeLists.txt \
+    grep "$1" -rIn \
+        --include={*.bash,*.c,*.cpp,*.h,*.hpp,*.sh,*.py,Makefile*,meson.build,CMakeLists.txt} \
         --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
         --exclude='*.lst' \
-        "$1" .
+        .
 }
 
 # =============================================================================
