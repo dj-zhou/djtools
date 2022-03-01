@@ -456,7 +456,7 @@ function _show_and_run() {
     printf >&2 "run:"
     for arg in "$@"; do
         arg="${arg%\'/\'\\\'\'}"
-        printf >&2 " '%s'" "$arg"
+        printf >&2 " $GRN'%s'$NOC" "$arg"
     done
     printf >&2 "\n"
     # run
