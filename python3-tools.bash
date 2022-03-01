@@ -30,7 +30,7 @@ function _dj_python3_venv_numpy_pandas() {
     # install latest pip3
     _show_and_run python -c "import pkg_resources; pkg_resources.require('pip>=21')" &>/dev/null || pip install --upgrade 'pip>=21'
     # prepare requirements.txt file
-    _show_and_run requirements_file=$(mktemp)
+    requirements_file=$(mktemp) # FIXME: cannot use _show_and_run here, don't know why
     _show_and_run trap 'rm -f "$requirements_file"' SIGTERM SIGINT EXIT
     _show_and_run cat >"$requirements_file" <<EOF
     ipympl
