@@ -22,6 +22,12 @@ function _dj_python3_install() {
 
 # =============================================================================
 function _dj_python3_venv_numpy_pandas() {
+
+    python3_v=$(version check python3)
+    if [[ "$python3_v"=*"3.8"* ]]; then
+        _install_if_not_installed python3.8-venv
+    fi
+
     VENV_DIR=".venv"
 
     _show_and_run rm -rf "$VENV_DIR"
@@ -54,7 +60,7 @@ EOF
     # start Jupyter-lab
     _show_and_run export JUPYTER_CONFIG_DIR="$VENV_DIR/.jupyter"
     _show_and_run jupyter labextension install jupyter-threejs
-    _show_and_run jupyter-lab
+    _show_and_run jupyter-lab &
 }
 
 # =============================================================================
