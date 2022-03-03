@@ -43,6 +43,7 @@ function _dj_python3_venv_numpy_pandas() {
     requirements_file=$(mktemp) # FIXME: cannot use _show_and_run here, don't know why
     _show_and_run trap 'rm -f "$requirements_file"' SIGTERM EXIT
     _show_and_run cat >"$requirements_file" <<EOF
+    black
     ipympl
     jupyterlab
     jupyterlab_templates
@@ -60,11 +61,17 @@ EOF
     # install packages
     _show_and_run python -c "import pkg_resources; pkg_resources.require(open('${requirements_file}',mode='r'))" &>/dev/null || pip install --ignore-installed -r "${requirements_file}"
     # temporary fix fr nodejs
-    dj setup nodejs
+    nodejs_v=$(version check nodejs)
+    anw=$(_version_if_ge_than $nodejs_v "12.0.0")
+    if [ "$anw" = "no" ]; then
+        _show_and_run dj setup nodejs
+    fi
     # start Jupyter-lab
     _show_and_run export JUPYTER_CONFIG_DIR="$VENV_DIR/.jupyter"
     _show_and_run jupyter labextension install jupyter-threejs
-    _show_and_run jupyter-lab &
+    _show_and_run jupyter nbextension install https://github.com/drillan/jupyter-black/archive/master.zip — user
+    _show_and_run jupyter nbextension enable jupyter-black-master/jupyter-black
+    _show_and_run jupyter-lab
 }
 
 # =============================================================================
