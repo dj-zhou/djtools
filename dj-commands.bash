@@ -1603,8 +1603,14 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     ACTIONS["python3"]="$_python3_cmds "
+    # ------------------------
     ACTIONS["install"]="$_install_list "
     for i in $_install_list; do
+        ACTIONS[$i]=" "
+    done
+    # ------------------------
+    ACTIONS["virtual-env"]="$_virtual_env_list "
+    for i in $_virtual_env_list; do
         ACTIONS[$i]=" "
     done
     # --------------------------------------------------------
