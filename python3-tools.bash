@@ -31,10 +31,12 @@ function _dj_python3_venv_numpy_pandas() {
 
     VENV_DIR=".venv"
 
-    if [ ! -d "$VENV_DIR" ]; then
+    if [[ -d "$VENV_DIR" && -f $VENV_DIR/bin/activate ]]; then
+        _show_and_run source "$VENV_DIR"/bin/activate
+    else
         _show_and_run python3 -m venv "$VENV_DIR"
+        _show_and_run source "$VENV_DIR"/bin/activate
     fi
-    _show_and_run source "$VENV_DIR"/bin/activate
     # install latest pip3
     _show_and_run python -c "import pkg_resources; pkg_resources.require('pip>=21')" &>/dev/null || pip install --upgrade 'pip>=21'
     # prepare requirements.txt file
