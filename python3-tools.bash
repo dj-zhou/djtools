@@ -24,8 +24,9 @@ function _dj_python3_install() {
 function _dj_python3_venv_numpy_pandas() {
 
     python3_v=$(version check python3)
-    if [[ "$python3_v"=*"3.8"* ]]; then
-        _install_if_not_installed python3.8-venv
+    echo "Python3: $python3_v"
+    if [[ $python3_v = *"3.8"* ]]; then
+        _show_and_run _install_if_not_installed python3.8-venv
     fi
 
     VENV_DIR=".venv"
@@ -37,7 +38,7 @@ function _dj_python3_venv_numpy_pandas() {
     _show_and_run python -c "import pkg_resources; pkg_resources.require('pip>=21')" &>/dev/null || pip install --upgrade 'pip>=21'
     # prepare requirements.txt file
     requirements_file=$(mktemp) # FIXME: cannot use _show_and_run here, don't know why
-    _show_and_run trap 'rm -f "$requirements_file"' SIGTERM SIGINT EXIT
+    _show_and_run trap 'rm -f "$requirements_file"' SIGTERM EXIT
     _show_and_run cat >"$requirements_file" <<EOF
     ipympl
     jupyterlab
