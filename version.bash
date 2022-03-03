@@ -246,6 +246,15 @@ function _version_check_magic_enum() {
 }
 
 # =============================================================================
+function _version_check_nvm() {
+    if [ -d "${HOME}/.nvm" ]; then
+        echo $(nvm --version)
+        return
+    fi
+    echo "none"
+}
+
+# =============================================================================
 function _version_check_opencv() {
     # example:
     # #define CV_VERSION_MAJOR    3
@@ -417,6 +426,11 @@ function version() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'nvm' ]; then
+            _version_check_nvm
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'opencv' ]; then
             _version_check_opencv
             return
@@ -519,8 +533,8 @@ function _version() {
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
-    check_list+="cli11 cmake eigen3 fmt gcc glog gtest g++ gnome magic-enum opencv "
-    check_list+="opengl python3 systemd ubuntu yaml-cpp "
+    check_list+="cli11 cmake eigen3 fmt gcc glog gtest g++ gnome magic-enum nvm "
+    check_list+="opencv opengl python3 systemd ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do
         ACTIONS[$i]=" "
