@@ -246,6 +246,18 @@ function _version_check_magic_enum() {
 }
 
 # =============================================================================
+function _version_check_nodejs() {
+    nvm_v=$(version check nvm)
+    if [[ ! $nvm_v = "none" ]]; then
+        nodejs_v=$(node -v)
+        nodejs_v=$(echo $nodejs_v | sed 's/v//g')
+        echo $nodejs_v
+        return
+    fi
+    echo "none"
+}
+
+# =============================================================================
 function _version_check_nvm() {
     if [ -d "${HOME}/.nvm" ]; then
         echo $(nvm --version)
@@ -426,6 +438,11 @@ function version() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'nodejs' ]; then
+            _version_check_nodejs
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'nvm' ]; then
             _version_check_nvm
             return
@@ -533,8 +550,8 @@ function _version() {
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
-    check_list+="cli11 cmake eigen3 fmt gcc glog gtest g++ gnome magic-enum nvm "
-    check_list+="opencv opengl python3 systemd ubuntu yaml-cpp "
+    check_list+="cli11 cmake eigen3 fmt gcc glog gtest g++ gnome magic-enum nodejs "
+    check_list+="nvm opencv opengl python3 systemd ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do
         ACTIONS[$i]=" "
