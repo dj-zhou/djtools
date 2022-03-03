@@ -1175,15 +1175,18 @@ function _dj_setup_nodejs() {
     pushd_quiet ${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
 
-    nvm_v=$(_find_package_version nvm)
-    _echo_install nvm $nvm_v
-    _press_enter_or_wait_s_continue 5
+    # install nvm to ${HOME}/.nvm -----------
+    if [ ! -d ${HOME}/.nvm ]; then
+        nvm_v=$(_find_package_version nvm)
+        _echo_install nvm $nvm_v
+        _press_enter_or_wait_s_continue 5
 
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_v/install.sh | bash
-    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" ||
-        printf %s "${XDG_CONFIG_HOME}/nvm")"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_v/install.sh | bash
+        export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" ||
+            printf %s "${XDG_CONFIG_HOME}/nvm")"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    fi
+    # install nodejs -----------
     nodejs_v=$(_find_package_version nodejs)
     _echo_install nodejs $nodejs_v
     _press_enter_or_wait_s_continue 5
