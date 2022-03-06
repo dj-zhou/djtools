@@ -45,10 +45,10 @@ function _ask_to_execute_cmd() {
     echo "command: "$1
     echo -e 'Do you want to execute command "'${1}'"?'
     read answer
-    if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || (
+    if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || (\
         $answer = 'No') || ($answer = 'no') ]]; then
         echo 'Command "'$1'" is NOT executed!'
-    elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || (
+    elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || (\
         $answer = 'Yes') || ($answer = 'yes') ]]; then
         echo 'Command "'$1'" is going to be executed!'
         $1
@@ -334,11 +334,11 @@ function _install_if_not_installed() {
     cur_dir_install=$PWD
     for package in "$@"; do
         if [[ "no" = $(_check_if_package_installed $package) ]]; then
-            echo -e "$GRN$package$NOC: ${BLU}installing$NOC"
+            echo -e "installing $GRN$package$NOC$NOC"
             # bug: /var/lib/dpkg/lock-frontend, etc, errors will not be seen
             sudo apt-get install -y $package &>/dev/null
         else
-            echo -e "$GRN$package$NOC: is already installed"
+            echo -e "$GRN$package$NOC is already installed"
         fi
     done
     cd $cur_dir_install && unset cur_dir_install
