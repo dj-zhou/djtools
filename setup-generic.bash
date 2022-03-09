@@ -1559,6 +1559,11 @@ function _dj_setup_windows_fonts() {
 }
 
 # =============================================================================
+function _dj_setup_wireshark() {
+    echo "todo: https://www.wireshark.org/#download"
+}
+
+# =============================================================================
 # make sure the related package is public available in dj-zhou's github
 # compile from the source code will install it to
 #   /usr/local/lib/libyaml-cpp.a
@@ -2090,6 +2095,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'windows-fonts' ]; then
         _dj_setup_windows_fonts
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'wireshark' ]; then
+        _dj_setup_wireshark
         return
     fi
     # --------------------------
