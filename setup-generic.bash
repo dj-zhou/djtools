@@ -1444,7 +1444,7 @@ function _dj_setup_spdlog() { # static/shared
     echo -e " 3: v1.7.0 (default)"
     echo -e " 4: v1.8.0"
 
-    echo -e "${GRN} please enter a number from 1 to 4:${NOC}"
+    echo -e "${GRN}please enter a number from 1 to 4:${NOC}"
     read asw
     case "$asw" in
     "1")
@@ -1466,8 +1466,15 @@ function _dj_setup_spdlog() { # static/shared
     esac
     pushd_quiet ${PWD}
 
+    _show_and_run sudo rm -f /usr/local/lib/libspdlog.a
+    _show_and_run sudo rm -f /usr/local/lib/libspdlog.so*
+    _show_and_run sudo rm -rf /usr/local/include/spdlog/
+    _show_and_run sudo rm -f /usr/local/lib/pkgconfig/spdlog.pc
+    _show_and_run sudo rm -rf /usr/local/lib/cmake/spdlog/
+
     _echo_install spdlog $version
     _press_enter_or_wait_s_continue 5
+
     cd ~ && mkdir -p soft && cd soft/
     rm spdlog -rf
 
@@ -1486,10 +1493,13 @@ function _dj_setup_spdlog() { # static/shared
 
     echo -e "\n${GRN}spdlog $version${NOC} is installed."
     if [ "$static_shared" = 'static' ]; then
-        _verify_lib_installation libspdlog.a /usr/local/lib/
+        _verify_lib_installation libspdlog.a /usr/local/lib
     else
-        _verify_lib_installation libspdlog.so /usr/local/lib/
+        _verify_lib_installation libspdlog.so /usr/local/lib
     fi
+    _verify_header_files spdlog.h /usr/local/include/spdlog
+    _verify_pkgconfig_file spdlog.pc /usr/local/lib/pkgconfig
+    _verify_cmake_files spdlogConfig.cmake /usr/local/lib/cmake/spdlog
 
     popd_quiet
 }
