@@ -179,7 +179,7 @@ function _version_check_gcc() {
 # however, the source code installation does not generate this package config file:
 # https://github.com/google/glog/pull/239
 function _version_check_glog() {
-    file=/usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc
+    file="/usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc"
     if [ ! -f $file ]; then
         echo "glog may not be installed correctly!"
         echo "note: source code installation does not have a libglog.pc file"
@@ -316,8 +316,23 @@ function _version_check_python3() {
 }
 
 # =============================================================================
+function _version_check_spdlog() {
+    file="/usr/local/lib/pkgconfig/spdlog.pc"
+    if [ ! -f $file ]; then
+        echo "spdlog may not be installed correctly!"
+        return
+    fi
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"Version: "* ]]; then
+            version=$(echo $line | awk '{ print $2 }')
+        fi
+    done <$file
+    echo $version
+}
+
+# =============================================================================
 function _version_check_systemd() {
-    file=/usr/lib/x86_64-linux-gnu/pkgconfig/libsystemd.pc
+    file="/usr/lib/x86_64-linux-gnu/pkgconfig/libsystemd.pc"
     if [ ! -f $file ]; then
         echo "libsystemd may not be installed correctly!"
         return
@@ -339,7 +354,7 @@ function _version_check_ubuntu() {
 
 # =============================================================================
 function _version_check_yaml_cpp() {
-    file=/usr/local/lib/pkgconfig/yaml-cpp.pc
+    file="/usr/local/lib/pkgconfig/yaml-cpp.pc"
     if [ ! -f $file ]; then
         echo "libyaml-cpp may not be installed correctly!"
         return
@@ -463,6 +478,11 @@ function version() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'spdlog' ]; then
+            _version_check_spdlog
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'systemd' ]; then
             _version_check_systemd
             return
@@ -551,7 +571,7 @@ function _version() {
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
     check_list+="cli11 cmake eigen3 fmt gcc glog gtest g++ gnome magic-enum nodejs "
-    check_list+="nvm opencv opengl python3 systemd ubuntu yaml-cpp "
+    check_list+="nvm opencv opengl python3 spdlog systemd ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do
         ACTIONS[$i]=" "
