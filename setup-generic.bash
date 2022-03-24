@@ -1136,6 +1136,10 @@ function _dj_stup_network_tools() {
 function _dj_setup_nlohmann_json3_dev() {
     pushd_quiet ${PWD}
 
+    v=$(_find_package_version nlohmann-json3)
+    _echo_install nlohmann-json3 $v
+    _press_enter_or_wait_s_continue 5
+
     # Ubuntu 18.04
     # due to an error: ImportError: No module named apt_pkg
     # I need to use Python3.6 to use the add-apt-repository command
@@ -1146,11 +1150,6 @@ function _dj_setup_nlohmann_json3_dev() {
         echo "Python3 should be of v3.6 to continue."
         return
     fi
-    # on Ubuntu 18.04, this installed the 3.1.2-2~bionic version
-    # (sudo apt-cache madison nlohmann-json3-dev)
-    # sudo add-apt-repository ppa:team-xbmc/ppa
-    # sudo apt-get update
-    # sudo apt-get install nlohmann-json3-dev
 
     # install from source
 
@@ -1159,13 +1158,18 @@ function _dj_setup_nlohmann_json3_dev() {
     rm json -rf
     git clone https://github.com/nlohmann/json.git
     cd json
-    git checkout v3.9.1 # use a fixed version at this moment
+    git checkout $v
     rm build -rf && mkdir build && cd build
     cmake ..
     make -j$(nproc)
     sudo make install
 
     popd_quiet
+
+    echo -e "${GRN}nlohmann-json3 $v${NOC} is installed:"
+    _verify_header_files json.hpp /usr/local/include/nlohmann
+    _verify_cmake_files nlohmann_jsonConfig.cmake /usr/local/lib/cmake/nlohmann_json
+    _verify_pkgconfig_file nlohmann_json.pc /usr/local/lib/pkgconfig
 }
 
 # =============================================================================
