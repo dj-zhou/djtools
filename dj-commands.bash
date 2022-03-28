@@ -967,7 +967,7 @@ function _dj_grep_string() {
     echo -e "${GRN}grep -rIn \"$1\" .${NOC}:"
     # -I option ignores the search from binary files, that is perfect!
     grep "$1" -rIn \
-        --include={*.bash,*.c,*.cpp,*.h,*.hpp,*.sh,*.md,*.py,Makefile*,meson.build,CMakeLists.txt} \
+        --include={*.yml,*.yaml,*.bash,*.c,*.cpp,*.h,*.hpp,*.sh,*.md,*.py,Makefile*,meson.build,CMakeLists.txt} \
         --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
         --exclude='*.lst' \
         .
