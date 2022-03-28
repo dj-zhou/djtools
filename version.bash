@@ -155,7 +155,7 @@ function _version_check_eigen3() {
 function _version_check_fmt() {
     file="/usr/local/lib/pkgconfig/fmt.pc"
     if [ ! -f $file ]; then
-        echo "fmt may not be installed correctly!"
+        echo "fmt maybe not installed correctly!"
         return
     fi
     while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -181,7 +181,7 @@ function _version_check_gcc() {
 function _version_check_glog() {
     file="/usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc"
     if [ ! -f $file ]; then
-        echo "glog may not be installed correctly!"
+        echo "glog maybe not installed correctly!"
         echo "note: source code installation does not have a libglog.pc file"
         return
     fi
@@ -227,7 +227,7 @@ function _version_check_gnome() {
 function _version_check_magic_enum() {
     file="/usr/local/include/magic_enum.hpp"
     if [ ! -f $file ]; then
-        echo "magic-enum may not be installed!"
+        echo "magic-enum maybe not installed!"
         return
     fi
 
@@ -243,6 +243,22 @@ function _version_check_magic_enum() {
         fi
     done <$file
     echo $major_version.$minor_version.$patch_version
+}
+
+# =============================================================================
+function _version_check_nlohmann_json3() {
+    # nlohmann_json.pc /usr/local/lib/pkgconfig
+    file="/usr/local/lib/pkgconfig/nlohmann_json.pc"
+    if [ ! -f $file ]; then
+        echo "nlohmann-json3 maybe not installed correctly!"
+        return
+    fi
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"Version: "* ]]; then
+            version=$(echo $line | awk '{ print $2 }')
+        fi
+    done <$file
+    echo $version
 }
 
 # =============================================================================
@@ -319,7 +335,7 @@ function _version_check_python3() {
 function _version_check_spdlog() {
     file="/usr/local/lib/pkgconfig/spdlog.pc"
     if [ ! -f $file ]; then
-        echo "spdlog may not be installed correctly!"
+        echo "spdlog maybe not installed correctly!"
         return
     fi
     while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -334,7 +350,7 @@ function _version_check_spdlog() {
 function _version_check_systemd() {
     file="/usr/lib/x86_64-linux-gnu/pkgconfig/libsystemd.pc"
     if [ ! -f $file ]; then
-        echo "libsystemd may not be installed correctly!"
+        echo "libsystemd maybe not installed correctly!"
         return
     fi
     while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -356,7 +372,7 @@ function _version_check_ubuntu() {
 function _version_check_yaml_cpp() {
     file="/usr/local/lib/pkgconfig/yaml-cpp.pc"
     if [ ! -f $file ]; then
-        echo "libyaml-cpp may not be installed correctly!"
+        echo "libyaml-cpp maybe not installed correctly!"
         return
     fi
     while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -450,6 +466,11 @@ function version() {
         # ------------------------------
         if [ $2 = 'magic-enum' ]; then
             _version_check_magic_enum
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'nlohmann-json3' ]; then
+            _version_check_nlohmann_json3
             return
         fi
         # ------------------------------
@@ -569,9 +590,9 @@ function _version() {
 
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
-    check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
-    check_list+="cli11 cmake eigen3 fmt gcc glog gtest g++ gnome magic-enum nodejs "
-    check_list+="nvm opencv opengl python3 spdlog systemd ubuntu yaml-cpp "
+    check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ cli11 cmake "
+    check_list+="eigen3 fmt gcc glog gtest g++ gnome magic-enum nlohmann-json3 "
+    check_list+="nodejs nvm opencv opengl python3 spdlog systemd ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do
         ACTIONS[$i]=" "
