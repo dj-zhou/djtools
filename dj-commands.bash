@@ -963,20 +963,76 @@ function _dj_grep_package() {
 }
 
 # =============================================================================
+# todo: combine exclude-dir and excludes
 function _dj_grep_string() {
-    echo -e "${GRN}grep -rIn \"$1\" .${NOC}:"
-    # -I option ignores the search from binary files, that is perfect!
-    grep "$1" -rIn \
-        --include={*.yml,*.yaml,*.bash,*.c,*.cpp,*.h,*.hpp,*.sh,*.md,*.py,Makefile*,meson.build,CMakeLists.txt} \
-        --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
-        --exclude='*.lst' \
-        .
+    if [ "$1" = "-in-bash" ]; then
+        # how to search in the files without extension??
+        grep "$2" -rIn \
+            --include={*.bash,*.sh} \
+            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+            --exclude='*.lst' \
+            .
+        return
+    fi
+    if [ "$1" = "-in-config" ]; then
+        grep "$2" -rIn \
+            --include={*.json,Dockerfile,*.xml} \
+            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+            --exclude='*.lst' \
+            .
+        return
+    fi
+    if [ "$1" = "-in-c-code" ]; then
+        grep "$2" -rIn \
+            --include={*.c,*.cpp,*.h,*.hpp,Makefile*,meson.build,CMakeLists.txt} \
+            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+            --exclude='*.lst' \
+            .
+        return
+    fi
+    if [ "$1" = "-in-meson" ]; then
+        _dj_grep_string_in_meson "$2"
+        return
+    fi
+    if [ "$1" = "-in-python" ]; then
+        grep "$2" -rIn \
+            --include={*.py,*.ipynb} \
+            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+            --exclude='*.lst' \
+            .
+        return
+    fi
+    if [ "$1" = "-in-rust" ]; then # seems not working for *.rs files
+        # not a bug, a single "*.rs" does not work here, don't know why
+        grep "$2" -rIn \
+            --include={*.rs,*.rs} \
+            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+            --exclude='*.lst' \
+            .
+        return
+    fi
+    if [ "$1" = "-in-yaml" ]; then
+        grep "$2" -rIn \
+            --include={*.yml,*.yaml} \
+            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+            --exclude='*.lst' \
+            .
+        return
+    fi
+    if [ "$1" = "-in-yocto-recipe" ]; then
+        grep "$2" -rIn \
+            --include={*.bb,*.inc,*.sample,*.bbappend} \
+            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+            --exclude='*.lst' \
+            .
+        return
+    fi
 }
 
 # =============================================================================
 # to find something in a meson file
 # only works in . directory
-function _dj_grep_in_meson() { # term
+function _dj_grep_string_in_meson() { # term
     term=$1
     if [ -z "$term" ]; then
         echo -e "usage:"
@@ -1307,7 +1363,7 @@ function dj() {
     # ------------------------------
     if [ $1 = 'grep' ]; then
         # ------------------------------
-        if [ $2 = 'package' ]; then
+        if [ $2 = '-package' ]; then
             # ------------------------------
             if [[ $# -ge 3 ]]; then
                 shift 2
@@ -1316,19 +1372,13 @@ function dj() {
             fi
         fi
         # ------------------------------
-        if [ $2 = 'string' ]; then
+        if [ $2 = '-string' ]; then
             # ------------------------------
             if [[ $# -ge 3 ]]; then
                 shift 2
                 _dj_grep_string "$@"
                 return
             fi
-        fi
-        # ------------------------------
-        if [ $2 = 'in-meson' ]; then
-            shift 2
-            _dj_grep_in_meson "$@"
-            return
         fi
         echo "dj grep: wrong argument, exit."
         return
@@ -1653,12 +1703,17 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    grep_list="package string in-meson "
+    grep_list="-package -string "
     ACTIONS[grep]="$grep_list "
     for i in $grep_list; do
         ACTIONS[$i]=" "
     done
-
+    string_list="-in-bash -in-config -in-c-code -in-meson -in-python "
+    string_list+="-in-rust -in-yaml -in-yocto-recipe "
+    ACTIONS["-string"]="$string_list "
+    for i in $string_list; do
+        ACTIONS[$i]=" "
+    done
     # --------------------------------------------------------
     # --------------------------------------------------------
     # --------------------------------------------------------
@@ -1668,7 +1723,7 @@ function _dj() {
     for i in $git_list; do
         ACTIONS[$i]=" "
     done
-    search_list="-name -email -string "
+    search_list="-name -email -commit "
     ACTIONS[search]="$search_list "
     for i in $search_list; do
         ACTIONS[$i]=" "
