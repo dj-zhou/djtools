@@ -966,6 +966,7 @@ function _dj_grep_package() {
 # todo: combine exclude-dir and excludes
 function _dj_grep_string() {
     if [ "$1" = "-in-bash" ]; then
+        echo "grep in ${GRN}*.bash, *.sh${NOC} files"
         # how to search in the files without extension??
         grep "$2" -rIn \
             --include={*.bash,*.sh} \
@@ -975,6 +976,7 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-config" ]; then
+        echo "grep in ${GRN}*.json,Dockerfile,*.xml${NOC} files"
         grep "$2" -rIn \
             --include={*.json,Dockerfile,*.xml} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
@@ -983,18 +985,21 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-c-code" ]; then
+        echo "grep in ${GRN}*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt${NOC} files"
         grep "$2" -rIn \
-            --include={*.c,*.cpp,*.h,*.hpp,Makefile*,meson.build,CMakeLists.txt} \
+            --include={*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
             .
         return
     fi
     if [ "$1" = "-in-meson" ]; then
+        echo "grep in ${GRN}meson.build${NOC} files"
         _dj_grep_string_in_meson "$2"
         return
     fi
     if [ "$1" = "-in-python" ]; then
+        echo "grep in ${GRN}*.py,*.ipynb${NOC} files"
         grep "$2" -rIn \
             --include={*.py,*.ipynb} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
@@ -1003,6 +1008,7 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-rust" ]; then # seems not working for *.rs files
+        echo "grep in ${GRN}*.rs${NOC} files"
         # not a bug, a single "*.rs" does not work here, don't know why
         grep "$2" -rIn \
             --include={*.rs,*.rs} \
@@ -1012,6 +1018,7 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-yaml" ]; then
+        echo "grep in ${GRN}*.yml,*.yaml${NOC} files"
         grep "$2" -rIn \
             --include={*.yml,*.yaml} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
@@ -1020,6 +1027,7 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-yocto-recipe" ]; then
+        echo "grep in ${GRN}*.bb,*.inc,*.sample,*.bbappend${NOC} files"
         grep "$2" -rIn \
             --include={*.bb,*.inc,*.sample,*.bbappend} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
