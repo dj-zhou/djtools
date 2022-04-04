@@ -1027,9 +1027,9 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-yocto-recipe" ]; then
-        echo "grep in ${GRN}*.bb,*.inc,*.sample,*.bbappend${NOC} files"
+        echo "grep in ${GRN}*.bb,*.conf,*.inc,*.sample,*.bbappend${NOC} files"
         grep "$2" -rIn \
-            --include={*.bb,*.inc,*.sample,*.bbappend} \
+            --include={*.bb,*.conf,*.inc,*.sample,*.bbappend} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
             .
