@@ -39,13 +39,14 @@ function _yocto_bake_plain_sdk() { # image-file
 
 # =============================================================================
 # must run this function in a build directory
+# this does not work well
 function _yocto_bake_recipe() { # full recipe name
     if [ $# -lt 1 ]; then
         echo "yocto bake recip: need a full recipe name"
         return
     fi
     source ../poky/oe-init-build-env . &>/dev/null
-    _show_and_run bitbake -b $1 -c compile -D
+    _show_and_run bitbake -b $1 -c compile
 }
 
 # =============================================================================
