@@ -1512,7 +1512,7 @@ function _dj() {
     setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools driver dropbox eigen3 "
     setup_list+="flamegraph fmt foxit-pdf-reader gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
-    setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio libserialport "
+    setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport "
     setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson mongodb network-tools nlohmann-json3-dev "
     setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom "
     setup_list+="pip plotjuggler pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rpi-pico rust "
