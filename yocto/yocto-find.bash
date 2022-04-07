@@ -338,8 +338,8 @@ function _yocto_show_a_file() { # file_full_name filter
             for file in $find_files; do
                 if [[ "$file" = *"$filter"* ]]; then
                     if [ $not_shown_folder_name = 1 ]; then
-                        echo -e "\n${GRN}---------------------------------------"
-                        echo -e "$folder_name${NOC}"
+                        echo -e "\n-------------------------------------------------------"
+                        echo -e "${HGRN}$folder_name${NOC}"
                         not_shown_folder_name=0
                     fi
                     echo "$file"
