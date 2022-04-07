@@ -339,7 +339,7 @@ function _yocto_show_a_file() { # file_full_name filter
                 if [[ "$file" = *"$filter"* ]]; then
                     if [ $not_shown_folder_name = 1 ]; then
                         echo -e "\n-------------------------------------------------------"
-                        echo -e "${HGRN}$folder_name${NOC}"
+                        echo -e "${HGRN}$folder_name/${NOC}"
                         not_shown_folder_name=0
                     fi
                     echo "$file"
@@ -462,7 +462,7 @@ function _yocto_list_resources() {
             echo -e "\n${GRN}----------------------------------------------${NOC}"
             cd $item
             folder_name=$(basename "$item")
-            printf "${GRN}$folder_name${NOC}"
+            printf "${HGRN}$folder_name${NOC}"
             if [[ -d .git ]]; then
                 printf " (git repo)\n"
             elif [[ -f .git ]]; then
