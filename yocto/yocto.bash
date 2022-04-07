@@ -12,9 +12,9 @@ function _yocto_bake_image() { # meta-layer #image-name
 
 # =============================================================================
 # must run this function in a build directory
-function _yocto_build_plain_sdk() { # image-file
+function _yocto_bake_plain_sdk() { # image-file
     if [ $# -lt 1 ]; then
-        echo "yocto build plain-sdk: need the image name"
+        echo "yocto bake plain-sdk: need the image name"
         return
     fi
     source ../poky/oe-init-build-env . &>/dev/null
@@ -31,10 +31,22 @@ function _yocto_build_plain_sdk() { # image-file
         return
     fi
     # finally, build the plain-sdk ------------------
-    echo -e "build the SDK with the command:"
+    echo -e "bake the SDK with the command:"
     echo -e "${PRP}  bitbake -c populate_sdk $1${NOC}"
     _press_enter_or_wait_s_continue 5
     bitbake -c populate_sdk $1
+}
+
+# =============================================================================
+# must run this function in a build directory
+# this does not work well
+function _yocto_bake_recipe() { # full recipe name
+    if [ $# -lt 1 ]; then
+        echo "yocto bake recip: need a full recipe name"
+        return
+    fi
+    source ../poky/oe-init-build-env . &>/dev/null
+    _show_and_run bitbake -b $1 -c compile
 }
 
 # =============================================================================
@@ -170,11 +182,18 @@ function yocto() {
     # ------------------------------
     if [ $1 = 'bake' ]; then
         if [ $2 = 'image' ]; then
-            _yocto_bake_image $3 $4 $5
+            shift 2
+            _yocto_bake_image $@
             return
         fi
         if [ $2 = 'plain-sdk' ]; then
-            _yocto_build_plain_sdk $3 $4 $5 $6 $7
+            shift 2
+            _yocto_bake_plain_sdk $@
+            return
+        fi
+        if [ $2 = 'recipe' ]; then
+            shift 2
+            _yocto_bake_recipe $@
             return
         fi
         return
@@ -182,7 +201,8 @@ function yocto() {
 
     # ------------------------------
     if [ $1 = 'flash' ]; then
-        _yocto_flash $2 $3 $4 $5 $6 $7 $8 $9 ${10}
+        shift 1
+        _yocto_flash $@
         return
     fi
     # ------------------------------
@@ -201,11 +221,13 @@ function yocto() {
             return
         fi
         if [ $2 = 'dev-env' ]; then
-            _yocto_setup_dev_env $3 $4 $5 $6 $7
+            shift 2
+            _yocto_setup_dev_env $@
             return
         fi
         if [ $2 = 'plain-sdk' ]; then
-            _yocto_setup_plain_sdk $3 $4 $5 $6 $7
+            shift 2
+            _yocto_setup_plain_sdk $@
             return
         fi
     fi
@@ -263,7 +285,7 @@ function _yocto() {
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
-    bake_list="image plain-sdk "
+    bake_list="image plain-sdk recipe "
     ACTIONS[bake]="$bake_list "
     meta_layer_list="$(_yocto_find_meta_layers) "
     ACTIONS[image]="$meta_layer_list "
@@ -274,6 +296,7 @@ function _yocto() {
             ACTIONS[j]=" "
         done
     done
+    ACTIONS[recipe]=" "
     # ------------------------------------------------------------------------
     setup_list="dev-env plain-sdk "
     ACTIONS[setup]="$setup_list "
