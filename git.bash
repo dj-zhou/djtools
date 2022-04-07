@@ -40,7 +40,7 @@ function _dj_git_search_show_result() {
 }
 
 # =============================================================================
-function _dj_git_search_string() {
+function _dj_git_search_commit() {
     str="$1"
     git log --oneline | grep "$str"
     echo -e "you can run ${GRN}git show [commit]${NOC} to see the detail of a commit"
@@ -49,7 +49,7 @@ function _dj_git_search_string() {
 # =============================================================================
 function _dj_git_search() {
     if [ $# -le 1 ]; then
-        echo "usage: dj git search -name/-email/-string [name/email/string]"
+        echo "usage: dj git search -name/-email/-commit [name/email/commit message]"
         return
     fi
     if [ $1 = '-name' ]; then
@@ -62,8 +62,9 @@ function _dj_git_search() {
         _dj_git_search_show_result "$all_branches"
         return
     fi
-    if [ $1 = '-string' ]; then
-        _dj_git_search_string "$2"
+    if [ $1 = '-commit' ]; then
+        _dj_git_search_commit "$2"
         return
     fi
+    echo "dj grep search: argument not supported, exit!"
 }

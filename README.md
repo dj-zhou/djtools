@@ -77,8 +77,17 @@ A tool used to generate flame graph, assisting `perf` tools.
 #### `dj grep`
 
 * `in-meson`: to find specific content in all `meson.build` files in current directory.
-* `package`: run `ldconfig` command to see the package relationships.
-* `string`: to search some string in all files in current directory, avoid those directories: `build`, `bin`, `_bcross*`, `_bnative*`, `builddir`, `.git`, `.cache`.
+* `-package`: run `ldconfig` command to see the package relationships.
+* `-string`: to search some string in all files in current directory, avoid those directories: `build`, `bin`, `_bcross*`, `_bnative*`, `builddir`, `.git`, `.cache`, etc.
+  * `-in-bash`: search in bash files;
+  * `-in-config`: search in config files, like `.json`, `Dockerfile`, etc;
+  * `-in-c-code`: search in C/C++ codes;
+  * `-in-meson`: search in `meson.build` files;
+  * `-in-python`: search in Python files;
+  * `-in-rust`: search in Rust program files;
+  * `in-yaml`: search in YAML files;
+  * `-in-yocto-recipes`: search in Yocto recipe files.
+
 
 #### `dj help`
 
