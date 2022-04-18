@@ -45,10 +45,10 @@ function _ask_to_execute_cmd() {
     echo "command: "$1
     echo -e 'Do you want to execute command "'${1}'"?'
     read answer
-    if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || (\
+    if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || (
         $answer = 'No') || ($answer = 'no') ]]; then
         echo 'Command "'$1'" is NOT executed!'
-    elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || (\
+    elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || (
         $answer = 'Yes') || ($answer = 'yes') ]]; then
         echo 'Command "'$1'" is going to be executed!'
         $1
@@ -270,7 +270,7 @@ function _find_ch_index_in_str_start_from() {
 }
 
 # =============================================================================
-function _size_calculate() { # $fz_byte $output_control
+function _size_human_readable() { # $fz_byte $output_control
     fz_byte=$1
     output_control=$2
     if [[ $output_control = 'true' ]]; then

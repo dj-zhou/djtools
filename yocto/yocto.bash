@@ -20,14 +20,14 @@ function _yocto_bake_plain_sdk() { # image-file
     source ../poky/oe-init-build-env . &>/dev/null
     # must be in a build directory ---------------
     if [ $(_yocto_check_is_a_build_directory) = 'false' ]; then
-        echo -e "not in a valid bitbake build directory, exit!"
+        echo -e "not in a valid bitbake build directory, exit!!"
         return
     fi
 
     # it can fail to find image name ------------------
     image_file=$(_yocto_find_image_file_from_its_name $1)
     if [ -z $image_file ]; then
-        echo -e "image is not built, need to build the image first, exit!"
+        echo -e "image is not built, need to build the image first, exit!!"
         return
     fi
     # finally, build the plain-sdk ------------------
@@ -74,9 +74,15 @@ function _yocto_flash() { # block-device # image-file
         return
     fi
     echo -e "          SD card: ${GRN}$dev${NOC}"
-    card_size=$(_disk_size $dev false)
+    card_size_byte=$(_disk_size $dev)
+    echo "card_size_byte = $card_size_byte"
+    if [ $card_size_byte -gt 137438953472 ]; then # max size: 128G
+        echo -e "${YLW}card too large, a wrong card? Max size supported: 128G${NOC}"
+        return
+    fi
+    card_size=$(_size_human_readable $card_size_byte false)
     if [[ -z "$card_size" ]]; then
-        echo -e "${RED}card size not obtained, abort yocto flash ${NOC}"
+        echo -e "${RED}card size not obtained, abort \"yocto flash\" command ${NOC}"
         return
     fi
     echo -e "             size: ${GRN}${card_size}${NOC}"
@@ -88,7 +94,7 @@ function _yocto_flash() { # block-device # image-file
     if [[ -z "$image_file" || ! -f "$image_file" ]]; then
         # must be in a build folder --------------
         if [ $(_yocto_check_is_a_build_directory) = 'false' ]; then
-            echo -e "${RED}not in a valid bitbake build directory, exit!${NOC}"
+            echo -e "${RED}not in a valid bitbake build directory, exit!!${NOC}"
             return
         fi
         # find the machine -----------------
@@ -101,14 +107,14 @@ function _yocto_flash() { # block-device # image-file
         # find tmp/ folder ---------------
         tmp_dir=$(_yocto_find_TMPDIR)
         if [ -z $tmp_dir ]; then
-            echo "TMPDIR not found, exit!\n"
+            echo -e "${RED}TMPDIR not found, exit!!${NOC}"
             return
         fi
         # find the wic.gz or wic.zst file ----------
         # if some other target use some other kind of file, update this ------
         image_file=$(_yocto_find_image_file_from_its_name $2)
         if [ -z "$image_file" ]; then
-            echo -e "image file not found, exit!"
+            echo -e "${RED}image file not found, exit!!${NOC}"
             return
         fi
         echo -e "       image name: ${GRN}$2${NOC}"
@@ -123,7 +129,7 @@ function _yocto_flash() { # block-device # image-file
     fi
     # show its file size --------------
     image_size=$(stat -c %s $image_file)
-    echo -e "  image file size: ${GRN}$(_size_calculate $image_size false)${NOC}"
+    echo -e "  image file size: ${GRN}$(_size_human_readable $image_size false)${NOC}"
 
     # shows its creation time --------------
     creation_time=$(stat -c %y $image_file)

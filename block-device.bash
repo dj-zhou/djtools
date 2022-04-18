@@ -35,10 +35,10 @@ eom
 }
 
 # =============================================================================
-# example: _disk_size sda true
-#          _disk_size /dev/sda false
-# if the $2 is true, it only return the size in bytes
-# if the $2 is false, it will print necessary information
+# example:
+#          _disk_size sda
+#          _disk_size /dev/sda
+# it only return size in bytes, to get human readable size, call _size_human_readable() function
 function _disk_size() {
     if [[ $# -lt 2 ]]; then
         _disk_size_help
@@ -58,7 +58,7 @@ function _disk_size() {
     fi
     fz_byte=$(echo $find_fz_byte | cut -d' ' -f5 | grep -o -E '[0-9]+' |
         awk 'NR==1 {print $1}')
-    _size_calculate $fz_byte $2
+    echo $fz_byte
 }
 
 # =============================================================================
