@@ -27,10 +27,8 @@ function _is_block_device_mounted() {
 function _disk_size_help() {
     cat <<eom
     _disk_size: wrong usage, use it like:
-       _disk_size sda true
-       _disk_size /dev/sda true
-       _disk_size sda false
-       _disk_size /dev/sda false
+       _disk_size sda
+       _disk_size /dev/sda
 eom
 }
 
@@ -40,7 +38,7 @@ eom
 #          _disk_size /dev/sda
 # it only return size in bytes, to get human readable size, call _size_human_readable() function
 function _disk_size() {
-    if [[ $# -lt 2 ]]; then
+    if [[ $# -lt 1 ]]; then
         _disk_size_help
         return
     fi
