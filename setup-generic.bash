@@ -405,6 +405,17 @@ function _dj_setup_foxit_reader() {
 }
 
 # =============================================================================
+function _dj_setup_fsm_pro() {
+    pushd_quiet ${PWD}
+    cd ~ && mkdir -p soft/ && cd soft/
+
+    wget https://www.fsmpro.io/downloads/FsmPro.deb
+    sudo dpkg -i FsmPro.deb
+
+    popd_quiet
+}
+
+# =============================================================================
 function _dj_setup_gcc_aarch64_linux() {
     pushd_quiet ${PWD}
 
@@ -1763,6 +1774,13 @@ function _dj_setup() {
         _dj_setup_foxit_reader
         return
     fi
+
+    # --------------------------
+    if [ $1 = 'fsm-pro' ]; then
+        _dj_setup_fsm_pro
+        return
+    fi
+
     # --------------------------
     if [ $1 = 'gadgets' ]; then
         _dj_setup_gadgets
