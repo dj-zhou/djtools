@@ -412,6 +412,8 @@ function _dj_setup_fsm_pro() {
     wget https://www.fsmpro.io/downloads/FsmPro.deb
     sudo dpkg -i FsmPro.deb
 
+    echo "reference: https://www.fsmpro.io/"
+
     popd_quiet
 }
 
