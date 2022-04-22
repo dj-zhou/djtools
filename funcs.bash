@@ -460,5 +460,5 @@ function _show_and_run() {
     done
     printf >&2 "\n"
     # run
-    $@
+    "$@"
 }

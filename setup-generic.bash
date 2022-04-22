@@ -340,7 +340,12 @@ eom
 function _dj_setup_fmt() {
     pushd_quiet ${PWD}
 
-    fmt_v=$(_find_package_version fmt)
+    if [ $# -eq 0 ]; then
+        fmt_v=$(_find_package_version fmt)
+    else
+        fmt_v=$1
+    fi
+
     _echo_install fmt $fmt_v
     _press_enter_or_wait_s_continue 5
 
@@ -1755,7 +1760,7 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'fmt' ]; then
-        _dj_setup_fmt
+        _dj_setup_fmt $2
         return
     fi
     # --------------------------
