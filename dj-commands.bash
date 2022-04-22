@@ -1108,7 +1108,7 @@ function _dj_ssh_general_no_password() {
 # I don't know why ~/.ssh/config is not needed
 # make sure the content in ~/.ssh/id_rsa-github-<account>.pub is pasted to the GitHub account
 # install ssh-askpass to avoid some error, however, it will have an popup window to press
-function _dj_ssh_github_activate() {
+function _dj_git_ssh_account_activate() {
 
     _install_if_not_installed ssh-askpass
 
@@ -1146,7 +1146,7 @@ function _dj_ssh_github_activate() {
 }
 
 # =============================================================================
-function _dj_ssh_github_all_accounts() {
+function _dj_git_ssh_account_show_all() {
     all_github_accounts=$(ls ~/.ssh | grep .pub)
     for i in $all_github_accounts; do
         username=${i%".pub"}
@@ -1156,7 +1156,7 @@ function _dj_ssh_github_all_accounts() {
 }
 
 # =============================================================================
-function _dj_ssh_github_current_account() {
+function _dj_git_ssh_account_show_current() {
     if [ ! -f ~/.ssh/.github-activated-account ]; then
         echo -e "you need to run ${PRP} dj ssh-github activate <github username>${NOC} to activate one"
         return
@@ -1422,15 +1422,15 @@ function dj() {
         if [ $2 = 'ssh-account' ]; then
             if [ $3 = '--activate' ]; then
                 shift 3
-                _dj_ssh_github_activate $@
+                _dj_git_ssh_account_activate $@
                 return
             fi
             if [ $3 = '--show-all' ]; then
-                _dj_ssh_github_all_accounts
+                _dj_git_ssh_account_show_all
                 return
             fi
             if [ $3 = '--show-current' ]; then
-                _dj_ssh_github_current_account
+                _dj_git_ssh_account_show_current
                 return
             fi
         fi
@@ -1730,7 +1730,7 @@ function _dj() {
     for i in $ssh_account_list; do
         ACTIONS[$i]=" "
     done
-    all_accounts="$(_dj_ssh_github_all_accounts) "
+    all_accounts="$(_dj_git_ssh_account_show_all) "
     ACTIONS["--activate"]="$all_accounts"
     for i in $all_accounts; do
         ACTIONS[$i]=" "
