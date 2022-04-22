@@ -1568,7 +1568,7 @@ function _dj() {
     # --------------------------------------------------------
     setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost can-analyzer "
     setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools driver dropbox eigen3 "
-    setup_list+="flamegraph fmt foxit-pdf-reader gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
+    setup_list+="flamegraph fmt foxit-pdf-reader fsm-pro gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
     setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libcsv-3.0.2 libev libgpiod libiio libserialport "
     setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson mongodb network-tools nlohmann-json3-dev "
