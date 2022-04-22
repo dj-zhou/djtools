@@ -1419,6 +1419,22 @@ function dj() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'ssh-account' ]; then
+            if [ $3 = '--activate' ]; then
+                shift 3
+                _dj_ssh_github_activate $@
+                return
+            fi
+            if [ $3 = '--show-all' ]; then
+                _dj_ssh_github_all_accounts
+                return
+            fi
+            if [ $3 = '--show-current' ]; then
+                _dj_ssh_github_current_account
+                return
+            fi
+        fi
+        # ------------------------------
         if [ $2 = 'ssh-clone' ]; then
             # --------------------------
             if [[ "$3" = 'bitbucket' ]] ||
@@ -1483,28 +1499,7 @@ function dj() {
         fi
         return
     fi
-    # ------------------------------
-    if [ $1 = 'ssh-github' ]; then
-        # ------------------------------
-        if [ $2 = 'activate' ]; then
-            shift 2
-            _dj_ssh_github_activate $@
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'all-accounts' ]; then
-            _dj_ssh_github_all_accounts
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'current-account' ]; then
-            _dj_ssh_github_current_account
-            return
-        fi
-        # ------------------------------
-        echo "dj ssh-github: argument not supported, exit."
-        return
-    fi
+
     # ------------------------------
     if [ $1 = 'udev' ]; then
         # ------------------------------
@@ -1559,7 +1554,6 @@ function _dj() {
         replace
         setup
         ssh-general
-        ssh-github
         udev
         udevadm
         unpack
@@ -1680,18 +1674,6 @@ function _dj() {
     # --------------------------------------------------------
     ACTIONS["ssh-general"]="no-password "
     ACTIONS["no-password"]=" "
-    # --------------------------------------------------------
-    # --------------------------------------------------------
-    ssh_github_list="activate all-accounts current-account "
-    ACTIONS["ssh-github"]="$ssh_github_list"
-    for i in $ssh_github_list; do
-        ACTIONS[$i]=" "
-    done
-    all_accounts="$(_dj_ssh_github_all_accounts) "
-    ACTIONS[activate]="$all_accounts"
-    for i in $all_accounts; do
-        ACTIONS[$i]=" "
-    done
 
     # --------------------------------------------------------
     # --------------------------------------------------------
@@ -1731,7 +1713,7 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     # --------------------------------------------------------
-    git_list="config search ssh-clone "
+    git_list="config search ssh-account ssh-clone "
     ACTIONS[git]="$git_list "
     for i in $git_list; do
         ACTIONS[$i]=" "
@@ -1741,6 +1723,20 @@ function _dj() {
     for i in $search_list; do
         ACTIONS[$i]=" "
     done
+
+    # --------------------------------------------------------
+    ssh_account_list="--activate --show-all --show-current "
+    ACTIONS["ssh-account"]="$ssh_account_list "
+    for i in $ssh_account_list; do
+        ACTIONS[$i]=" "
+    done
+    all_accounts="$(_dj_ssh_github_all_accounts) "
+    ACTIONS["--activate"]="$all_accounts"
+    for i in $all_accounts; do
+        ACTIONS[$i]=" "
+    done
+
+    # --------------------------------------------------------
     ACTIONS["ssh-clone"]="bitbucket github gitee "
     # --------------------------------------------------------
     bitbucket_repos="$(_dj_clone_repo_list bitbucket) "
