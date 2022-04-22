@@ -73,6 +73,10 @@ A tool used to generate flame graph, assisting `perf` tools.
 * `config`: to configure a repository with name and email address, locally.
 * `search`: to list all remote branches by using the author's name, or email address, or to search some commit that with specific string in the commit message.
 * `ssh-clone`: to clone repository using ssh, for example, the command `dj git ssh-clone github robotics-note` is the same as `git clone git@github.com:dj-zhou/robotics-note.git`, because we have setup the GitHub account as `dj-zhou`.
+* `ssh-account`: account related commands, only work for GitHub for now:
+  * `--activate`: to activate one account;
+  * `--show-all`: to show all available accounts;
+  * `--show-current`: to show current active account.
 
 #### `dj grep`
 
@@ -155,14 +159,6 @@ The versions of most of the packages are listed in file `path/to/djtools/.packag
 #### `dj ssh-general`
 
 * `no-password`: to copy the host ssh file to a target to avoid using password in the future.
-
-#### `dj ssh-github`
-
-GitHub related commands:
-
-* `activate`: to activate one account;
-* `all-accounts`: to show all available accounts;
-* `current-account`: to show current active account.
 
 #### `dj udev`
 
