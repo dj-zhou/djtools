@@ -678,6 +678,33 @@ function _dj_setup_lcm() {
 }
 
 # =============================================================================
+function _dj_setup_libbpf() {
+    pushd_quiet ${PWD}
+
+    _install_if_not_installed libelf-dev
+
+    v=$(_find_package_version libbpf)
+    _echo_install libbpf $v
+
+    _show_and_run cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run rm -rf libbpf
+    _show_and_run git clone https://github.com/libbpf/libbpf.git
+    _show_and_run cd libbpf
+    _show_and_run git checkout $v
+
+    _show_and_run cd src
+    _show_and_run make -j$(nproc)
+    _show_and_run mkdir build root
+    BUILD_STATIC_ONLY=y OBJDIR=build DESTDIR=root make install
+
+    _show_and_run cd root/usr/
+    _show_and_run sudo cp -r include/* /usr/include/
+    _show_and_run sudo cp lib64/* -r /usr/lib/
+
+    popd_quiet
+}
+
+# =============================================================================
 function _dj_setup_libcsv_3_0_2() {
     pushd_quiet ${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
@@ -1886,6 +1913,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'lcm' ]; then
         _dj_setup_lcm
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'libbpf' ]; then
+        _dj_setup_libbpf
         return
     fi
     if [ $1 = 'libcsv-3.0.2' ]; then
