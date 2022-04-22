@@ -1107,8 +1107,11 @@ function _dj_ssh_general_no_password() {
 # reference: https://gist.github.com/jexchan/2351996
 # I don't know why ~/.ssh/config is not needed
 # make sure the content in ~/.ssh/id_rsa-github-<account>.pub is pasted to the GitHub account
-# there may be a better solution
+# install ssh-askpass to avoid some error, however, it will have an popup window to press
 function _dj_ssh_github_activate() {
+
+    _install_if_not_installed ssh-askpass
+
     github_username=$1
     key_file=${HOME}/.ssh/id_rsa-github-$github_username
     if [ ! -f ${key_file} ]; then
@@ -1123,7 +1126,8 @@ function _dj_ssh_github_activate() {
             $asw = 'Yes') || ($asw = 'yes') ]]; then
             # proceed -------------
             echo -e "SSH key file ${GRN}${key_file}${NOC} not found, generate one automatically:"
-            printf "${key_file}\n\n" | ssh-keygen
+            echo -e "${YLW}Press [OK] on the popup window${NOC}"
+            _show_and_run printf "${key_file}\n\n\n\n" | ssh-keygen
             echo -e "copy the following content into a new GitHub SSH Key (https://github.com/settings/keys, need login):"
             echo -e "${GRN}"
             cat ${key_file}.pub
@@ -1134,9 +1138,10 @@ function _dj_ssh_github_activate() {
     fi
 
     # if see this error: Error connecting to agent: Connection refused, do
-    # eval "$(ssh-agent)"
-    ssh-add -D
-    ssh-add ${key_file}
+    # it is just fine to run it
+    _show_and_run eval "$(ssh-agent)" &>/dev/null
+    _show_and_run ssh-add -D
+    _show_and_run ssh-add ${key_file}
     echo $github_username >~/.ssh/.github-activated-account
 }
 
