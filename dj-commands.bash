@@ -1437,9 +1437,9 @@ function dj() {
         # ------------------------------
         if [ $2 = 'ssh-clone' ]; then
             # --------------------------
-            if [[ "$3" = 'bitbucket' ]] ||
-                [[ "$3" = 'github' ]] ||
-                [[ "$3" = 'gitee' ]]; then
+            if [[ "$3" = 'bitbucket' ||
+                "$3" = 'github' ||
+                "$3" = 'gitee' ]]; then
                 shift 2
                 _dj_git_ssh_clone_from $@
                 return
