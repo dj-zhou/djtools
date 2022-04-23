@@ -124,15 +124,15 @@ function _find_argument_after_option() {
             # echo "find_option = "$find_option
             # echo "find_argument = "$find_argument
         elif [ $find_option = 2 ] && [ $find_argument = 0 ]; then
-            arg=$var
+            arg_found=$var
             find_argument=1
-            # echo "arg = "$arg
+            # echo "arg_found = "$arg_found
             # echo "find_argument = "$find_argument
         fi
         # echo "argument_no = "$argument_no
     done
-    # echo "final result = "$arg
-    echo $arg
+    # echo "final result = "$arg_found
+    echo $arg_found
 }
 
 # =============================================================================
@@ -454,9 +454,9 @@ function popd_quiet() {
 function _show_and_run() {
     # show
     printf >&2 "run:"
-    for arg in "$@"; do
-        arg="${arg%\'/\'\\\'\'}"
-        printf >&2 " $GRN'%s'$NOC" "$arg"
+    for arg_show_and_run in "$@"; do
+        arg_show_and_run="${arg_show_and_run%\'/\'\\\'\'}"
+        printf >&2 " $GRN'%s'$NOC" "$arg_show_and_run"
     done
     printf >&2 "\n"
     # run

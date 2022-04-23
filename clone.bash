@@ -103,19 +103,18 @@ function _dj_git_ssh_clone_from() {
         fi
     fi
     if [[ -z $repo_name ]]; then
-        echo -e "${PRP}dj ssh-clone $platform${NOC}: repo name not given"
+        echo -e "${PRP}dj git ssh-clone $platform${NOC}: repo name not given"
         return
     fi
     uname=$(_dj_clone_find_username $platform)
     link=$(_dj_clone_find_link $platform)
     source_link=git@$link:$uname/$repo_name.git
-    echo -e "dj ssh-clone: ${GRN}$source_link${NOC}"
+    echo -e "dj git ssh-clone: ${GRN}$source_link${NOC}"
 
-    b_name=$(_find_argument_after_option -b $3 $4 $5 $6 $7 $8)
-
-    if [[ ! -z $b_name ]]; then
-        git clone $source_link -b $b_name
+    branch_name="$(_find_argument_after_option -b $3 $4 $5 $6 $7 $8)"
+    if [[ ! -z "$branch_name" ]]; then
+        git clone "$source_link" -b "$branch_name"
     else
-        git clone $source_link
+        git clone "$source_link"
     fi
 }

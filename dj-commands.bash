@@ -1107,8 +1107,11 @@ function _dj_ssh_general_no_password() {
 # reference: https://gist.github.com/jexchan/2351996
 # I don't know why ~/.ssh/config is not needed
 # make sure the content in ~/.ssh/id_rsa-github-<account>.pub is pasted to the GitHub account
-# there may be a better solution
-function _dj_ssh_github_activate() {
+# install ssh-askpass to avoid some error, however, it will have an popup window to press
+function _dj_git_ssh_account_activate() {
+
+    _install_if_not_installed ssh-askpass
+
     github_username=$1
     key_file=${HOME}/.ssh/id_rsa-github-$github_username
     if [ ! -f ${key_file} ]; then
@@ -1123,7 +1126,8 @@ function _dj_ssh_github_activate() {
             $asw = 'Yes') || ($asw = 'yes') ]]; then
             # proceed -------------
             echo -e "SSH key file ${GRN}${key_file}${NOC} not found, generate one automatically:"
-            printf "${key_file}\n\n" | ssh-keygen
+            echo -e "${YLW}Press [OK] on the popup window${NOC}"
+            _show_and_run printf "${key_file}\n\n\n\n" | ssh-keygen
             echo -e "copy the following content into a new GitHub SSH Key (https://github.com/settings/keys, need login):"
             echo -e "${GRN}"
             cat ${key_file}.pub
@@ -1134,14 +1138,15 @@ function _dj_ssh_github_activate() {
     fi
 
     # if see this error: Error connecting to agent: Connection refused, do
-    # eval "$(ssh-agent)"
-    ssh-add -D
-    ssh-add ${key_file}
+    # it is just fine to run it
+    _show_and_run eval "$(ssh-agent)" &>/dev/null
+    _show_and_run ssh-add -D
+    _show_and_run ssh-add ${key_file}
     echo $github_username >~/.ssh/.github-activated-account
 }
 
 # =============================================================================
-function _dj_ssh_github_all_accounts() {
+function _dj_git_ssh_account_show_all() {
     all_github_accounts=$(ls ~/.ssh | grep .pub)
     for i in $all_github_accounts; do
         username=${i%".pub"}
@@ -1151,7 +1156,7 @@ function _dj_ssh_github_all_accounts() {
 }
 
 # =============================================================================
-function _dj_ssh_github_current_account() {
+function _dj_git_ssh_account_show_current() {
     if [ ! -f ~/.ssh/.github-activated-account ]; then
         echo -e "you need to run ${PRP} dj ssh-github activate <github username>${NOC} to activate one"
         return
@@ -1414,11 +1419,27 @@ function dj() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'ssh-account' ]; then
+            if [ $3 = '--activate' ]; then
+                shift 3
+                _dj_git_ssh_account_activate $@
+                return
+            fi
+            if [ $3 = '--show-all' ]; then
+                _dj_git_ssh_account_show_all
+                return
+            fi
+            if [ $3 = '--show-current' ]; then
+                _dj_git_ssh_account_show_current
+                return
+            fi
+        fi
+        # ------------------------------
         if [ $2 = 'ssh-clone' ]; then
             # --------------------------
-            if [[ "$3" = 'bitbucket' ]] ||
-                [[ "$3" = 'github' ]] ||
-                [[ "$3" = 'gitee' ]]; then
+            if [[ "$3" = 'bitbucket' ||
+                "$3" = 'github' ||
+                "$3" = 'gitee' ]]; then
                 shift 2
                 _dj_git_ssh_clone_from $@
                 return
@@ -1478,28 +1499,7 @@ function dj() {
         fi
         return
     fi
-    # ------------------------------
-    if [ $1 = 'ssh-github' ]; then
-        # ------------------------------
-        if [ $2 = 'activate' ]; then
-            shift 2
-            _dj_ssh_github_activate $@
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'all-accounts' ]; then
-            _dj_ssh_github_all_accounts
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'current-account' ]; then
-            _dj_ssh_github_current_account
-            return
-        fi
-        # ------------------------------
-        echo "dj ssh-github: argument not supported, exit."
-        return
-    fi
+
     # ------------------------------
     if [ $1 = 'udev' ]; then
         # ------------------------------
@@ -1554,7 +1554,6 @@ function _dj() {
         replace
         setup
         ssh-general
-        ssh-github
         udev
         udevadm
         unpack
@@ -1675,18 +1674,6 @@ function _dj() {
     # --------------------------------------------------------
     ACTIONS["ssh-general"]="no-password "
     ACTIONS["no-password"]=" "
-    # --------------------------------------------------------
-    # --------------------------------------------------------
-    ssh_github_list="activate all-accounts current-account "
-    ACTIONS["ssh-github"]="$ssh_github_list"
-    for i in $ssh_github_list; do
-        ACTIONS[$i]=" "
-    done
-    all_accounts="$(_dj_ssh_github_all_accounts) "
-    ACTIONS[activate]="$all_accounts"
-    for i in $all_accounts; do
-        ACTIONS[$i]=" "
-    done
 
     # --------------------------------------------------------
     # --------------------------------------------------------
@@ -1726,7 +1713,7 @@ function _dj() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     # --------------------------------------------------------
-    git_list="config search ssh-clone "
+    git_list="config search ssh-account ssh-clone "
     ACTIONS[git]="$git_list "
     for i in $git_list; do
         ACTIONS[$i]=" "
@@ -1736,6 +1723,20 @@ function _dj() {
     for i in $search_list; do
         ACTIONS[$i]=" "
     done
+
+    # --------------------------------------------------------
+    ssh_account_list="--activate --show-all --show-current "
+    ACTIONS["ssh-account"]="$ssh_account_list "
+    for i in $ssh_account_list; do
+        ACTIONS[$i]=" "
+    done
+    all_accounts="$(_dj_git_ssh_account_show_all) "
+    ACTIONS["--activate"]="$all_accounts"
+    for i in $all_accounts; do
+        ACTIONS[$i]=" "
+    done
+
+    # --------------------------------------------------------
     ACTIONS["ssh-clone"]="bitbucket github gitee "
     # --------------------------------------------------------
     bitbucket_repos="$(_dj_clone_repo_list bitbucket) "
