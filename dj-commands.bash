@@ -975,19 +975,19 @@ function _dj_grep_string() {
             .
         return
     fi
-    if [ "$1" = "-in-config" ]; then
-        echo -e "grep in ${GRN}*.json,Dockerfile,*.xml${NOC} files"
+    if [ "$1" = "-in-ccode" ]; then
+        echo -e "grep in ${GRN}*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt${NOC} files"
         grep "$2" -rIn \
-            --include={*.json,Dockerfile,*.xml} \
+            --include={*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
             .
         return
     fi
-    if [ "$1" = "-in-c-code" ]; then
-        echo -e "grep in ${GRN}*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt${NOC} files"
+    if [ "$1" = "-in-config" ]; then
+        echo -e "grep in ${GRN}*.json,Dockerfile,*.xml${NOC} files"
         grep "$2" -rIn \
-            --include={*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt} \
+            --include={*.json,Dockerfile,*.xml} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
             .
@@ -1008,11 +1008,11 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-rust" ]; then # seems not working for *.rs files
-        echo -e "grep in ${GRN}*.rs${NOC} files"
+        echo -e "grep in ${GRN}*.rs,Cargo.toml,Cargo.lock${NOC} files"
         # not a bug, a single "*.rs" does not work here, don't know why
         grep "$2" -rIn \
-            --include={*.rs,*.rs} \
-            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+            --include={*.rs,*.rs,Cargo.toml,Cargo.lock} \
+            --exclude-dir={.venv,build,subprojects,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
             .
         return
@@ -1703,7 +1703,7 @@ function _dj() {
     for i in $grep_list; do
         ACTIONS[$i]=" "
     done
-    string_list="-in-bash -in-config -in-c-code -in-meson -in-python "
+    string_list="-in-bash -in-config -in-meson -in-python -in-ccode "
     string_list+="-in-rust -in-yaml -in-yocto-recipe "
     ACTIONS["-string"]="$string_list "
     for i in $string_list; do
