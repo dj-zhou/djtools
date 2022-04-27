@@ -200,6 +200,36 @@ function _dj_setup_kdiff3_meld() {
 }
 
 # =============================================================================
+# tested on ubuntu 18.04
+function _dj_setup_kermit() {
+    _install_if_not_installed ckermit lrzsz
+
+    kermrc_file="kermrc"
+    _show_and_run rm $kermrc_file -f
+    _show_and_run touch $kermrc_file
+    echo 'set line /dev/ttyUSB0' >>$kermrc_file
+    echo 'set speed 115200' >>$kermrc_file
+    echo 'set carrier-watch off' >>$kermrc_file
+    echo 'set handshake none' >>$kermrc_file
+    echo 'set flow-control none' >>$kermrc_file
+    echo 'set stop-bits 1' >>$kermrc_file
+    echo 'set modem none' >>$kermrc_file
+    echo 'set protocol zmodem' >>$kermrc_file
+    echo 'connect' >>$kermrc_file
+    _show_and_run mv $kermrc_file ~/
+
+    _show_and_run sudo cp $djtools_path/scripts/kermit-serial /usr/bin
+    _show_and_run sudo chmod +x /usr/bin/kermit-serial
+
+    cat <<eom
+Kermit is installed, usage:
+1. use ~/.kermrc config: $ kermit
+2. use kermit-serial: $ kermit-serial /dev/ttyUSB0 115200
+eom
+
+}
+
+# =============================================================================
 function _dj_setup_gadgets() {
     pushd_quiet ${PWD}
 
@@ -1569,7 +1599,7 @@ function _dj() {
     setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools driver dropbox eigen3 "
     setup_list+="flamegraph fmt foxit-pdf-reader fsm-pro gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
     setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
-    setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport "
+    setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport "
     setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson mongodb network-tools nlohmann-json3-dev "
     setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom "
     setup_list+="pip plotjuggler pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rpi-pico rust "
