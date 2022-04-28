@@ -75,7 +75,6 @@ function _yocto_flash() { # block-device # image-file
     fi
     echo -e "          SD card: ${GRN}$dev${NOC}"
     card_size_byte=$(_disk_size $dev)
-    echo "card_size_byte = $card_size_byte"
     if [ $card_size_byte -gt 137438953472 ]; then # max size: 128G
         echo -e "${YLW}card too large, a wrong card? Max size supported: 128G${NOC}"
         return
