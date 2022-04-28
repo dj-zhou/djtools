@@ -2,11 +2,11 @@
 
 # =============================================================================
 _touchpad_help() {
-    echo -e "touchpad usage:"
+    echo "touchpad usage:"
     echo "    touchpad thinkpad enable "
     echo "       -- enable the touchpad on ThinkPad laptops"
     echo "    touchpad thinkpad disable "
-    echo -e "       -- disable the touchpad on ThinkPad laptops"
+    echo "       -- disable the touchpad on ThinkPad laptops"
 }
 
 # =============================================================================
@@ -70,9 +70,7 @@ function _touchpad_roc_control() {
     done
 
     # echo "equal_pos = " $equal_pos
-    echo "first_space_after_equal = " $first_space_after_equal
     touchpadID=${touchpad:$equal_pos:${first_space_after_equal}-${equal_pos}}
-    echo $touchpadID
     # enable or disable the ROC touchpad
     xinput set-prop $touchpadID "Device Enabled" $1
 }
@@ -94,14 +92,10 @@ function touchpad {
         if [ $1 = 'thinkpad' ]; then
             if [ $2 = 'enable' ]; then
                 _touchpad_thinkpad_control 1
-                echo ' '
                 echo 'Touch Pad on ThinkPad laptop is enabled '
-                echo ' '
             elif [ $2 = 'disable' ]; then
                 _touchpad_thinkpad_control 0
-                echo ' '
                 echo 'Touch Pad on ThinkPad laptop is disabled '
-                echo ' '
             else
                 echo 'touchpad thinkpad: argument not supported.'
             fi
@@ -109,22 +103,18 @@ function touchpad {
         if [ $1 = 'roc' ] || [ $1 = 'precision' ]; then
             if [ $2 = 'enable' ]; then
                 _touchpad_roc_control 1
-                echo ' '
                 if [ $1 = 'roc' ]; then
                     echo 'Touch Pad on ROC Zephyrus laptop is enabled '
                 elif [ $1 = 'precision' ]; then
                     echo 'Touch Pad on Dell Precision laptop is enabled '
                 fi
-                echo ' '
             elif [ $2 = 'disable' ]; then
                 _touchpad_roc_control 0
-                echo ' '
                 if [ $1 = 'roc' ]; then
                     echo 'Touch Pad on ROC Zephyrus laptop is disabled '
                 elif [ $1 = 'precision' ]; then
                     echo 'Touch Pad on Dell Precision laptop is disabled '
                 fi
-                echo ' '
             else
                 echo 'touchpad roc/precision: argument not supported.'
             fi
