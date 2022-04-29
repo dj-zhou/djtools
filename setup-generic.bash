@@ -1911,6 +1911,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'kermit' ]; then
+        _dj_setup_kermit
+        return
+    fi
+    # --------------------------
     if [ $1 = 'lcm' ]; then
         _dj_setup_lcm
         return
