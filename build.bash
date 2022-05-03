@@ -129,25 +129,27 @@ function _build_meson_use_oesdk() { # sdk_path
 }
 
 # =============================================================================
-# this should implement the same logic as in _build_oesdk()
-# now, it does not take --fresh or --conti option, but it runs a taking --conti option
 function _build_meson_native() {
+    if [ $1 = "clean" ]; then
+        echo -e "${CYN}meson.build${NOC}: clean ..."
+    else
+        echo -e "${CYN}meson.build${NOC}: build natively ..."
+    fi
+
     cur_dir=${PWD}
-
-    echo -e "use ${CYN}Meson${NOC} to build natively ..."
-
     proj_dir="_bnative.meson"
     if [ -f "meson.build" ]; then
         if [ ! -d "$proj_dir" ]; then
-            meson setup $proj_dir
+            _show_and_run meson setup $proj_dir
         fi
         if [ ! -f "$proj_dir/build.ninja" ]; then
-            rm $proj_dir -rf
-            meson setup $proj_dir
+            _show_and_run rm $proj_dir -rf
+            _show_and_run meson setup $proj_dir
             rm -rf builddir # just a hack
             return
         fi
-        cd $proj_dir && ninja
+        _show_and_run cd $proj_dir
+        _show_and_run ninja
         cd $cur_dir && rm -rf builddir # just a hack
     else
         echo -e "${RED}not a meson project directory, exit!${NOC}"
@@ -230,12 +232,11 @@ function _build_make() {
 
 # =============================================================================
 function _build_cmake() {
-
     target_tag=$1
     if [[ -z "$target_tag" ]]; then
         target_tag="all"
     fi
-    echo -e "${CYN}CMakeLists.txt${NOC}: ${CYN}$target_tag${NOC} ..."
+    echo -e "${CYN}CMakeLists.txt${NOC}: $target_tag ..."
     cur_dir=${PWD}
     build_dir="_bnative.cmake"
     # ---------------------------------------------------
@@ -331,13 +332,14 @@ function build() {
     fi
     # ------------------------------
     if [ $1 = 'meson-native' ]; then
-        _build_meson_native $3 $4 $5 $6 $7
+        shift 1
+        _build_meson_native "$@"
         return
     fi
     # ------------------------------
     if [ $1 = 'template' ]; then
-        shift
-        compile_template $@
+        shift 1
+        compile_template "$@"
         return
     fi
     echo -e "${GRN}build${NOC}: argument ${RED}$1${NOC} not supported."
