@@ -199,7 +199,7 @@ function _build_in_docker() {
 #         IDT_LIST:         200 B         2 KB      9.77%
 
 # =============================================================================
-function compile_makefile() {
+function _build_make() {
     echo -e "use ${GRN}Makefile${NOC} to build/clean/install ..."
     target_tag=$1
     if [ "$target_tag" = "clean" ]; then
@@ -236,12 +236,17 @@ function compile_makefile() {
 }
 
 # =============================================================================
-function compile_cmakelist() {
-    echo -e "use ${GRN}CMakeLists.txt${NOC} to build/clean/install ..."
+function _build_cmake() {
+
+    target_tag=$1
+    if [[ -z "$target_tag" ]]; then
+        target_tag="all"
+    fi
+    echo -e "${GRN}CMakeLists.txt${NOC}: ${GRN}$target_tag${NOC} ..."
     cur_dir=${PWD}
     build_dir="_bnative.cmake"
-    target_tag=$1
-    if [[ -z "$target_tag" || "$target_tag" = "all" ]]; then
+    # ---------------------------------------------------
+    if [[ "$target_tag" = "all" ]]; then
         if [ ! -d "$build_dir" ]; then
             echo -e "${GRN}mkdir "$build_dir" && cd "$build_dir" && cmake ..${NOC}"
             mkdir "$build_dir" && cd "$build_dir" && cmake ..
@@ -254,11 +259,13 @@ function compile_cmakelist() {
         cd $cur_dir
         return
     fi
+    # ---------------------------------------------------
     if [ "$target_tag" = "clean" ]; then
         echo -e "${GRN}rm -rf "$build_dir"/${NOC}"
         rm -rf "$build_dir"/
         return
     fi
+    # ---------------------------------------------------
     if [ "$target_tag" = "install" ]; then
         if [ ! -d "$build_dir" ]; then
             echo -e "${GRN}mkdir "$build_dir" && cd "$build_dir" && cmake .. && make -j$(nproc)${NOC}"
@@ -270,6 +277,14 @@ function compile_cmakelist() {
         sudo make install
         cd $cur_dir
         return
+    fi
+    # ---------------------------------------------------
+    if [ "$target_tag" = "test" ]; then
+        if [ -d $build_dir ]; then
+            pushd_quiet $build_dir
+            make test
+            popd_quiet
+        fi
     fi
 }
 
@@ -298,18 +313,20 @@ function compile_template() {
 function build() {
     # ------------------------------
     if [ $1 = 'cmake' ]; then
-        compile_cmakelist $2 $3 $4 $5 $6
+        shift 1
+        _build_cmake "$@"
         return
     fi
     # ------------------------------
     if [ $1 = 'docker' ]; then
-        shift
-        _build_in_docker $@
+        shift 1
+        _build_in_docker "$@"
         return
     fi
     # ------------------------------
     if [ $1 = 'make' ]; then
-        compile_makefile $2 $3 $4 $5 $6
+        shift 1
+        _build_make "$@"
         return
     fi
     # ------------------------------
@@ -384,6 +401,26 @@ function _build_build_docker_exists() {
 }
 
 # =============================================================================
+function _cmakelists_add_test_exists() {
+    if [ -f "CMakeLists.txt" ]; then
+        find_add_test=0
+        while IFS='' read -r line || [[ -n "$line" ]]; do
+            if [[ $line == *"add_test("* ]]; then
+                find_add_test=1
+            fi
+        done <CMakeLists.txt
+        if [ $find_add_test = '1' ]; then
+            echo "test "
+        else
+            echo " "
+        fi
+        return
+    fi
+
+    echo " "
+}
+
+# =============================================================================
 function _build() {
     COMPREPLY=()
 
@@ -414,6 +451,8 @@ function _build() {
     done
     # -----------------------------------------------------
     cmake_list="all clean install "
+    # if "add_test " exists in CMakelist.txt file
+    cmake_list+=$(_cmakelists_add_test_exists)
     ACTIONS[cmake]="$cmake_list "
     for i in $cmake_list; do
         ACTIONS[$i]=" "

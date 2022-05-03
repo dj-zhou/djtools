@@ -18,12 +18,12 @@ function compile_make_build_etc() {
 
     # ------------------------------
     if [ -f "Makefile" ]; then
-        compile_makefile $clean_tag
+        _build_make $clean_tag
         return
     fi
     # ------------------------------
     if [ -f "CMakeLists.txt" ]; then
-        compile_cmakelist $clean_tag
+        _build_cmake $clean_tag
         return
     fi
     # ------------------------------
