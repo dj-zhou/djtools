@@ -45,7 +45,7 @@ function _build_meson_use_oesdk() { # sdk_path
             meson . $sdk_output -Db_sanitize=none
             cd $sdk_output
             ninja
-            echo -e " fresh build: dirctory \"${CYN}$sdk_output${NOC}\" exists"
+            echo -e " fresh build: dirctory \"${CYN}$sdk_output${NOC}\" exists, removed it."
             echo -e "sdk location: ${CYN}$sdk_path${NOC}"
             cd $cur_dir
 
@@ -323,17 +323,15 @@ function build() {
         return
     fi
     # ------------------------------
-    if [ $1 = 'meson' ]; then
-        # ------------------------------
-        if [ $2 = '-cross' ]; then
-            _build_meson_use_oesdk $3 $4 $5 $6 $7
-            return
-        fi
-        # ------------------------------
-        if [ $2 = '-native' ]; then
-            _build_meson_native $3 $4 $5 $6 $7
-            return
-        fi
+    if [ $1 = 'meson-cross' ]; then
+
+        shift 1
+        _build_meson_use_oesdk "$@"
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'meson-native' ]; then
+        _build_meson_native $3 $4 $5 $6 $7
         return
     fi
     # ------------------------------
@@ -356,7 +354,7 @@ function _build_main_meson_exists() {
             fi
         done <meson.build
         if [ $find_main_meson = '1' ]; then
-            echo "meson "
+            echo "meson-native meson-cross "
         else
             echo " "
         fi
@@ -414,6 +412,26 @@ function _cmakelists_add_test_exists() {
 }
 
 # =============================================================================
+function _meson_build_test_exists() {
+    if [ -f "meson.build" ]; then
+        find_test=0
+        while IFS='' read -r line || [[ -n "$line" ]]; do
+            if [[ $line == *"test("* ]]; then
+                find_test=1
+            fi
+        done <meson.build
+        if [ $find_test = '1' ]; then
+            echo "test "
+        else
+            echo " "
+        fi
+        return
+    fi
+
+    echo " "
+}
+
+# =============================================================================
 function _build() {
     COMPREPLY=()
 
@@ -445,7 +463,7 @@ function _build() {
     # -----------------------------------------------------
     cmake_list="all clean install "
     # if "add_test " exists in CMakelist.txt file
-    cmake_list+=$(_cmakelists_add_test_exists)
+    cmake_list+="$(_cmakelists_add_test_exists)"
     ACTIONS[cmake]="$cmake_list "
     for i in $cmake_list; do
         ACTIONS[$i]=" "
@@ -465,16 +483,20 @@ function _build() {
     done
 
     # -----------------------------------------------------
-    meson_list="-cross -native "
-    ACTIONS[meson]="$meson_list "
-    oesdk_list="$(ls -a ${HOME}/ | grep oesdk | sed 's/-oesdk//g') "
-    ACTIONS[-cross]="$oesdk_list "
-    for i in $oesdk_list; do
+    meson_cross_list="$(ls -a ${HOME}/ | grep oesdk | sed 's/-oesdk//g') "
+    ACTIONS["meson-cross"]="$meson_cross_list "
+    for i in $meson_cross_list; do
         ACTIONS[$i]="--conti --fresh "
     done
-    ACTIONS[-native]=" " # does not take --conti or --fresh option
-    ACTIONS[--conti]=" "
-    ACTIONS[--fresh]=" "
+    ACTIONS["--conti"]=" "
+    ACTIONS["--fresh"]=" "
+    # -----------------------------------------------------
+    meson_native_list="all "
+    meson_native_list+="$(_meson_build_test_exists)"
+    ACTIONS["meson-native"]="$meson_native_list"
+    for i in $meson_native_list; do
+        ACTIONS[$i]=" " # does not take --conti or --fresh option
+    done
 
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
