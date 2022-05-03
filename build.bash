@@ -7,7 +7,7 @@
 # it still says native build (meson/ninja)
 function _build_meson_use_oesdk() { # sdk_path
 
-    echo -e "Cross build using ${GRN}Meson${NOC} ..."
+    echo -e "Cross build using ${CYN}Meson${NOC} ..."
     if [ $# -lt 1 ]; then
         echo "build meson -cross: need the sdk path."
         return
@@ -39,28 +39,25 @@ function _build_meson_use_oesdk() { # sdk_path
         # if the curent directory contains the $sdk_output directory, then
         # rm $sdk_output -r
         # meson build && cd build && ninja
+        echo -e "${CYN}build meson -cross${NOC}"
         if [ -d $sdk_output ]; then
-            echo "containes a $sdk_output directory"
             rm $sdk_output/ -rf
             meson . $sdk_output -Db_sanitize=none
             cd $sdk_output
             ninja
-            echo -e "${GRN}build meson -cross${NOC}"
-            echo -e "    fresh build, contains $sdk_output/ directory."
-            echo -e "    sdk location: ${GRN}$sdk_path${NOC}"
+            echo -e " fresh build: dirctory \"${CYN}$sdk_output${NOC}\" exists"
+            echo -e "sdk location: ${CYN}$sdk_path${NOC}"
             cd $cur_dir
 
         # if the curent directory is $fb2_sdk_build_directory/, then
         elif [ $directory_name = "$sdk_output" ]; then
-            echo "inside a $sdk_output directory"
             cd ../
             rm $sdk_output/ -rf
             meson . $sdk_output -Db_sanitize=none
             cd $sdk_output
             ninja
-            echo -e "${GRN}build meson -cross${NOC}"
-            echo -e "    fresh build, in $sdk_output/ directory."
-            echo -e "    sdk location: ${GRN}$sdk_path${NOC}"
+            echo -e " fresh build: inside dirctory \"${CYN}$sdk_output${NOC}\""
+            echo -e "sdk location: ${CYN}$sdk_path${NOC}"
 
         # if in a subdirectory of $sdk_output/
         elif [[ "$cur_dir" = *"$sdk_output"* ]]; then
@@ -70,9 +67,8 @@ function _build_meson_use_oesdk() { # sdk_path
             meson . $sdk_output -Db_sanitize=none
             cd $sdk_output
             ninja
-            echo -e "${GRN}build meson -cross${NOC}"
-            echo -e "    fresh build, in $sdk_output/ sub-directory."
-            echo -e "    sdk location: ${GRN}$sdk_path${NOC}"
+            echo -e " fresh build: inside a sub-directory of \"${CYN}$sdk_output${NOC}\""
+            echo -e "sdk location: ${CYN}$sdk_path${NOC}"
             cd $cur_dir
 
         # if the current directory does not contain a $sdk_output/ directory,then
@@ -81,13 +77,12 @@ function _build_meson_use_oesdk() { # sdk_path
             meson . $sdk_output -Db_sanitize=none #  -Dprefix=/usr
             cd $sdk_output
             ninja
-            echo -e "${GRN}build meson -cross${NOC}"
-            echo -e "    fresh build, have created the $sdk_output/ directory"
-            echo -e "    sdk location: $sdk_path"
+            echo -e "${CYN}build meson -cross${NOC}"
+            echo -e " fresh build: create directory \"${CYN}$sdk_output${NOC}\""
+            echo -e "sdk location: ${CYN}$sdk_path${NOC}"
             cd $cur_dir
         else
-            echo -e "${GRN} build meson -cross${NOC}"
-            echo -e "    fresh build, but no meson.build file found, no build, exit!!"
+            echo -e " fresh build: ${RED}no meson.build file, exit!!${NOC}"
         fi
         _yocto_reset_env_variables
         rm -rf builddir # just a hack
@@ -97,6 +92,7 @@ function _build_meson_use_oesdk() { # sdk_path
     # ------------------------------------------------------------------
     # ------------------------------------------------------------------
     # if "--fresh" is not given, it is a contiue build
+    echo -e "${CYN}build meson -cross${NOC}"
 
     directory_name=$(basename "${PWD}")
     unset LD_LIBRARY_PATH
@@ -105,17 +101,16 @@ function _build_meson_use_oesdk() { # sdk_path
     if [ -d $sdk_output ]; then
         cd $sdk_output
         ninja
-        echo -e "${GRN}build meson -cross${NOC}"
-        echo -e "with \"--conti\" option: contains $sdk_output/ directory"
-        echo -e "sdk location: ${GRN}$sdk_path${NOC}"
+
+        echo -e "continue build: dirctory \"${CYN}$sdk_output${NOC}\" exists"
+        echo -e "  sdk location: ${CYN}$sdk_path${NOC}"
         cd $cur_dir
 
     # just in the $sdk_output/ directory
     elif [ $directory_name = "$sdk_output" ]; then
         ninja
-        echo -e "${GRN} build meson -cross${NOC}"
-        echo -e "with \"--conti\" option: in $sdk_output/ directory"
-        echo -e "sdk location: ${GRN}$sdk_path${NOC}"
+        echo -e "continue build: inside dirctory \"${CYN}$sdk_output${NOC}\""
+        echo -e " sdk location: ${CYN}$sdk_path${NOC}"
 
     # if the current path is ~/xx/$sdk_output/yy/zz --------
     elif [[ "$cur_dir" = *"$sdk_output"* ]]; then
@@ -124,12 +119,10 @@ function _build_meson_use_oesdk() { # sdk_path
         cd $sdk_build_path
         ninja
         cd $cur_dir
-        echo -e "${GRN}build meson -cross${NOC}"
-        echo -e "with \"--conti\" option: in $sdk_output/ sub-directory"
-        echo -e "    sdk location: ${GRN}$sdk_path${NOC}"
+        echo -e "continue build: inside a sub-directory of \"${CYN}$sdk_output${NOC}\""
+        echo -e "  sdk location: ${CYN}$sdk_path${NOC}"
     else
-        echo -e "${GRN}build meson -cross${NOC}"
-        echo -e "not in $sdk_output/ or its sub directory, no build, exit!!"
+        echo -e " continue build: ${RED}failed, exit!!${NOC}"
     fi
     _yocto_reset_env_variables
     rm -rf builddir # just a hack
@@ -141,7 +134,7 @@ function _build_meson_use_oesdk() { # sdk_path
 function _build_meson_native() {
     cur_dir=${PWD}
 
-    echo -e "use ${GRN}Meson${NOC} to build natively ..."
+    echo -e "use ${CYN}Meson${NOC} to build natively ..."
 
     proj_dir="_bnative.meson"
     if [ -f "meson.build" ]; then
@@ -165,7 +158,7 @@ function _build_meson_native() {
 
 # =============================================================================
 function _build_in_docker() {
-    echo -e "use ${GRN}Docker container${NOC} to build/clean ..."
+    echo -e "use ${CYN}Docker container${NOC} to build/clean ..."
     if ! [ -f "build-in-docker" ]; then
         echo "no build-in-docker file, exit."
         return
@@ -200,7 +193,7 @@ function _build_in_docker() {
 
 # =============================================================================
 function _build_make() {
-    echo -e "use ${GRN}Makefile${NOC} to build/clean/install ..."
+    echo -e "use ${CYN}Makefile${NOC} to build/clean/install ..."
     target_tag=$1
     if [ "$target_tag" = "clean" ]; then
         echo -e "${GRN}make clean${NOC}"
@@ -231,7 +224,7 @@ function _build_make() {
     bss_used=$(arm-none-eabi-size -B -d bin/*.elf | awk '{print $3}')
     bss_used=$(echo $bss_used | awk '{print $2}')
     ram_percentage=$(awk "BEGIN {print $((bss_used)) * 100  / $((ram_kb)) / 1024}" | awk '{printf("%d",$0);}')
-    echo -e "${GRN}\n------------------------------------${NOC}"
+    echo -e "${CYN}\n------------------------------------${NOC}"
     echo -e "${micro_controller} memory usage summary\nFLASH: ${flash_percentage}%, RAM: ${ram_percentage}%\n"
 }
 
@@ -242,7 +235,7 @@ function _build_cmake() {
     if [[ -z "$target_tag" ]]; then
         target_tag="all"
     fi
-    echo -e "${GRN}CMakeLists.txt${NOC}: ${GRN}$target_tag${NOC} ..."
+    echo -e "${CYN}CMakeLists.txt${NOC}: ${CYN}$target_tag${NOC} ..."
     cur_dir=${PWD}
     build_dir="_bnative.cmake"
     # ---------------------------------------------------
