@@ -454,9 +454,10 @@ function popd_quiet() {
 function _show_and_run() {
     # show
     printf >&2 "run:"
-    for arg_show_and_run in "$@"; do
-        arg_show_and_run="${arg_show_and_run%\'/\'\\\'\'}"
-        printf >&2 " $GRN'%s'$NOC" "$arg_show_and_run"
+    local arg
+    for arg in "$@"; do
+        arg="${arg%\'/\'\\\'\'}"
+        printf >&2 " $GRN'%s'$NOC" "$arg"
     done
     printf >&2 "\n"
     # run
