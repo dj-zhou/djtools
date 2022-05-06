@@ -7,9 +7,9 @@
 # it still says native build (meson/ninja)
 function _build_meson_cross() { # sdk_path
 
-    echo -e "Cross build with ${CYN}meson.build${NOC} ..."
+    echo -e "${CYN}meson.build (cross)${NOC}: ..."
     if [ $# -lt 1 ]; then
-        echo "build meson -cross: need the sdk path."
+        echo "build meson-cross: need the sdk path, or \"clean\" target."
         return
     fi
     if [ $1 = "clean" ]; then
@@ -43,7 +43,7 @@ function _build_meson_cross() { # sdk_path
         # if the curent directory contains the $sdk_output directory, then
         # rm $sdk_output -r
         # meson build && cd build && ninja
-        echo -e "${CYN}build meson -cross${NOC}"
+        echo -e "${CYN}build meson-cross${NOC}"
         if [ -d $sdk_output ]; then
             rm $sdk_output/ -rf
             meson . $sdk_output -Db_sanitize=none
@@ -81,7 +81,7 @@ function _build_meson_cross() { # sdk_path
             meson . $sdk_output -Db_sanitize=none #  -Dprefix=/usr
             cd $sdk_output
             ninja
-            echo -e "${CYN}build meson -cross${NOC}"
+            echo -e "${CYN}build meson-cross${NOC}"
             echo -e " fresh build: create directory \"${CYN}$sdk_output${NOC}\""
             echo -e "sdk location: ${CYN}$sdk_path${NOC}"
             cd $cur_dir
@@ -96,7 +96,7 @@ function _build_meson_cross() { # sdk_path
     # ------------------------------------------------------------------
     # ------------------------------------------------------------------
     # if "--fresh" is not given, it is a contiue build
-    echo -e "${CYN}build meson -cross${NOC}"
+    echo -e "${CYN}build meson-cross${NOC}"
 
     directory_name=$(basename "${PWD}")
     unset LD_LIBRARY_PATH
@@ -137,19 +137,19 @@ function _build_meson_native() {
     proj_dir="_bnative.meson"
     # clean ----------------
     if [ $1 = "clean" ]; then
-        echo -e "${CYN}meson.build${NOC}: clean ..."
+        echo -e "${CYN}meson.build (native)${NOC}: clean ..."
         _show_and_run rm $proj_dir -rf
         return
     fi
     # test ----------------
     if [ $1 = "test" ]; then
-        echo -e "${CYN}meson.build${NOC}: test natively ..."
+        echo -e "${CYN}meson.build (native)${NOC}: test ..."
         echo "build meson-native test: todo"
         return
     fi
 
     # build ----------------
-    echo -e "${CYN}meson.build${NOC}: build natively ..."
+    echo -e "${CYN}meson.build (native)${NOC}: build ..."
 
     # exit if not a meson project
     if [ ! -f "meson.build" ]; then
