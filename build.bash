@@ -130,32 +130,39 @@ function _build_meson_use_oesdk() { # sdk_path
 
 # =============================================================================
 function _build_meson_native() {
+    proj_dir="_bnative.meson"
+    # clean ----------------
     if [ $1 = "clean" ]; then
         echo -e "${CYN}meson.build${NOC}: clean ..."
-    else
-        echo -e "${CYN}meson.build${NOC}: build natively ..."
+        _show_and_run rm $proj_dir -rf
+        return
+    fi
+    # test ----------------
+    if [ $1 = "test" ]; then
+        echo -e "${CYN}meson.build${NOC}: test natively ..."
+        echo "build meson-native test: todo"
+        return
     fi
 
-    cur_dir=${PWD}
-    proj_dir="_bnative.meson"
-    if [ -f "meson.build" ]; then
-        if [ ! -d "$proj_dir" ]; then
-            _show_and_run meson setup $proj_dir
-        fi
-        if [ ! -f "$proj_dir/build.ninja" ]; then
-            _show_and_run rm $proj_dir -rf
-            _show_and_run meson setup $proj_dir
-            rm -rf builddir # just a hack
-            return
-        fi
-        _show_and_run cd $proj_dir
-        _show_and_run ninja
-        cd $cur_dir && rm -rf builddir # just a hack
-    else
-        echo -e "${RED}not a meson project directory, exit!${NOC}"
+    # build ----------------
+    echo -e "${CYN}meson.build${NOC}: build natively ..."
+
+    # exit if not a meson project
+    if [ ! -f "meson.build" ]; then
+        echo -e "${RED}not a meson project, exit!${NOC}"
+        return
     fi
-    rm -rf builddir # just a hack
-    cd $cur_dir
+
+    if [ ! -d "$proj_dir" ]; then
+        _show_and_run meson setup $proj_dir
+    elif [ ! -f "$proj_dir/build.ninja" ]; then
+        _show_and_run rm $proj_dir -rf
+        _show_and_run meson setup $proj_dir
+
+    fi
+    pushd_quiet $proj_dir
+    ninja
+    popd_quiet
 }
 
 # =============================================================================
@@ -493,7 +500,7 @@ function _build() {
     ACTIONS["--conti"]=" "
     ACTIONS["--fresh"]=" "
     # -----------------------------------------------------
-    meson_native_list="all "
+    meson_native_list="all clean "
     meson_native_list+="$(_meson_build_test_exists)"
     ACTIONS["meson-native"]="$meson_native_list"
     for i in $meson_native_list; do

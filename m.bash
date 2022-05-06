@@ -49,5 +49,5 @@ function m() {
 
 # =============================================================================
 function mc() {
-    compile_make_build_etc clean
+    compile_make_build_etc "clean"
 }
