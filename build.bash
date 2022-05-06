@@ -5,11 +5,15 @@
 # problem:
 # on Ubuntu 18.04, the SDK .appolo-image-wandboard-poky-2.6.4-oesdk does not work!
 # it still says native build (meson/ninja)
-function _build_meson_use_oesdk() { # sdk_path
+function _build_meson_cross() { # sdk_path
 
-    echo -e "Cross build using ${CYN}Meson${NOC} ..."
+    echo -e "Cross build with ${CYN}meson.build${NOC} ..."
     if [ $# -lt 1 ]; then
         echo "build meson -cross: need the sdk path."
+        return
+    fi
+    if [ $1 = "clean" ]; then
+        _show_and_run rm _bcross* -rf
         return
     fi
     _save_current_env_variables
@@ -334,7 +338,7 @@ function build() {
     if [ $1 = 'meson-cross' ]; then
 
         shift 1
-        _build_meson_use_oesdk "$@"
+        _build_meson_cross "$@"
         return
     fi
     # ------------------------------
@@ -492,7 +496,7 @@ function _build() {
     done
 
     # -----------------------------------------------------
-    meson_cross_list="$(ls -a ${HOME}/ | grep oesdk | sed 's/-oesdk//g') "
+    meson_cross_list="clean $(ls -a ${HOME}/ | grep oesdk | sed 's/-oesdk//g') "
     ACTIONS["meson-cross"]="$meson_cross_list "
     for i in $meson_cross_list; do
         ACTIONS[$i]="--conti --fresh "
