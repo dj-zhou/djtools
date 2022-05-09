@@ -1632,7 +1632,7 @@ function _dj_setup_wireshark() {
         _show_and_run sudo cp /usr/bin/lib/* /usr/lib/x86_64-linux-gnu/
     fi
     cat <<eom
-To create your dissector:
+To create your own dissector:
 https://mika-s.github.io/wireshark/lua/dissector/2017/11/04/creating-a-wireshark-dissector-in-lua-1.html
 eom
 }

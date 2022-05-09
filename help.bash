@@ -1,5 +1,7 @@
 #!/bin/bash
 
+_help_list="apt_pkg auto-mount cu ffmpeg jupyter pipocom screen wireshark "
+
 # =============================================================================
 function _dj_help_apt_pkg_error() {
     cat <<eom
@@ -106,6 +108,19 @@ eom
 }
 
 # =============================================================================
+function _dj_help_wireshark() {
+    cat <<eom
+1. Capture CAN messages (example):
+    $ tcpdump -c 1000 -X -i can1 -w can1.pcap
+    (be cautious about tcpdump version)
+2. Create your own dissector:
+    https://mika-s.github.io/wireshark/lua/dissector/2017/11/04/creating-a-wireshark-dissector-in-lua-1.html
+3. Capture UDP/TCP messages:
+    $ todo
+eom
+}
+
+# =============================================================================
 function _dj_help_skill() {
     if [ $1 = 'apt_pkg' ]; then
         _dj_help_apt_pkg_error
@@ -133,6 +148,10 @@ function _dj_help_skill() {
     fi
     if [ $1 = 'screen' ]; then
         _dj_help_screen
+        return
+    fi
+    if [ $1 = 'wireshark' ]; then
+        _dj_help_wireshark
         return
     fi
 }
