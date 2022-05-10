@@ -7,7 +7,7 @@
 # it still says native build (meson/ninja)
 function _build_meson_cross() { # sdk_path
 
-    echo -e "${CYN}meson.build (cross)${NOC}: ..."
+    echo -e "${CYN}meson.build (cross)${NOC} ..."
     if [ $# -lt 1 ]; then
         echo "build meson-cross: need the sdk path, or \"clean\" target."
         return
@@ -134,19 +134,19 @@ function _build_meson_native() {
     proj_dir="_bnative.meson"
     # clean ----------------
     if [ $1 = "clean" ]; then
-        echo -e "${CYN}meson.build (native)${NOC}: clean ..."
+        echo -e "${CYN}meson.build (native)${NOC} clean ..."
         _show_and_run rm $proj_dir -rf
         return
     fi
     # test ----------------
     if [ $1 = "test" ]; then
-        echo -e "${CYN}meson.build (native)${NOC}: test ..."
+        echo -e "${CYN}meson.build (native)${NOC} test ..."
         echo "build meson-native test: todo"
         return
     fi
 
     # build ----------------
-    echo -e "${CYN}meson.build (native)${NOC}: build ..."
+    echo -e "${CYN}meson.build (native)${NOC} build ..."
 
     # exit if not a meson project
     if [ ! -f "meson.build" ]; then
@@ -167,10 +167,11 @@ function _build_meson_native() {
 }
 
 # =============================================================================
+docker_sh_file="build-in-container"
 function _build_in_docker() {
     echo -e "use ${CYN}Docker container${NOC} to build/clean ..."
-    if ! [ -f "build-in-docker" ]; then
-        echo "no build-in-docker file, exit."
+    if ! [ -f "$docker_sh_file" ]; then
+        echo "no $docker_sh_file file, exit."
         return
     fi
     if ! [ -f "docker/Dockerfile" ]; then
@@ -179,7 +180,7 @@ function _build_in_docker() {
     fi
     target_tag="$1"
     if [[ -z "$target_tag" || "$target_tag" = "all" ]]; then
-        ./build-in-docker
+        ./$docker_sh_file
         return
     fi
     if [[ "$target_tag" = "clean" ]]; then
@@ -203,21 +204,18 @@ function _build_in_docker() {
 
 # =============================================================================
 function _build_make() {
-    echo -e "use ${CYN}Makefile${NOC} to build/clean/install ..."
+    echo -e "${CYN}Makefile${NOC} ..."
     target_tag=$1
     if [ "$target_tag" = "clean" ]; then
-        echo -e "${GRN}make clean${NOC}"
-        make clean
+        _show_and_run make clean
         return
     fi
     if [ "$target_tag" = "install" ]; then
-        echo -e "${GRN}sudo make install${NOC}"
-        sudo make install
+        _show_and_run sudo make install
         return
     fi
 
-    echo -e "${GRN}make -j$(nproc) $target_tag${NOC}"
-    make -j$(nproc) $target_tag
+    _show_and_run make -j$(nproc) $target_tag
 
     # stm32 project dedicated scripts, can be moved into Makefile
     if [ ! -f .project-stm32 ] || [ ! -f bin/*.elf ]; then
@@ -394,7 +392,8 @@ function _build_makefile_exists() {
 
 # =============================================================================
 function _build_build_docker_exists() {
-    if [[ -f "build-in-docker" ]] && [[ -f "docker/build" ]] && [[ -f "docker/Dockerfile" ]]; then
+    if [[ -f "$docker_sh_file" ]] &&
+        [[ -f "docker/build" ]] && [[ -f "docker/Dockerfile" ]]; then
         echo "docker "
         return
     fi
@@ -446,7 +445,7 @@ function _build() {
     COMPREPLY=()
 
     # All possible first values in command line
-    service="template"
+    service="template "
     service+=$(_build_build_docker_exists)
     service+=$(_build_cmakelists_exists)
     service+=$(_build_makefile_exists)
