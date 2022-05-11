@@ -28,6 +28,9 @@ function compile_make_build_etc() {
         fi
         if [ -f "meson.build" ]; then
             _build_meson_native "$target"
+            if [ "$target" = "clean" ]; then
+                _build_meson_cross "clean"
+            fi
         fi
         return
     fi
