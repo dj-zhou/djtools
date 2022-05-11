@@ -1793,9 +1793,8 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    help_list="apt_pkg auto-mount cu ffmpeg jupyter pipocom screen "
-    ACTIONS[help]="$help_list "
-    for i in $help_list; do
+    ACTIONS[help]="$_help_list "
+    for i in $_help_list; do
         ACTIONS[$i]=" "
     done
 

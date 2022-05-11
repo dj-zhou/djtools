@@ -1622,7 +1622,19 @@ function _dj_setup_windows_fonts() {
 
 # =============================================================================
 function _dj_setup_wireshark() {
-    echo "todo: https://www.wireshark.org/#download"
+    sudo add-apt-repository ppa:wireshark-dev/stable
+    sudo apt-get update -y
+    _install_if_not_installed wireshark
+    _show_and_run sudo adduser $USER wireshark
+    if [ -f /usr/bin/lib/libQt5XcbQpa.so.5 ]; then
+        echo "to solve the following error had seen before:"
+        echo -e "${YLW}wireshark: relocation error: /usr/bin/plugins/platforms/../../lib/libQt5XcbQpa.so.5: symbol _ZdlPvm version Qt_5 not defined in file libQt5Core.so.5 with link time reference${NOC}"
+        _show_and_run sudo cp /usr/bin/lib/* /usr/lib/x86_64-linux-gnu/
+    fi
+    cat <<eom
+To create your own dissector:
+https://mika-s.github.io/wireshark/lua/dissector/2017/11/04/creating-a-wireshark-dissector-in-lua-1.html
+eom
 }
 
 # =============================================================================

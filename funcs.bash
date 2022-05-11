@@ -331,17 +331,17 @@ function _check_if_package_installed() {
 # =============================================================================
 # should find a better way to install
 function _install_if_not_installed() {
-    cur_dir_install=$PWD
+    local cur_dir_install=$PWD
     for package in "$@"; do
         if [[ "no" = $(_check_if_package_installed $package) ]]; then
-            echo -e "installing $GRN$package$NOC$NOC"
+            echo -e "$CYNinstalling $package$NOC$NOC"
             # bug: /var/lib/dpkg/lock-frontend, etc, errors will not be seen
             sudo apt-get install -y $package &>/dev/null
         else
-            echo -e "$GRN$package$NOC is already installed"
+            echo -e "$CYN$package is already installed$NOC"
         fi
     done
-    cd $cur_dir_install && unset cur_dir_install
+    cd $cur_dir_install
 }
 
 # =============================================================================
