@@ -23,7 +23,7 @@ function compile_make_build_etc() {
     fi
     # ------------------------------
     if [[ -f "CMakeLists.txt" || -f "meson.build" ]]; then
-        if [ -f "meson.build" ]; then
+        if [ -f "CMakeLists.txt" ]; then
             _build_cmake "$target"
         fi
         if [ -f "meson.build" ]; then
