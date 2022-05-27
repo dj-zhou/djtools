@@ -18,8 +18,8 @@ function _dj_help() {
     echo "-----------------------------------------------------"
     echo -e "\nFirst level commands:"
     echo "   setup         - to install some software"
-    echo "   clone         - clone a repo from github/gitee/bitbucket"
-    echo "   ssh-clone     - use ssh protocol to clone a repo from github/gitee/bitbucket"
+    echo "   clone         - clone a repo from github/bitbucket"
+    echo "   ssh-clone     - use ssh protocol to clone a repo from github/bitbucket"
     echo "   udev          - udev rule setup for usb devices"
     echo "   work-check    - check work status of all repos in a folder"
     echo -e ""
@@ -1468,8 +1468,7 @@ function dj() {
         if [ $2 = 'ssh-clone' ]; then
             # --------------------------
             if [[ "$3" = 'bitbucket' ||
-                "$3" = 'github' ||
-                "$3" = 'gitee' ]]; then
+                "$3" = 'github' ]]; then
                 shift 2
                 _dj_git_ssh_clone_from $@
                 return
@@ -1648,7 +1647,7 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ACTIONS[clone]="bitbucket github gitee "
+    ACTIONS[clone]="bitbucket github "
 
     # --------------------------------------------------------
     flame_list="generate clear help "
@@ -1767,7 +1766,7 @@ function _dj() {
     done
 
     # --------------------------------------------------------
-    ACTIONS["ssh-clone"]="bitbucket github gitee "
+    ACTIONS["ssh-clone"]="bitbucket github "
     # --------------------------------------------------------
     bitbucket_repos="$(_dj_clone_repo_list bitbucket) "
     ACTIONS[bitbucket]+="$bitbucket_repos "
@@ -1780,13 +1779,6 @@ function _dj() {
     ACTIONS[github]+="$github_repos "
     ACTIONS[github]+="--add "
     for i in $github_repos; do
-        ACTIONS[$i]=" "
-    done
-    # --------------------------------------------------------
-    gitee_repos="$(_dj_clone_repo_list gitee) "
-    ACTIONS[gitee]+="$gitee_repos "
-    ACTIONS[gitee]+="--add "
-    for i in $gitee_repos; do
         ACTIONS[$i]=" "
     done
     ACTIONS[--add]=" "

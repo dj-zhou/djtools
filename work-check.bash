@@ -12,8 +12,6 @@ function _work_check_git_source() {
         git_source="BitBucket"
     elif [[ $git_remote_v = *"github"* ]]; then
         git_source="GitHub"
-    elif [[ $git_remote_v = *"gitee"* ]]; then
-        git_source="GiTee"
     else
         git_source="----"
     fi
