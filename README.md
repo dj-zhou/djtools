@@ -7,7 +7,7 @@ Supported system: Ubuntu 18.04/20.04. Note that Ubuntu 18.04 is not fully tested
 
 ### Installation
 
-The installation script will install some necessary software, and will make the bash scripts in this repo valid by putting **BitBucket/GitHub/GiTee usernames** into **~/.bashrc**, which, will source the **djtools.bash** every time when opening a new terminal.
+The installation script will install some necessary software, and will make the bash scripts in this repo valid by putting **BitBucket/GitHub usernames** into **~/.bashrc**, which, will source the **djtools.bash** every time when opening a new terminal.
 
 ```bash
 cd /path/to/djtools
@@ -27,11 +27,7 @@ Do you have a GitHub username? [Yes/No]
 y
 Please enter your GitHub username:
 dj-zhou
-Do you have a GiTee username? [Yes/No]
-y
-Please enter your GiTee username:
-d-zhou
-If bitbucket/github/gitee usernames set wrong, you can still edit them in ~/.bashrc
+If bitbucket/github usernames set wrong, you can still edit them in ~/.bashrc
 djtools installation finished.
 ```
 
@@ -42,16 +38,14 @@ After the installation, you will get those (similar) lines in `~/.bashrc`:
 # djtools setup
 bitbucket_username=sky-Hawk
 github_username=dj-zhou
-gitee_username=dj-zhou
 source /home/robot/workspace/djtools/djtools.bash
 ```
 
 Meanwhile, there are three files generated in `~` directory:
 
 ```text
-.BitBucket-repos-sky-Hawk
-.GiTee-repos-d-zhou
-.GitHub-repos-dj-zhou
+.bitbucket-repos-sky-Hawk
+.github-repos-dj-zhou
 ```
 
 You can put the names of repositories into theses files to enable the **tab completable** feature of  `dj git ssh-clone` commands.
@@ -186,7 +180,7 @@ Used to check if the repositories have been pushed, for example, the following c
 dj work-check .
 ```
 
-will check all the folders (possibly repositories) in the current folder (`.`), and tell if the repo is <span style="color:red">dirty</span>,  <span style="color:blue">ahead</span> or <span style="color:cyan">behind</span>, or <span style="color:yellow">upstream-gone</span>, Meanwhile, it will write those information: commit time, source (github/bitbucket/gitee, etc), status (dirty/ahead/behind), branch name, the tag, commit value, commit message, to a text file in the home directory. For example: `work-check-dj-dell-20200709-121415.txt`.
+will check all the folders (possibly repositories) in the current folder (`.`), and tell if the repo is <span style="color:red">dirty</span>,  <span style="color:blue">ahead</span> or <span style="color:cyan">behind</span>, or <span style="color:yellow">upstream-gone</span>, Meanwhile, it will write those information: commit time, source (github/bitbucket, etc), status (dirty/ahead/behind), branch name, the tag, commit value, commit message, to a text file in the home directory. For example: `work-check-dj-dell-20200709-121415.txt`.
 
 It is recommended to run this command to see if there is some work have not been finished, committed or pushed.
 

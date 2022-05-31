@@ -22,7 +22,7 @@ echo '# djtools setup' >>~/.bashrc
 
 # =============================================================================
 # get bitbucket/github, etc, user name
-repo_source="github gitee bitbucket"
+repo_source="github bitbucket"
 for rs in $repo_source; do
     # -----------------------------------------------------------------
     echo -e "Please enter your $rs username [empty answer means no account]: "

@@ -5,8 +5,6 @@ function _dj_clone_repo_list() { # platform
     platform="$1"
     if [ $platform = 'github' ]; then
         file=$HOME/.$platform-repos-$github_username
-    elif [ $platform = 'gitee' ]; then
-        file=$HOME/.$platform-repos-$gitee_username
     elif [ $platform = 'bitbucket' ]; then
         file=$HOME/.$platform-repos-$bitbucket_username
     fi
@@ -27,7 +25,6 @@ function _dj_clone_help() {
  Second level commands:
     bitbuket - to clone repo from BitBucket
     github   - to clone repo from GitHub
-    gitee    - to clone repo from GiTee
 
  Third level argument:
     --add        - to add the $4 argument into a repo file in ~ directory
@@ -49,10 +46,6 @@ function _dj_clone_find_username() {
         echo $github_username
         return
     fi
-    if [ "$platform" = 'gitee' ]; then
-        echo $gitee_username
-        return
-    fi
 }
 
 # =============================================================================
@@ -64,10 +57,6 @@ function _dj_clone_find_link() {
     fi
     if [ "$platform" = 'github' ]; then
         echo "github.com"
-        return
-    fi
-    if [ "$platform" = 'gitee' ]; then
-        echo "gitee.com"
         return
     fi
 }
