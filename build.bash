@@ -48,7 +48,7 @@ function _build_meson_cross() { # sdk_path
             meson . $sdk_output -Db_sanitize=none
             cd $sdk_output
             ninja
-            echo -e " fresh build: dirctory \"${CYN}$sdk_output${NOC}\" exists, removed it."
+            echo -e " fresh build: directory \"${CYN}$sdk_output${NOC}\" exists, removed it."
             echo -e "sdk location: ${CYN}$sdk_path${NOC}"
             cd $cur_dir
 
@@ -59,7 +59,7 @@ function _build_meson_cross() { # sdk_path
             meson . $sdk_output -Db_sanitize=none
             cd $sdk_output
             ninja
-            echo -e " fresh build: inside dirctory \"${CYN}$sdk_output${NOC}\""
+            echo -e " fresh build: inside directory \"${CYN}$sdk_output${NOC}\""
             echo -e "sdk location: ${CYN}$sdk_path${NOC}"
 
         # if in a subdirectory of $sdk_output/
@@ -103,14 +103,14 @@ function _build_meson_cross() { # sdk_path
         cd $sdk_output
         ninja
 
-        echo -e "continue build: dirctory \"${CYN}$sdk_output${NOC}\" exists"
+        echo -e "continue build: directory \"${CYN}$sdk_output${NOC}\" exists"
         echo -e "  sdk location: ${CYN}$sdk_path${NOC}"
         cd $cur_dir
 
     # just in the $sdk_output/ directory
     elif [ $directory_name = "$sdk_output" ]; then
         ninja
-        echo -e "continue build: inside dirctory \"${CYN}$sdk_output${NOC}\""
+        echo -e "continue build: inside directory \"${CYN}$sdk_output${NOC}\""
         echo -e " sdk location: ${CYN}$sdk_path${NOC}"
 
     # if the current path is ~/xx/$sdk_output/yy/zz --------

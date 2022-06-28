@@ -1097,7 +1097,7 @@ function _dj_setup_meson_ninjia() {
 
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf ninja
-    git clone git://github.com/ninja-build/ninja.git && cd ninja
+    git clone https://github.com/ninja-build/ninja.git && cd ninja
     git checkout v$ninja_v
     mkdir build && cd build
     cmake ..
