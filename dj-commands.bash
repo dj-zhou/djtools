@@ -87,7 +87,7 @@ function _create_can_analyzer_desktop_item() {
 
     sudo chmod +x $folder/$file
 
-    echo -e "${YLW}if cubeMX is not installed to ~/soft/can-analyzer/, you need to revise file:${NOC}"
+    echo -e "${YLW}if CAN Analyzer is not installed to ~/soft/can-analyzer/, you need to revise file:${NOC}"
     echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
 }
 
