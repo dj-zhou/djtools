@@ -22,7 +22,7 @@ function _yocto_check_is_a_build_directory() {
 function _yocto_find_variable_in_file() { # $variable $file
     variable=$1
     file=$2
-    # --------------------------------------------------------
+    # ----------------------------------------
     # form 1: MACHINE = "xxxx", MACHINE = 'xxxx'
     value=$(grep "^$variable = " $file | awk '{print $3 }' |
         sed 's/"//g' | sed "s/'//g")
@@ -30,7 +30,7 @@ function _yocto_find_variable_in_file() { # $variable $file
         echo $value
         return
     fi
-    # --------------------------------------------------------
+    # ----------------------------------------
     # form 2: MACHINE ?= "xxxx", MACHINE ?= 'xxxx'
     value=$(grep "^$variable ?= " $file | awk '{print $3 }' |
         sed 's/"//g' | sed "s/'//g")
@@ -38,7 +38,7 @@ function _yocto_find_variable_in_file() { # $variable $file
         echo $value
         return
     fi
-    # --------------------------------------------------------
+    # ----------------------------------------
     # form 3: MACHINE ??= "xxxx", MACHINE ??= 'xxxx'
     value=$(grep "^$variable ??= " $file | awk '{print $3 }' |
         sed 's/"//g' | sed "s/'//g")
@@ -46,7 +46,7 @@ function _yocto_find_variable_in_file() { # $variable $file
         echo $value
         return
     fi
-    # --------------------------------------------------------
+    # ----------------------------------------
     # not found, return empty string, there maybe some other forms
     # echo "not found, return empty string " >&2
     echo " "
@@ -316,7 +316,7 @@ function _yocto_find_bmap_file() { # $wic_file
 
 # =============================================================================
 # find a file in current directory, excluding the build directory
-function _yocto_show_a_file() { # file_full_name filter
+function _yocto_show_bb_or_inc() { # file_full_name filter
     cur_dir=${PWD}
 
     file_full_name=$1
@@ -334,15 +334,18 @@ function _yocto_show_a_file() { # file_full_name filter
         find_files=$(find -name "*$file_full_name")
         not_shown_folder_name=1
         if [ ! -z "$find_files" ]; then
-
             for file in $find_files; do
                 if [[ "$file" = *"$filter"* ]]; then
                     if [ $not_shown_folder_name = 1 ]; then
-                        echo -e "\n-------------------------------------------------------"
-                        echo -e "${HGRN}$folder_name/${NOC}"
+                        echo -e "\n---------------------------------------"
+                        echo -e "${HGRN}$folder_name${NOC}"
                         not_shown_folder_name=0
                     fi
-                    echo "$file"
+                    if [[ "$file" = *".bb" ]]; then
+                        echo "$file.bb"
+                    elif [[ "$file" = *".inc" ]]; then
+                        echo "$file.inc"
+                    fi
                 fi
             done
         fi
@@ -368,13 +371,13 @@ function _yocto_show_conf() { # filter
         conf_full_name="$conf_name*.conf"
     fi
 
-    _yocto_show_a_file $conf_full_name $filter
+    _yocto_show_bb_or_inc $conf_full_name $filter
 }
 
 # =============================================================================
 function _yocto_show_bb_file() { #filter
     if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
-        echo -e "\n this is a build directory, stop searching, exit!!\n" >&2
+        echo -e "${YLW}this is a build directory, stop searching, exit!!${NOC}" >&2
         return
     fi
 
@@ -383,36 +386,17 @@ function _yocto_show_bb_file() { #filter
     exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
     # find bb file ---------------
     if [ "$exact_vague" = "exact" ]; then
-        bb_full_name="$bb_name.bb"
+        bb_full_name="$bb_name"
     else
-        bb_full_name="$bb_name*.bb"
+        bb_full_name="$bb_name*"
     fi
-    _yocto_show_a_file $bb_full_name $filter
-}
-
-# =============================================================================
-function _yocto_show_inc_file() { #filter
-    if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
-        echo -e "\n this is a build directory, stop searching, exit!!\n" >&2
-        return
-    fi
-
-    bb_name=$1
-    filter=$2
-    exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
-    # find bb file ---------------
-    if [ "$exact_vague" = "exact" ]; then
-        bb_full_name="$bb_name.inc"
-    else
-        bb_full_name="$bb_name*.inc"
-    fi
-    _yocto_show_a_file $bb_full_name $filter
+    _yocto_show_bb_or_inc $bb_full_name $filter
 }
 
 # =============================================================================
 function _yocto_list_things() {
     if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
-        echo "in a build directory, exit!"
+        echo "${YLW}in a build directory, exit!${NOC}"
         return
     fi
     cur_dir=${PWD}
@@ -431,8 +415,8 @@ function _yocto_list_things() {
         for loop in "./" "./*/" "./*/*/" "./*/*/*/"; do
             find_x=$(ls ${loop}${things} 2>/dev/null)
             if [[ ! -z "$find_x" ]]; then
-                echo -e "\n${GRN}---------------------------------------"
-                echo -e "$(basename $item)${NOC}"
+                echo -e "\n---------------------------------------"
+                echo -e "${HGRN}$(basename $item)${NOC}"
                 echo "$find_x"
             fi
         done
@@ -459,7 +443,7 @@ function _yocto_list_resources() {
 
     for item in ./*; do
         if [[ -d $item ]] && ([[ -d $item/.git ]] || [[ -f $item/.git ]]); then
-            echo -e "\n${GRN}----------------------------------------------${NOC}"
+            echo -e "\n----------------------------------------------"
             cd $item
             folder_name=$(basename "$item")
             printf "${HGRN}$folder_name${NOC}"

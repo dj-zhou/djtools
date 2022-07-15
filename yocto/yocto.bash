@@ -250,16 +250,12 @@ function yocto() {
             _yocto_show_conf $3 "machine" $4 $5 $6 $7 $8 $9
             return
         fi
-        if [ $2 = 'image-bb' ]; then
+        if [ $2 = 'image-bb-inc' ]; then
             _yocto_show_bb_file $3 "image" $4 $5 $6 $7 $8 $9
             return
         fi
-        if [ $2 = 'recipe-bb' ]; then
+        if [ $2 = 'recipe-bb-inc' ]; then
             _yocto_show_bb_file $3 "recipe" -e vague
-            return
-        fi
-        if [ $2 = 'image-inc' ]; then
-            _yocto_show_inc_file $3 "image" $4 $5 $6 $7 $8 $9
             return
         fi
         return
@@ -339,7 +335,7 @@ function _yocto() {
     done
 
     # ------------------------------------------------------------------------
-    show_list="distro-conf machine-conf image-bb recipe-bb "
+    show_list="distro-conf machine-conf image-bb-inc recipe-bb-inc "
     ACTIONS[show]+="$show_list "
     for i in $show_list; do
         ACTIONS[$i]=" "
