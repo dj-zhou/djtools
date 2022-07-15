@@ -58,7 +58,7 @@ function _yocto_bake_recipe() { # full recipe name
 
 # bmaptool needs to be the one from the SDK (i.e. ~/.--oesdk/xx/yy/environment-setup-armv7vet2hf-neon-fb-linux-gnueabi)
 # however, in this script, we "source ../poky/oe-init-build-env ." and it still works fine
-function _yocto_flash() { # block-device # image-file
+function _yocto_flash() { # block-device # image-file # "--skip"
     # argument check -------------------
     if [ $# -lt 1 ]; then
         echo -e "usage:\n   yocto flash /dev/sdx <image name>"
@@ -145,10 +145,14 @@ function _yocto_flash() { # block-device # image-file
     # if [[ "$image_file"=*"wic.gz" || "$image_file"=*"wic.zst" ]] ; then
     if [[ ${image_file} = *'wic.gz'* || ${image_file} = *'wic.zst'* ]]; then
         # try always run this before flashing ------------------
-        echo -e "-----------------------------\n"
-        echo -e "run ${GRN}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
-        _press_enter_or_wait_s_continue 2
-        bitbake bmap-tools-native -caddto_recipe_sysroot
+        if [[ $# = 3 && $3 = "--skip" ]]; then
+            echo -e "skip bitbake check, flash ..."
+        else
+            echo -e "-----------------------------\n"
+            echo -e "run ${GRN}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
+            _press_enter_or_wait_s_continue 2
+            bitbake bmap-tools-native -caddto_recipe_sysroot
+        fi
         if [[ -f "$bmap_file" ]]; then
             # the following command need to use a *.wic.bmap file in the same path
             # of the wic.gz file
