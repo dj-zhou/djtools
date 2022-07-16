@@ -341,10 +341,8 @@ function _yocto_show_bb_or_inc() { # file_full_name filter
                         echo -e "${HGRN}$folder_name${NOC}"
                         not_shown_folder_name=0
                     fi
-                    if [[ "$file" = *".bb" ]]; then
-                        echo "$file.bb"
-                    elif [[ "$file" = *".inc" ]]; then
-                        echo "$file.inc"
+                    if [[ "$file" = *".bb" || "$file" = *".inc" ]]; then
+                        echo "$file"
                     fi
                 fi
             done
