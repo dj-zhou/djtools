@@ -69,8 +69,8 @@ function _yocto_flash() { # block-device # image-file # "--skip"
     dev_str=$1
     dev=$(_verify_block_device $dev_str)
     if [ -z $dev ]; then
-        echo -e "\n block device $dev not found, exit!!"
-        echo -e " you can use command \"lsblk\" to find it."
+        echo -e "${RED}block device $dev_str not found, exit!!${NOC}"
+        echo -e "you can use command \"lsblk\" to find it."
         return
     fi
     echo -e "          SD card: ${GRN}$dev${NOC}"
