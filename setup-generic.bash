@@ -1243,6 +1243,8 @@ function _dj_setup_nodejs() {
     # nvm install $nodejs_v
 
     # popd_quiet
+
+    # https://stackoverflow.com/a/36401038
     if [["${ubuntu_v}" = *'18.04'* ]]; then
         _install_if_not_installed git-core curl build-essential openssl libssl-dev
         pushd_quiet ${PWD}
@@ -1250,13 +1252,17 @@ function _dj_setup_nodejs() {
 
         v=$(_find_package_version nodejs)
         # nodejs is a huge package, do not build it from scratch
-        if [ ! -d node ]; then
-        git clone https://github.com/nodejs/node.git
-        cd node
+        if [[ ! -d node ]]; then
+            git clone https://github.com/nodejs/node.git
+            cd node
         else
-            cd node && git checkout master && git fetch -p && git pull
-            fi
-         && git checkout v$v && ./configure
+            cd node
+            git checkout master
+            git fetch -p
+            git pull
+        fi
+        git checkout v$v
+        ./configure
         make -j$(nproc) && sudo make install
 
         popd_quiet
