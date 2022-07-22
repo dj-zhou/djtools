@@ -1221,28 +1221,56 @@ function _dj_setup_nlohmann_json3_dev() {
 # use nvm (node version management) to install nodejs
 # https://github.com/nvm-sh/nvm#installing-and-updating
 function _dj_setup_nodejs() {
-    pushd_quiet ${PWD}
-    cd ~ && mkdir -p soft/ && cd soft/
+    # pushd_quiet ${PWD}
+    # cd ~ && mkdir -p soft/ && cd soft/
 
-    # install nvm to ${HOME}/.nvm -----------
-    if [ ! -d ${HOME}/.nvm ]; then
-        nvm_v=$(_find_package_version nvm)
-        _echo_install nvm $nvm_v
-        _press_enter_or_wait_s_continue 2
+    # # install nvm to ${HOME}/.nvm -----------
+    # if [ ! -d ${HOME}/.nvm ]; then
+    #     nvm_v=$(_find_package_version nvm)
+    #     _echo_install nvm $nvm_v
+    #     _press_enter_or_wait_s_continue 2
 
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_v/install.sh | bash
-        export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" ||
-            printf %s "${XDG_CONFIG_HOME}/nvm")"
-        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    #     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_v/install.sh | bash
+    #     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" ||
+    #         printf %s "${XDG_CONFIG_HOME}/nvm")"
+    #     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    # fi
+    # # install nodejs -----------
+    # nodejs_v=$(_find_package_version nodejs)
+    # _echo_install nodejs $nodejs_v
+    # _press_enter_or_wait_s_continue 2
+
+    # nvm install $nodejs_v
+
+    # popd_quiet
+    if [["${ubuntu_v}" = *'18.04'* ]]; then
+        _install_if_not_installed git-core curl build-essential openssl libssl-dev
+        pushd_quiet ${PWD}
+        cd ~ && mkdir -p soft/ && cd soft/
+
+        v=$(_find_package_version nodejs)
+        # nodejs is a huge package, do not build it from scratch
+        if [ ! -d node ]; then
+        git clone https://github.com/nodejs/node.git
+        cd node
+        else
+            cd node && git checkout master && git fetch -p && git pull
+            fi
+         && git checkout v$v && ./configure
+        make -j$(nproc) && sudo make install
+
+        popd_quiet
+        return
     fi
-    # install nodejs -----------
-    nodejs_v=$(_find_package_version nodejs)
-    _echo_install nodejs $nodejs_v
-    _press_enter_or_wait_s_continue 2
-
-    nvm install $nodejs_v
-
-    popd_quiet
+    # need test
+    if [["${ubuntu_v}" = *'20.04'* ]]; then
+        sudo apt install nodejs
+        cat <<eom
+--------------------------------------------
+Check nodejs version: $ node -v
+--------------------------------------------
+eom
+    fi
 }
 
 # =============================================================================
