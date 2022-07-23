@@ -1245,7 +1245,7 @@ function _dj_setup_nodejs() {
     # popd_quiet
 
     # https://stackoverflow.com/a/36401038
-    if [["${ubuntu_v}" = *'18.04'* ]]; then
+    if [[ "${ubuntu_v}" = *'18.04'* || "${ubuntu_v}" = *'20.04'* ]]; then
         _install_if_not_installed git-core curl build-essential openssl libssl-dev
         pushd_quiet ${PWD}
         cd ~ && mkdir -p soft/ && cd soft/
@@ -1267,15 +1267,6 @@ function _dj_setup_nodejs() {
 
         popd_quiet
         return
-    fi
-    # need test
-    if [["${ubuntu_v}" = *'20.04'* ]]; then
-        sudo apt install nodejs
-        cat <<eom
---------------------------------------------
-Check nodejs version: $ node -v
---------------------------------------------
-eom
     fi
 }
 

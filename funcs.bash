@@ -334,7 +334,7 @@ function _install_if_not_installed() {
     local cur_dir_install=$PWD
     for package in "$@"; do
         if [[ "no" = $(_check_if_package_installed $package) ]]; then
-            echo -e "$CYNinstalling $package$NOC$NOC"
+            echo -e "${CYN}installing $package$NOC"
             # bug: /var/lib/dpkg/lock-frontend, etc, errors will not be seen
             sudo apt-get install -y $package &>/dev/null
         else
