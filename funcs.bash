@@ -463,3 +463,11 @@ function _show_and_run() {
     # run
     "$@"
 }
+
+# =============================================================================
+function _tic_toc_run() {
+    start_time=$(date +%s)
+    _show_and_run "$@"
+    end_time=$(date +%s)
+    echo -e "run time: $((end_time - start_time)) seconds"
+}
