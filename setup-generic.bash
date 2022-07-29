@@ -1486,33 +1486,8 @@ function _dj_setup_serial_console() {
 # =============================================================================
 function _dj_setup_spdlog() { # static/shared
     static_shared=$1          # if empty, treat as dynamic
-    echo -e "------------------------------"
-    echo -e " ${GRN}which version are you going to install?${NOC}"
-    echo -e " 1: v1.6.0"
-    echo -e " 2: v1.6.1"
-    echo -e " 3: v1.7.0 (default)"
-    echo -e " 4: v1.8.0"
 
-    echo -e "${GRN}please enter a number from 1 to 4:${NOC}"
-    read asw
-    case "$asw" in
-    "1")
-        version="v1.6.0"
-        ;;
-    "2")
-        version="v1.6.1"
-        ;;
-    "3")
-        version="v1.7.0"
-        ;;
-    "4")
-        version="v1.8.0"
-        ;;
-    *)
-        echo -e "${YLW}wrong input, set to v1.7.0.${NOC}"
-        version="v1.7.0"
-        ;;
-    esac
+    v=$(_find_package_version spdlog)
     pushd_quiet ${PWD}
 
     _show_and_run sudo rm -f /usr/local/lib/libspdlog.a
@@ -1521,14 +1496,14 @@ function _dj_setup_spdlog() { # static/shared
     _show_and_run sudo rm -f /usr/local/lib/pkgconfig/spdlog.pc
     _show_and_run sudo rm -rf /usr/local/lib/cmake/spdlog/
 
-    _echo_install spdlog $version
+    _echo_install spdlog v$v
     _press_enter_or_wait_s_continue 5
 
     cd ~ && mkdir -p soft && cd soft/
     rm spdlog -rf
 
-    git clone https://github.com/gabime/spdlog.git -b $version
-    cd spdlog && mkdir build && cd build
+    git clone https://github.com/gabime/spdlog.git
+    cd spdlog && git checkout v$v && mkdir build && cd build
 
     # static build need to be specific
     # if no option found, "shared" is default
