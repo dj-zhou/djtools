@@ -34,7 +34,7 @@ function djfile() {
     # ------------------------------
     if [ $1 = '--stm32' ]; then
         shift 1
-        dj-file --stm32 $@
+        dj-file --stm32 "$@"
         return
     fi
     # ------------------------------

@@ -188,17 +188,17 @@ function yocto() {
     if [ $1 = 'bake' ]; then
         if [ $2 = 'image' ]; then
             shift 2
-            _yocto_bake_image $@
+            _yocto_bake_image "$@"
             return
         fi
         if [ $2 = 'plain-sdk' ]; then
             shift 2
-            _yocto_bake_plain_sdk $@
+            _yocto_bake_plain_sdk "$@"
             return
         fi
         if [ $2 = 'recipe' ]; then
             shift 2
-            _yocto_bake_recipe $@
+            _yocto_bake_recipe "$@"
             return
         fi
         return
@@ -207,7 +207,7 @@ function yocto() {
     # ------------------------------
     if [ $1 = 'flash' ]; then
         shift 1
-        _yocto_flash $@
+        _yocto_flash "$@"
         return
     fi
     # ------------------------------
@@ -227,12 +227,12 @@ function yocto() {
         fi
         if [ $2 = 'dev-env' ]; then
             shift 2
-            _yocto_setup_dev_env $@
+            _yocto_setup_dev_env "$@"
             return
         fi
         if [ $2 = 'plain-sdk' ]; then
             shift 2
-            _yocto_setup_plain_sdk $@
+            _yocto_setup_plain_sdk "$@"
             return
         fi
     fi
