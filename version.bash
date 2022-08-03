@@ -310,7 +310,7 @@ function _version_check_opencv() {
             return
         fi
     done
-    if [ $file_is_found='0' ]; then
+    if [ $file_is_found = '0' ]; then
         echo "opencv is not installed."
     fi
 }
