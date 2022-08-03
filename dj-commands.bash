@@ -95,11 +95,12 @@ function _create_can_analyzer_desktop_item() {
 # note
 function _dj_setup_can_analyzer() {
     cur_dir=$PWD
-    cd ~ && mkdir -p soft/ && cd soft/
+    mkdir -p ~/soft/
+    pushd_quiet ~/soft/
     rm can-analyzer -rf
     git clone https://github.com/dj-zhou/can-analyzer.git
     chmod +x can-analyzer/CANAnalysis
-    cd ${cur_dir}
+    popd_quiet
     _create_can_analyzer_desktop_item
 }
 
