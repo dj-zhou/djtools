@@ -106,7 +106,7 @@ function _version_check_cli11() {
             return
         fi
     done
-    if [ $file_is_found='0' ]; then
+    if [ $file_is_found = '0' ]; then
         echo "cli11 is not installed."
     fi
 }
@@ -146,7 +146,7 @@ function _version_check_eigen3() {
             return
         fi
     done
-    if [ $file_is_found='0' ]; then
+    if [ $file_is_found = '0' ]; then
         echo "opencv is not installed."
     fi
 }
