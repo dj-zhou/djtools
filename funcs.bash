@@ -493,7 +493,7 @@ function _log_show_run() {
     run_time=$(_get_time)
     printf >&2 "[${run_time}] "
     _show "$@"
-    printf "[${run_time}] run: " >>$log_file
+    printf "[${run_time}] run:" >>$log_file
     for arg in "$@"; do
         arg="${arg%\'/\'\\\'\'}"
         printf >>$log_file " '%s'" "$arg"
