@@ -2,7 +2,7 @@
 
 # =============================================================================
 function _dj_setup_ros_melodic() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # only Uubntu 18.04 can install ros-melodic
     if [[ $ubuntu_v != *'Ubuntu 18.04'* ]]; then
@@ -62,12 +62,12 @@ You can run those now:
 ---------------------------------------------
 eom
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_ros_noetic() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # only Uubntu 18.04 can install ros-melodic
     if [[ $ubuntu_v != *'Ubuntu 20.04'* ]]; then
@@ -127,13 +127,13 @@ You can run those now:
 ---------------------------------------------
 eom
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
 function _dj_setup_ros2_foxy_from_deb_package() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # only Uubntu 20.04 can install ros2 Foxy Fitzroy
     if [[ $ubuntu_v != *'Ubuntu 20.04'* ]]; then
@@ -197,7 +197,7 @@ https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/#install-
 https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/#install-additional-packages-using-ros-1-packages
 eom
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================

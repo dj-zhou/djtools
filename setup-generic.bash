@@ -12,7 +12,7 @@ eom
 
 # =============================================================================
 function _dj_setup_abseil_cpp() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
 
     abseil_v=$(_find_package_version abseil-cpp)
@@ -24,7 +24,7 @@ function _dj_setup_abseil_cpp() {
     make -j$(nproc)
     sudo make install
 
-    popd_quiet
+    _popd_quiet
 
     _verify_lib_installation libabsl_base.a /usr/local/lib
     _verify_pkgconfig_file absl_base.pc /usr/local/lib/pkgconfig
@@ -34,7 +34,7 @@ function _dj_setup_abseil_cpp() {
 
 # =============================================================================
 function _dj_setup_adobe_pdf_reader() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # install i386 related dependencies --------------------
     sudo dpkg --add-architecture i386
@@ -51,7 +51,7 @@ function _dj_setup_adobe_pdf_reader() {
     _wget_if_not_exist $file "88036c68998d565c4365e2ad89b04d51" $url
     sudo dpkg -i $file
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================================
@@ -85,7 +85,7 @@ function _create_anaconda_desktop_item() {
 
 # =============================================================================
 function _dj_setup_anaconda() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
 
     python3_ver=$(version check python3)
@@ -105,7 +105,7 @@ function _dj_setup_anaconda() {
 
     _create_anaconda_desktop_item
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -118,7 +118,7 @@ function _dj_setup_ansible() {
 
 # =============================================================================
 function _dj_setup_arduino_1_8_13() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
     rm arduino* -rf
@@ -129,12 +129,12 @@ function _dj_setup_arduino_1_8_13() {
 
     sudo ln -sf ${HOME}/soft/arduino-1.8.13/arduino /usr/bin/arduino
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_baidu_netdisk() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -143,12 +143,12 @@ function _dj_setup_baidu_netdisk() {
 
     sudo dpkg -i $file
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_computer() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     sudo rm -rf ~/Documents/
     sudo rm -rf ~/Music/
@@ -225,7 +225,7 @@ eom
     echo -e "time & date control: \n you need to run the code:\n"
     echo -e "    timedatectl set-local-rtc 1\n"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -257,7 +257,7 @@ function _dj_setup_driver() {
 
 # =============================================================================
 function _dj_setup_dropbox() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     sudo apt-get --fix-broken install
     _install_if_not_installed libpango1.0-0
@@ -273,13 +273,13 @@ function _dj_setup_dropbox() {
     echo -e "You can run the following command to setup the Dropbox"
     echo -e "   dropbox start -i\n"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 # Install a version from its source code
 function _dj_setup_eigen3() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     eigen3_v=$(_find_package_version eigen3)
     _echo_install eigen3 $eigen3_v
@@ -304,12 +304,12 @@ function _dj_setup_eigen3() {
     _verify_header_files /usr/include/eigen3
     _verify_header_files /usr/local/include/eigen3
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_flamegraph() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -333,12 +333,12 @@ FlameGraph is installed, use it by:
 --------------------------------------------
 eom
 
-    popd_quiet
+    _popd_quiet
 }
 # =============================================================================
 # 7.1.3 is used in Yocto, however, it seems some code uses only 7.0.1 version natively.
 function _dj_setup_fmt() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     if [ $# -eq 0 ]; then
         fmt_v=$(_find_package_version fmt)
@@ -373,12 +373,12 @@ function _dj_setup_fmt() {
     _verify_pkgconfig_file fmt.pc /usr/local/lib/pkgconfig
     _verify_cmake_files fmt-config.cmake /usr/local/lib/cmake/fmt
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_foxit_reader() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "install Foxit Reader ..."
     echo -e "  recommended location: /opt/foxitsoftware/foxitreader\n"
@@ -406,12 +406,12 @@ function _dj_setup_foxit_reader() {
         echo -e "a symbolic link cannot be generated\n"
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_fsm_pro() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
 
     wget https://www.fsmpro.io/downloads/FsmPro.deb
@@ -419,12 +419,12 @@ function _dj_setup_fsm_pro() {
 
     echo "reference: https://www.fsmpro.io/"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_gcc_aarch64_linux() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "install gcc-aarch64-linux-gnu ...\n"
     _press_enter_or_wait_s_continue 10
@@ -453,14 +453,14 @@ function _dj_setup_gcc_aarch64_linux() {
         sudo update-alternatives --config aarch64-linux-gnu-gcc
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 # for Ubuntu 20.04:
 # https://askubuntu.com/questions/1243252/how-to-install-arm-none-eabi-gdb-on-ubuntu-20-04-lts-focal-fossa
 function _dj_setup_gcc_arm_stm32() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "remove ${RED}gcc-arm-none-eabi${NOC}, and install ${GRN}gcc-arm-embedded${NOC} ...\n"
     _press_enter_or_wait_s_continue 10
@@ -514,12 +514,12 @@ function _dj_setup_gcc_arm_stm32() {
         sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-size /usr/bin/arm-none-eabi-size
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_gcc_arm_linux_gnueabi() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "install gcc-arm-linux-gnueabi ..."
     _press_enter_or_wait_s_continue 10
@@ -557,12 +557,12 @@ function _dj_setup_gcc_arm_linux_gnueabi() {
         sudo update-alternatives --config arm-linux-gnueabi-g++
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_gcc_arm_linux_gnueabihf() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "install gcc-arm-linux-gnueabihf ..."
     _press_enter_or_wait_s_continue 10
@@ -598,23 +598,23 @@ function _dj_setup_gcc_arm_linux_gnueabihf() {
         sudo update-alternatives --config arm-linux-gnueabihf-g++
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_git_lfs() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
     curl -s \
         https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh |
         sudo bash
     _install_if_not_installed git-lfs
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_gitg_gitk() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "install gitg and gitk ..."
     _press_enter_or_wait_s_continue 10 # to check the key pressed TODO
@@ -623,13 +623,13 @@ function _dj_setup_gitg_gitk() {
     git config --global credential.helper store
     # git config --global credential.helper 'cache --timeout=36000'
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 # make sure the related package is public available in dj-zhou's github
 function _dj_setup_i219_v() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -641,12 +641,12 @@ function _dj_setup_i219_v() {
 
     _ask_to_execute_cmd "sudo reboot"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_lcm() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     if [[ ! "${ubuntu_v}" = *'20.04'* ]] && [[ ! "${ubuntu_v}" = *'18.04'* ]]; then
         echo "lcm installation is only tested within Ubuntu 20.04/18.04"
@@ -674,12 +674,12 @@ function _dj_setup_lcm() {
     _verify_header_files /usr/local/include/lcm/
     _verify_pkgconfig_file lcm-java.pc /usr/local/lib/pkgconfig
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_libbpf() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     _install_if_not_installed libelf-dev
 
@@ -701,12 +701,12 @@ function _dj_setup_libbpf() {
     _show_and_run sudo cp -r include/* /usr/include/
     _show_and_run sudo cp lib64/* -r /usr/lib/
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_libcsv_3_0_2() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
 
     rm -rf libcsv-3.0.2
@@ -731,7 +731,7 @@ header file:
 --------------------------------------------
 eom
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -744,7 +744,7 @@ eom
 # this setup works only for the host computer, don't know how to do it for
 # cross compilers
 function _dj_setup_libev() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -776,12 +776,12 @@ function _dj_setup_libev() {
 
     cd ~/soft
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_libgpiod() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf libgpiod*
 
@@ -823,12 +823,12 @@ function _dj_setup_libgpiod() {
         return
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_libiio() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
     # install some software
     _install_if_not_installed bison flex libxml2-dev
 
@@ -858,7 +858,7 @@ function _dj_setup_libiio() {
 
     echo "iio.h is installed to /usr/include/"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -891,7 +891,7 @@ function _dj_setup_libserialport() {
 
 # =============================================================================
 function _dj_setup_libsystemd() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     _install_if_not_installed libmount-dev libcap-dev
     systemd_v=$(_find_package_version libsystemd)
@@ -915,7 +915,7 @@ function _dj_setup_libsystemd() {
     _verify_lib_installation libsystemd.so /x86_64-linux-gnu
     _verify_pkgconfig_file libsystemd.pc /usr/lib/x86_64-linux-gnu/pkgconfig
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -927,7 +927,7 @@ function _dj_setup_mathpix() {
 # =============================================================================
 # this might need a higher version of g++ to compile (>= 9.3?)
 function _dj_setup_matplot_xx() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     static_shared=$1
 
@@ -972,12 +972,12 @@ function _dj_setup_matplot_xx() {
         _verify_lib_installation libmatplot.so /usr/local/lib/
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_magic_enum() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/ && rm magic_enum -rf
 
@@ -991,13 +991,13 @@ function _dj_setup_magic_enum() {
     _verify_header_files magic_enum.hpp /usr/local/include/
     head -n 8 /usr/local/include/magic_enum.hpp
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 # testing on Ubuntu 18.04
 function _dj_setup_mbed() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     _install_if_not_installed mercurial git
     # install mbed-cli
@@ -1042,7 +1042,7 @@ eom
     python3 -m pip install pycryptodome
     python3 -m pip install cryptography
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -1093,7 +1093,7 @@ function _dj_setup_meson_ninjia() {
     _press_enter_or_wait_s_continue 5
     # ninja is needed for meson, so install it as well
 
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf ninja
@@ -1105,7 +1105,7 @@ function _dj_setup_meson_ninjia() {
     sudo make install
     echo -e "${GRN}meson${NOC} is installed to ${GRN}/usr/local/bin${NOC}"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -1166,7 +1166,7 @@ function _dj_stup_network_tools() {
     _install_if_not_installed nethogs iptraf
 
     echo -e "install ${GRN}mNet-Assist${NOC}"
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
     cd ~ && mkdir -p soft && cd soft
     rm -rf m-net-assist
     git clone https://github.com/dj-zhou/m-net-assist.git
@@ -1174,12 +1174,12 @@ function _dj_stup_network_tools() {
     # does it support new Ubuntu system?
     sudo dpkg -i mNetAssist-release-amd64.deb
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_nlohmann_json3_dev() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     v=$(_find_package_version nlohmann-json3)
     _echo_install nlohmann-json3 $v
@@ -1209,7 +1209,7 @@ function _dj_setup_nlohmann_json3_dev() {
     make -j$(nproc)
     sudo make install
 
-    popd_quiet
+    _popd_quiet
 
     echo -e "${GRN}nlohmann-json3 $v${NOC} is installed:"
     _verify_header_files json.hpp /usr/local/include/nlohmann
@@ -1221,7 +1221,7 @@ function _dj_setup_nlohmann_json3_dev() {
 # use nvm (node version management) to install nodejs
 # https://github.com/nvm-sh/nvm#installing-and-updating
 function _dj_setup_nodejs() {
-    # pushd_quiet ${PWD}
+    # _pushd_quiet ${PWD}
     # cd ~ && mkdir -p soft/ && cd soft/
 
     # # install nvm to ${HOME}/.nvm -----------
@@ -1242,12 +1242,12 @@ function _dj_setup_nodejs() {
 
     # nvm install $nodejs_v
 
-    # popd_quiet
+    # _popd_quiet
 
     # https://stackoverflow.com/a/36401038
     if [[ "${ubuntu_v}" = *'18.04'* || "${ubuntu_v}" = *'20.04'* ]]; then
         _install_if_not_installed git-core curl build-essential openssl libssl-dev
-        pushd_quiet ${PWD}
+        _pushd_quiet ${PWD}
         cd ~ && mkdir -p soft/ && cd soft/
 
         v=$(_find_package_version nodejs)
@@ -1265,7 +1265,7 @@ function _dj_setup_nodejs() {
         ./configure
         make -j$(nproc) && sudo make install
 
-        popd_quiet
+        _popd_quiet
         return
     fi
 }
@@ -1299,7 +1299,7 @@ eom
 
 # =============================================================================
 function _dj_setup_nvtop() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     if [[ "${ubuntu_v}" = *'18.04'* ||
         "${ubuntu_v}" = *'20.04'* ]]; then
@@ -1313,12 +1313,12 @@ function _dj_setup_nvtop() {
         sudo make install
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_qt_5_13_1() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "install Qt 5.13.1 \n"
 
@@ -1346,12 +1346,12 @@ function _dj_setup_qt_5_13_1() {
     echo 'export LD_LIBRARY_PATH=~/Qt5.13.1/5.13.1/gcc_64/lib:$LD_LIBRARY_PATH' >>~/.bashrc
     echo -e "PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_qt_5_14_2() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "\nInstall Qt 5.14.2\n"
     _press_enter_or_wait_s_continue 10
@@ -1380,12 +1380,12 @@ function _dj_setup_qt_5_14_2() {
     echo 'export LD_LIBRARY_PATH=~/Qt5.14.2/5.14.2/gcc_64/lib:$LD_LIBRARY_PATH' >>~/.bashrc
     echo -e "PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_rpi_pico() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # install dependencies
     _install_if_not_installed libnewlib-arm-none-eabi \
@@ -1437,7 +1437,7 @@ function _dj_setup_rpi_pico() {
     mkdir build && cd build && cmake ..
     make -j$(nproc)
 
-    popd_quiet
+    _popd_quiet
     cat <<eom
 download the firmware:
 1. hold on BOOTSEL button
@@ -1460,19 +1460,19 @@ eom
 
 # =============================================================================
 function _dj_setup_slack() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft && cd soft/
     # the download page: https://slack.com/downloads/linux
     wget https://downloads.slack-edge.com/linux_releases/slack-desktop-4.8.0-amd64.deb
     sudo dpkg -i slack-desktop*.deb
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_saleae_logic() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft && cd soft/
     version="1.2.18"
@@ -1487,7 +1487,7 @@ function _dj_setup_saleae_logic() {
     mv "$file" logic
     sudo ln -sf ${HOME}/soft/logic/Logic /usr/bin/logic
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -1513,7 +1513,7 @@ function _dj_setup_spdlog() { # static/shared
     static_shared=$1          # if empty, treat as dynamic
 
     v=$(_find_package_version spdlog)
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     _show_and_run sudo rm -f /usr/local/lib/libspdlog.a
     _show_and_run sudo rm -f /usr/local/lib/libspdlog.so*
@@ -1550,12 +1550,12 @@ function _dj_setup_spdlog() { # static/shared
     _verify_pkgconfig_file spdlog.pc /usr/local/lib/pkgconfig
     _verify_cmake_files spdlogConfig.cmake /usr/local/lib/cmake/spdlog
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_sublime() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     sudo apt-get update
     _install_if_not_installed apt-transport-https ca-certificates curl
@@ -1567,7 +1567,7 @@ function _dj_setup_sublime() {
     sudo apt-get update
     _install_if_not_installed sublime-text
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -1596,7 +1596,7 @@ function _dj_setup_typora() {
 # =============================================================================
 # tested: Ubuntu 18.04, Ubuntu 20.04
 function _dj_setup_vscode() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -1608,7 +1608,7 @@ function _dj_setup_vscode() {
     sudo dpkg -i vscode.deb
     sudo rm vscode.deb
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -1646,7 +1646,7 @@ eom
 # shared library build seems not working, error:
 # ./_bnative.cmake/yaml-demo: symbol lookup error: ./_bnative.cmake/yaml-demo: undefined symbol: _ZN4YAML6detail9node_data12empty_scalarB5cxx11Ev
 function _dj_setup_yaml_cpp() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # dependencies to install --------------
     echo "install build-essential"
@@ -1684,7 +1684,7 @@ function _dj_setup_yaml_cpp() {
     _verify_header_files /usr/local/include/yaml-cpp/
     _verify_pkgconfig_file yaml-cpp.pc /usr/local/lib/pkgconfig
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================

@@ -151,7 +151,7 @@ function _system_wallpaper_random() {
         echo -e '\n' >>~/.bashrc
     fi
     # _random_wallpaper # from funcs.bash
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd $wallpaper_folder
     set -- *
@@ -160,7 +160,7 @@ function _system_wallpaper_random() {
     # it only works for gnome
     gsettings set org.gnome.desktop.background picture-uri "file://$wallpaper_folder/${!random_num}"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================

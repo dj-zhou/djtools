@@ -41,7 +41,7 @@ function _mark_down_help_table_of_content() {
 
 # =============================================================================
 function mark-down() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # ------------------------------
     if [ $# -eq 0 ]; then
@@ -73,7 +73,7 @@ function mark-down() {
     echo -e 'mark-down: "'$1 '"command not supported'
     _mark-down_help
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================

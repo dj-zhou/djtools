@@ -441,12 +441,17 @@ function _echo_install() { # package # version
 }
 
 # =============================================================================
-function pushd_quiet() { # directory
+_get_time() {
+    date +%Y-%m-%dT%H:%M:%S%z
+}
+
+# =============================================================================
+function _pushd_quiet() { # directory
     pushd $1 &>/dev/null
 }
 
 # =============================================================================
-function popd_quiet() {
+function _popd_quiet() {
     popd &>/dev/null
 }
 

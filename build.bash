@@ -161,9 +161,9 @@ function _build_meson_native() {
         _show_and_run meson setup $proj_dir
 
     fi
-    pushd_quiet $proj_dir
+    _pushd_quiet $proj_dir
     ninja
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -281,9 +281,9 @@ function _build_cmake() {
     # ---------------------------------------------------
     if [ "$target_tag" = "test" ]; then
         if [ -d $build_dir ]; then
-            pushd_quiet $build_dir
+            _pushd_quiet $build_dir
             make test
-            popd_quiet
+            _popd_quiet
         fi
     fi
 }

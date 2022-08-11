@@ -165,7 +165,7 @@ function _dj_setup_cmake() {
 
     _press_enter_or_wait_s_continue 5
 
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
     rm -rf CMake
@@ -178,7 +178,7 @@ function _dj_setup_cmake() {
     sudo make install
     echo -e "${GRN}cmake${NOC} is installed to ${GRN}/usr/local/bin${NOC}"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -231,7 +231,7 @@ eom
 
 # =============================================================================
 function _dj_setup_gadgets() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
     sudo rm -rf dj-gadgets
@@ -263,7 +263,7 @@ function _dj_setup_gadgets() {
     make
     sudo make install
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -278,7 +278,7 @@ function _dj_setup_devtools() {
 # https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04
 # this is only tested in Ubuntu 18.04
 function _dj_setup_container_docker() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # Install a few prerequisite packages
     packages="apt-transport-https ca-certificates curl software-properties-common "
@@ -311,7 +311,7 @@ function _dj_setup_container_docker() {
     sudo chmod 666 /var/run/docker.sock
     echo -e "you need to reboot computer so docker does not need sudo to run"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -329,7 +329,7 @@ function _dj_setup_container_docker_compose() {
 # https://github.com/wagoodman/dive
 # how to clone the repo and use its Makefile to install? -- don't know
 function _dj_setup_container_dive() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # ----------------------------------------------
     cd ~ && mkdir -p soft/ && cd soft/
@@ -342,7 +342,7 @@ function _dj_setup_container_dive() {
     echo "    \$ sudo dive <image-tag/hash>"
     echo "you can find the image-tag/hash from command: sudo docker images -a"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -355,7 +355,7 @@ function _dj_setup_container_lxd_4_0() {
 
 # =============================================================================
 function _dj_setup_pangolin() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # dependency installation
     packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
@@ -382,12 +382,12 @@ function _dj_setup_pangolin() {
     echo "   \$ dj setup gtest"
     echo "   \$ dj setup glog"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_cutecom() {
-    pushd_quiet "${PWD}"
+    _pushd_quiet "${PWD}"
 
     v=$(_find_package_version cutecom)
     _echo_install cutecom $v
@@ -402,12 +402,12 @@ function _dj_setup_cutecom() {
     make -j$(nproc)
     sudo make install
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_picocom() {
-    pushd_quiet "${PWD}"
+    _pushd_quiet "${PWD}"
 
     cd ~ && mkdir -p soft/ && cd soft/
 
@@ -422,12 +422,12 @@ function _dj_setup_picocom() {
     make
     sudo cp picocom /usr/bin/
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_pip() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~/
     _install_if_not_installed python3-pip
@@ -440,7 +440,7 @@ function _dj_setup_pip() {
     echo "   \$ pip --version"
     echo "   \$ pip3 --version"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -453,7 +453,7 @@ function _dj_setup_perf() {
 
 # =============================================================================
 function _dj_setup_plotjuggler() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
     cd ~ && mkdir -p soft && cd soft
 
     _install_if_not_installed qtbase5-dev libqt5svg5-dev \
@@ -470,7 +470,7 @@ function _dj_setup_plotjuggler() {
     make -j$(nproc)
     sudo make install
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -515,7 +515,7 @@ function _dj_setup_python_3_9() {
 
 # =============================================================================
 function _dj_setup_qemu() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     version=$1
     echo $version
@@ -534,7 +534,7 @@ function _dj_setup_qemu() {
         echo -e "$CYN the installed qemu is probably for ARM only, check it later$NOC"
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================================
@@ -568,7 +568,7 @@ function _create_stm32cubemx_desktop_item() {
 
 # =============================================================================
 function _dj_setup_stm32_cubemx() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft && cd soft/
 
@@ -581,7 +581,7 @@ function _dj_setup_stm32_cubemx() {
 
     _create_stm32cubemx_desktop_item
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -595,7 +595,7 @@ function _dj_setup_stm32_cubemx() {
 # stlink tests on Ubuntu 18.04
 # v1.6.0 failed
 function _dj_setup_stm32_tools() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
     _press_enter_or_wait_s_continue 5
@@ -652,12 +652,12 @@ function _dj_setup_stm32_tools() {
     echo 'KERNEL=="ttyACM[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
     sudo service udev restart
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_glfw3() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "install glfw3 ..."
 
@@ -674,12 +674,12 @@ function _dj_setup_glfw3() {
     make -j$(nproc)
     sudo make install && sudo ldconfig
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_gnuplot() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft && cd soft/
     rm -rf gnuplot
@@ -690,12 +690,12 @@ function _dj_setup_gnuplot() {
     make -j$(nproc)
     sudo make install && sudo ldconfig
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_google_repo() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # it needs python2
     _install_if_not_installed python
@@ -718,12 +718,12 @@ function _dj_setup_google_repo() {
 -----------------------------------------------------------------
 
 eom
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_gtest() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     v=$(_find_package_version googletest)
     _echo_install googletest $v
@@ -745,12 +745,12 @@ function _dj_setup_gtest() {
     _verify_pkgconfig_file gtest.pc /usr/local/lib/pkgconfig/
     _verify_pkgconfig_file gtest_main.pc /usr/local/lib/pkgconfig/
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_glog() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "install glog ..."
 
@@ -768,7 +768,7 @@ function _dj_setup_glog() {
     _verify_lib_installation libglog.so /usr/local/lib
     _verify_header_files /usr/local/include/glog/
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -787,7 +787,7 @@ function _dj_setup_gnome() {
 # =============================================================================
 # ninja is used to compile
 function _dj_setup_grpc() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     grpc_v=$(_find_package_version grpc)
     cd ~ && mkdir -p soft && cd soft/
@@ -800,7 +800,7 @@ function _dj_setup_grpc() {
     cmake --build .
     sudo cmake --build . -- install
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -912,7 +912,7 @@ function _dj_setup_rust() {
 # https://www.linuxbabe.com/desktop-linux/how-to-install-chinese-wubi-input-method-on-debian-8-gnome-desktop
 # tested on Ubuntu 16.04, 18.04 and 20.04
 function _dj_setup_wubi() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     _install_if_not_installed ibus
     _install_if_not_installed ibus-table-wubi
@@ -935,14 +935,14 @@ eom
         echo -e "please follow the link below to finish the setup:"
         echo -e " https://www.pinyinjoe.com/linux/ubuntu-18-gnome-chinese-setup.htm"
     fi
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_vtk_8_2_0() {
     echo "vtk 8.2.0 installation"
 
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # vtk 8 ----------------
     # reference: https://kezunlin.me/post/b901735e/
@@ -962,7 +962,7 @@ function _dj_setup_vtk_8_2_0() {
     echo "the installed library seems to be in /usr/local/lib folder"
     echo "the installed header files seem to be in /usr/local/include/vtk-8.2/ folder"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -975,7 +975,7 @@ function _dj_work_check() {
 # to search a library use: ldconfig -p | grep xxxx
 # once this command get extended, we add sub command to "dj search"
 function _dj_grep_package() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     lib_to_find=$1
     echo -e "run: ${GRN}ldconfig -p | grep $lib_to_find${NOC}:"
@@ -989,7 +989,7 @@ function _dj_grep_package() {
     # echo -e " \$ ls | grep $lib_to_find"
     # ls | grep $lib_to_find
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -1199,7 +1199,7 @@ function _dj_setup_vim_env() {
     echo -e "setup the vim as an IDE"
     _press_enter_or_wait_s_continue 20
 
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     VIMRC=~/.vimrc
 
@@ -1312,12 +1312,12 @@ function _dj_setup_vim_env() {
     echo -e "YouCompleteMe needs to be compiled after the plugins are installed:"
     echo -e "  dj setup you-complete-me"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_you_complete_me() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     folder=~/.vim/bundle/YouCompleteMe
     if [ -d $folder ]; then
@@ -1329,7 +1329,7 @@ function _dj_setup_you_complete_me() {
         echo -e "dj setup vim-env"
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================

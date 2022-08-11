@@ -53,7 +53,7 @@ eom
 
 # =============================================================================
 function _dj_replace() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     if [ $# = 3 ]; then
         if [ $3 = '.' ]; then
@@ -69,7 +69,7 @@ function _dj_replace() {
         fi
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -90,7 +90,7 @@ function dj_clang_format_brush() {
 
 # =============================================================================
 function _dj_format() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     if [ $1 = 'brush' ]; then
         dj_clang_format_brush $2 $3 $4 $5
@@ -116,12 +116,12 @@ function _dj_format() {
         return
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_clang_format() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     _install_if_not_installed clang-format
 
@@ -141,7 +141,7 @@ function _dj_setup_clang_format() {
         echo "You can edit ~/.config/Code/User/settings.json manually."
     fi
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -150,7 +150,7 @@ function _dj_setup_clang_format() {
 # Ubuntu 20.04: 12.0.0 (tested), https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.0
 
 function _dj_setup_clang_llvm() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "Install LLVM clang (clang+llvm) on Ubuntu $(version check ubuntu)"
 
@@ -210,5 +210,5 @@ function _dj_setup_clang_llvm() {
         echo "You can edit ~/.config/Code/User/settings.json manually."
     fi
 
-    popd_quiet
+    _popd_quiet
 }

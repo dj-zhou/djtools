@@ -4,7 +4,7 @@
 # may not be a good way to install opencv
 # recommend to install opencv-4.1.1
 function _dj_setup_opencv_2_4_13() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     echo -e "Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.11.2"
@@ -32,7 +32,7 @@ function _dj_setup_opencv_2_4_13() {
     echo " lib files *.so are installed in /usr/local/lib/"
     echo " header files are installded in /usr/local/include/opencv2/"
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -51,10 +51,10 @@ function _setup_opencv_dependencies() {
     # Cameras programming interface libs
     packages+="libdc1394-22 libdc1394-22-dev libxine2-dev libv4l-dev v4l-utils "
 
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
     cd /usr/include/linux
     sudo ln -s -f ../libv4l1-videodev.h videodev.h
-    popd_quiet
+    _popd_quiet
 
     # GTK lib for the graphical user functionalities coming from OpenCV highghui module
     packages+="libgtk-3-dev "
@@ -83,7 +83,7 @@ function _setup_opencv_dependencies() {
 
 # =============================================================================
 function _dj_setup_opencv_3_4_13() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     _setup_opencv_dependencies
 
@@ -151,7 +151,7 @@ function _dj_setup_opencv_3_4_13() {
         /usr/local/lib/pkgconfig/opencv.pc
 eom
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -161,7 +161,7 @@ eom
 # notice: there is some manual work todo before actually automate this procedure
 # this does not work on Ubuntu 20.04!
 function _dj_setup_opencv_4_1_1() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     if [[ -d "/usr/local/include/opencv2" ]]; then
         echo "other version of opencv is installed, exit"
@@ -212,13 +212,13 @@ function _dj_setup_opencv_4_1_1() {
     https://github.com/dj-zhou/opencv4-demo/001-imread-imshow
 eom
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
 # https://medium.com/@sb.jaduniv/how-to-install-opencv-4-2-0-with-cuda-10-1-on-ubuntu-20-04-lts-focal-fossa-bdc034109df3
 function _dj_setup_opencv_4_2_0() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     if [[ -d "/usr/local/include/opencv2" ]]; then
         echo "other version of opencv is installed, exit"
@@ -280,5 +280,5 @@ function _dj_setup_opencv_4_2_0() {
 
     sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
 
-    popd_quiet
+    _popd_quiet
 }
