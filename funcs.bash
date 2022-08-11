@@ -451,8 +451,7 @@ function popd_quiet() {
 }
 
 # =============================================================================
-function _show_and_run() {
-    # show
+function _show() {
     printf >&2 "run:"
     local arg
     for arg in "$@"; do
@@ -460,7 +459,11 @@ function _show_and_run() {
         printf >&2 " $GRN'%s'$NOC" "$arg"
     done
     printf >&2 "\n"
-    # run
+}
+
+# =============================================================================
+function _show_and_run() {
+    _show "$@"
     "$@"
 }
 
