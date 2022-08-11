@@ -441,7 +441,7 @@ function _echo_install() { # package # version
 }
 
 # =============================================================================
-_get_time() {
+function _get_time() {
     date +%Y-%m-%dT%H:%M:%S%z
 }
 
@@ -478,4 +478,21 @@ function _tic_toc_run() {
     _show_and_run "$@"
     end_time=$(date +%s)
     echo -e "run time: $((end_time - start_time)) seconds"
+}
+
+# =============================================================================
+# use the first argument as the log file name
+function _log_show_run() {
+    local log_file="$1"
+    shift 1
+    run_time=$(_get_time)
+    printf >&2 "[${run_time}] "
+    _show "$@"
+    printf "[${run_time}] run: " >>$log_file
+    for arg in "$@"; do
+        arg="${arg%\'/\'\\\'\'}"
+        printf >>$log_file " '%s'" "$arg"
+    done
+    printf >>$log_file "\n"
+    "$@"
 }
