@@ -2,7 +2,7 @@
 
 # =============================================================================
 function djfile() {
-    pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
     # ------------------------------
     if [ $# -eq 0 ]; then
@@ -46,7 +46,7 @@ function djfile() {
     echo -e 'djfile: "'$1 '"command not supported'
     djfile_help
 
-    popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================

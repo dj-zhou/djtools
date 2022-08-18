@@ -441,18 +441,27 @@ function _echo_install() { # package # version
 }
 
 # =============================================================================
-function pushd_quiet() { # directory
+function _get_time() {
+    date "+%Y-%m-%d %H:%M:%S%z"
+}
+
+# =============================================================================
+function _get_time_short() {
+    date +%Y%m%d-%H%M%S
+}
+
+# =============================================================================
+function _pushd_quiet() { # directory
     pushd $1 &>/dev/null
 }
 
 # =============================================================================
-function popd_quiet() {
+function _popd_quiet() {
     popd &>/dev/null
 }
 
 # =============================================================================
-function _show_and_run() {
-    # show
+function _show() {
     printf >&2 "run:"
     local arg
     for arg in "$@"; do
@@ -460,6 +469,35 @@ function _show_and_run() {
         printf >&2 " $GRN'%s'$NOC" "$arg"
     done
     printf >&2 "\n"
-    # run
+}
+
+# =============================================================================
+function _show_and_run() {
+    _show "$@"
+    "$@"
+}
+
+# =============================================================================
+function _tic_toc_run() {
+    start_time=$(date +%s)
+    _show_and_run "$@"
+    end_time=$(date +%s)
+    echo -e "run time: $((end_time - start_time)) seconds"
+}
+
+# =============================================================================
+# use the first argument as the log file name
+function _log_show_run() {
+    local log_file="$1"
+    shift 1
+    run_time=$(_get_time)
+    printf >&2 "[${run_time}] "
+    _show "$@"
+    printf "[${run_time}] run:" >>$log_file
+    for arg in "$@"; do
+        arg="${arg%\'/\'\\\'\'}"
+        printf >>$log_file " '%s'" "$arg"
+    done
+    printf >>$log_file "\n"
     "$@"
 }
