@@ -442,11 +442,11 @@ function _echo_install() { # package # version
 
 # =============================================================================
 function _get_time() {
-    date +%Y-%m-%dT%H:%M:%S%z
+    date "+%Y-%m-%d %H:%M:%S%z"
 }
 
 # =============================================================================
-function _get_date() {
+function _get_time_short() {
     date +%Y%m%d-%H%M%S
 }
 
