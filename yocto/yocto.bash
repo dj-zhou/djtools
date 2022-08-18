@@ -58,7 +58,7 @@ function _yocto_bake_recipe() { # full recipe name
 
 # bmaptool needs to be the one from the SDK (i.e. ~/.--oesdk/xx/yy/environment-setup-armv7vet2hf-neon-fb-linux-gnueabi)
 # however, in this script, we "source ../poky/oe-init-build-env ." and it still works fine
-function _yocto_flash() { # block-device # image-file
+function _yocto_flash() { # block-device # image-file # "--skip"
     # argument check -------------------
     if [ $# -lt 1 ]; then
         echo -e "usage:\n   yocto flash /dev/sdx <image name>"
@@ -69,8 +69,8 @@ function _yocto_flash() { # block-device # image-file
     dev_str=$1
     dev=$(_verify_block_device $dev_str)
     if [ -z $dev ]; then
-        echo -e "\n block device $dev not found, exit!!"
-        echo -e " you can use command \"lsblk\" to find it."
+        echo -e "${RED}block device $dev_str not found, exit!!${NOC}"
+        echo -e "you can use command \"lsblk\" to find it."
         return
     fi
     echo -e "          SD card: ${GRN}$dev${NOC}"
@@ -145,10 +145,14 @@ function _yocto_flash() { # block-device # image-file
     # if [[ "$image_file"=*"wic.gz" || "$image_file"=*"wic.zst" ]] ; then
     if [[ ${image_file} = *'wic.gz'* || ${image_file} = *'wic.zst'* ]]; then
         # try always run this before flashing ------------------
-        echo -e "-----------------------------\n"
-        echo -e "run ${GRN}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
-        _press_enter_or_wait_s_continue 2
-        bitbake bmap-tools-native -caddto_recipe_sysroot
+        if [[ $# = 3 && $3 = "--skip" ]]; then
+            echo -e "skip bitbake check, flash ..."
+        else
+            echo -e "-----------------------------\n"
+            echo -e "run ${GRN}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
+            _press_enter_or_wait_s_continue 2
+            bitbake bmap-tools-native -caddto_recipe_sysroot
+        fi
         if [[ -f "$bmap_file" ]]; then
             # the following command need to use a *.wic.bmap file in the same path
             # of the wic.gz file
@@ -250,16 +254,12 @@ function yocto() {
             _yocto_show_conf $3 "machine" $4 $5 $6 $7 $8 $9
             return
         fi
-        if [ $2 = 'image-bb' ]; then
+        if [ $2 = 'image-bb-inc' ]; then
             _yocto_show_bb_file $3 "image" $4 $5 $6 $7 $8 $9
             return
         fi
-        if [ $2 = 'recipe-bb' ]; then
+        if [ $2 = 'recipe-bb-inc' ]; then
             _yocto_show_bb_file $3 "recipe" -e vague
-            return
-        fi
-        if [ $2 = 'image-inc' ]; then
-            _yocto_show_inc_file $3 "image" $4 $5 $6 $7 $8 $9
             return
         fi
         return
@@ -339,7 +339,7 @@ function _yocto() {
     done
 
     # ------------------------------------------------------------------------
-    show_list="distro-conf machine-conf image-bb recipe-bb "
+    show_list="distro-conf machine-conf image-bb-inc recipe-bb-inc "
     ACTIONS[show]+="$show_list "
     for i in $show_list; do
         ACTIONS[$i]=" "
