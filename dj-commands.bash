@@ -1602,7 +1602,7 @@ function _dj() {
     setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
     setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom "
     setup_list+="pip plotjuggler pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rpi-pico rust "
-    setup_list+="saleae-logic serial-console spdlog slack stm32-cubeMX stm32-tools sublime texlive typora vim-env "
+    setup_list+="saleae-logic serial-console spdlog slack stm32-cubeMX stm32-tools sublime texlive tldr typora vim-env "
     setup_list+="vscode vtk-8.2.0 windows-fonts wireshark wubi yaml-cpp you-complete-me "
     ACTIONS[setup]="$setup_list "
     for i in $setup_list; do

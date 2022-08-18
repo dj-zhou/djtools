@@ -1583,6 +1583,12 @@ function _dj_setup_texlive() {
 }
 
 # =============================================================================
+function _dj_setup_tldr() {
+    _install_if_not_installed tldr
+    echo "example: $ tldr tar"
+}
+
+# =============================================================================
 # why this does not work with python3.9?
 function _dj_setup_typora() {
     wget -qO - https://typora.io/linux/public-key.asc | sudo apt-key add -
@@ -2160,6 +2166,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'texlive' ]; then
         _dj_setup_texlive
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'tldr' ]; then
+        _dj_setup_tldr
         return
     fi
     # --------------------------
