@@ -1541,7 +1541,7 @@ function _dj_setup_spdlog() { # static/shared
     make -j$(nproc)
     sudo make install
 
-    echo -e "\n${GRN}spdlog $version${NOC} is installed."
+    echo -e "\n${GRN}spdlog v$v${NOC} is installed."
     if [ "$static_shared" = 'static' ]; then
         _verify_lib_installation libspdlog.a /usr/local/lib
     else
