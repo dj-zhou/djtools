@@ -4,7 +4,7 @@ cli11 2.1.1 # (no "v" in front!) released Sep. 29th, 2021
 cmake v3.21.3
 cutecom v0.50.0 # Aug. 6th, 2018
 eigen3 3.4.0 # Aug. 18th, 2021
-fmt 8.0.1
+fmt 9.1.0
 glog v0.5.0       # March 21st, 2019
 googletest 1.11.0 # June 11, 2021
 grpc 1.38.0

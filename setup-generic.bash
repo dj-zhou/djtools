@@ -336,7 +336,7 @@ eom
     _popd_quiet
 }
 # =============================================================================
-# 7.1.3 is used in Yocto, however, it seems some code uses only 7.0.1 version natively.
+# example code: packages/fmt; /packages/spdlog
 function _dj_setup_fmt() {
     _pushd_quiet ${PWD}
 
@@ -362,13 +362,14 @@ function _dj_setup_fmt() {
     cd fmt
     git checkout ${fmt_v}
     rm -rf build && mkdir build && cd build
-    cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
+    cmake .. -DBUILD_SHARED_LIBS=TRUE -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
     make -j$(nproc)
     sudo make install
 
     echo -e "\n${GRN}fmt $fmt_v${NOC} is installed."
 
-    _verify_lib_installation libfmt.a /usr/local/lib
+    # _verify_lib_installation libfmt.a /usr/local/lib
+    _verify_lib_installation libfmt.so /usr/local/lib
     _verify_header_files /usr/local/include/fmt
     _verify_pkgconfig_file fmt.pc /usr/local/lib/pkgconfig
     _verify_cmake_files fmt-config.cmake /usr/local/lib/cmake/fmt
