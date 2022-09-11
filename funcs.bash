@@ -482,7 +482,8 @@ function _tic_toc_run() {
     start_time=$(date +%s)
     _show_and_run "$@"
     end_time=$(date +%s)
-    echo -e "run time: $((end_time - start_time)) seconds"
+    elapsed_time=$((end_time - start_time))
+    echo -e "run time: $elapsed_time seconds"
 }
 
 # =============================================================================
@@ -500,4 +501,27 @@ function _log_show_run() {
     done
     printf >>$log_file "\n"
     "$@"
+}
+
+# =============================================================================
+# to measure the time of running some commands
+function tic-toc() {
+    start_time=$(get-time-us)
+    _show_and_run "$@"
+    end_time=$(get-time-us)
+    elapsed_time=$((end_time - start_time))
+    printf "run time: $elapsed_time us"
+    seconds=$((elapsed_time / 1000000))
+    us=$((elapsed_time - seconds * 1000000))
+    # must add leading zeros
+    len=$(echo $us | wc -c)
+    len=$((len - 1))
+    leading_zeros=$((6 - len))
+    printf " (${seconds}."
+    if [ $leading_zeros -gt 1 ]; then
+        for i in {1..${leading_zeros}}; do
+            printf "0"
+        done
+    fi
+    echo "$us s)"
 }
