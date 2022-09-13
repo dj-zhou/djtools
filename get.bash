@@ -12,7 +12,7 @@ function _dj_get() {
         return
     fi
     if [ $1 = 'git-tag' ]; then
-        git describe --abbrev=7 --dirty --always --tags
+        git describe --abbrev=7 --dirty=+ --always --tags
         return
     fi
     echo "dj get: argument not supported"
