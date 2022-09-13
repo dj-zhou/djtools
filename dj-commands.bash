@@ -3,6 +3,7 @@
 source $djtools_path/clang-format.bash
 source $djtools_path/clone.bash
 source $djtools_path/help.bash
+source $djtools_path/get.bash
 source $djtools_path/setup-generic.bash
 source $djtools_path/setup-opencv.bash
 source $djtools_path/python3-tools.bash
@@ -1437,6 +1438,12 @@ function dj() {
         return
     fi
     # ------------------------------
+    if [ $1 = 'get' ]; then
+        shift 1
+        _dj_get "$@"
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'git' ]; then
         if [ $2 = 'config' ]; then
             shift 2
@@ -1574,6 +1581,7 @@ function _dj() {
     local SERVICES=("
         flame-graph
         format
+        get
         git
         grep
         help
@@ -1591,6 +1599,12 @@ function _dj() {
 
     # declare an associative array for options
     declare -A ACTIONS
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    ACTIONS[get]="$get_list "
+    for i in $get_list; do
+        ACTIONS[$i]=" "
+    done
 
     # --------------------------------------------------------
     # --------------------------------------------------------
