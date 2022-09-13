@@ -1,5 +1,20 @@
 #!/bin/bash
 
+git_list="config search ssh-account ssh-clone "
+search_list="-name -email -commit "
+ssh_account_list="--activate --show-all --show-current "
+
+# =============================================================================
+function _dj_git_ssh_account_show_all() {
+    all_github_accounts=$(ls ~/.ssh | grep .pub)
+    for i in $all_github_accounts; do
+        username=${i%".pub"}
+        username=$(echo "${username/"id_rsa-github-"/}")
+        echo $username
+    done
+}
+
+all_accounts="$(_dj_git_ssh_account_show_all) "
 # =============================================================================
 function _dj_git_config() { # name, email
     if [ $# -eq 0 ]; then

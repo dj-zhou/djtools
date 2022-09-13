@@ -1,4 +1,7 @@
 #!/bin/bash
+udev_list="uvc-video-capture --dialout --show one-third-console "
+udev_list+="stlink-v2.1 logitech-f710 ft4232h "
+udevadm_list="$(ls /dev/tty*) "
 
 # =============================================================================
 function _dj_udev_help() {
