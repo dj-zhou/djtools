@@ -41,44 +41,38 @@ function _dj_python3_venv_numpy_pandas() {
     _show_and_run echo "install latest pip3"
     python -c "import pkg_resources; pkg_resources.require('pip>=21')" \
         &>/dev/null || pip install --upgrade 'pip>=21'
-
+    _show_and_run echo "install wheel"
+    python -c "import pkg_resources; pkg_resources.require('pip>=21')" \
+        &>/dev/null || pip install wheel
     # prepare requirements.txt file
     rqs_file=$(mktemp)
     trap 'rm -f "$rqs_file"' SIGTERM EXIT
     cat >"$rqs_file" <<EOF
-    black
-    ipympl
     jupyterlab
     jupyter-black
     jupyterlab_templates
-    matplotlib
-    numba
     numpy
     pandas
-    pythreejs
-    plyfile
-    pyyaml
-    scipy
 EOF
     # some fix (will know)
     _show_and_run export PIP_INDEX_URL=https://pypi.org/simple
     _show_and_run echo "install packages"
     # install packages
-    python3 -c "import pkg_resources; pkg_resources.require(open('${rqs_file}',mode='r'))" \
-        &>/dev/null || pip3 install --ignore-installed -r "${rqs_file}"
+    python -c "import pkg_resources; pkg_resources.require(open('${rqs_file}',mode='r'))" \
+        &>/dev/null || pip install --ignore-installed -r "${rqs_file}"
     # # temporary fix fr nodejs
-    # nodejs_v=$(version check node)
-    # anw=$(_version_if_ge_than $nodejs_v "12.0.0")
-    # if [ "$anw" = "no" ]; then
-    #     _show_and_run dj setup nodejs
-    # fi
-    # # start Jupyter-lab
-    # _show_and_run export JUPYTER_CONFIG_DIR="$VENV_DIR/.jupyter"
-    # _show_and_run jupyter labextension install jupyter-threejs
-    # _show_and_run jupyter nbextension install \
-    #     https://github.com/drillan/jupyter-black/archive/master.zip --user
-    # _show_and_run jupyter nbextension enable jupyter-black-master/jupyter-black
-    # _show_and_run jupyter-lab
+    nodejs_v=$(version check node)
+    anw=$(_version_if_ge_than $nodejs_v "12.0.0")
+    if [ "$anw" = "no" ]; then
+        _show_and_run dj setup nodejs
+    fi
+    # start Jupyter-lab
+    _show_and_run export JUPYTER_CONFIG_DIR="$VENV_DIR/.jupyter"
+    _show_and_run jupyter labextension install jupyter-threejs
+    _show_and_run jupyter nbextension install \
+        https://github.com/drillan/jupyter-black/archive/master.zip --user
+    _show_and_run jupyter nbextension enable jupyter-black-master/jupyter-black
+    _show_and_run jupyter-lab
 }
 
 # =============================================================================
