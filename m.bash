@@ -11,23 +11,24 @@
 # Makefile           bin/
 # CMakeList.txt     _bnative.cmake/
 # meson.build       _bnative.meson/, or _bcross.[sdk name]/
-# make.sh            no build directory, it all depends on how make.sh is written
+# make.sh            no default build directory, it all depends on how make.sh is written
 
 function compile_make_build_etc() {
     target="$1"
-
     # ------------------------------
     if [ -f "Makefile" ]; then
         _build_make "$target"
         return
     fi
     # ------------------------------
+    # CMake and Meson are of the same importance
     if [[ -f "CMakeLists.txt" || -f "meson.build" ]]; then
         if [ -f "CMakeLists.txt" ]; then
             _build_cmake "$target"
         fi
         if [ -f "meson.build" ]; then
             _build_meson_native "$target"
+            # this is a hack
             if [ "$target" = "clean" ]; then
                 _build_meson_cross "clean"
             fi
@@ -41,7 +42,12 @@ function compile_make_build_etc() {
         ./make.sh "$target"
         return
     fi
-    echo -e "(djtools) m/mc: ${RED}build method not , nothing is built.${NOC}"
+    if [ "$target" = "clean" ]; then
+        printf "(djtools) mc: "
+    else
+        printf "(djtools) m: "
+    fi
+    printf "${RED}build script (Makefile/CMakeLists.txt/meson.build/make.sh) not found, exit.${NOC}\n"
 }
 
 # =============================================================================
@@ -53,4 +59,9 @@ function m() {
 # =============================================================================
 function mc() {
     compile_make_build_etc "clean"
+}
+
+# =============================================================================
+function mi() {
+    compile_make_build_etc "install"
 }
