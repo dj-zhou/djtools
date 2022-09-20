@@ -513,10 +513,10 @@ function tic-toc() {
     printf "run time: $elapsed_time us"
     seconds=$((elapsed_time / 1000000))
     us=$((elapsed_time - seconds * 1000000))
-    # must add leading zeros
+    # the length is 1 char more
     len=$(echo $us | wc -c)
-    len=$((len - 1))
-    leading_zeros=$((6 - len))
+    # must add leading zeros
+    leading_zeros=$((7 - len))
     printf " (${seconds}."
     if [ $leading_zeros -gt 1 ]; then
         for i in {1..${leading_zeros}}; do
