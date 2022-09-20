@@ -21,10 +21,12 @@ function _dj_python3_install() {
 }
 
 # =============================================================================
+# this seems failed in some Ubuntu 20.04 system, don't know why
+# this works in Ubuntu 18.04
 function _dj_python3_venv_numpy_pandas() {
 
     python3_v=$(version check python3)
-    echo "Python3: $python3_v"
+    _show_and_run echo "Python3: $python3_v"
     if [[ $python3_v = *"3.8"* ]]; then
         _show_and_run _install_if_not_installed python3.8-venv
     fi
@@ -37,37 +39,30 @@ function _dj_python3_venv_numpy_pandas() {
         _show_and_run python3 -m venv "$VENV_DIR"
         _show_and_run source "$VENV_DIR"/bin/activate
     fi
-    # install latest pip3
-    _show_and_run python -c \
-        "import pkg_resources; pkg_resources.require('pip>=21')" \
+    _show_and_run echo "install latest pip3"
+    python -c "import pkg_resources; pkg_resources.require('pip>=21')" \
         &>/dev/null || pip install --upgrade 'pip>=21'
+    _show_and_run echo "install wheel"
+    python -c "import pkg_resources; pkg_resources.require('pip>=21')" \
+        &>/dev/null || pip install wheel
     # prepare requirements.txt file
-    # FIXME: cannot use _show_and_run here, don't know why
     rqs_file=$(mktemp)
-    _show_and_run trap 'rm -f "$rqs_file"' SIGTERM EXIT
-    _show_and_run cat >"$rqs_file" <<EOF
-    black
-    ipympl
+    trap 'rm -f "$rqs_file"' SIGTERM EXIT
+    cat >"$rqs_file" <<EOF
     jupyterlab
     jupyter-black
     jupyterlab_templates
-    matplotlib
-    numba
     numpy
     pandas
-    pythreejs
-    plyfile
-    pyyaml
-    scipy
 EOF
     # some fix (will know)
     _show_and_run export PIP_INDEX_URL=https://pypi.org/simple
+    _show_and_run echo "install packages"
     # install packages
-    _show_and_run python -c \
-        "import pkg_resources; pkg_resources.require(open('${rqs_file}',mode='r'))" \
+    python -c "import pkg_resources; pkg_resources.require(open('${rqs_file}',mode='r'))" \
         &>/dev/null || pip install --ignore-installed -r "${rqs_file}"
-    # temporary fix fr nodejs
-    nodejs_v=$(version check nodejs)
+    # # temporary fix fr nodejs
+    nodejs_v=$(version check node)
     anw=$(_version_if_ge_than $nodejs_v "12.0.0")
     if [ "$anw" = "no" ]; then
         _show_and_run dj setup nodejs

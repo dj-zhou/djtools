@@ -262,25 +262,27 @@ function _version_check_nlohmann_json3() {
 }
 
 # =============================================================================
-function _version_check_nodejs() {
-    nvm_v=$(version check nvm)
-    if [[ ! $nvm_v = "none" ]]; then
-        nodejs_v=$(node -v)
-        nodejs_v=$(echo $nodejs_v | sed 's/v//g')
-        echo $nodejs_v
-        return
-    fi
-    echo "none"
+function _version_check_node() {
+    # nvm_v=$(version check nvm)
+    # if [[ ! $nvm_v = "none" ]]; then
+    #     nodejs_v=$(node -v)
+    #     nodejs_v=$(echo $nodejs_v | sed 's/v//g')
+    #     echo $nodejs_v
+    #     return
+    # fi
+    v=$(node -v)
+    v=$(echo $v | sed 's/v//g')
+    echo $v
 }
 
 # =============================================================================
-function _version_check_nvm() {
-    if [ -d "${HOME}/.nvm" ]; then
-        echo $(nvm --version)
-        return
-    fi
-    echo "none"
-}
+# function _version_check_nvm() {
+#     if [ -d "${HOME}/.nvm" ]; then
+#         echo $(nvm --version)
+#         return
+#     fi
+#     echo "none"
+# }
 
 # =============================================================================
 function _version_check_opencv() {
@@ -474,15 +476,15 @@ function version() {
             return
         fi
         # ------------------------------
-        if [ $2 = 'nodejs' ]; then
-            _version_check_nodejs
+        if [ $2 = 'node' ]; then
+            _version_check_node
             return
         fi
         # ------------------------------
-        if [ $2 = 'nvm' ]; then
-            _version_check_nvm
-            return
-        fi
+        # if [ $2 = 'nvm' ]; then
+        #     _version_check_nvm
+        #     return
+        # fi
         # ------------------------------
         if [ $2 = 'opencv' ]; then
             _version_check_opencv
@@ -592,7 +594,7 @@ function _version() {
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ cli11 cmake "
     check_list+="eigen3 fmt gcc glog gtest g++ gnome magic-enum nlohmann-json3 "
-    check_list+="nodejs nvm opencv opengl python3 spdlog systemd ubuntu yaml-cpp "
+    check_list+="node opencv opengl python3 spdlog systemd ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do
         ACTIONS[$i]=" "
