@@ -3,6 +3,7 @@
 source $djtools_path/clang-format.bash
 source $djtools_path/clone.bash
 source $djtools_path/help.bash
+source $djtools_path/get.bash
 source $djtools_path/setup-generic.bash
 source $djtools_path/setup-opencv.bash
 source $djtools_path/python3-tools.bash
@@ -1176,16 +1177,6 @@ function _dj_git_ssh_account_activate() {
 }
 
 # =============================================================================
-function _dj_git_ssh_account_show_all() {
-    all_github_accounts=$(ls ~/.ssh | grep .pub)
-    for i in $all_github_accounts; do
-        username=${i%".pub"}
-        username=$(echo "${username/"id_rsa-github-"/}")
-        echo $username
-    done
-}
-
-# =============================================================================
 function _dj_git_ssh_account_show_current() {
     if [ ! -f ~/.ssh/.github-activated-account ]; then
         echo -e "you need to run ${PRP} dj ssh-github activate <github username>${NOC} to activate one"
@@ -1437,6 +1428,12 @@ function dj() {
         return
     fi
     # ------------------------------
+    if [ $1 = 'get' ]; then
+        shift 1
+        _dj_get "$@"
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'git' ]; then
         if [ $2 = 'config' ]; then
             shift 2
@@ -1574,6 +1571,7 @@ function _dj() {
     local SERVICES=("
         flame-graph
         format
+        get
         git
         grep
         help
@@ -1591,6 +1589,13 @@ function _dj() {
 
     # declare an associative array for options
     declare -A ACTIONS
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    # get.bash
+    ACTIONS[get]="$get_list "
+    for i in $get_list; do
+        ACTIONS[$i]=" "
+    done
 
     # --------------------------------------------------------
     # --------------------------------------------------------
@@ -1710,16 +1715,10 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    udev_list="uvc-video-capture --dialout --show one-third-console "
-    udev_list+="stlink-v2.1 logitech-f710 ft4232h "
     ACTIONS[udev]="$udev_list "
     for i in $udev_list; do
         ACTIONS[$i]=" "
     done
-
-    # --------------------------------------------------------
-    # --------------------------------------------------------
-    udevadm_list="$(ls /dev/tty*) "
     ACTIONS[udevadm]="$udevadm_list "
     for i in $udevadm_list; do
         ACTIONS[$i]=" "
@@ -1738,28 +1737,24 @@ function _dj() {
     for i in $string_list; do
         ACTIONS[$i]=" "
     done
+
     # --------------------------------------------------------
     # --------------------------------------------------------
-    # --------------------------------------------------------
-    # --------------------------------------------------------
-    git_list="config search ssh-account ssh-clone "
+    # git.bash
     ACTIONS[git]="$git_list "
     for i in $git_list; do
         ACTIONS[$i]=" "
     done
-    search_list="-name -email -commit "
     ACTIONS[search]="$search_list "
     for i in $search_list; do
         ACTIONS[$i]=" "
     done
 
     # --------------------------------------------------------
-    ssh_account_list="--activate --show-all --show-current "
     ACTIONS["ssh-account"]="$ssh_account_list "
     for i in $ssh_account_list; do
         ACTIONS[$i]=" "
     done
-    all_accounts="$(_dj_git_ssh_account_show_all) "
     ACTIONS["--activate"]="$all_accounts"
     for i in $all_accounts; do
         ACTIONS[$i]=" "
