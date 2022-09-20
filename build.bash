@@ -6,14 +6,13 @@
 # on Ubuntu 18.04, the SDK .appolo-image-wandboard-poky-2.6.4-oesdk does not work!
 # it still says native build (meson/ninja)
 function _build_meson_cross() { # sdk_path
-
     echo -e "${CYN}meson.build (cross)${NOC} ..."
     if [ $# -lt 1 ]; then
         echo "build meson-cross: need the sdk path, or \"clean\" target."
         return
     fi
     if [ $1 = "clean" ]; then
-        _show_and_run rm _bcross* -rf
+        _show_and_run rm "_bcross"* -rf
         return
     fi
     _save_current_env_variables
@@ -131,39 +130,33 @@ function _build_meson_cross() { # sdk_path
 
 # =============================================================================
 function _build_meson_native() {
+    target_tag=$1
+    if [[ -z "$target_tag" ]]; then
+        target_tag="all"
+    fi
+    echo -e "${CYN}meson.build (native)${NOC}: $GRN$target_tag$NOC ..."
     proj_dir="_bnative.meson"
-    # clean ----------------
-    if [ $1 = "clean" ]; then
-        echo -e "${CYN}meson.build (native)${NOC} clean ..."
-        _show_and_run rm $proj_dir -rf
-        return
-    fi
-    # test ----------------
-    if [ $1 = "test" ]; then
-        echo -e "${CYN}meson.build (native)${NOC} test ..."
-        echo "build meson-native test: todo"
+
+    if [ "$target_tag" = "clean" ]; then
+        _show_and_run sudo rm -rf "$proj_dir"
         return
     fi
 
-    # build ----------------
-    echo -e "${CYN}meson.build (native)${NOC} build ..."
-
-    # exit if not a meson project
-    if [ ! -f "meson.build" ]; then
-        echo -e "${RED}not a meson project, exit!${NOC}"
+    if [ "$target_tag" = "test" ]; then
+        _show_and_run echo "build meson-native test: todo"
         return
     fi
 
     if [ ! -d "$proj_dir" ]; then
-        _show_and_run meson setup $proj_dir
+        _show_and_run meson setup "$proj_dir"
     elif [ ! -f "$proj_dir/build.ninja" ]; then
-        _show_and_run rm $proj_dir -rf
-        _show_and_run meson setup $proj_dir
+        _show_and_run rm "$proj_dir" -rf
+        _show_and_run meson setup "$proj_dir"
 
     fi
-    _pushd_quiet $proj_dir
-    ninja
-    _popd_quiet
+    _show_and_run _pushd_quiet "$proj_dir"
+    _show_and_run ninja
+    _show_and_run _popd_quiet
 }
 
 # =============================================================================
@@ -203,9 +196,12 @@ function _build_in_docker() {
 #         IDT_LIST:         200 B         2 KB      9.77%
 
 # =============================================================================
-function _build_make() {
-    echo -e "${CYN}Makefile${NOC} ..."
+function _build_makefile() {
     target_tag=$1
+    if [[ -z "$target_tag" ]]; then
+        target_tag="all"
+    fi
+    echo -e "${CYN}Makefile${NOC}: $GRN$target_tag$NOC ..."
     if [ "$target_tag" = "clean" ]; then
         _show_and_run make clean
         return
@@ -215,7 +211,7 @@ function _build_make() {
         return
     fi
 
-    _show_and_run make -j$(nproc) $target_tag
+    _show_and_run make -j$(nproc)
 
     # stm32 project dedicated scripts, can be moved into Makefile
     if [ ! -f .project-stm32 ] || [ ! -f bin/*.elf ]; then
@@ -242,48 +238,48 @@ function _build_cmake() {
     if [[ -z "$target_tag" ]]; then
         target_tag="all"
     fi
-    echo -e "${CYN}CMakeLists.txt${NOC}: $target_tag ..."
-    cur_dir=${PWD}
+    echo -e "${CYN}CMakeLists.txt${NOC}: $GRN$target_tag$NOC ..."
     build_dir="_bnative.cmake"
     # ---------------------------------------------------
     if [[ "$target_tag" = "all" ]]; then
         if [ ! -d "$build_dir" ]; then
-            echo -e "${GRN}mkdir "$build_dir" && cd "$build_dir" && cmake ..${NOC}"
-            mkdir "$build_dir" && cd "$build_dir" && cmake ..
+            _show_and_run mkdir "$build_dir"
+            _show_and_run _pushd_quiet "$build_dir"
+            _show_and_run cmake ..
         else
-            echo -e "${GRN}cd $build_dir/ && cmake ..${NOC}"
-            cd "$build_dir"/ && cmake ..
+            _show_and_run _pushd_quiet "$build_dir"
+            _show_and_run cmake ..
         fi
-        echo -e "${GRN}make -j$(nproc)${NOC}"
-        make -j$(nproc)
-        cd $cur_dir
+        _show_and_run make -j$(nproc)
+        _show_and_run _popd_quiet
         return
     fi
     # ---------------------------------------------------
     if [ "$target_tag" = "clean" ]; then
-        echo -e "${GRN}rm -rf "$build_dir"/${NOC}"
-        rm -rf "$build_dir"/
+        _show_and_run sudo rm -rf "$build_dir"
         return
     fi
     # ---------------------------------------------------
     if [ "$target_tag" = "install" ]; then
         if [ ! -d "$build_dir" ]; then
-            echo -e "${GRN}mkdir "$build_dir" && cd "$build_dir" && cmake .. && make -j$(nproc)${NOC}"
-            mkdir "$build_dir" && cd "$build_dir" && cmake .. && make -j$(nproc)
-            cd ..
+            _show_and_run mkdir "$build_dir"
+            _show_and_run _pushd_quiet "$build_dir"
+            _show_and_run cmake ..
+            _show_and_run make -j$(nproc)
+            _show_and_run sudo make install
+        else
+            _show_and_run _pushd_quiet "$build_dir"
+            _show_and_run sudo make install
         fi
-        echo -e "${GRN}cd "$build_dir" && sudo make install${NOC}"
-        cd $build_dir
-        sudo make install
-        cd $cur_dir
+        _show_and_run _popd_quiet
         return
     fi
-    # ---------------------------------------------------
+    # # ---------------------------------------------------
     if [ "$target_tag" = "test" ]; then
         if [ -d $build_dir ]; then
-            _pushd_quiet $build_dir
-            make test
-            _popd_quiet
+            _show_and_run _pushd_quiet $build_dir
+            _show_and_run make test
+            _show_and_run _popd_quiet
         fi
     fi
 }
@@ -326,7 +322,7 @@ function build() {
     # ------------------------------
     if [ $1 = 'make' ]; then
         shift 1
-        _build_make "$@"
+        _build_makefile "$@"
         return
     fi
     # ------------------------------
