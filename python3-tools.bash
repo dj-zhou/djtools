@@ -21,7 +21,7 @@ function _dj_python3_install() {
 }
 
 # =============================================================================
-# this seems failed in Ubuntu 20.04
+# this seems failed in some Ubuntu 20.04 system, don't know why
 # this works in Ubuntu 18.04
 function _dj_python3_venv_numpy_pandas() {
 
