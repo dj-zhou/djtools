@@ -22,11 +22,11 @@ function compile_make_build_etc() {
     fi
     # ------------------------------
     # CMake and Meson are of the same importance
-    if [[ -f "CMakeLists.txt" || -f "meson.build" ]]; then
+    if [[ $(_build_cmakelists_exists) = 'yes' || $(_build_main_meson_exists) = 'yes' ]]; then
         if [ -f "CMakeLists.txt" ]; then
             _build_cmake "$target"
         fi
-        if [ -f "meson.build" ]; then
+        if [ $(_build_main_meson_exists) = 'yes' ]; then
             _build_meson_native "$target"
             # this is a hack
             if [ "$target" = "clean" ]; then

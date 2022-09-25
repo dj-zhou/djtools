@@ -358,23 +358,24 @@ function _build_main_meson_exists() {
             fi
         done <meson.build
         if [ $find_main_meson = '1' ]; then
-            echo "meson-native meson-cross "
+            echo "yes"
         else
-            echo " "
+            echo "no"
         fi
         return
     fi
 
-    echo " "
+    echo "no"
 }
 
 # =============================================================================
+# todo: in some projects, CMakeLists.txt file can be in the sub-directory
 function _build_cmakelists_exists() {
     if [ -f "CMakeLists.txt" ]; then
-        echo "cmake "
+        echo "yes"
         return
     fi
-    echo " "
+    echo "no"
 }
 
 # =============================================================================
@@ -443,9 +444,13 @@ function _build() {
     # All possible first values in command line
     service="template "
     service+=$(_build_build_docker_exists)
-    service+=$(_build_cmakelists_exists)
+     if [ $(_build_cmakelists_exists) = 'yes' ]; then
+        service+="cmake "
+    fi
     service+=$(_build_makefile_exists)
-    service+=$(_build_main_meson_exists)
+    if [ $(_build_main_meson_exists) = 'yes' ]; then
+        service+="meson-native meson-cross "
+    fi
     local SERVICES=("
         $service
     ")
