@@ -208,15 +208,16 @@ function _dj_setup_kermit() {
     kermrc_file="kermrc"
     _show_and_run rm $kermrc_file -f
     _show_and_run touch $kermrc_file
-    echo 'set line /dev/ttyUSB0' >>$kermrc_file
-    echo 'set speed 115200' >>$kermrc_file
-    echo 'set carrier-watch off' >>$kermrc_file
-    echo 'set handshake none' >>$kermrc_file
-    echo 'set flow-control none' >>$kermrc_file
-    echo 'set stop-bits 1' >>$kermrc_file
-    echo 'set modem none' >>$kermrc_file
-    echo 'set protocol zmodem' >>$kermrc_file
-    echo 'connect' >>$kermrc_file
+    # _show_and_run does not show the ">>" thing
+    _show_and_run echo 'set line /dev/ttyUSB0' >>$kermrc_file
+    _show_and_run echo 'set speed 115200' >>$kermrc_file
+    _show_and_run echo 'set carrier-watch off' >>$kermrc_file
+    _show_and_run echo 'set handshake none' >>$kermrc_file
+    _show_and_run echo 'set flow-control none' >>$kermrc_file
+    _show_and_run echo 'set stop-bits 1' >>$kermrc_file
+    _show_and_run echo 'set modem none' >>$kermrc_file
+    _show_and_run echo 'set protocol zmodem' >>$kermrc_file
+    _show_and_run echo 'connect' >>$kermrc_file
     _show_and_run mv $kermrc_file ~/
 
     _show_and_run sudo cp $djtools_path/scripts/kermit-serial /usr/bin
