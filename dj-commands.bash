@@ -233,39 +233,43 @@ eom
 
 # =============================================================================
 function _dj_setup_gadgets() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
-    sudo rm -rf dj-gadgets
-    git clone https://dj-zhou@github.com/dj-zhou/dj-gadgets.git
-    cd dj-gadgets
-    sudo rm build -rf
-    mkdir build
-    cd build
-    cmake ..
-    make
-    sudo make install
+    _show_and_run sudo rm -rf dj-gadgets
+    _show_and_run git clone https://dj-zhou@github.com/dj-zhou/dj-gadgets.git
+    _show_and_run cd dj-gadgets
+    _show_and_run sudo rm -rf build
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     # check depenency
     v=$(version check cli11)
     if [ "$v" = "cli11 is not installed" ]; then
-        dj setup cli11
+        _show_and_run dj setup cli11
     fi
 
     if [ ! -f /usr/local/lib/libmatplot.* ]; then
-        dj setup matplot++
+        _show_and_run dj setup matplot++
+    fi
+
+    if [ ! -f "/usr/local/include/magic_enum.hpp" ]; then
+        _show_and_run dj setup magic-enum
     fi
 
     # dj-file installation
-    cd ../dj-file/
-    rm build -rf
-    mkdir build
-    cd build
-    cmake ..
-    make
-    sudo make install
+    _show_and_run cd ../dj-file/
+    _show_and_run rm build -rf
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make
+    _show_and_run sudo make install
 
-    _popd_quiet
+    _show_and_run _popd_quiet
 }
 
 # =============================================================================
