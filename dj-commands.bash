@@ -30,7 +30,7 @@ function _dj_help() {
 
 # =============================================================================
 function _dj_setup_boost() {
-    cur_dir=${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     gpp_v=$(version check g++)
     anw=$(_version_if_ge_than $gpp_v "10.1.0")
@@ -44,23 +44,24 @@ function _dj_setup_boost() {
     _press_enter_or_wait_s_continue 5
 
     _install_if_not_installed python3-dev libxml2-dev
-    cd ~ && mkdir -p soft/ && cd soft/
-    sudo rm -rf boost
-    git clone https://github.com/boostorg/boost.git
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
+    _show_and_run sudo rm -rf boost
+    _show_and_run git clone https://github.com/boostorg/boost.git
 
-    cd boost
-    git checkout boost-$v
+    _show_and_run cd boost
+    _show_and_run git checkout boost-$v
     # clone the submodules! this takes long though
-    git submodule update --init --recursive
+    _show_and_run git submodule update --init --recursive
     # install is simple
-    ./bootstrap.sh --prefix=/usr/local
-    sudo ./b2 install
+    _show_and_run ./bootstrap.sh --prefix=/usr/local
+    _show_and_run sudo ./b2 install
 
     _verify_header_files /usr/include/ # this is not accurate
     _verify_lib_installation libboost_atomic.so /usr/local/lib
     _verify_lib_installation libboost_timer.so /usr/local/lib
 
-    cd $cur_dir
+    _show_and_run _popd_quiet
 }
 
 # =============================================================================================
