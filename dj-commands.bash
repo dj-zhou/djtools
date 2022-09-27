@@ -57,8 +57,8 @@ function _dj_setup_boost() {
     sudo ./b2 install
 
     _verify_header_files /usr/include/ # this is not accurate
-    _verify_lib_installation libboost_atomic.so /usr/local/lib/
-    _verify_lib_installation libboost_timer.so /usr/local/lib/
+    _verify_lib_installation libboost_atomic.so /usr/local/lib
+    _verify_lib_installation libboost_timer.so /usr/local/lib
 
     cd $cur_dir
 }
