@@ -166,20 +166,20 @@ function _dj_setup_cmake() {
 
     _press_enter_or_wait_s_continue 5
 
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     cd ~ && mkdir -p soft/ && cd soft/
-    rm -rf CMake
-    git clone https://github.com/Kitware/CMake.git
-    cd CMake
-    git checkout $v
+    _show_and_run rm -rf CMake
+    _show_and_run git clone https://github.com/Kitware/CMake.git
+    _show_and_run cd CMake
+    _show_and_run git checkout $v
 
-    ./bootstrap --prefix=/usr/local
-    make -j$(nproc)
-    sudo make install
+    _show_and_run ./bootstrap --prefix=/usr/local
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
     echo -e "${GRN}cmake${NOC} is installed to ${GRN}/usr/local/bin${NOC}"
 
-    _popd_quiet
+    _show_and_run _popd_quiet
 }
 
 # =============================================================================
