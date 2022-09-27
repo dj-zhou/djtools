@@ -361,7 +361,7 @@ function _dj_setup_container_lxd_4_0() {
 
 # =============================================================================
 function _dj_setup_pangolin() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     # dependency installation
     packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
@@ -369,18 +369,21 @@ function _dj_setup_pangolin() {
 
     # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
 
-    cd ~ && mkdir -p soft/ && cd soft/
-    rm -rf Pangolin/
-    git clone https://github.com/stevenlovegrove/Pangolin.git
-    cd Pangolin
-    git checkout v0.6 # released on Apr 22, 2021, need test
-    rm -rf build/ && mkdir build && cd build
-    cmake ..
-    make -j$(nproc)
-    sudo make install
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf Pangolin/
+    _show_and_run git clone https://github.com/stevenlovegrove/Pangolin.git
+    _show_and_run cd Pangolin
+    _show_and_run git checkout v0.6 # released on Apr 22, 2021, need test
+    _show_and_run rm -rf build/
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
-    echo -e "libpangolin.so is in path: ${GRN}/usr/local/lib/${NOC}"
-    echo -e "header files are in path: ${GRN}/usr/local/include/pangolin/${NOC}"
+    _verify_lib_installation libpangolin.so /usr/local/lib/
+    _verify_header_files /usr/local/include/pangolin/
 
     echo -e "If you see error: ${RED}Could not find GLEW${NOC}"
     echo "you should run the following commands:"
@@ -388,7 +391,7 @@ function _dj_setup_pangolin() {
     echo "   \$ dj setup gtest"
     echo "   \$ dj setup glog"
 
-    _popd_quiet
+    _show_and_run _popd_quiet
 }
 
 # =============================================================================
@@ -663,24 +666,27 @@ function _dj_setup_stm32_tools() {
 
 # =============================================================================
 function _dj_setup_glfw3() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     echo -e "install glfw3 ..."
 
-    cd ~ && mkdir -p soft && cd soft/
+    _show_and_run mkdir -p ~/soft
+    _show_and_run cd ~/soft/
 
     # glfw3
     packages="build-essential cmake git xorg-dev libglu1-mesa-dev "
     _install_if_not_installed $packages
-    rm -rf glfw3/
-    git clone https://github.com/dj-zhou/glfw3.git
-    cd glfw3/
-    mkdir build && cd build/
-    cmake .. -DBUILD_SHARED_LIBS=ON
-    make -j$(nproc)
-    sudo make install && sudo ldconfig
+    _show_and_run rm -rf glfw3/
+    _show_and_run git clone https://github.com/dj-zhou/glfw3.git
+    _show_and_run cd glfw3/
+    _show_and_run mkdir build
+    _show_and_run cd build/
+    _show_and_run cmake .. -DBUILD_SHARED_LIBS=ON
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
+    _show_and_run sudo ldconfig
 
-    _popd_quiet
+    _show_and_run _popd_quiet
 }
 
 # =============================================================================
@@ -729,20 +735,24 @@ eom
 
 # =============================================================================
 function _dj_setup_gtest() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     v=$(_find_package_version googletest)
     _echo_install googletest $v
     _press_enter_or_wait_s_continue 5
 
-    cd ~ && mkdir -p soft && cd soft/
-    rm -rf googletest
-    git clone https://github.com/google/googletest.git
-    cd googletest
-    git checkout release-$v
-    rm build -rf && mkdir build && cd build
-    cmake ..
-    make -j$(nproc) && sudo make install
+    _show_and_run mkdir -p ~/soft
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf googletest
+    _show_and_run git clone https://github.com/google/googletest.git
+    _show_and_run cd googletest
+    _show_and_run git checkout release-$v
+    _show_and_run rm build -rf
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     echo -e "\n${GRN}googletest $v${NOC} is installed."
     _verify_lib_installation libgtest.a /usr/local/lib/
@@ -751,30 +761,34 @@ function _dj_setup_gtest() {
     _verify_pkgconfig_file gtest.pc /usr/local/lib/pkgconfig/
     _verify_pkgconfig_file gtest_main.pc /usr/local/lib/pkgconfig/
 
-    _popd_quiet
+    _show_and_run _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_glog() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     echo -e "install glog ..."
 
     v=$(_find_package_version glog)
-    cd ~ && mkdir -p soft && cd soft/
-    rm -rf glog
-    git clone https://github.com/google/glog.git
-    cd glog
-    git checkout $v
-    rm build -rf && mkdir build && cd build
-    cmake ..
-    make -j$(nproc) && sudo make install
+    _show_and_run mkdir -p ~/soft
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf glog
+    _show_and_run git clone https://github.com/google/glog.git
+    _show_and_run cd glog
+    _show_and_run git checkout $v
+    _show_and_run rm build -rf
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     _verify_lib_installation libglog.a /usr/local/lib
     _verify_lib_installation libglog.so /usr/local/lib
     _verify_header_files /usr/local/include/glog/
 
-    _popd_quiet
+    _show_and_run _popd_quiet
 }
 
 # =============================================================================
@@ -793,20 +807,22 @@ function _dj_setup_gnome() {
 # =============================================================================
 # ninja is used to compile
 function _dj_setup_grpc() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     grpc_v=$(_find_package_version grpc)
-    cd ~ && mkdir -p soft && cd soft/
-    rm grpc -rf
-    git clone https://github.com/grpc/grpc.git --recurse-submodules \
+    _show_and_run mkdir -p ~/soft
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf grpc
+    _show_and_run git clone https://github.com/grpc/grpc.git --recurse-submodules \
         --shallow-submodules --depth 1 --branch v${grpc_v}
-    cd grpc
-    mkdir build && cd build
-    cmake .. -GNinja
-    cmake --build .
-    sudo cmake --build . -- install
+    _show_and_run cd grpc
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake .. -GNinja
+    _show_and_run cmake --build .
+    _show_and_run sudo cmake --build . -- install
 
-    _popd_quiet
+    _show_and_run _popd_quiet
 }
 
 # =============================================================================
