@@ -183,7 +183,7 @@ function _dj_setup_computer() {
         _show_and_run sudo dpkg -i google-chrome*
     fi
 
-    _show_and_run _popd_quiet
+    _popd_quiet
 
     # -----------------------------------
     gnome_v=$(version check gnome)
@@ -214,7 +214,7 @@ function _dj_setup_computer() {
     echo -e "${CYN}time & date control, please run command:${NOC}"
     echo "$ timedatectl set-local-rtc 1"
 
-    _show_and_run _popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -268,26 +268,30 @@ function _dj_setup_dropbox() {
 # =============================================================================
 # Install a version from its source code
 function _dj_setup_eigen3() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     eigen3_v=$(_find_package_version eigen3)
     _echo_install eigen3 $eigen3_v
     _press_enter_or_wait_s_continue 5
 
-    sudo rm -rf /usr/local/include/eigen3
-    sudo rm -rf /usr/include/eigen3
+    _show_and_run sudo rm -rf /usr/local/include/eigen3
+    _show_and_run sudo rm -rf /usr/include/eigen3
 
-    cd ~ && mkdir -p soft/ && cd soft/
-    rm -rf eigen*
-    wget https://gitlab.com/libeigen/eigen/-/archive/$eigen3_v/eigen-$eigen3_v.tar.gz
-    tar -xvf eigen-$eigen3_v.tar.gz
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf eigen*
+    _show_and_run wget https://gitlab.com/libeigen/eigen/-/archive/$eigen3_v/eigen-$eigen3_v.tar.gz
+    _show_and_run tar -xvf eigen-$eigen3_v.tar.gz
 
-    cd eigen-$eigen3_v
-    mkdir build && cd build && cmake ..
-    make -j$(nproc) && sudo make install
+    _show_and_run cd eigen-$eigen3_v
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     # just to prevent compiling error in the future
-    sudo cp /usr/local/include/eigen3/ -r /usr/include/
+    _show_and_run sudo cp /usr/local/include/eigen3/ -r /usr/include/
 
     echo -e "\n${GRN}eigen3 $eigen3_v${NOC} is installed."
     _verify_header_files /usr/include/eigen3
@@ -327,7 +331,7 @@ eom
 # =============================================================================
 # example code: packages/fmt; /packages/spdlog
 function _dj_setup_fmt() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     if [ $# -eq 0 ]; then
         fmt_v=$(_find_package_version fmt)
@@ -339,21 +343,24 @@ function _dj_setup_fmt() {
     _press_enter_or_wait_s_continue 5
 
     # remove first ------------------
-    sudo rm -rf /usr/local/lib/libfmt.a
-    sudo rm -rf /usr/local/include/fmt/
-    sudo rm -rf /usr/local/lib/pkgconfig/fmt.pc
-    sudo rm -rf /usr/local/lib/cmake/fmt/
+    _show_and_run sudo rm -rf /usr/local/lib/libfmt.a
+    _show_and_run sudo rm -rf /usr/local/include/fmt/
+    _show_and_run sudo rm -rf /usr/local/lib/pkgconfig/fmt.pc
+    _show_and_run sudo rm -rf /usr/local/lib/cmake/fmt/
 
     # --------------------
-    cd ~ && mkdir -p soft/ && cd soft/
-    rm -rf fmt
-    git clone https://github.com/fmtlib/fmt.git
-    cd fmt
-    git checkout ${fmt_v}
-    rm -rf build && mkdir build && cd build
-    cmake .. -DBUILD_SHARED_LIBS=TRUE -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
-    make -j$(nproc)
-    sudo make install
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf fmt
+    _show_and_run git clone https://github.com/fmtlib/fmt.git
+    _show_and_run cd fmt
+    _show_and_run git checkout ${fmt_v}
+    _show_and_run rm -rf build
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake .. -DBUILD_SHARED_LIBS=TRUE -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     echo -e "\n${GRN}fmt $fmt_v${NOC} is installed."
 
@@ -734,21 +741,22 @@ eom
 # this setup works only for the host computer, don't know how to do it for
 # cross compilers
 function _dj_setup_libev() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
 
     v=$(_find_package_version libev)
     _echo_install libev $v
     _press_enter_or_wait_s_continue 5
 
     file="libev-$v"
-    wget http://dist.schmorp.de/libev/$file.tar.gz
-    tar -zxf $file.tar.gz
-    cd $file
-    ./configure
-    make
-    sudo make install
+    _show_and_run wget http://dist.schmorp.de/libev/$file.tar.gz
+    _show_and_run tar -zxf $file.tar.gz
+    _show_and_run cd $file
+    _show_and_run ./configure
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     # check for the LD_LIBRARY_PATH
     # if it is not set for libev, then set it
@@ -756,15 +764,12 @@ function _dj_setup_libev() {
     if [[ "$result" = *"/usr/local/lib"* ]]; then
         echo "LD_LIBRARY_PATH is already set, no need to set it again"
     else
-        echo "LD_LIBRARY_PATH is not set, set it now"
-        echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >>~/.bashrc
+        _show_and_run echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >>~/.bashrc
     fi
 
     echo -e "\n${GRN}libev $v${NOC} is installed."
     _verify_lib_installation libev.so /usr/local/lib/
     _verify_lib_installation libev.a /usr/local/lib/
-
-    cd ~/soft
 
     _popd_quiet
 }
@@ -853,21 +858,23 @@ function _dj_setup_libiio() {
 
 # =============================================================================
 function _dj_setup_libserialport() {
-    pushd "${PWD}" &>/dev/null
+    _show_and_run _pushd_quiet "${PWD}"
 
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/ soft/
 
     v=$(_find_package_version libserialport)
     _echo_install libserialport $v
     _press_enter_or_wait_s_continue 5
 
-    rm -rf libserialport/
-    git clone git://sigrok.org/libserialport.git
+    _show_and_run rm -rf libserialport/
+    _show_and_run git clone git://sigrok.org/libserialport.git
 
-    cd libserialport
-    ./autogen.sh
-    ./configure
-    make -j4 && sudo make install
+    _show_and_run cd libserialport
+    _show_and_run ./autogen.sh
+    _show_and_run ./configure
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     # check if library installed correctly
     _verify_lib_installation libserialport.a /usr/local/lib/
@@ -876,7 +883,7 @@ function _dj_setup_libserialport() {
     _verify_pkgconfig_file libserialport.pc /usr/local/lib/pkgconfig
     _verify_header_files libserialport.h /usr/local/include
 
-    popd &>/dev/null
+    _popd_quiet
 }
 
 # =============================================================================
@@ -967,15 +974,17 @@ function _dj_setup_matplot_xx() {
 
 # =============================================================================
 function _dj_setup_magic_enum() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
-    cd ~ && mkdir -p soft/ && cd soft/ && rm magic_enum -rf
+    _show_and_run mkdir -p ~/soft/ 
+    _show_and_run cd ~/soft/ 
+    _show_and_run rm -rf magic_enum
 
     ver=$(_find_package_version magic-enum)
-    git clone https://github.com/Neargye/magic_enum
-    cd magic_enum
-    git checkout $ver
-    sudo cp include/magic_enum.hpp /usr/local/include/
+    _show_and_run git clone https://github.com/Neargye/magic_enum
+    _show_and_run cd magic_enum
+    _show_and_run git checkout $ver
+    _show_and_run sudo cp include/magic_enum.hpp /usr/local/include/
 
     echo -e "${GRN}magic_enum $ver${NOC} is installed:"
     _verify_header_files magic_enum.hpp /usr/local/include/
@@ -1156,13 +1165,14 @@ function _dj_stup_network_tools() {
     _install_if_not_installed nethogs iptraf
 
     echo -e "install ${GRN}mNet-Assist${NOC}"
-    _pushd_quiet ${PWD}
-    cd ~ && mkdir -p soft && cd soft
-    rm -rf m-net-assist
-    git clone https://github.com/dj-zhou/m-net-assist.git
-    cd m-net-assist
+    _show_and_run _pushd_quiet ${PWD}
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf m-net-assist
+    _show_and_run git clone https://github.com/dj-zhou/m-net-assist.git
+    _show_and_run cd m-net-assist
     # does it support new Ubuntu system?
-    sudo dpkg -i mNetAssist-release-amd64.deb
+    _show_and_run sudo dpkg -i mNetAssist-release-amd64.deb
 
     _popd_quiet
 }
