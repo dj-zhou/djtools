@@ -148,84 +148,73 @@ function _dj_setup_baidu_netdisk() {
 
 # =============================================================================
 function _dj_setup_computer() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
-    sudo rm -rf ~/Documents/
-    sudo rm -rf ~/Music/
-    sudo rm -rf ~/Pictures/
-    sudo rm -rf ~/Public/
-    sudo rm -rf ~/Templates/
-    sudo rm -rf ~/Videos/
-    sudo rm -rf ~/examples.desktop
+    _show_and_run sudo rm -rf ~/Documents/
+    _show_and_run sudo rm -rf ~/Music/
+    _show_and_run sudo rm -rf ~/Pictures/
+    _show_and_run sudo rm -rf ~/Public/
+    _show_and_run sudo rm -rf ~/Templates/
+    _show_and_run sudo rm -rf ~/Videos/
+    _show_and_run sudo rm -rf ~/examples.desktop
+  
+    # -----------------------------------
+    _show_and_run sudo apt-get update -y
+    _show_and_run sudo apt-get upgrade -y
+
 
     # -----------------------------------
-    sudo apt-get update -y
-    sudo apt-get upgrade -y
-
-    # -----------------------------------
-    cat <<eom
-going to install the following packages:
-       ark cmake curl dconf-editor dconf-tools git
-       git-lfs g++ htop libgtk2.0-dev lsb-core
-       scrot terminator tree vlc vim wmctrl xclip yasm
-eom
-
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
     packages="ark cmake curl dconf-editor dconf-tools git "
     packages+="git-lfs g++ htop libgtk2.0-dev libncurses5-dev lsb-core "
     packages+="scrot terminator tree vlc vim wmctrl xclip yasm "
     _install_if_not_installed $packages
 
     # -----------------------------------
-    echo -e "going to install Google Chrome\n"
-    _press_enter_or_wait_s_continue 10
-    cd ~ && mkdir -p soft/ && cd soft/
+    echo -e "${CYN}install Google Chrome${NOC}"
+    _press_enter_or_wait_s_continue 5
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
     google_ver=$(google-chrome --version)
     if [[ "$google_ver" = *"Google Chrome"* ]]; then
         echo "Google Chrome already installed"
     else
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo dpkg -i google-chrome*
+        _show_and_run wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        _show_and_run sudo dpkg -i google-chrome*
     fi
 
-    cd ~
-
-    # -----------------------------------
-    # remove firefox
-    # echo -e "going to remove firefox\n"
-    # _press_enter_or_wait_s_continue 10
-    # sudo apt-get purge firefox -y
-    # rm -Rf ~/.mozilla/firefox/
+    _show_and_run _popd_quiet
 
     # -----------------------------------
     gnome_v=$(version check gnome)
     # to display simplified Chinese: important, do not comment out!
     if [ ! "$gnome_v" = ' ' ]; then
-        echo -e "going to setup simplified Chinese support\n"
-        _press_enter_or_wait_s_continue 10
-        gsettings set org.gnome.gedit.preferences.encodings \
+        echo -e "${CYN}setup simplified Chinese support${NOC}"
+        _press_enter_or_wait_s_continue 5
+        _show_and_run gsettings set org.gnome.gedit.preferences.encodings \
             auto-detected "['CURRENT','GB18030','GBK','GB2312','UTF-8','UTF-16']"
     fi
 
     # -----------------------------------
     # to disable the fixed dock (in dock setting, it is Auto-hide the Dock option)
     if [ ! "$gnome_v" = ' ' ]; then
-        echo -e "hide the Dock when any windows overlap with it\n"
-        _press_enter_or_wait_s_continue 10
-        gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
+        echo -e "${CYN}hide the Dock when any windows overlap with it${NOC}"
+        _press_enter_or_wait_s_continue 5
+        _show_and_run gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
     fi
+
     # -----------------------------------
     # to lock the screen from commands
     if [ ! "$gnome_v" = ' ' ]; then
-        echo -e "going to setup lock screen command\n"
-        _press_enter_or_wait_s_continue 10
+        echo -e "${CYN}setup lock screen command${NOC}"
+        _press_enter_or_wait_s_continue 5
         _install_if_not_installed gnome-screensaver
     fi
     # -----------------------------------
-    echo -e "time & date control: \n you need to run the code:\n"
-    echo -e "    timedatectl set-local-rtc 1\n"
+    echo -e "${CYN}time & date control, please run command:${NOC}"
+    echo "$ timedatectl set-local-rtc 1"
 
-    _popd_quiet
+    _show_and_run _popd_quiet
 }
 
 # =============================================================================
