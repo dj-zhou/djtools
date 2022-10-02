@@ -148,49 +148,48 @@ function _dj_setup_clang_format() {
 # Ubuntu 16.04: give up
 # Ubuntu 18.04: 11.1.0 (tested), https://github.com/llvm/llvm-project/releases/tag/llvmorg-11.1.0
 # Ubuntu 20.04: 12.0.0 (tested), https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.0
-
 function _dj_setup_clang_llvm() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
-    echo -e "Install LLVM clang (clang+llvm) on Ubuntu $(version check ubuntu)"
+    echo -e "Install LLVM clang (clang+llvm) on Ubuntu ${GRN}$(version check ubuntu)${NOC}"
 
     _press_enter_or_wait_s_continue 5
 
     # how to choose a version?
 
     if [[ ${ubuntu_v} = *'16.04'* ]]; then
-        echo "todo"
+        echo "not supported"
         return
     elif [[ ${ubuntu_v} = *'18.04'* ]]; then
-        target_dir="clang-llvm-11.1.0"
-        repo="$target_dir-x86-64-ubuntu-1604"
-        folder_unpacked="clang+llvm-11.1.0-x86_64-linux-gnu-ubuntu-16.04" # this should be correct!
+        _show_and_run target_dir="clang-llvm-11.1.0"
+        _show_and_run repo="$target_dir-x86-64-ubuntu-1604"
+        # this should be correct!
+        _show_and_run folder_unpacked="clang+llvm-11.1.0-x86_64-linux-gnu-ubuntu-16.04"
     elif [[ ${ubuntu_v} = *'20.04'* ]]; then
-        target_dir="clang-llvm-12.0.0"
-        repo="$target_dir-x86-64-ubuntu-2004"
-        folder_unpacked="clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04"
+        _show_and_run target_dir="clang-llvm-12.0.0"
+        _show_and_run repo="$target_dir-x86-64-ubuntu-2004"
+        _show_and_run folder_unpacked="clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04"
     fi
 
     # just move all things to dj-zhou github
     # use command:
     #    split -b 10M [file].tar.xz clang-llvm.tar.xz
     # to get file.tar.xzaa, file.tar.xzab, etc, and then push into github repo
-    url=https://github.com/dj-zhou/${repo}.git
-    cd ~ && mkdir -p soft/ && cd soft/
-    rm $repo -rf
-    git clone $url
-    cd $repo
-    cat clang-llvm* >$repo.tar.xz
+    _show_and_run url=https://github.com/dj-zhou/${repo}.git
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
+    _show_and_run rm $repo -rf
+    _show_and_run git clone $url
+    _show_and_run cd $repo
+    _show_and_run cat clang-llvm* >$repo.tar.xz
 
-    echo "untar the clang file ..."
-    tar xf ${repo}.tar.xz
-    sudo rm -rf /opt/$target_dir/
+    _show_and_run tar xf ${repo}.tar.xz
+    _show_and_run sudo rm -rf /opt/$target_dir/
 
-    echo "copy the clang files into /opt/$target_dir/ ..."
-    sudo mv ${folder_unpacked}/ $target_dir/
-    sudo mv $target_dir/ /opt/
+    _show_and_run sudo mv ${folder_unpacked}/ $target_dir/
+    _show_and_run sudo mv $target_dir/ /opt/
 
-    mkdir -p ~/.config/Code/User
+    _show_and_run mkdir -p ~/.config/Code/User
 
     echo -e "Do you want to apply the default vscode settings? [Yes/No]"
     read asw
@@ -201,9 +200,9 @@ function _dj_setup_clang_llvm() {
     elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || (
         $asw = 'Yes') || ($asw = 'yes') ]]; then
         if [[ ${ubuntu_v} = *'18.04'* ]]; then
-            cp ${djtools_path}/settings/vscode-settings-1804.json ~/.config/Code/User/settings.json
+            _show_and_run cp ${djtools_path}/settings/vscode-settings-1804.json ~/.config/Code/User/settings.json
         elif [[ ${ubuntu_v} = *'20.04'* ]]; then
-            cp ${djtools_path}/settings/vscode-settings-2004.json ~/.config/Code/User/settings.json
+            _show_and_run cp ${djtools_path}/settings/vscode-settings-2004.json ~/.config/Code/User/settings.json
         fi
     else
         echo "wrong answer, not setting applied!"
