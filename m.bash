@@ -17,7 +17,7 @@ function compile_make_build_etc() {
     target="$1"
     # ------------------------------
     if [ -f "Makefile" ]; then
-        _build_make "$target"
+        _build_makefile "$target"
         return
     fi
     # ------------------------------
