@@ -156,7 +156,7 @@ function _build_meson_native() {
     fi
     _show_and_run _pushd_quiet "$proj_dir"
     _show_and_run ninja
-    _show_and_run _popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -251,7 +251,7 @@ function _build_cmake() {
             _show_and_run cmake ..
         fi
         _show_and_run make -j$(nproc)
-        _show_and_run _popd_quiet
+        _popd_quiet
         return
     fi
     # ---------------------------------------------------
@@ -271,7 +271,7 @@ function _build_cmake() {
             _show_and_run _pushd_quiet "$build_dir"
             _show_and_run sudo make install
         fi
-        _show_and_run _popd_quiet
+        _popd_quiet
         return
     fi
     # # ---------------------------------------------------
@@ -279,7 +279,7 @@ function _build_cmake() {
         if [ -d $build_dir ]; then
             _show_and_run _pushd_quiet $build_dir
             _show_and_run make test
-            _show_and_run _popd_quiet
+            _popd_quiet
         fi
     fi
 }
@@ -444,7 +444,7 @@ function _build() {
     # All possible first values in command line
     service="template "
     service+=$(_build_build_docker_exists)
-     if [ $(_build_cmakelists_exists) = 'yes' ]; then
+    if [ $(_build_cmakelists_exists) = 'yes' ]; then
         service+="cmake "
     fi
     service+=$(_build_makefile_exists)
