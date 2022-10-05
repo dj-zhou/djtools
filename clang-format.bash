@@ -193,7 +193,7 @@ function _dj_setup_clang_llvm() {
 
     echo -e "Do you want to apply the default vscode settings? [Yes/No]"
     read asw
-
+    
     if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (
         $asw = 'No') || ($asw = 'no') ]]; then
         echo "You can edit ~/.config/Code/User/settings.json manually."
