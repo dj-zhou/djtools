@@ -235,6 +235,7 @@ eom
 # =============================================================================
 # fix: need to setup eigen3,
 # why need to install matplot++?
+# need to install cli11 first, then matplot++?
 function _dj_setup_gadgets() {
     _show_and_run _pushd_quiet ${PWD}
 
@@ -249,7 +250,7 @@ function _dj_setup_gadgets() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    # check depenency
+    # check dependency
     v=$(version check cli11)
     if [ "$v" = "cli11 is not installed" ]; then
         _show_and_run dj setup cli11
