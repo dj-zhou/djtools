@@ -157,11 +157,10 @@ function _dj_setup_computer() {
     _show_and_run sudo rm -rf ~/Templates/
     _show_and_run sudo rm -rf ~/Videos/
     _show_and_run sudo rm -rf ~/examples.desktop
-  
+
     # -----------------------------------
     _show_and_run sudo apt-get update -y
     _show_and_run sudo apt-get upgrade -y
-
 
     # -----------------------------------
     _press_enter_or_wait_s_continue 5
@@ -976,8 +975,8 @@ function _dj_setup_matplot_xx() {
 function _dj_setup_magic_enum() {
     _show_and_run _pushd_quiet ${PWD}
 
-    _show_and_run mkdir -p ~/soft/ 
-    _show_and_run cd ~/soft/ 
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
     _show_and_run rm -rf magic_enum
 
     ver=$(_find_package_version magic-enum)
@@ -1752,7 +1751,7 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'cli11' ]; then
-        _dj_setup_cli11
+        _dj_setup_cli11 $2
         return
     fi
     # --------------------------

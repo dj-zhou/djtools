@@ -113,35 +113,40 @@ function _dj_setup_can_dev_tools() {
 }
 
 # =============================================================================
+# it failed to install v1.9.0 on ubuntu 20.04, due to build error from googletest
 function _dj_setup_cli11() {
-    cur_dir_cli11=${PWD}
-
-    v=$(_find_package_version cli11)
+    _show_and_run _pushd_quiet ${PWD}
+    if [ ! -z $1 ]; then
+        v=$1
+    else
+        v=$(_find_package_version cli11)
+    fi
     _echo_install CLI11 v$v
     _press_enter_or_wait_s_continue 5
 
     # remove some exisiting files to prevent error
     # v2.1.1 does not have CLI11.pc file installed, but >=v2.0.0 has!
-    sudo rm -rf /usr/local/lib/pkgconfig/CLI11.pc
-    sudo rm -rf /usr/local/lib/cmake/CLI11/CLI11Config.cmake
-    sudo rm -rf /usr/local/lib/cmake/CLI11/CLI11ConfigVersion.cmake
+    _show_and_run sudo rm -rf /usr/local/lib/pkgconfig/CLI11.pc
+    _show_and_run sudo rm -rf /usr/local/lib/cmake/CLI11/CLI11Config.cmake
+    _show_and_run sudo rm -rf /usr/local/lib/cmake/CLI11/CLI11ConfigVersion.cmake
 
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p ~/soft
+    _show_and_run cd ~/soft
 
-    rm -rf CLI11/
-    git clone https://github.com/CLIUtils/CLI11
-    cd CLI11
-    git checkout v$v
+    _show_and_run sudo rm -rf CLI11/
+    _show_and_run git clone https://github.com/CLIUtils/CLI11
+    _show_and_run cd CLI11
+    _show_and_run git checkout v$v
     # gtest is a submodule of it
-    git submodule update --init
-    mkdir build
-    cd build
-    cmake ..
-    make -j$(nproc)
-    sudo make install
+    _show_and_run git submodule update --init
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     echo -e "\n${GRN}CLI11 $v${NOC} is installed."
-    anw=$(_version_if_ge_than $v "1.9.1")
+    anw=$(_version_if_ge_than $v "1.9.0")
     if [ "$anw" = "no" ]; then
         _verify_header_files /usr/local/include/CLI/
         _verify_cmake_files CLI11Config.cmake /usr/local/lib/cmake/CLI11/
@@ -154,7 +159,7 @@ function _dj_setup_cli11() {
         _verify_pkgconfig_file CLI11.pc /usr/local/share/pkgconfig
     fi
 
-    cd $cur_dir_cli11
+    _popd_quiet
 }
 
 # =============================================================================
@@ -1637,6 +1642,11 @@ function _dj() {
     done
     # special ones -----------------
     ACTIONS[container]="dive docker docker-compose lxd-4.0 "
+    cli11_version="1.9.0 2.1.1 "
+    ACTIONS[cli11]="$cli11_version"
+    for i in $cli11_version; do
+        ACTIONS[$i]=" "
+    done
     ACTIONS[docker]=" "
     ACTIONS[dive]="  "
     ACTIONS["lxd-4.0"]=" "
