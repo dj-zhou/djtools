@@ -61,7 +61,7 @@ function _dj_setup_boost() {
     _verify_lib_installation libboost_atomic.so /usr/local/lib
     _verify_lib_installation libboost_timer.so /usr/local/lib
 
-    _show_and_run _popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================================
@@ -180,7 +180,7 @@ function _dj_setup_cmake() {
     _show_and_run sudo make install
     echo -e "${GRN}cmake${NOC} is installed to ${GRN}/usr/local/bin${NOC}"
 
-    _show_and_run _popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -233,15 +233,16 @@ eom
 }
 
 # =============================================================================
-# fix: need to setup eigen3,
-# why need to install matplot++?
-# need to install cli11 first, then matplot++?
 function _dj_setup_gadgets() {
     _show_and_run _pushd_quiet ${PWD}
 
+    v=$(version check eigen3)
+    if [ "$v" = "eigen3 is not installed"* ]; then
+        _show_and_run dj setup eigen3
+    fi
     cd ~ && mkdir -p soft/ && cd soft/
     _show_and_run sudo rm -rf dj-gadgets
-    _show_and_run git clone https://dj-zhou@github.com/dj-zhou/dj-gadgets.git
+    _show_and_run git clone https://github.com/dj-zhou/dj-gadgets.git
     _show_and_run cd dj-gadgets
     _show_and_run sudo rm -rf build
     _show_and_run mkdir build
@@ -254,10 +255,6 @@ function _dj_setup_gadgets() {
     v=$(version check cli11)
     if [ "$v" = "cli11 is not installed" ]; then
         _show_and_run dj setup cli11
-    fi
-
-    if [ ! -f /usr/local/lib/libmatplot.* ]; then
-        _show_and_run dj setup matplot++
     fi
 
     if [ ! -f "/usr/local/include/magic_enum.hpp" ]; then
@@ -273,7 +270,7 @@ function _dj_setup_gadgets() {
     _show_and_run make
     _show_and_run sudo make install
 
-    _show_and_run _popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -395,7 +392,7 @@ function _dj_setup_pangolin() {
     echo "   \$ dj setup gtest"
     echo "   \$ dj setup glog"
 
-    _show_and_run _popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -690,7 +687,7 @@ function _dj_setup_glfw3() {
     _show_and_run sudo make install
     _show_and_run sudo ldconfig
 
-    _show_and_run _popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -765,7 +762,7 @@ function _dj_setup_gtest() {
     _verify_pkgconfig_file gtest.pc /usr/local/lib/pkgconfig/
     _verify_pkgconfig_file gtest_main.pc /usr/local/lib/pkgconfig/
 
-    _show_and_run _popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -792,7 +789,7 @@ function _dj_setup_glog() {
     _verify_lib_installation libglog.so /usr/local/lib
     _verify_header_files /usr/local/include/glog/
 
-    _show_and_run _popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================
@@ -826,7 +823,7 @@ function _dj_setup_grpc() {
     _show_and_run cmake --build .
     _show_and_run sudo cmake --build . -- install
 
-    _show_and_run _popd_quiet
+    _popd_quiet
 }
 
 # =============================================================================

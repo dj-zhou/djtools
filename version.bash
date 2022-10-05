@@ -147,7 +147,7 @@ function _version_check_eigen3() {
         fi
     done
     if [ $file_is_found='0' ]; then
-        echo "opencv is not installed."
+        echo "eigen3 is not installed."
     fi
 }
 
