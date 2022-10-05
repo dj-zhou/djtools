@@ -64,7 +64,7 @@ function _dj_replace() {
             sed -i "s/"$1"/"$2"/g" $3
             return
         else
-            echo -e "{PRP}dj replace${NOC}: not supported!"
+            echo -e "${YLW}dj replace${NOC}: not supported!"
             return
         fi
     fi
@@ -77,11 +77,11 @@ function _dj_replace() {
 function dj_clang_format_brush() {
     format_style=$1
     echo $format_style
-    if [ $format_style = 'file' ]; then
+    if [[ $format_style = 'file' ]]; then
         find . \
             -name *.h -o -iname *.hpp -o -iname *.cpp -o -iname *.c |
             xargs clang-format -style=file -i
-    elif [ $format_style = 'google' ]; then
+    elif [[ $format_style = 'google' ]]; then
         find . \
             -name *.h -o -iname *.hpp -o -iname *.cpp -o -iname *.c |
             xargs clang-format -style=google -i
@@ -161,21 +161,21 @@ function _dj_setup_clang_llvm() {
         echo "not supported"
         return
     elif [[ ${ubuntu_v} = *'18.04'* ]]; then
-        _show_and_run target_dir="clang-llvm-11.1.0"
-        _show_and_run repo="$target_dir-x86-64-ubuntu-1604"
+        target_dir="clang-llvm-11.1.0"
+        repo="$target_dir-x86-64-ubuntu-1604"
         # this should be correct!
-        _show_and_run folder_unpacked="clang+llvm-11.1.0-x86_64-linux-gnu-ubuntu-16.04"
+        folder_unpacked="clang+llvm-11.1.0-x86_64-linux-gnu-ubuntu-16.04"
     elif [[ ${ubuntu_v} = *'20.04'* ]]; then
-        _show_and_run target_dir="clang-llvm-12.0.0"
-        _show_and_run repo="$target_dir-x86-64-ubuntu-2004"
-        _show_and_run folder_unpacked="clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04"
+        target_dir="clang-llvm-12.0.0"
+        repo="$target_dir-x86-64-ubuntu-2004"
+        folder_unpacked="clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04"
     fi
 
     # just move all things to dj-zhou github
     # use command:
     #    split -b 10M [file].tar.xz clang-llvm.tar.xz
     # to get file.tar.xzaa, file.tar.xzab, etc, and then push into github repo
-    _show_and_run url=https://github.com/dj-zhou/${repo}.git
+    url=https://github.com/dj-zhou/${repo}.git
     _show_and_run mkdir -p ~/soft/
     _show_and_run cd ~/soft/
     _show_and_run rm $repo -rf
