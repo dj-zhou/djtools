@@ -17,7 +17,7 @@ function compile_make_build_etc() {
     target="$1"
     # ------------------------------
     if [ -f "Makefile" ]; then
-        _build_make "$target"
+        _build_makefile "$target"
         return
     fi
     # ------------------------------
@@ -64,4 +64,43 @@ function mc() {
 # =============================================================================
 function mi() {
     compile_make_build_etc "install"
+}
+
+# =============================================================================
+# loop into each directory and build
+function mma() {
+    for dir in ./*; do
+        if [[ -d $dir ]]; then
+            echo -e "${CYN}-------------------------${NOC}"
+            _show_and_run _pushd_quiet $dir
+            m "$@"
+            _popd_quiet
+        fi
+    done
+}
+
+# =============================================================================
+# loop into each directory and build
+function mmc() {
+    for dir in ./*; do
+        if [[ -d $dir ]]; then
+            echo -e "${CYN}-------------------------${NOC}"
+            _show_and_run _pushd_quiet $dir
+            mc
+            _popd_quiet
+        fi
+    done
+}
+
+# =============================================================================
+# loop into each directory and build
+function mmi() {
+    for dir in ./*; do
+        if [[ -d $dir ]]; then
+            echo -e "${CYN}-------------------------${NOC}"
+            _show_and_run _pushd_quiet $dir
+            mi
+            _popd_quiet
+        fi
+    done
 }
