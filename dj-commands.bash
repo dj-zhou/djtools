@@ -234,6 +234,7 @@ eom
 
 # =============================================================================
 # fix: need to setup eigen3,
+# why need to install matplot++?
 function _dj_setup_gadgets() {
     _show_and_run _pushd_quiet ${PWD}
 
