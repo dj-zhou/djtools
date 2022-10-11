@@ -1055,12 +1055,12 @@ function _dj_setup_meson_ninjia() {
         echo "cmake needs to be 3.20 or higher version, exit."
         return
     fi
-    python3_v=$(version check python3)
-    anw=$(_version_if_ge_than "$python3_v" "3.7")
-    if [[ "$anw" = "yes" ]]; then
-        echo "I failed to use python3>3.6 to install meson v$meson_v."
-        return
-    fi
+    # python3_v=$(version check python3)
+    # anw=$(_version_if_ge_than "$python3_v" "3.7")
+    # if [[ "$anw" = "yes" ]]; then
+    #     echo "I failed to use python3>3.6 to install meson v$meson_v."
+    #     return
+    # fi
     _echo_install meson $meson_v
     _press_enter_or_wait_s_continue 5
     # remove /usr/bin/meson
@@ -1070,7 +1070,7 @@ function _dj_setup_meson_ninjia() {
     _install_if_not_installed python3
 
     # meson release: https://github.com/mesonbuild/meson/releases
-    python3 -m pip install meson==$meson_v
+    _show_and_run python3 -m pip install meson==$meson_v
 
     # make sure ~/.local/bin is in the PATH variable
     # but not sure if it is in it for new installed Ubuntu ... will check
@@ -1084,25 +1084,28 @@ function _dj_setup_meson_ninjia() {
         echo '# (djtools) meson path setup' >>~/.bashrc
         echo -e 'export PATH=$PATH:~/.local/bin\n' >>~/.bashrc
     fi
-    echo -e "${GRN}meson${NOC} is installed to ${GRN}~/.local/bin${NOC}"
+    echo -e "${GRN}meson${NOC} is installed to ${GRN}${HOME}/.local/bin${NOC}"
 
     # ---------------------------------------------
     _echo_install ninja $ninja_v
     _press_enter_or_wait_s_continue 5
     # ninja is needed for meson, so install it as well
 
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
-    cd ~ && mkdir -p soft/ && cd soft/
-    rm -rf ninja
-    git clone https://github.com/ninja-build/ninja.git && cd ninja
-    git checkout v$ninja_v
-    mkdir build && cd build
-    cmake ..
-    make -j$(nproc)
-    sudo make install
-    echo -e "${GRN}meson${NOC} is installed to ${GRN}/usr/local/bin${NOC}"
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf ninja
+    _show_and_run git clone https://github.com/ninja-build/ninja.git && cd ninja
+    _show_and_run git checkout v$ninja_v
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
+    _show_and_run which meson
+    _show_and_run which ninja
     _popd_quiet
 }
 
