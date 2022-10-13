@@ -842,12 +842,12 @@ function _dj_setup_gpp_10() {
     _press_enter_or_wait_s_continue 10
 
     if ! compgen -G "/etc/apt/sources.list.d/ubuntu-toolchain-r*.list" >/dev/null; then
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get -y update
+        _show_and_run sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        _show_and_run sudo apt-get -y update
     fi
 
-    sudo apt-get install -y gcc-10
-    sudo apt-get install -y g++-10
+    _show_and_run sudo apt-get install -y gcc-10
+    _show_and_run sudo apt-get install -y g++-10
 
     # install g++9/gcc-9
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
@@ -861,18 +861,16 @@ function _dj_setup_gpp_10() {
     echo -e "run update-alternatives:"
     for i in 4 5 6 7 8 9 10; do
         if [ -f /usr/bin/gcc-$i ]; then
-            sudo update-alternatives --install \
+            _show_and_run sudo update-alternatives --install \
                 /usr/bin/gcc gcc /usr/bin/gcc-$i $i
         fi
         if [ -f /usr/bin/g++-$i ]; then
-            sudo update-alternatives --install \
+            _show_and_run sudo update-alternatives --install \
                 /usr/bin/g++ g++ /usr/bin/g++-$i $i
         fi
     done
-    echo -e "\n-------------------"
-    sudo update-alternatives --config gcc
-    echo -e "\n-------------------"
-    sudo update-alternatives --config g++
+    _show_and_run sudo update-alternatives --config gcc
+    _show_and_run sudo update-alternatives --config g++
 }
 
 # =============================================================================
@@ -882,12 +880,12 @@ function _dj_setup_gpp_11() {
     _press_enter_or_wait_s_continue 5
 
     if ! compgen -G "/etc/apt/sources.list.d/ubuntu-toolchain-r*.list" >/dev/null; then
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-        sudo apt-get -y update
+        _show_and_run sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        _show_and_run sudo apt-get -y update
     fi
 
-    sudo apt-get install -y gcc-11
-    sudo apt-get install -y g++-11
+    _show_and_run sudo apt-get install -y gcc-11
+    _show_and_run sudo apt-get install -y g++-11
 
     # install g++10/gcc-10
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
@@ -909,24 +907,22 @@ function _dj_setup_gpp_11() {
     echo -e "run update-alternatives:"
     for i in 4 5 6 7 8 9 10 11; do
         if [ -f /usr/bin/gcc-$i ]; then
-            sudo update-alternatives --install \
+            _show_and_run sudo update-alternatives --install \
                 /usr/bin/gcc gcc /usr/bin/gcc-$i $i
         fi
         if [ -f /usr/bin/g++-$i ]; then
-            sudo update-alternatives --install \
+            _show_and_run sudo update-alternatives --install \
                 /usr/bin/g++ g++ /usr/bin/g++-$i $i
         fi
     done
-    echo -e "\n-------------------"
-    sudo update-alternatives --config gcc
-    echo -e "\n-------------------"
-    sudo update-alternatives --config g++
+    _show_and_run sudo update-alternatives --config gcc
+    _show_and_run sudo update-alternatives --config g++
 }
 
 # =============================================================================
 function _dj_setup_rust() {
     echo -e "install ${GRN}rust${NOC}"
-    curl https://sh.rustup.rs -sSf | sh
+    _show_and_run curl https://sh.rustup.rs -sSf | sh
     echo 'export PATH="$HOME/.cargo/bin:$PATH"' >>~/.bashrc
     echo -e "You need to run ${GRN}\"source ~/.bashrc\"${NOC} manually."
     echo -e "update rust by ${GRN}rustup update${NOC}"
