@@ -355,26 +355,16 @@ function _verify_lib_installation() {
 
 # =============================================================================
 function _verify_header_files() {
-    # --------------------------
-    # to make it back compatible
-    if [ $# = 1 ]; then
-        if [ ! -d "$1" ]; then
-            echo -e "${RED}header files are not found${NOC}"
-        else
-            echo -e "header files path: ${GRN}$1${NOC}"
-        fi
+    if [ $# != 2]; then
+        echo "usage: $0 [header file] [path]"
         return
     fi
-    # --------------------------
-    # this is the right feature to use
-    if [ $# = 2 ]; then
-        if [ ! -f "$2/$1" ]; then
-            echo -e "${RED}header file $1 is not found in $2${NOC}"
-        else
-            echo -e "      header file: ${GRN}$2/$1${NOC}"
-        fi
-        return
+    if [ ! -f "$2/$1" ]; then
+        echo -e "${RED}header file $1 is not found in $2${NOC}"
+    else
+        echo -e "      header file: ${GRN}$2/$1${NOC}"
     fi
+    return
 }
 
 # =============================================================================

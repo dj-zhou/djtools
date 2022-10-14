@@ -43,6 +43,10 @@ function _dj_setup_boost() {
     _echo_install boost $v
     _press_enter_or_wait_s_continue 5
 
+    # remove previously installed files
+    _show_and_run sudo rm -rf /usr/local/include/boost
+    _show_and_run sudo rm -rf /usr/local/lib/libboost*
+
     _install_if_not_installed python3-dev libxml2-dev
     _show_and_run mkdir -p ~/soft/
     _show_and_run cd ~/soft/
@@ -57,7 +61,7 @@ function _dj_setup_boost() {
     _show_and_run ./bootstrap.sh --prefix=/usr/local
     _show_and_run sudo ./b2 install
 
-    _verify_header_files /usr/include/ # this is not accurate
+    _verify_header_files version.hpp /usr/local/include/boost
     _verify_lib_installation libboost_atomic.so /usr/local/lib
     _verify_lib_installation libboost_timer.so /usr/local/lib
 
@@ -258,11 +262,11 @@ function _dj_setup_gadgets() {
 
     # check dependency
     v=$(version check cli11)
-    if [ "$v" = "cli11 is not installed" ]; then
+    if [[ "$v" = *"cli11 is not installed"* ]]; then
         _show_and_run dj setup cli11
     fi
 
-    if [ ! -f "/usr/local/include/magic_enum.hpp" ]; then
+    if [[ ! -f "/usr/local/include/magic_enum.hpp" ]]; then
         _show_and_run dj setup magic-enum
     fi
 
