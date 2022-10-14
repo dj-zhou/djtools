@@ -28,8 +28,8 @@ function _dj_setup_abseil_cpp() {
 
     _verify_lib_installation libabsl_base.a /usr/local/lib
     _verify_pkgconfig_file absl_base.pc /usr/local/lib/pkgconfig
-    _verify_header_files /usr/local/include/absl/
-    _verify_cmake_files abslConfig.cmake /usr/local/lib/cmake/absl/
+    _verify_header_files config.h /usr/local/include/absl/base
+    _verify_cmake_files abslConfig.cmake /usr/local/lib/cmake/absl
 }
 
 # =============================================================================
@@ -290,32 +290,33 @@ function _dj_setup_eigen3() {
     _show_and_run sudo make install
 
     # just to prevent compiling error in the future
-    _show_and_run sudo cp /usr/local/include/eigen3/ -r /usr/include/
+    _show_and_run sudo ln -s /usr/local/include/eigen3 /usr/include/eigen3
 
     echo -e "\n${GRN}eigen3 $eigen3_v${NOC} is installed."
-    _verify_header_files /usr/include/eigen3
-    _verify_header_files /usr/local/include/eigen3
+    _verify_header_files Eigen /usr/local/include/eigen3/Eigen
+    _verify_header_files Eigen /usr/include/eigen3/Eigen
 
     _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_flamegraph() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
 
-    _dj_setup_perf
+    _show_and_run dj setup perf
 
-    rm -rf FlameGraph
-    git clone https://github.com/brendangregg/FlameGraph.git
-    sudo cp -r FlameGraph /usr/local/bin/ # OK, I know, this is not good
+    _show_and_run rm -rf FlameGraph
+    _show_and_run git clone https://github.com/brendangregg/FlameGraph.git
+    _show_and_run sudo cp -r FlameGraph /usr/local/bin/ # OK, I know, this is not good
 
     # create symbolic link
-    sudo rm -f /usr/bin/stackcollapse-perf.pl
-    sudo rm -f /usr/bin/flamegraph.pl
-    sudo ln -s /usr/local/bin/FlameGraph/stackcollapse-perf.pl /usr/bin/stackcollapse-perf.pl
-    sudo ln -s /usr/local/bin/FlameGraph/flamegraph.pl /usr/bin/flamegraph.pl
+    _show_and_run sudo rm -f /usr/bin/stackcollapse-perf.pl
+    _show_and_run sudo rm -f /usr/bin/flamegraph.pl
+    _show_and_run sudo ln -s /usr/local/bin/FlameGraph/stackcollapse-perf.pl /usr/bin/stackcollapse-perf.pl
+    _show_and_run sudo ln -s /usr/local/bin/FlameGraph/flamegraph.pl /usr/bin/flamegraph.pl
 
     cat <<eom
 --------------------------------------------
@@ -365,7 +366,7 @@ function _dj_setup_fmt() {
 
     # _verify_lib_installation libfmt.a /usr/local/lib
     _verify_lib_installation libfmt.so /usr/local/lib
-    _verify_header_files /usr/local/include/fmt
+    _verify_header_files format.h /usr/local/include/fmt
     _verify_pkgconfig_file fmt.pc /usr/local/lib/pkgconfig
     _verify_cmake_files fmt-config.cmake /usr/local/lib/cmake/fmt
 
@@ -374,29 +375,30 @@ function _dj_setup_fmt() {
 
 # =============================================================================
 function _dj_setup_foxit_reader() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     echo -e "install Foxit Reader ..."
     echo -e "  recommended location: /opt/foxitsoftware/foxitreader\n"
     _press_enter_or_wait_s_continue 10
 
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
 
     # no way to get the latest version?
     file=FoxitReader.enu.setup.2.4.4.0911.x64.run
     url="http://cdn01.foxitsoftware.com/pub/foxit/reader/desktop/"
     url=${url}linux/2.x/2.4/en_us/$file.tar.gz
-    _wget_if_not_exist $file.tar.gz "22d2553945edc0af9dbd52dd4a2cee22" ${url}
-    gzip -d $file.tar.gz
-    tar xvf $file.tar
-    sudo ./FoxitReader*.run
+    _show_and_run _wget_if_not_exist $file.tar.gz "22d2553945edc0af9dbd52dd4a2cee22" ${url}
+    _show_and_run gzip -d $file.tar.gz
+    _show_and_run tar xvf $file.tar
+    _show_and_run sudo ./FoxitReader*.run
 
     # create a symbolic link
     foxit_reader_location=$(sudo find /opt -name "FoxitReader")
     echo $foxit_reader_location
     if [[ ! -z "$foxit_reader_location" ]]; then
         echo 'a symbolic link "foxit" is generated in /usr/bin'
-        sudo ln -sf $foxit_reader_location /usr/bin/foxit
+        _show_and_run sudo ln -sf $foxit_reader_location /usr/bin/foxit
     else
         echo -e "FoxitReader not installed into a recommended location"
         echo -e "a symbolic link cannot be generated\n"
@@ -407,11 +409,12 @@ function _dj_setup_foxit_reader() {
 
 # =============================================================================
 function _dj_setup_fsm_pro() {
-    _pushd_quiet ${PWD}
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run _pushd_quiet ${PWD}
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
 
-    wget https://www.fsmpro.io/downloads/FsmPro.deb
-    sudo dpkg -i FsmPro.deb
+    _show_and_run wget https://www.fsmpro.io/downloads/FsmPro.deb
+    _show_and_run sudo dpkg -i FsmPro.deb
 
     echo "reference: https://www.fsmpro.io/"
 
@@ -456,12 +459,13 @@ function _dj_setup_gcc_aarch64_linux() {
 # for Ubuntu 20.04:
 # https://askubuntu.com/questions/1243252/how-to-install-arm-none-eabi-gdb-on-ubuntu-20-04-lts-focal-fossa
 function _dj_setup_gcc_arm_stm32() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     echo -e "remove ${RED}gcc-arm-none-eabi${NOC}, and install ${GRN}gcc-arm-embedded${NOC} ...\n"
     _press_enter_or_wait_s_continue 10
 
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
     packages="build-essential git flex bison libgmp3-dev libmpfr-dev "
     packages+="libncurses5-dev libmpc-dev autoconf texinfo libtool "
     packages+="libftdi-dev libusb-1.0-0-dev zlib1g zlib1g-dev python-yaml "
@@ -471,43 +475,41 @@ function _dj_setup_gcc_arm_stm32() {
     if [[ "${ubuntu_v}" = *'18.04'* ]]; then
         # sudo echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" \
         # | sudo tee -a /etc/apt/sources.list
-        sudo rm -rf /etc/apt/sources.list.d/gcc-arm-stm32.list
-        sudo sh -c 'echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" \
+        _show_and_run sudo rm -rf /etc/apt/sources.list.d/gcc-arm-stm32.list
+        _show_and_run sudo sh -c 'echo "deb http://kr.archive.ubuntu.com/ubuntu bionic main universe" \
             >> /etc/apt/sources.list.d/gcc-arm-stm32.list'
     elif [[ "${ubuntu_v}" = *'16.04'* ]]; then
         echo "just do nothing"
     fi
     if [[ "${ubuntu_v}" = *'18.04'* ||
         "${ubuntu_v}" = *'16.04'* ]]; then
-        sudo apt-get remove gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
-        sudo apt-add-repository ppa:team-gcc-arm-embedded/ppa
-        sudo apt-get update
+        _show_and_run sudo apt-get remove gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+        _show_and_run sudo apt-add-repository ppa:team-gcc-arm-embedded/ppa
+        _show_and_run sudo apt-get update
         _install_if_not_installed gcc-arm-embedded
 
-        echo -e "\n"
         echo " (just maybe) gcc-arm-embedded is installed in /usr/share/gcc-arm-embedded/"
         echo " (question) Is there still an arm-none-eabi? "
-        echo -e "\n"
+
     elif [[ "${ubuntu_v}" = *'20.04'* ]]; then
-        sudo apt remove gcc-arm-none-eabi
+        _show_and_run sudo apt remove gcc-arm-none-eabi
         file="gcc-arm-none-eabi-10.3-2021.10"
         filename="${file}-x86_64-linux.tar.bz2"
         url="https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm"
         link="${url}/10.3-2021.10/${filename}"
 
         # check if the file exists --------------------
-        _wget_if_not_exist $filename "2383e4eb4ea23f248d33adc70dc3227e" ${link}
+        _show_and_run _wget_if_not_exist $filename "2383e4eb4ea23f248d33adc70dc3227e" ${link}
 
-        echo "sudo tar xjf ${filename} -C /usr/share/"
-        sudo tar xjf ${filename} -C /usr/share/
+        _show_and_run sudo tar xjf ${filename} -C /usr/share/
 
-        echo -e "create symbolic links\n"
-        sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-ar /usr/bin/arm-none-eabi-ar
-        sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-gcc /usr/bin/arm-none-eabi-gcc
-        sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-g++ /usr/bin/arm-none-eabi-g++
-        sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-gdb /usr/bin/arm-none-eabi-gdb
-        sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-objcopy /usr/bin/arm-none-eabi-objcopy
-        sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-size /usr/bin/arm-none-eabi-size
+        echo -e "create symbolic links"
+        _show_and_run sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-ar /usr/bin/arm-none-eabi-ar
+        _show_and_run sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-gcc /usr/bin/arm-none-eabi-gcc
+        _show_and_run sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-g++ /usr/bin/arm-none-eabi-g++
+        _show_and_run sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-gdb /usr/bin/arm-none-eabi-gdb
+        _show_and_run sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-objcopy /usr/bin/arm-none-eabi-objcopy
+        _show_and_run sudo ln -sf /usr/share/${file}/bin/arm-none-eabi-size /usr/bin/arm-none-eabi-size
     fi
 
     _popd_quiet
@@ -654,20 +656,22 @@ function _dj_setup_lcm() {
     v=$(_find_package_version lcm)
     _echo_install lcm $v
 
-    cd ~ && mkdir -p soft/ && cd soft/
-    rm -rf lcm
-    git clone https://github.com/lcm-proj/lcm.git
-    cd lcm
-    git checkout $v
-    mkdir build && cd build
-    cmake ..
-    make -j$(nproc)
-    sudo make install
-    sudo ldconfig
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf lcm
+    _show_and_run git clone https://github.com/lcm-proj/lcm.git
+    _show_and_run cd lcm
+    _show_and_run git checkout $v
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
+    _show_and_run sudo ldconfig
 
-    echo "lcm $v is installed."
+    echo -e "${GRN}lcm $v${NOC} is installed."
     _verify_lib_installation liblcm.so /usr/local/lib
-    _verify_header_files /usr/local/include/lcm/
+    _verify_header_files lcm.h /usr/local/include/lcm/
     _verify_pkgconfig_file lcm-java.pc /usr/local/lib/pkgconfig
 
     _popd_quiet
@@ -811,7 +815,7 @@ function _dj_setup_libgpiod() {
 
         _verify_lib_installation libgpiod.so /usr/local/lib
         _verify_pkgconfig_file libgpiod.pc /usr/local/lib/pkgconfig
-        _verify_lib_installation gpiod.h /usr/local/include
+        _verify_header_files gpiod.h /usr/local/include
     else
         echo "_dj_setup_libgpiod: todo"
         return
@@ -923,7 +927,7 @@ function _dj_setup_mathpix() {
 # =============================================================================
 # this might need a higher version of g++ to compile (>= 9.3?)
 function _dj_setup_matplot_xx() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     static_shared=$1
 
@@ -936,36 +940,38 @@ function _dj_setup_matplot_xx() {
     _install_if_not_installed libfftw3-dev
 
     # removed previously installed files ------
-    sudo rm -f /usr/local/lib/Matplot++/libnodesoup.a
-    sudo rm -f /usr/local/lib/libmatplot.a
-    sudo rm -f /usr/local/lib/libmatplot.so
-    sudo rm -rf /usr/local/include/matplot
-    sudo rm -rf /usr/local/lib/cmake/Matplot++
+    _show_and_run sudo rm -f /usr/local/lib/Matplot++/libnodesoup.a
+    _show_and_run sudo rm -f /usr/local/lib/libmatplot.a
+    _show_and_run sudo rm -f /usr/local/lib/libmatplot.so
+    _show_and_run sudo rm -rf /usr/local/include/matplot
+    _show_and_run sudo rm -rf /usr/local/lib/cmake/Matplot++
 
-    cd ~ && mkdir -p soft/ && cd soft/
-    rm -rf matplotplusplus
-    git clone https://github.com/alandefreitas/matplotplusplus.git
-    cd matplotplusplus
-    git checkout $v
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf matplotplusplus
+    _show_and_run git clone https://github.com/alandefreitas/matplotplusplus.git
+    _show_and_run cd matplotplusplus
+    _show_and_run git checkout $v
 
     # compile and install ------
-    mkdir build && cd build
+    _show_and_run mkdir build
+    _show_and_run cd build
     if [ "$static_shared" = 'static' ]; then
-        cmake .. -DBUILD_SHARED_LIBS=OFF
+        _show_and_run cmake .. -DBUILD_SHARED_LIBS=OFF
     else
-        cmake .. -DBUILD_SHARED_LIBS=ON
+        _show_and_run cmake .. -DBUILD_SHARED_LIBS=ON
     fi
-    make -j$(nproc)
-    sudo make install
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
     sudo ldconfig
     if [ "$static_shared" = 'static' ]; then
-        _verify_header_files /usr/local/include/matplot/
-        _verify_lib_installation libmatplot.a /usr/local/lib/
-        _verify_lib_installation libnodesoup.a /usr/local/lib/Matplot++/
+        _verify_header_files matplot.h /usr/local/include/matplot
+        _verify_lib_installation libmatplot.a /usr/local/lib
+        _verify_lib_installation libnodesoup.a /usr/local/lib/Matplot++
 
     else
-        _verify_header_files /usr/local/include/matplot/
-        _verify_lib_installation libmatplot.so /usr/local/lib/
+        _verify_header_files matplot.h /usr/local/include/matplot
+        _verify_lib_installation libmatplot.so /usr/local/lib
     fi
 
     _popd_quiet
@@ -986,7 +992,7 @@ function _dj_setup_magic_enum() {
     _show_and_run sudo cp include/magic_enum.hpp /usr/local/include/
 
     echo -e "${GRN}magic_enum $ver${NOC} is installed:"
-    _verify_header_files magic_enum.hpp /usr/local/include/
+    _verify_header_files magic_enum.hpp /usr/local/include
     head -n 8 /usr/local/include/magic_enum.hpp
 
     _popd_quiet
@@ -1181,7 +1187,7 @@ function _dj_stup_network_tools() {
 
 # =============================================================================
 function _dj_setup_nlohmann_json3_dev() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     v=$(_find_package_version nlohmann-json3)
     _echo_install nlohmann-json3 $v
@@ -1200,16 +1206,19 @@ function _dj_setup_nlohmann_json3_dev() {
 
     # install from source
 
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~soft/
 
-    rm json -rf
-    git clone https://github.com/nlohmann/json.git
-    cd json
-    git checkout $v
-    rm build -rf && mkdir build && cd build
-    cmake ..
-    make -j$(nproc)
-    sudo make install
+    _show_and_run rm json -rf
+    _show_and_run git clone https://github.com/nlohmann/json.git
+    _show_and_run cd json
+    _show_and_run git checkout $v
+    _show_and_run rm build -rf
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     _popd_quiet
 
@@ -1249,23 +1258,25 @@ function _dj_setup_nodejs() {
     # https://stackoverflow.com/a/36401038
     if [[ "${ubuntu_v}" = *'18.04'* || "${ubuntu_v}" = *'20.04'* ]]; then
         _install_if_not_installed git-core curl build-essential openssl libssl-dev
-        _pushd_quiet ${PWD}
-        cd ~ && mkdir -p soft/ && cd soft/
+        _show_and_run _pushd_quiet ${PWD}
+        _show_and_run mkdir -p ~/soft/
+        _show_and_run cd ~/soft/
 
         v=$(_find_package_version nodejs)
         # nodejs is a huge package, do not build it from scratch
         if [[ ! -d node ]]; then
-            git clone https://github.com/nodejs/node.git
-            cd node
+            _show_and_run git clone https://github.com/nodejs/node.git
+            _show_and_run cd node
         else
-            cd node
-            git checkout master
-            git fetch -p
-            git pull
+            _show_and_run cd node
+            _show_and_run git checkout master
+            _show_and_run git fetch -p
+            _show_and_run git pull
         fi
-        git checkout v$v
-        ./configure
-        make -j$(nproc) && sudo make install
+        _show_and_run git checkout v$v
+        _show_and_run ./configure
+        _show_and_run make -j$(nproc)
+        _show_and_run sudo make install
 
         _popd_quiet
         return
@@ -1276,13 +1287,13 @@ function _dj_setup_nodejs() {
 # this may only work on desktop computer
 # nvidia-driver-455 is good at time of this commit
 function _dj_setup_nvidia() {
-    sudo apt-get purge nvidia*
+    _show_and_run sudo apt-get purge nvidia*
     _install_if_not_installed libncurses5-dev
     if [[ "${ubuntu_v}" = *'18.04'* ||
         "${ubuntu_v}" = *'20.04'* ]]; then
         if [[ ! -f /etc/apt/sources.list.d/graphics-drivers*.list ]]; then
-            sudo add-apt-repository ppa:graphics-drivers/ppa
-            sudo apt-get -y update
+            _show_and_run sudo add-apt-repository ppa:graphics-drivers/ppa
+            _show_and_run sudo apt-get -y update
         fi
         _install_if_not_installed nvidia-driver-455 nvidia-settings
     fi
@@ -1301,18 +1312,20 @@ eom
 
 # =============================================================================
 function _dj_setup_nvtop() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     if [[ "${ubuntu_v}" = *'18.04'* ||
         "${ubuntu_v}" = *'20.04'* ]]; then
-        cd ~ && mkdir -p soft/ && cd soft/
-        rm nvtop -rf
-        git clone https://github.com/Syllo/nvtop.git
-        cd nvtop
-        mkdir build && cd build
-        cmake .. -DNVML_RETRIEVE_HEADER_ONLINE=True
-        make -j$(nproc)
-        sudo make install
+        _show_and_run mkdir -p ~/soft/
+        _show_and_run cd ~/soft/
+        _show_and_run rm nvtop -rf
+        _show_and_run git clone https://github.com/Syllo/nvtop.git
+        _show_and_run cd nvtop
+        _show_and_run mkdir build
+        _show_and_run cd build
+        _show_and_run cmake .. -DNVML_RETRIEVE_HEADER_ONLINE=True
+        _show_and_run make -j$(nproc)
+        _show_and_run sudo make install
     fi
 
     _popd_quiet
@@ -1689,7 +1702,7 @@ function _dj_setup_yaml_cpp() {
 
     echo -e "\n${GRN}yaml-cpp $yaml_v${NOC} is installed."
     _verify_lib_installation libyaml-cpp.a /usr/local/lib
-    _verify_header_files /usr/local/include/yaml-cpp/
+    _verify_header_files yaml.h /usr/local/include/yaml-cpp
     _verify_pkgconfig_file yaml-cpp.pc /usr/local/lib/pkgconfig
 
     _popd_quiet

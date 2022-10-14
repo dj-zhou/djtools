@@ -152,14 +152,14 @@ function _dj_setup_cli11() {
     echo -e "\n${GRN}CLI11 $v${NOC} is installed."
     anw=$(_version_if_ge_than $v "1.9.0")
     if [ "$anw" = "no" ]; then
-        _verify_header_files /usr/local/include/CLI/
-        _verify_cmake_files CLI11Config.cmake /usr/local/lib/cmake/CLI11/
-        _verify_cmake_files CLI11ConfigVersion.cmake /usr/local/lib/cmake/CLI11/
+        _verify_header_files CLI.hpp /usr/local/include/CLI
+        _verify_cmake_files CLI11Config.cmake /usr/local/lib/cmake/CLI11
+        _verify_cmake_files CLI11ConfigVersion.cmake /usr/local/lib/cmake/CLI11
         _verify_pkgconfig_file CLI11.pc /usr/local/lib/pkgconfig
     else
-        _verify_header_files /usr/local/include/CLI/
-        _verify_cmake_files CLI11Config.cmake /usr/local/share/cmake/CLI11/
-        _verify_cmake_files CLI11ConfigVersion.cmake /usr/local/share/cmake/CLI11/
+        _verify_header_files CLI.hpp /usr/local/include/CLI
+        _verify_cmake_files CLI11Config.cmake /usr/local/share/cmake/CLI11
+        _verify_cmake_files CLI11ConfigVersion.cmake /usr/local/share/cmake/CLI11
         _verify_pkgconfig_file CLI11.pc /usr/local/share/pkgconfig
     fi
 
@@ -392,8 +392,8 @@ function _dj_setup_pangolin() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    _verify_lib_installation libpangolin.so /usr/local/lib/
-    _verify_header_files /usr/local/include/pangolin/
+    _verify_lib_installation libpangolin.so /usr/local/lib
+    _verify_header_files pangolin.h /usr/local/include/pangolin
 
     echo -e "If you see error: ${RED}Could not find GLEW${NOC}"
     echo "you should run the following commands:"
@@ -765,11 +765,11 @@ function _dj_setup_gtest() {
     _show_and_run sudo make install
 
     echo -e "\n${GRN}googletest $v${NOC} is installed."
-    _verify_lib_installation libgtest.a /usr/local/lib/
-    _verify_lib_installation libgtest_main.a /usr/local/lib/
-    _verify_header_files /usr/local/include/gtest/
-    _verify_pkgconfig_file gtest.pc /usr/local/lib/pkgconfig/
-    _verify_pkgconfig_file gtest_main.pc /usr/local/lib/pkgconfig/
+    _verify_lib_installation libgtest.a /usr/local/lib
+    _verify_lib_installation libgtest_main.a /usr/local/lib
+    _verify_header_files gtest.h /usr/local/include/gtest
+    _verify_pkgconfig_file gtest.pc /usr/local/lib/pkgconfig
+    _verify_pkgconfig_file gtest_main.pc /usr/local/lib/pkgconfig
 
     _popd_quiet
 }
@@ -796,7 +796,7 @@ function _dj_setup_glog() {
 
     _verify_lib_installation libglog.a /usr/local/lib
     _verify_lib_installation libglog.so /usr/local/lib
-    _verify_header_files /usr/local/include/glog/
+    _verify_header_files logging.h /usr/local/include/glog
 
     _popd_quiet
 }
