@@ -90,6 +90,21 @@ function _version_check_aarch64_linux_gnu_gcc() {
 }
 
 # =============================================================================
+function _version_check_boost() {
+    file="/usr/local/include/boost/version.hpp"
+
+    if [ ! -f $file ]; then
+        echo "boost is not installed."
+    fi
+
+    boost_v=$(cat $file | grep "define BOOST_LIB_VERSION" | awk '{print $3}')
+    boost_v=$(echo $boost_v | sed 's/"//g')
+    boost_v=$(echo $boost_v | sed 's/_/./g')
+    boost_v=$boost_v".0"
+    echo $boost_v
+}
+
+# =============================================================================
 function _version_check_cli11() {
     files="/usr/local/lib/pkgconfig/CLI11.pc "
     files+="/usr/local/share/pkgconfig/CLI11.pc "
@@ -421,6 +436,11 @@ function version() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'boost' ]; then
+            _version_check_boost
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'cli11' ]; then
             _version_check_cli11
             return
@@ -592,7 +612,7 @@ function _version() {
 
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
-    check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ cli11 cmake "
+    check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
     check_list+="eigen3 fmt gcc glog gtest g++ gnome magic-enum nlohmann-json3 "
     check_list+="node opencv opengl python3 spdlog systemd ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
