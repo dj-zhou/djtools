@@ -355,7 +355,7 @@ function _verify_lib_installation() {
 
 # =============================================================================
 function _verify_header_files() {
-    if [ $# != 2]; then
+    if [ $# != 2 ]; then
         echo "usage: $0 [header file] [path]"
         return
     fi
