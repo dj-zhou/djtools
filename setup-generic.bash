@@ -1667,38 +1667,40 @@ eom
 # shared library build seems not working, error:
 # ./_bnative.cmake/yaml-demo: symbol lookup error: ./_bnative.cmake/yaml-demo: undefined symbol: _ZN4YAML6detail9node_data12empty_scalarB5cxx11Ev
 function _dj_setup_yaml_cpp() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     # dependencies to install --------------
-    echo "install build-essential"
-    sudo apt-get -y update &>/dev/null
+    _show_and_run sudo apt-get -y update
     _install_if_not_installed build-essential
 
     cmake_v=$(version check cmake)
 
     anw=$(_version_if_ge_than $cmake_v 3.20.5)
     if [ "$anw" = 'no' ]; then
-        dj setup cmake
+        _show_and_run dj setup cmake
     fi
     # remove existing library, if there is
-    sudo rm -rf /usr/local/lib/libyaml-cpp*
+    _show_and_run sudo rm -rf /usr/local/lib/libyaml-cpp*
 
     yaml_v=$(_find_package_version yaml-cpp)
     _echo_install yaml-cpp $yaml_v
     _press_enter_or_wait_s_continue 5
 
-    cd ~ && mkdir -p soft/ && cd soft/
-    rm yaml-cpp -rf
+    _show_and_run mkdir -p ~/soft/
+    _show_and_run cd ~/soft/
+    _show_and_run rm -rf yaml-cpp
 
-    git clone https://github.com/jbeder/yaml-cpp.git
-    cd yaml-cpp
-    git checkout yaml-cpp-$yaml_v
-    rm -rf build/ && mkdir build && cd build
+    _show_and_run git clone https://github.com/jbeder/yaml-cpp.git
+    _show_and_run cd yaml-cpp
+    _show_and_run git checkout yaml-cpp-$yaml_v
+    _show_and_run rm -rf build/
+    _show_and_run mkdir build
+    _show_and_run cd build
 
-    cmake ..
+    _show_and_run cmake ..
     _press_enter_or_wait_s_continue 5
-    make -j4 # do not use all CPU threads
-    sudo make install
+    _show_and_run make -j4 # just do not use all CPU threads
+    _show_and_run sudo make install
 
     echo -e "\n${GRN}yaml-cpp $yaml_v${NOC} is installed."
     _verify_lib_installation libyaml-cpp.a /usr/local/lib
