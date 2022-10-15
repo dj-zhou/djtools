@@ -172,8 +172,8 @@ function _dj_setup_computer() {
     # -----------------------------------
     echo -e "${CYN}install Google Chrome${NOC}"
     _press_enter_or_wait_s_continue 5
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     google_ver=$(google-chrome --version)
     if [[ "$google_ver" = *"Google Chrome"* ]]; then
         echo "Google Chrome already installed"
@@ -276,8 +276,8 @@ function _dj_setup_eigen3() {
     _show_and_run sudo rm -rf /usr/local/include/eigen3
     _show_and_run sudo rm -rf /usr/include/eigen3
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf eigen*
     _show_and_run wget https://gitlab.com/libeigen/eigen/-/archive/$eigen3_v/eigen-$eigen3_v.tar.gz
     _show_and_run tar -xvf eigen-$eigen3_v.tar.gz
@@ -303,8 +303,8 @@ function _dj_setup_eigen3() {
 function _dj_setup_flamegraph() {
     _show_and_run _pushd_quiet ${PWD}
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
     _show_and_run dj setup perf
 
@@ -349,8 +349,8 @@ function _dj_setup_fmt() {
     _show_and_run sudo rm -rf /usr/local/lib/cmake/fmt/
 
     # --------------------
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf fmt
     _show_and_run git clone https://github.com/fmtlib/fmt.git
     _show_and_run cd fmt
@@ -381,8 +381,8 @@ function _dj_setup_foxit_reader() {
     echo -e "  recommended location: /opt/foxitsoftware/foxitreader\n"
     _press_enter_or_wait_s_continue 10
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
     # no way to get the latest version?
     file=FoxitReader.enu.setup.2.4.4.0911.x64.run
@@ -410,8 +410,8 @@ function _dj_setup_foxit_reader() {
 # =============================================================================
 function _dj_setup_fsm_pro() {
     _show_and_run _pushd_quiet ${PWD}
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
     _show_and_run wget https://www.fsmpro.io/downloads/FsmPro.deb
     _show_and_run sudo dpkg -i FsmPro.deb
@@ -464,8 +464,8 @@ function _dj_setup_gcc_arm_stm32() {
     echo -e "remove ${RED}gcc-arm-none-eabi${NOC}, and install ${GRN}gcc-arm-embedded${NOC} ...\n"
     _press_enter_or_wait_s_continue 10
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     packages="build-essential git flex bison libgmp3-dev libmpfr-dev "
     packages+="libncurses5-dev libmpc-dev autoconf texinfo libtool "
     packages+="libftdi-dev libusb-1.0-0-dev zlib1g zlib1g-dev python-yaml "
@@ -635,7 +635,7 @@ function _dj_setup_i219_v() {
     cd i219-v/$1/src/
     sudo make install
 
-    cd ~/soft/
+    cd $soft_dir
 
     _ask_to_execute_cmd "sudo reboot"
 
@@ -656,8 +656,8 @@ function _dj_setup_lcm() {
     v=$(_find_package_version lcm)
     _echo_install lcm $v
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf lcm
     _show_and_run git clone https://github.com/lcm-proj/lcm.git
     _show_and_run cd lcm
@@ -746,8 +746,8 @@ eom
 function _dj_setup_libev() {
     _show_and_run _pushd_quiet ${PWD}
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
     v=$(_find_package_version libev)
     _echo_install libev $v
@@ -863,7 +863,7 @@ function _dj_setup_libiio() {
 function _dj_setup_libserialport() {
     _show_and_run _pushd_quiet "${PWD}"
 
-    _show_and_run mkdir -p ~/soft/
+    _show_and_run mkdir -p $soft_dir
     _show_and_run cd ~/ soft/
 
     v=$(_find_package_version libserialport)
@@ -946,8 +946,8 @@ function _dj_setup_matplot_xx() {
     _show_and_run sudo rm -rf /usr/local/include/matplot
     _show_and_run sudo rm -rf /usr/local/lib/cmake/Matplot++
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf matplotplusplus
     _show_and_run git clone https://github.com/alandefreitas/matplotplusplus.git
     _show_and_run cd matplotplusplus
@@ -981,8 +981,8 @@ function _dj_setup_matplot_xx() {
 function _dj_setup_magic_enum() {
     _show_and_run _pushd_quiet ${PWD}
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf magic_enum
 
     ver=$(_find_package_version magic-enum)
@@ -1099,8 +1099,8 @@ function _dj_setup_meson_ninjia() {
 
     _show_and_run _pushd_quiet ${PWD}
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf ninja
     _show_and_run git clone https://github.com/ninja-build/ninja.git && cd ninja
     _show_and_run git checkout v$ninja_v
@@ -1174,8 +1174,8 @@ function _dj_stup_network_tools() {
 
     echo -e "install ${GRN}mNet-Assist${NOC}"
     _show_and_run _pushd_quiet ${PWD}
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf m-net-assist
     _show_and_run git clone https://github.com/dj-zhou/m-net-assist.git
     _show_and_run cd m-net-assist
@@ -1206,7 +1206,7 @@ function _dj_setup_nlohmann_json3_dev() {
 
     # install from source
 
-    _show_and_run mkdir -p ~/soft/
+    _show_and_run mkdir -p $soft_dir
     _show_and_run cd ~soft/
 
     _show_and_run rm json -rf
@@ -1259,8 +1259,8 @@ function _dj_setup_nodejs() {
     if [[ "${ubuntu_v}" = *'18.04'* || "${ubuntu_v}" = *'20.04'* ]]; then
         _install_if_not_installed git-core curl build-essential openssl libssl-dev
         _show_and_run _pushd_quiet ${PWD}
-        _show_and_run mkdir -p ~/soft/
-        _show_and_run cd ~/soft/
+        _show_and_run mkdir -p $soft_dir
+        _show_and_run cd $soft_dir
 
         v=$(_find_package_version nodejs)
         # nodejs is a huge package, do not build it from scratch
@@ -1316,8 +1316,8 @@ function _dj_setup_nvtop() {
 
     if [[ "${ubuntu_v}" = *'18.04'* ||
         "${ubuntu_v}" = *'20.04'* ]]; then
-        _show_and_run mkdir -p ~/soft/
-        _show_and_run cd ~/soft/
+        _show_and_run mkdir -p $soft_dir
+        _show_and_run cd $soft_dir
         _show_and_run rm nvtop -rf
         _show_and_run git clone https://github.com/Syllo/nvtop.git
         _show_and_run cd nvtop
@@ -1686,8 +1686,8 @@ function _dj_setup_yaml_cpp() {
     _echo_install yaml-cpp $yaml_v
     _press_enter_or_wait_s_continue 5
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf yaml-cpp
 
     _show_and_run git clone https://github.com/jbeder/yaml-cpp.git

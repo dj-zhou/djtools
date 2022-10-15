@@ -24,6 +24,7 @@ HWHT='\033[1;37m'
 djtools_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 # add some global variables
 ubuntu_v=$(lsb_release -a)
+soft_dir=$HOME/soft/
 
 # =============================================================================
 source $djtools_path/block-device.bash

@@ -48,8 +48,8 @@ function _dj_setup_boost() {
     _show_and_run sudo rm -rf /usr/local/lib/libboost*
 
     _install_if_not_installed python3-dev libxml2-dev
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run sudo rm -rf boost
     _show_and_run git clone https://github.com/boostorg/boost.git
 
@@ -93,7 +93,7 @@ function _create_can_analyzer_desktop_item() {
 
     sudo chmod +x $folder/$file
 
-    echo -e "${YLW}if CAN Analyzer is not installed to ~/soft/can-analyzer/, you need to revise file:${NOC}"
+    echo -e "${YLW}if CAN Analyzer is not installed to $soft_dircan-analyzer/, you need to revise file:${NOC}"
     echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
 }
 
@@ -379,8 +379,8 @@ function _dj_setup_pangolin() {
 
     # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
 
-    _show_and_run mkdir -p ~/soft/
-    _show_and_run cd ~/soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf Pangolin/
     _show_and_run git clone https://github.com/stevenlovegrove/Pangolin.git
     _show_and_run cd Pangolin
@@ -581,7 +581,7 @@ function _create_stm32cubemx_desktop_item() {
 
     sudo chmod +x $folder/$file
 
-    echo -e "${YLW}if cubeMX is not installed to ~/soft/STM32CubeMX/, you need to revise file:${NOC}"
+    echo -e "${YLW}if cubeMX is not installed to $soft_dirSTM32CubeMX/, you need to revise file:${NOC}"
     echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
 }
 
@@ -652,7 +652,7 @@ function _dj_setup_stm32_tools() {
     # install stm32flash ----------------
     echo -e "install  stm32flash ..."
     _press_enter_or_wait_s_continue 10
-    cd ~/soft/
+    cd $soft_dir
     rm stm32-tools -rf
     git clone https://github.com/dj-zhou/stm32-tools.git
     cd stm32-tools/stm32flash
@@ -681,7 +681,7 @@ function _dj_setup_glfw3() {
     echo -e "install glfw3 ..."
 
     _show_and_run mkdir -p ~/soft
-    _show_and_run cd ~/soft/
+    _show_and_run cd $soft_dir
 
     # glfw3
     packages="build-essential cmake git xorg-dev libglu1-mesa-dev "
@@ -752,7 +752,7 @@ function _dj_setup_gtest() {
     _press_enter_or_wait_s_continue 5
 
     _show_and_run mkdir -p ~/soft
-    _show_and_run cd ~/soft/
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf googletest
     _show_and_run git clone https://github.com/google/googletest.git
     _show_and_run cd googletest
@@ -782,7 +782,7 @@ function _dj_setup_glog() {
 
     v=$(_find_package_version glog)
     _show_and_run mkdir -p ~/soft
-    _show_and_run cd ~/soft/
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf glog
     _show_and_run git clone https://github.com/google/glog.git
     _show_and_run cd glog
@@ -821,7 +821,7 @@ function _dj_setup_grpc() {
 
     grpc_v=$(_find_package_version grpc)
     _show_and_run mkdir -p ~/soft
-    _show_and_run cd ~/soft/
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf grpc
     _show_and_run git clone https://github.com/grpc/grpc.git --recurse-submodules \
         --shallow-submodules --depth 1 --branch v${grpc_v}
