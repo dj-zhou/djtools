@@ -4,27 +4,30 @@
 # may not be a good way to install opencv
 # recommend to install opencv-4.1.1
 function _dj_setup_opencv_2_4_13() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     echo -e "Have you installed Qt? The openCV installation may need Qt"
     echo " use the following command to install Qt 5.11.2"
     echo -e "     dj setup qt-5.11.2"
     _press_enter_or_wait_s_continue 20
 
-    cd ~ && mkdir -p soft && cd soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
     sudo rm -rf opencv-4.1.1 # otherwise, it will not going to clone into this folder
 
-    wget https://codeload.github.com/opencv/opencv/zip/2.4.13.6
-    mv 2.4.13.6 opencv-2.4.13.6.zip
-    unzip opencv-2.4.13.6.zip
-    cd opencv-2.4.13.6
-    mkdir build && cd build
-    cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
+    _show_and_run wget https://codeload.github.com/opencv/opencv/zip/2.4.13.6
+    _show_and_run mv 2.4.13.6 opencv-2.4.13.6.zip
+    _show_and_run unzip opencv-2.4.13.6.zip
+    _show_and_run cd opencv-2.4.13.6
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
         -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON \
         WITH_OPENCL=ON WITH_GDAL=ON WITH_IPP=ON BUILD_JASPER=ON BUILD_JPEG=ON \
         BUILD_PNG=ON BUIILD_TIFF=ON WITH_OPENMP=ON ..
-    make -j$(nproc) && sudo make install
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     _ask_to_remove_a_folder opencv-2.4.13
     _ask_to_remove_a_file opencv-2.4.13.zip
@@ -51,9 +54,9 @@ function _setup_opencv_dependencies() {
     # Cameras programming interface libs
     packages+="libdc1394-22 libdc1394-22-dev libxine2-dev libv4l-dev v4l-utils "
 
-    _pushd_quiet ${PWD}
-    cd /usr/include/linux
-    sudo ln -s -f ../libv4l1-videodev.h videodev.h
+    _show_and_run _pushd_quiet ${PWD}
+    _show_and_run cd /usr/include/linux
+    _show_and_run sudo ln -s -f ../libv4l1-videodev.h videodev.h
     _popd_quiet
 
     # GTK lib for the graphical user functionalities coming from OpenCV highghui module
@@ -77,41 +80,43 @@ function _setup_opencv_dependencies() {
     packages+="libopencv-dev libjasper-dev libgstreamer-plugins-base0.10-dev "
     packages+="libgstreamer0.10-dev libqt4-dev "
 
-    _install_if_not_installed $packages
+    _show_and_run _install_if_not_installed $packages
 
 }
 
 # =============================================================================
 function _dj_setup_opencv_3_4_13() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     _setup_opencv_dependencies
 
-    cd ~ && mkdir -p soft && cd soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
-    rm -rf opencv-3.4.13
-    rm -rf opencv_contrib-3.4.13
+    _show_and_run rm -rf opencv-3.4.13
+    _show_and_run rm -rf opencv_contrib-3.4.13
 
     opencv_url=https://github.com/opencv
     file=opencv-3.4.13.zip
     url_file=$opencv_url/opencv/archive/3.4.13.zip
-    _wget_if_not_exist $file "76ea65511341b5cd02b2d00674e72247" $url_file -O
+    _show_and_run _wget_if_not_exist $file "76ea65511341b5cd02b2d00674e72247" $url_file -O
     file=opencv_contrib-3.4.13.zip
     url_file=$opencv_url/opencv_contrib/archive/3.4.13.zip
-    _wget_if_not_exist $file "38ef3a805ea89677becca879bda70647" $url_file -O
+    _show_and_run _wget_if_not_exist $file "38ef3a805ea89677becca879bda70647" $url_file -O
 
-    unzip opencv-3.4.13.zip
-    unzip opencv_contrib-3.4.13.zip
+    _show_and_run unzip opencv-3.4.13.zip
+    _show_and_run unzip opencv_contrib-3.4.13.zip
 
     # some kind of virtual??
     export WORKON_HOME=$HOME/.virtualenvs
     export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
     source /usr/local/bin/virtualenvwrapper.sh
-    mkvirtualenv cv -p python3
+    _show_and_run mkvirtualenv cv -p python3
 
-    cd opencv-3.4.13
-    mkdir build && cd build
-    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    _show_and_run cd opencv-3.4.13
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake -D CMAKE_BUILD_TYPE=RELEASE \
         -D CMAKE_C_COMPILER=/usr/bin/gcc-9 \
         -D CMAKE_INSTALL_PREFIX=/usr/local \
         -D INSTALL_PYTHON_EXAMPLES=ON \
@@ -139,7 +144,8 @@ function _dj_setup_opencv_3_4_13() {
         -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
         -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include ..
 
-    make -j$(nproc) && sudo make install
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     cat <<eom
     lib files *.so:
@@ -161,7 +167,7 @@ eom
 # notice: there is some manual work todo before actually automate this procedure
 # this does not work on Ubuntu 20.04!
 function _dj_setup_opencv_4_1_1() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     if [[ -d "/usr/local/include/opencv2" ]]; then
         echo "other version of opencv is installed, exit"
@@ -175,31 +181,35 @@ function _dj_setup_opencv_4_1_1() {
 
     _setup_opencv_dependencies
 
-    cd ~ && mkdir -p soft && cd soft/
-    rm -rf opencv-4.1.1
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm -rf opencv-4.1.1
 
-    git clone https://github.com/dj-zhou/opencv-4.1.1.git
-    git clone https://github.com/dj-zhou/ippicv.git
+    _show_and_run git clone https://github.com/dj-zhou/opencv-4.1.1.git
+    _show_and_run git clone https://github.com/dj-zhou/ippicv.git
 
     if [ $# = 1 ] && [ $1 = 'with-contrib' ]; then
-        git clone https://github.com/dj-zhou/opencv_contrib-4.1.1.git
+        _show_and_run git clone https://github.com/dj-zhou/opencv_contrib-4.1.1.git
     fi
 
-    cd opencv-4.1.1
-    git checkout add-eigen3-include
-    sudo rm -rf build && mkdir build && cd build
+    _show_and_run cd opencv-4.1.1
+    _show_and_run git checkout add-eigen3-include
+    _show_and_run sudo rm -rf build
+    _show_and_run mkdir build
+    _show_and_run cd build
     if [ $# = 1 ] && [ $1 = 'with-contrib' ]; then
-        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
+        _show_and_run cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
             -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON \
             -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-4.1.1/modules ..
     else
-        cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
+        _show_and_run cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
             -D INSTALL_C_EXAMPLES=ON -D BUILD_EXAMPLES=ON ..
     fi
 
-    make -j$(nproc) && sudo make install
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
-    sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
+    _show_and_run sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
 
     cat <<eom
     lib files *.so are installed in
@@ -218,7 +228,7 @@ eom
 # =============================================================================
 # https://medium.com/@sb.jaduniv/how-to-install-opencv-4-2-0-with-cuda-10-1-on-ubuntu-20-04-lts-focal-fossa-bdc034109df3
 function _dj_setup_opencv_4_2_0() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     if [[ -d "/usr/local/include/opencv2" ]]; then
         echo "other version of opencv is installed, exit"
@@ -227,18 +237,18 @@ function _dj_setup_opencv_4_2_0() {
 
     _setup_opencv_dependencies
 
-    cd ~ && mkdir -p soft && cd soft/
-
-    rm -rf opencv-4.2.0
-    rm -rf opencv_contrib-4.2.0
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm -rf opencv-4.2.0
+    _show_and_run rm -rf opencv_contrib-4.2.0
 
     opencv_url=https://github.com/opencv
     file=opencv-4.2.0.zip
     url_file=$opencv_url/opencv/archive/4.2.0.zip
-    _wget_if_not_exist $file "b02b54115f1f99cb9e885d1e5988ff70" $url_file -O
+    _show_and_run _wget_if_not_exist $file "b02b54115f1f99cb9e885d1e5988ff70" $url_file -O
     file=opencv_contrib-4.2.0.zip
     url_file=$opencv_url/opencv_contrib/archive/4.2.0.zip
-    _wget_if_not_exist $file "4776354662667c85a91bcd19f6a13da7" $url_file -O
+    _show_and_run _wget_if_not_exist $file "4776354662667c85a91bcd19f6a13da7" $url_file -O
 
     # some kind of virtual??
     export WORKON_HOME=$HOME/.virtualenvs
@@ -246,9 +256,10 @@ function _dj_setup_opencv_4_2_0() {
     source /usr/local/bin/virtualenvwrapper.sh
     mkvirtualenv cv -p python3
 
-    cd opencv-4.2.0
-    mkdir build && cd build
-    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+    _show_and_run cd opencv-4.2.0
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake -D CMAKE_BUILD_TYPE=RELEASE \
         -D CMAKE_C_COMPILER=/usr/bin/gcc-9 \
         -D CMAKE_INSTALL_PREFIX=/usr/local \
         -D INSTALL_PYTHON_EXAMPLES=ON \
@@ -276,9 +287,10 @@ function _dj_setup_opencv_4_2_0() {
         -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
         -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include ..
 
-    make -j$(nproc) && sudo make install
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
-    sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
+    _show_and_run sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
 
     _popd_quiet
 }
