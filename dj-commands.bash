@@ -47,7 +47,7 @@ function _dj_setup_boost() {
     _show_and_run sudo rm -rf /usr/local/include/boost
     _show_and_run sudo rm -rf /usr/local/lib/libboost*
 
-    _install_if_not_installed python3-dev libxml2-dev
+    _show_and_run _install_if_not_installed python3-dev libxml2-dev
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
     _show_and_run sudo rm -rf boost
@@ -82,7 +82,7 @@ function _create_can_analyzer_desktop_item() {
     echo 'Encoding=UTF-8' >>$file
     echo 'Name=can-analyzer' >>$file
     echo 'Comment=can-analyzer' >>$file
-    echo 'Exec=bash -c "cd '$HOME'/soft/can-analyzer/ && ./CANAnalysis"' >>$file
+    echo 'Exec=bash -c "cd '$soft_dir'/can-analyzer/ && ./CANAnalysis"' >>$file
     echo 'Icon='$folder'/can-analyzer.xpm' >>$file
     echo 'StartupNotify=false' >>$file
     echo 'Type=Application' >>$file
@@ -93,19 +93,20 @@ function _create_can_analyzer_desktop_item() {
 
     sudo chmod +x $folder/$file
 
-    echo -e "${YLW}if CAN Analyzer is not installed to $soft_dircan-analyzer/, you need to revise file:${NOC}"
+    echo -e "${YLW}if CAN Analyzer is not installed to $soft_dir/can-analyzer/, you need to revise file:${NOC}"
     echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
 }
 
 # =============================================================================
 # note
 function _dj_setup_can_analyzer() {
-    cur_dir=$PWD
-    cd ~ && mkdir -p soft/ && cd soft/
-    rm can-analyzer -rf
-    git clone https://github.com/dj-zhou/can-analyzer.git
-    chmod +x can-analyzer/CANAnalysis
-    cd ${cur_dir}
+    _show_and_run _pushd_quiet ${PWD}
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm can-analyzer -rf
+    _show_and_run git clone https://github.com/dj-zhou/can-analyzer.git
+    _show_and_run chmod +x can-analyzer/CANAnalysis
+    _popd_quiet
     _create_can_analyzer_desktop_item
 }
 
@@ -113,7 +114,7 @@ function _dj_setup_can_analyzer() {
 function _dj_setup_can_dev_tools() {
     sudo apt update &>/dev/null
     echo -e "going to install ${GRN}can-utils${NOC}"
-    _install_if_not_installed can-utils
+    _show_and_run _install_if_not_installed can-utils
 }
 
 # =============================================================================
@@ -134,8 +135,8 @@ function _dj_setup_cli11() {
     _show_and_run sudo rm -rf /usr/local/lib/cmake/CLI11/CLI11Config.cmake
     _show_and_run sudo rm -rf /usr/local/lib/cmake/CLI11/CLI11ConfigVersion.cmake
 
-    _show_and_run mkdir -p ~/soft
-    _show_and_run cd ~/soft
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
     _show_and_run sudo rm -rf CLI11/
     _show_and_run git clone https://github.com/CLIUtils/CLI11
@@ -170,7 +171,7 @@ function _dj_setup_cli11() {
 # setting a fixed version is not a good idea, but ...
 function _dj_setup_cmake() {
     # install dependencies
-    _install_if_not_installed libssl-dev
+    _show_and_run _install_if_not_installed libssl-dev
     v=$(_find_package_version cmake)
     _echo_install CMake $v
 
@@ -178,7 +179,8 @@ function _dj_setup_cmake() {
 
     _show_and_run _pushd_quiet ${PWD}
 
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run rm -rf CMake
     _show_and_run git clone https://github.com/Kitware/CMake.git
     _show_and_run cd CMake
@@ -194,8 +196,7 @@ function _dj_setup_cmake() {
 
 # =============================================================================
 function _dj_setup_kdiff3_meld() {
-    _install_if_not_installed kdiff3
-    _install_if_not_installed meld
+    _show_and_run _install_if_not_installed kdiff3 meld
 
     all_config=$(git config --list)
     if [[ "$all_config" = *"merge.tool"* ]]; then
@@ -213,7 +214,7 @@ function _dj_setup_kdiff3_meld() {
 # =============================================================================
 # tested on ubuntu 18.04
 function _dj_setup_kermit() {
-    _install_if_not_installed ckermit lrzsz
+    _show_and_run _install_if_not_installed ckermit lrzsz
 
     kermrc_file="kermrc"
     _show_and_run rm $kermrc_file -f
@@ -249,7 +250,8 @@ function _dj_setup_gadgets() {
     if [ "$v" = "eigen3 is not installed"* ]; then
         _show_and_run dj setup eigen3
     fi
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     _show_and_run sudo rm -rf dj-gadgets
     _show_and_run git clone https://github.com/dj-zhou/dj-gadgets.git
     _show_and_run cd dj-gadgets
@@ -285,7 +287,7 @@ function _dj_setup_gadgets() {
 # =============================================================================
 # todo: for each package, yes (default) to intall, no to skip
 function _dj_setup_devtools() {
-    _install_if_not_installed \
+    _show_and_run _install_if_not_installed \
         libncurses5-dev \
         libnl-genl-3-dev
 }
@@ -298,7 +300,7 @@ function _dj_setup_container_docker() {
 
     # Install a few prerequisite packages
     packages="apt-transport-https ca-certificates curl software-properties-common "
-    _install_if_not_installed $packages
+    _show_and_run _install_if_not_installed $packages
 
     docker_url="https://download.docker.com/linux/ubuntu"
 
@@ -311,7 +313,7 @@ function _dj_setup_container_docker() {
     sudo apt-get -y update
 
     # Install
-    _install_if_not_installed docker-ce
+    _show_and_run _install_if_not_installed docker-ce
 
     # check the status -- not sure if the "active status" need a system reboot
     sudo systemctl status docker
@@ -348,11 +350,12 @@ function _dj_setup_container_dive() {
     _pushd_quiet ${PWD}
 
     # ----------------------------------------------
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
     dive_version="0.9.2"
     drive_url="https://github.com/wagoodman/dive/releases/download/v"
-    wget $drive_url$dive_version"/dive_"$dive_version"_linux_amd64.deb"
-    sudo dpkg -i dive_*.deb
+    _show_and_run wget $drive_url$dive_version"/dive_"$dive_version"_linux_amd64.deb"
+    _show_and_run sudo dpkg -i dive_*.deb
 
     echo "use the following command to check the docker image layouts"
     echo "    \$ sudo dive <image-tag/hash>"
@@ -363,7 +366,7 @@ function _dj_setup_container_dive() {
 
 # =============================================================================
 function _dj_setup_container_lxd_4_0() {
-    _install_if_not_installed snapd
+    _show_and_run _install_if_not_installed snapd
 
     sudo snap install lxd --channel=4.0/stable
     echo 'next step: $ sudo lxd init'
@@ -375,7 +378,7 @@ function _dj_setup_pangolin() {
 
     # dependency installation
     packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
-    _install_if_not_installed $packages
+    _show_and_run _install_if_not_installed $packages
 
     # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
 
@@ -412,14 +415,15 @@ function _dj_setup_cutecom() {
     _echo_install cutecom $v
     _press_enter_or_wait_s_continue 5
 
-    cd ~ && mkdir -p soft/ && cd soft/
-    rm -rf cutecom
-    git clone https://gitlab.com/cutecom/cutecom.git
-    cd cutecom
-    git checkout $v
-    cmake .
-    make -j$(nproc)
-    sudo make install
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm -rf cutecom
+    _show_and_run git clone https://gitlab.com/cutecom/cutecom.git
+    _show_and_run cd cutecom
+    _show_and_run git checkout $v
+    _show_and_run cmake .
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     _popd_quiet
 }
@@ -428,18 +432,19 @@ function _dj_setup_cutecom() {
 function _dj_setup_picocom() {
     _pushd_quiet "${PWD}"
 
-    cd ~ && mkdir -p soft/ && cd soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
     v=$(_find_package_version picocom)
     _echo_install picocom $v
     _press_enter_or_wait_s_continue 5
 
-    rm -rf picocom
-    git clone git@github.com:npat-efault/picocom.git
-    cd picocom
-    git checkout $V
-    make
-    sudo cp picocom /usr/bin/
+    _show_and_run rm -rf picocom
+    _show_and_run git clone git@github.com:npat-efault/picocom.git
+    _show_and_run cd picocom
+    _show_and_run git checkout $V
+    _show_and_run make
+    _show_and_run sudo cp picocom /usr/bin/
 
     _popd_quiet
 }
@@ -449,8 +454,8 @@ function _dj_setup_pip() {
     _pushd_quiet ${PWD}
 
     cd ~/
-    _install_if_not_installed python3-pip
-    _install_if_not_installed python-pip
+    _show_and_run _install_if_not_installed python3-pip
+    _show_and_run _install_if_not_installed python-pip
 
     sudo pip install --upgrade pip
     sudo pip3 install --upgrade pip
@@ -464,92 +469,92 @@ function _dj_setup_pip() {
 
 # =============================================================================
 function _dj_setup_perf() {
-    _install_if_not_installed linux-tools-common linux-tools-generic linux-tools-$(uname -r)
-    _install_if_not_installed linux-tools-common linux-tools-generic
+    _show_and_run _install_if_not_installed linux-tools-common linux-tools-generic linux-tools-$(uname -r)
+    _show_and_run _install_if_not_installed linux-tools-common linux-tools-generic
 
     echo "check perf version: \$ perf --version"
 }
 
 # =============================================================================
 function _dj_setup_plotjuggler() {
-    _pushd_quiet ${PWD}
-    cd ~ && mkdir -p soft && cd soft
+    _show_and_run _pushd_quiet ${PWD}
 
-    _install_if_not_installed qtbase5-dev libqt5svg5-dev \
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    _show_and_run _install_if_not_installed qtbase5-dev libqt5svg5-dev \
         libqt5websockets5-dev libqt5opengl5-dev libqt5x11extras5-dev
 
     v=$(_find_package_version plotjuggler)
 
-    rm -rf PlotJuggler
-    git clone https://github.com/facontidavide/PlotJuggler.git
-    cd PlotJuggler
-    git checkout $v
-    mkdir build && cd build
-    cmake ..
-    make -j$(nproc)
-    sudo make install
+    _show_and_run rm -rf PlotJuggler
+    _show_and_run git clone https://github.com/facontidavide/PlotJuggler.git
+    _show_and_run cd PlotJuggler
+    _show_and_run git checkout $v
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_pycharm() {
-    _install_if_not_installed snap
+    _show_and_run _install_if_not_installed snap
 
-    # cd ~ && mkdir -p soft && cd soft/
-    # file=pycharm-community-2020.3.3.tar.gz
-    # url=https://download-cf.jetbrains.com/python/$file
-    # _wget_if_not_exist $file "12e20683a01fb7182a029fe1ceeeed95" $url
-
-    sudo snap install pycharm-community --classic
+    _show_and_run sudo snap install pycharm-community --classic
 }
 
 # =============================================================================
 function _dj_setup_python_3_9() {
     if [[ ! -f /etc/apt/sources.list.d/deadsnake*.list ]]; then
-        sudo add-apt-repository ppa:deadsnakes/ppa
-        sudo apt-get -y update
+        _show_and_run sudo add-apt-repository ppa:deadsnakes/ppa
+        _show_and_run sudo apt-get -y update
     fi
-    _install_if_not_installed python3.9 python3.8
+    _show_and_run _install_if_not_installed python3.9 python3.8
 
     # ----------------------
     echo -e "run update-alternatives:"
     for i in 3 4 6 7 8 9; do
         if [ -f /usr/bin/python3.$i ]; then
-            sudo update-alternatives --install \
+            _show_and_run sudo update-alternatives --install \
                 /usr/bin/python3 python3 /usr/bin/python3.$i $i
         fi
     done
 
     # ----------------------
-    sudo update-alternatives --config python3
+    _show_and_run sudo update-alternatives --config python3
 
     # install some related software package
-    _install_if_not_installed python3.9-distutils
+    _show_and_run _install_if_not_installed python3.9-distutils
 
     # others ------------
-    _install_if_not_installed python3-pip
-    pip3 install --upgrade setuptools
+    _show_and_run _install_if_not_installed python3-pip
+    _show_and_run pip3 install --upgrade setuptools
 }
 
 # =============================================================================
 function _dj_setup_qemu() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     version=$1
-    echo $version
     if [ $version = "2.11.1" ]; then
         # this may only work within Ubuntu 18.04, not tested on other platforms
-        _install_if_not_installed qemu
+        _show_and_run _install_if_not_installed qemu
     elif [ $version = "4.2.0" ]; then
-        cd ~ && mkdir -p soft && cd soft/
-        git clone git://git.qemu-project.org/qemu.git
-        cd qemu
-        git checkout stable-4.2
-        mkdir build && cd build
+        _show_and_run mkdir -p $soft_dir
+        _show_and_run cd $soft_dir
+        _show_and_run git clone git://git.qemu-project.org/qemu.git
+        _show_and_run cd qemu
+        _show_and_run git checkout stable-4.2
+        _show_and_run mkdir build
+        _show_and_run cd build
         # is this only for ARM? will fix it later if needed
-        ../configure --target-list=arm-softmmu --audio-drv-list=
-        make -j8 && sudo make install
+        _show_and_run ../configure --target-list=arm-softmmu --audio-drv-list=
+        _show_and_run make -j$(nproc)
+        _show_and_run sudo make install
         echo -e "$CYN the installed qemu is probably for ARM only, check it later$NOC"
     fi
 
@@ -561,10 +566,10 @@ function _create_stm32cubemx_desktop_item() {
     folder="/usr/share/applications"
 
     # copy the icon file
-    sudo cp $djtools_path/settings/cubemx.xpm $folder
+    _show_and_run sudo cp $djtools_path/settings/cubemx.xpm $folder
 
     file="cubeMX.desktop"
-    touch $file
+    _show_and_run touch $file
 
     echo '[Desktop Entry]' >>$file
     echo 'Encoding=UTF-8' >>$file
@@ -576,10 +581,10 @@ function _create_stm32cubemx_desktop_item() {
     echo 'Type=Application' >>$file
     echo 'Categories=Application;Development;' >>$file
 
-    sudo rm -rf $folder/$file
-    sudo mv $file $folder
+    _show_and_run sudo rm -rf $folder/$file
+    _show_and_run sudo mv $file $folder
 
-    sudo chmod +x $folder/$file
+    _show_and_run sudo chmod +x $folder/$file
 
     echo -e "${YLW}if cubeMX is not installed to $soft_dirSTM32CubeMX/, you need to revise file:${NOC}"
     echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
@@ -587,16 +592,17 @@ function _create_stm32cubemx_desktop_item() {
 
 # =============================================================================
 function _dj_setup_stm32_cubemx() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
-    cd ~ && mkdir -p soft && cd soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
-    git clone https://gitee.com/d-zhou/stm32-cube-mx-v6.0.1.git
-    cd stm32-cube-mx-v6.0.1/
+    _show_and_run git clone https://gitee.com/d-zhou/stm32-cube-mx-v6.0.1.git
+    _show_and_run cd stm32-cube-mx-v6.0.1/
     cat archive.tar.* | tar -xzvf -
     # rm archive.tar.*
-    chmod +x SetupSTM32CubeMX-6.0.1.linux
-    ./SetupSTM32CubeMX-6.0.1.linux
+    _show_and_run chmod +x SetupSTM32CubeMX-6.0.1.linux
+    _show_and_run ./SetupSTM32CubeMX-6.0.1.linux
 
     _create_stm32cubemx_desktop_item
 
@@ -621,7 +627,7 @@ function _dj_setup_stm32_tools() {
 
     # install dependencies and some software ----------------
     packages="libusb-1.0.0-dev gtk+-3.0 cu putty screen cmake "
-    _install_if_not_installed $packages
+    _show_and_run _install_if_not_installed $packages
 
     # install cutecom from source ----------------
     _dj_setup_cutecom
@@ -630,46 +636,47 @@ function _dj_setup_stm32_tools() {
     echo -e "install ${GRN}stlink${NOC}"
     _press_enter_or_wait_s_continue 5
 
-    mkdir -p ~/soft && cd ~/soft
-    rm stlink -rf
-    git clone https://github.com/stlink-org/stlink
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm stlink -rf
+    _show_and_run git clone https://github.com/stlink-org/stlink
 
-    cd stlink
+    _show_and_run cd stlink
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
-        git checkout v1.7.0 # need test v1.7.0 before switch to it
+        _show_and_run git checkout v1.7.0 # need test v1.7.0 before switch to it
     elif [[ ${ubuntu_v} = *'20.04'* ]]; then
-        git checkout v1.7.0
+        _show_and_run git checkout v1.7.0
     else
         echo "${RED} NOT IMPLEMENTED YET${NOC}"
     fi
-    echo "sudo rm -rf /usr/local/bin/st-*"
-    sudo rm -rf /usr/local/bin/st-*
-    make release -j$(nproc)
-    cd build/Release/
-    sudo make install
-    sudo ldconfig
+
+    _show_and_run sudo rm -rf /usr/local/bin/st-*
+    _show_and_run make release -j$(nproc)
+    _show_and_run cd build/Release/
+    _show_and_run sudo make install
+    _show_and_run sudo ldconfig
 
     # install stm32flash ----------------
     echo -e "install  stm32flash ..."
     _press_enter_or_wait_s_continue 10
-    cd $soft_dir
-    rm stm32-tools -rf
-    git clone https://github.com/dj-zhou/stm32-tools.git
-    cd stm32-tools/stm32flash
-    make clean
-    make -j$(nproc)
-    sudo rm -rf /usr/local/bin/stm32flash
-    sudo make install
+    _show_and_run cd $soft_dir
+    _show_and_run rm stm32-tools -rf
+    _show_and_run git clone https://github.com/dj-zhou/stm32-tools.git
+    _show_and_run cd stm32-tools/stm32flash
+    _show_and_run make clean
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo rm -rf /usr/local/bin/stm32flash
+    _show_and_run sudo make install
 
     # udev rule ----------------
     echo -e "add serial port privilege to current user ..."
     _press_enter_or_wait_s_continue 10
-    sudo usermod -a -G dialout $(whoami)
+    _show_and_run sudo usermod -a -G dialout $(whoami)
     rule_file=stm32-tools.rules
-    sudo rm -f /etc/udev/rules.d/$rule_file
+    _show_and_run sudo rm -f /etc/udev/rules.d/$rule_file
     echo 'KERNEL=="ttyUSB[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
     echo 'KERNEL=="ttyACM[0-99]*",MODE="0666"' | sudo tee -a /etc/udev/rules.d/$rule_file
-    sudo service udev restart
+    _show_and_run sudo service udev restart
 
     _popd_quiet
 }
@@ -680,12 +687,12 @@ function _dj_setup_glfw3() {
 
     echo -e "install glfw3 ..."
 
-    _show_and_run mkdir -p ~/soft
+    _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
     # glfw3
     packages="build-essential cmake git xorg-dev libglu1-mesa-dev "
-    _install_if_not_installed $packages
+    _show_and_run _install_if_not_installed $packages
     _show_and_run rm -rf glfw3/
     _show_and_run git clone https://github.com/dj-zhou/glfw3.git
     _show_and_run cd glfw3/
@@ -701,36 +708,36 @@ function _dj_setup_glfw3() {
 
 # =============================================================================
 function _dj_setup_gnuplot() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
-    cd ~ && mkdir -p soft && cd soft/
-    rm -rf gnuplot
-    git clone https://github.com/gnuplot/gnuplot.git
-    cd gnuplot
-    ./prepare
-    ./configure
-    make -j$(nproc)
-    sudo make install && sudo ldconfig
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm -rf gnuplot
+    _show_and_run git clone https://github.com/gnuplot/gnuplot.git
+    _show_and_run cd gnuplot
+    _show_and_run ./prepare
+    _show_and_run ./configure
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install && sudo ldconfig
 
     _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_google_repo() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     # it needs python2
-    _install_if_not_installed python
+    _show_and_run _install_if_not_installed python
 
     if [ -f $djtools_path/tools/repo ]; then
-        echo -e "use repo from tools/"
-        sudo cp $djtools_path/tools/repo /bin/
-        sudo chmod a+x /bin/repo
+        _show_and_run sudo cp $djtools_path/tools/repo /bin/
+        _show_and_run sudo chmod a+x /bin/repo
     else
         echo -e "fetch from google "
-        curl https://storage.googleapis.com/git-repo-downloads/repo >repo
-        chmod a+x repo
-        sudo mv repo /bin/
+        _show_and_run curl https://storage.googleapis.com/git-repo-downloads/repo >repo
+        _show_and_run chmod a+x repo
+        _show_and_run sudo mv repo /bin/
     fi
 
     cat <<eom
@@ -751,7 +758,7 @@ function _dj_setup_gtest() {
     _echo_install googletest $v
     _press_enter_or_wait_s_continue 5
 
-    _show_and_run mkdir -p ~/soft
+    _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
     _show_and_run rm -rf googletest
     _show_and_run git clone https://github.com/google/googletest.git
@@ -781,7 +788,7 @@ function _dj_setup_glog() {
     echo -e "install glog ..."
 
     v=$(_find_package_version glog)
-    _show_and_run mkdir -p ~/soft
+    _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
     _show_and_run rm -rf glog
     _show_and_run git clone https://github.com/google/glog.git
@@ -807,9 +814,7 @@ function _dj_setup_gnome() {
     echo -e "install gnome on Ubuntu"
     _press_enter_or_wait_s_continue 20
 
-    _install_if_not_installed tasksel
-    _install_if_not_installed gnome-session
-    _install_if_not_installed ubuntu-desktop
+    _show_and_run _install_if_not_installed tasksel gnome-session ubuntu-desktop
 
     echo -e "when log in, choose GNOME"
 }
@@ -820,7 +825,7 @@ function _dj_setup_grpc() {
     _show_and_run _pushd_quiet ${PWD}
 
     grpc_v=$(_find_package_version grpc)
-    _show_and_run mkdir -p ~/soft
+    _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
     _show_and_run rm -rf grpc
     _show_and_run git clone https://github.com/grpc/grpc.git --recurse-submodules \
@@ -857,8 +862,7 @@ function _dj_setup_gpp_10() {
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
         echo -e "install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} "
         _press_enter_or_wait_s_continue 5
-        _install_if_not_installed gcc-9
-        _install_if_not_installed g++-9
+        _show_and_run _install_if_not_installed gcc-9 g++-9
     fi
 
     # ----------------------
@@ -895,16 +899,14 @@ function _dj_setup_gpp_11() {
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
         echo -e "install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC} "
         _press_enter_or_wait_s_continue 5
-        _install_if_not_installed gcc-10
-        _install_if_not_installed g++-10
+        _show_and_run _install_if_not_installed gcc-10 g++-10
     fi
 
     # install g++9/gcc-9
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
         echo -e "install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} "
         _press_enter_or_wait_s_continue 5
-        _install_if_not_installed gcc-9
-        _install_if_not_installed g++-9
+        _show_and_run _install_if_not_installed gcc-9 g++-9
     fi
 
     # ----------------------
@@ -942,8 +944,7 @@ function _dj_setup_rust() {
 function _dj_setup_wubi() {
     _pushd_quiet ${PWD}
 
-    _install_if_not_installed ibus
-    _install_if_not_installed ibus-table-wubi
+    _show_and_run _install_if_not_installed ibus ibus-table-wubi
     if [[ ${ubuntu_v} = *'16.04'* ]]; then
         cat <<eom
 -----------------------------------------------------------------
@@ -970,22 +971,27 @@ eom
 function _dj_setup_vtk_8_2_0() {
     echo "vtk 8.2.0 installation"
 
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     # vtk 8 ----------------
     # reference: https://kezunlin.me/post/b901735e/
-    cd ~ && mkdir -p soft && cd soft/
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
-    _install_if_not_installed cmake-qt-gui
+    _show_and_run _install_if_not_installed cmake-qt-gui
 
-    git clone https://gitee.com/dj-zhou/vtk-8.2.0.git
+    _show_and_run git clone https://gitee.com/dj-zhou/vtk-8.2.0.git
 
-    cd vtk-8.2.0 && sudo rm -rf build/ && mkdir -p build && cd build
-    cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
+    _show_and_run cd vtk-8.2.0
+    _show_and_run sudo rm -rf build/
+    _show_and_run mkdir -p build
+    _show_and_run cd build
+    _show_and_run cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/usr/local -DVTK_RENDERING_BACKEND=OpenGL2 \
         -DQT5_DIR=$HOME/Qt5.14.2/5.14.2/gcc_64/lib/cmake/Qt5 \
         -DVTK_QT_VERSION=5 -DVTK_Group_Qt=ON ..
-    make -j$(nproc) && sudo make install
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     echo "the installed library seems to be in /usr/local/lib folder"
     echo "the installed header files seem to be in /usr/local/include/vtk-8.2/ folder"
@@ -1003,7 +1009,7 @@ function _dj_work_check() {
 # to search a library use: ldconfig -p | grep xxxx
 # once this command get extended, we add sub command to "dj search"
 function _dj_grep_package() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     lib_to_find=$1
     echo -e "run: ${GRN}ldconfig -p | grep $lib_to_find${NOC}:"
@@ -1026,7 +1032,7 @@ function _dj_grep_string() {
     if [ "$1" = "-in-bash" ]; then
         echo -e "grep in ${GRN}*.bash, *.sh${NOC} files"
         # how to search in the files without extension??
-        grep "$2" -rIn \
+        _show_and_run grep "$2" -rIn \
             --include={*.bash,*.sh} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
@@ -1035,7 +1041,7 @@ function _dj_grep_string() {
     fi
     if [ "$1" = "-in-ccode" ]; then
         echo -e "grep in ${GRN}*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt${NOC} files"
-        grep "$2" -rIn \
+        _show_and_run grep "$2" -rIn \
             --include={*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
@@ -1044,7 +1050,7 @@ function _dj_grep_string() {
     fi
     if [ "$1" = "-in-config" ]; then
         echo -e "grep in ${GRN}*.json,Dockerfile,*.xml${NOC} files"
-        grep "$2" -rIn \
+        _show_and_run grep "$2" -rIn \
             --include={*.json,Dockerfile,*.xml} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
@@ -1058,7 +1064,7 @@ function _dj_grep_string() {
     fi
     if [ "$1" = "-in-python" ]; then
         echo -e "grep in ${GRN}*.py,*.ipynb${NOC} files"
-        grep "$2" -rIn \
+        _show_and_run grep "$2" -rIn \
             --include={*.py,*.ipynb} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
@@ -1068,7 +1074,7 @@ function _dj_grep_string() {
     if [ "$1" = "-in-rust" ]; then # seems not working for *.rs files
         echo -e "grep in ${GRN}*.rs,Cargo.toml,Cargo.lock${NOC} files"
         # not a bug, a single "*.rs" does not work here, don't know why
-        grep "$2" -rIn \
+        _show_and_run grep "$2" -rIn \
             --include={*.rs,*.rs,Cargo.toml,Cargo.lock} \
             --exclude-dir={.venv,build,subprojects,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
@@ -1077,7 +1083,7 @@ function _dj_grep_string() {
     fi
     if [ "$1" = "-in-yaml" ]; then
         echo -e "grep in ${GRN}*.yml,*.yaml${NOC} files"
-        grep "$2" -rIn \
+        _show_and_run grep "$2" -rIn \
             --include={*.yml,*.yaml} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
@@ -1086,7 +1092,7 @@ function _dj_grep_string() {
     fi
     if [ "$1" = "-in-yocto-recipe" ]; then
         echo -e "grep in ${GRN}*.bb,*.conf,*.inc,*.sample,*.bbappend${NOC} files"
-        grep "$2" -rIn \
+        _show_and_run grep "$2" -rIn \
             --include={*.bb,*.conf,*.inc,*.sample,*.bbappend} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
@@ -1168,7 +1174,7 @@ function _dj_ssh_general_no_password() {
 # install ssh-askpass to avoid some error, however, it will have an popup window to press
 function _dj_git_ssh_account_activate() {
 
-    _install_if_not_installed ssh-askpass
+    _show_and_run _install_if_not_installed ssh-askpass
 
     github_username=$1
     key_file=${HOME}/.ssh/id_rsa-github-$github_username
@@ -1223,7 +1229,7 @@ function _dj_setup_vim_env() {
 
     # install software, if not installed already
     packages="vim ctags cscope build-essential cmake python-dev python3-dev "
-    _install_if_not_installed $packages
+    _show_and_run _install_if_not_installed $packages
 
     # install Vundle -- plugin manager
     rm -rf ~/.vim/bundle/Vundle.vim
