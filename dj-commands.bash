@@ -1210,10 +1210,10 @@ function _dj_git_ssh_account_activate() {
 # =============================================================================
 function _dj_git_ssh_account_show_current() {
     if [ ! -f ~/.ssh/.github-activated-account ]; then
-        echo -e "you need to run ${PRP} dj ssh-github activate <github username>${NOC} to activate one"
+        echo -e "you need to run ${GRN}dj ssh-github activate <github username>${NOC} to activate one"
         return
     fi
-    cat ~/.ssh/.github-activated-account
+    _show_and_run cat ~/.ssh/.github-activated-account
 }
 
 # =============================================================================
@@ -1339,7 +1339,7 @@ function _dj_setup_vim_env() {
 
 # =============================================================================
 function _dj_setup_you_complete_me() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     folder=~/.vim/bundle/YouCompleteMe
     if [ -d $folder ]; then
@@ -1357,10 +1357,10 @@ function _dj_setup_you_complete_me() {
 # =============================================================================
 function _dj_flame_grapah() {
     if [ "$1" = 'clear' ]; then
-        sudo rm -f perf.data.old
-        sudo rm -f perf.folded
-        sudo rm -f perf.unfold
-        sudo rm -f perf.svg
+        _show_and_run sudo rm -f perf.data.old
+        _show_and_run sudo rm -f perf.folded
+        _show_and_run sudo rm -f perf.unfold
+        _show_and_run sudo rm -f perf.svg
         return 0
     fi
     if [ "$1" = 'help' ]; then
@@ -1389,9 +1389,9 @@ function _dj_flame_grapah() {
         return 1
     fi
     # need sudo??
-    sudo perf script -i ${perf_data_file} &>perf.unfold
-    stackcollapse-perf.pl perf.unfold &>perf.folded
-    flamegraph.pl perf.folded >perf.svg
+    _show_and_run sudo perf script -i ${perf_data_file} &>perf.unfold
+    _show_and_run stackcollapse-perf.pl perf.unfold &>perf.folded
+    _show_and_run flamegraph.pl perf.folded >perf.svg
 
     if [ -f "perf.svg" ]; then
         echo "perf.svg is generated, use browser to open it."
