@@ -1144,7 +1144,7 @@ function _dj_open_file() {
 function _dj_ssh_general_no_password() {
     if [ $# = 0 ]; then
         echo -e "usage:"
-        echo -e "    dj ssh-general no-password username@ip_address"
+        echo -e "$ dj ssh-general no-password user@ip"
         return
     fi
     user_and_ip="$1"
@@ -1153,18 +1153,16 @@ function _dj_ssh_general_no_password() {
     ip=${user_and_ip:${pos}+1:${#user_and_ip}-${pos}}
 
     # if ~/.ssh/id_rsa-general.pub does not exist, create one
-    key_file=id_rsa-general
+    key_file="${HOME}/.ssh/id_rsa-general"
     if [ ! -f "$key_file" ]; then
-        printf "${HOME}/.ssh/${key_file}\n\n" | ssh-keygen
+        _show_and_run printf "${key_file}\n\n" | _show_and_run ssh-keygen
     fi
 
     # just to create .ssh on target machine
-    echo "ssh -l $user $ip \"mkdir -p ~/.ssh\""
-    ssh -l $user $ip "mkdir -p ~/.ssh"
+    _show_and_run ssh -l $user $ip "mkdir -p ~/.ssh"
 
     # then run, copy the content of local id_rsa.pub to .ssh/autorized_keys in remote
-    echo "cat ${HOME}/.ssh/${key_file}.pub | ssh $user_and_ip \"cat >> .ssh/authorized_keys\""
-    cat ${HOME}/.ssh/${key_file}.pub | ssh $user_and_ip "cat >> .ssh/authorized_keys"
+    _show_and_run cat "${key_file}.pub" | _show_and_run ssh $user_and_ip "cat >> .ssh/authorized_keys"
 }
 
 # =============================================================================
