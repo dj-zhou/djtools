@@ -506,6 +506,8 @@ function _dj_setup_protobuf() {
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
+    _show_and_run sudo rm -rf /usr/local/lib/libproto*
+
     _show_and_run rm -rf protobuf
     _show_and_run git clone https://github.com/google/protobuf
     _show_and_run cd protobuf
