@@ -646,7 +646,7 @@ function _dj_setup_stm32_tools() {
     elif [[ ${ubuntu_v} = *'20.04'* ]]; then
         _show_and_run git checkout v1.7.0
     else
-        echo "${RED} NOT IMPLEMENTED YET${NOC}"
+        echo "${RED}NOT IMPLEMENTED YET${NOC}"
     fi
 
     _show_and_run sudo rm -rf /usr/local/bin/st-*
@@ -657,7 +657,7 @@ function _dj_setup_stm32_tools() {
 
     # install stm32flash ----------------
     echo -e "install  stm32flash ..."
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
     _show_and_run cd $soft_dir
     _show_and_run rm stm32-tools -rf
     _show_and_run git clone https://github.com/dj-zhou/stm32-tools.git
