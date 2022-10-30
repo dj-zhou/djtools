@@ -415,6 +415,9 @@ function _dj_setup_cutecom() {
     _echo_install cutecom $v
     _press_enter_or_wait_s_continue 5
 
+    # this is important
+    _install_if_not_installed qt5-default libqt5serialport5-dev
+
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
     _show_and_run rm -rf cutecom
@@ -666,7 +669,7 @@ function _dj_setup_stm32_tools() {
 
     # udev rule ----------------
     echo -e "add serial port privilege to current user ..."
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
     _show_and_run sudo usermod -a -G dialout $(whoami)
     rule_file=stm32-tools.rules
     _show_and_run sudo rm -f /etc/udev/rules.d/$rule_file
