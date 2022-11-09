@@ -1,5 +1,16 @@
 #!/bin/bash
 
+setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost can-analyzer "
+setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools driver dropbox eigen3 "
+setup_list+="flamegraph fmt foxit-pdf-reader fsm-pro gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
+setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
+setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport "
+setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
+setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom "
+setup_list+="pip plotjuggler protobuf pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rpi-pico "
+setup_list+="rust saleae-logic serial-console spdlog slack stm32-cubeMX stm32-tools sublime texlive tldr typora vim-env "
+setup_list+="vscode vtk-8.2.0 windows-fonts wireshark wubi yaml-cpp you-complete-me "
+
 # =============================================================================
 function _dj_setup_help() {
     _dj_help
@@ -2126,6 +2137,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'plotjuggler' ]; then
         _dj_setup_plotjuggler
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'protobuf' ]; then
+        _dj_setup_protobuf
         return
     fi
     # --------------------------
