@@ -6,12 +6,22 @@ function _version_help() {
     echo "  Author      : Dingjiang Zhou"
     echo "  Email       : zhoudingjiang@gmail.com "
     echo "  Create Date : July 19th, 2020 "
-    echo " -----------------------------------------------------"
+    echo " -------------------------------------------------------"
     echo -e "\n supported commands:\n"
     echo " check - to check software version"
     echo " swap  - to swap softwaare version, for example, gcc/g++"
 }
 
+# =============================================================================
+function _find_version_from_pkgconfig_file() { # file
+    file="$1"
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"Version: "* ]]; then
+            version=$(echo $line | awk '{ print $2 }')
+        fi
+    done <"$file"
+    echo "$version"
+}
 # =============================================================================
 # it can only compile x.y.z and xx.yy.zz
 _version_if_ge_than() { # current version #  required version
@@ -170,15 +180,11 @@ function _version_check_eigen3() {
 function _version_check_fmt() {
     file="/usr/local/lib/pkgconfig/fmt.pc"
     if [ ! -f $file ]; then
-        echo "fmt maybe not installed correctly!"
+        echo "fmt maybe not be installed correctly!"
         return
     fi
-    while IFS='' read -r line || [[ -n "$line" ]]; do
-        if [[ $line == *"Version: "* ]]; then
-            version=$(echo $line | awk '{ print $2 }')
-        fi
-    done <$file
-    echo $version
+
+    _find_version_from_pkgconfig_file $file
 }
 
 # =============================================================================
@@ -196,16 +202,23 @@ function _version_check_gcc() {
 function _version_check_glog() {
     file="/usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc"
     if [ ! -f $file ]; then
-        echo "glog maybe not installed correctly!"
+        echo "glog maybe not be installed correctly!"
         echo "note: source code installation does not have a libglog.pc file"
         return
     fi
-    while IFS='' read -r line || [[ -n "$line" ]]; do
-        if [[ $line == *"Version: "* ]]; then
-            version=$(echo $line | awk '{ print $2 }')
-        fi
-    done <$file
-    echo $version
+
+    _find_version_from_pkgconfig_file $file
+}
+
+# =============================================================================
+function _version_check_grpc() {
+    file="/usr/local/lib/pkgconfig/grpc++.pc"
+    if [ ! -f $file ]; then
+        echo "grpc maybe not be installed correctly!"
+        return
+    fi
+
+    _find_version_from_pkgconfig_file $file
 }
 
 # =============================================================================
@@ -213,15 +226,11 @@ function _version_check_glog() {
 function _version_check_gtest() {
     file="/usr/local/lib/pkgconfig/gtest.pc"
     if [ ! -f $file ]; then
-        echo "gtest may not installed correctly!"
+        echo "gtest may not be installed correctly!"
         return
     fi
-    while IFS='' read -r line || [[ -n "$line" ]]; do
-        if [[ $line == *"Version: "* ]]; then
-            version=$(echo $line | awk '{ print $2 }')
-        fi
-    done <$file
-    echo $version
+
+    _find_version_from_pkgconfig_file $file
 }
 
 # =============================================================================
@@ -265,15 +274,10 @@ function _version_check_nlohmann_json3() {
     # nlohmann_json.pc /usr/local/lib/pkgconfig
     file="/usr/local/lib/pkgconfig/nlohmann_json.pc"
     if [ ! -f $file ]; then
-        echo "nlohmann-json3 maybe not installed correctly!"
+        echo "nlohmann-json3 maybe not be installed correctly!"
         return
     fi
-    while IFS='' read -r line || [[ -n "$line" ]]; do
-        if [[ $line == *"Version: "* ]]; then
-            version=$(echo $line | awk '{ print $2 }')
-        fi
-    done <$file
-    echo $version
+    _find_version_from_pkgconfig_file $file
 }
 
 # =============================================================================
@@ -352,30 +356,20 @@ function _version_check_python3() {
 function _version_check_spdlog() {
     file="/usr/local/lib/pkgconfig/spdlog.pc"
     if [ ! -f $file ]; then
-        echo "spdlog maybe not installed correctly!"
+        echo "spdlog maybe not be installed correctly!"
         return
     fi
-    while IFS='' read -r line || [[ -n "$line" ]]; do
-        if [[ $line == *"Version: "* ]]; then
-            version=$(echo $line | awk '{ print $2 }')
-        fi
-    done <$file
-    echo $version
+    _find_version_from_pkgconfig_file $file
 }
 
 # =============================================================================
-function _version_check_systemd() {
+function _version_check_libsystemd() {
     file="/usr/lib/x86_64-linux-gnu/pkgconfig/libsystemd.pc"
     if [ ! -f $file ]; then
-        echo "libsystemd maybe not installed correctly!"
+        echo "libsystemd maybe not be installed correctly!"
         return
     fi
-    while IFS='' read -r line || [[ -n "$line" ]]; do
-        if [[ $line == *"Version: "* ]]; then
-            version=$(echo $line | awk '{ print $2 }')
-        fi
-    done <$file
-    echo $version
+    _find_version_from_pkgconfig_file $file
 }
 
 # =============================================================================
@@ -389,15 +383,10 @@ function _version_check_ubuntu() {
 function _version_check_yaml_cpp() {
     file="/usr/local/lib/pkgconfig/yaml-cpp.pc"
     if [ ! -f $file ]; then
-        echo "libyaml-cpp maybe not installed correctly!"
+        echo "libyaml-cpp maybe not be installed correctly!"
         return
     fi
-    while IFS='' read -r line || [[ -n "$line" ]]; do
-        if [[ $line == *"Version: "* ]]; then
-            version=$(echo $line | awk '{ print $2 }')
-        fi
-    done <$file
-    echo $version
+    _find_version_from_pkgconfig_file $file
 }
 
 # =============================================================================
@@ -471,6 +460,11 @@ function version() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'grpc' ]; then
+            _version_check_grpc
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'gtest' ]; then
             _version_check_gtest
             return
@@ -526,8 +520,8 @@ function version() {
             return
         fi
         # ------------------------------
-        if [ $2 = 'systemd' ]; then
-            _version_check_systemd
+        if [ $2 = 'libsystemd' ]; then
+            _version_check_libsystemd
             return
         fi
         # ------------------------------
@@ -613,8 +607,8 @@ function _version() {
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
-    check_list+="eigen3 fmt gcc glog gtest g++ gnome magic-enum nlohmann-json3 "
-    check_list+="node opencv opengl python3 spdlog systemd ubuntu yaml-cpp "
+    check_list+="eigen3 fmt gcc glog grpc gtest g++ gnome libsystemd magic-enum "
+    check_list+="nlohmann-json3 node opencv opengl python3 spdlog ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do
         ACTIONS[$i]=" "
