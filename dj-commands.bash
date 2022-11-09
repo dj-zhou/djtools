@@ -597,10 +597,10 @@ function _dj_setup_stm32_cube_mx() {
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
-    _show_and_run -rf stm32-cube-mx-v6.0.1
-    _show_and_run git clone https://gitee.com/d-zhou/stm32-cube-mx-v6.0.1.git
+    _show_and_run rm -rf stm32-cube-mx-v6.0.1
+    _show_and_run git clone https://github.com/dj-zhou/stm32-cube-mx-v6.0.1.git
     _show_and_run cd stm32-cube-mx-v6.0.1/
-    cat archive.tar.* | tar -xzvf -
+    _show_and_run ./merge-file.sh
     # rm archive.tar.*
     _show_and_run chmod +x SetupSTM32CubeMX-6.0.1.linux
     _show_and_run ./SetupSTM32CubeMX-6.0.1.linux
