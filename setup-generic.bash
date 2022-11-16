@@ -2216,8 +2216,13 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'stm32-cubeMX' ]; then
-        _dj_setup_stm32_cubemx $2 $3
+    if [ $1 = 'stm32-cube-mx' ]; then
+        _dj_setup_stm32_cube_mx $2 $3
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'stm32-cube-programmer' ]; then
+        _dj_setup_stm32_cube_programmer $2 $3
         return
     fi
     # --------------------------
