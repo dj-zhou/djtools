@@ -133,6 +133,32 @@ function _dj_setup_ansible() {
     sudo apt install ansible
 }
 
+# =============================================================================================
+function _create_arduino_desktop_item() {
+    folder="/usr/share/applications"
+
+    # copy the icon file
+    _show_and_run sudo cp $djtools_path/settings/arduino-ide.xpm $folder
+
+    file="arduino-ide.desktop"
+    _show_and_run touch $file
+
+    _show_and_run echo '[Desktop Entry]' >>$file
+    _show_and_run echo 'Encoding=UTF-8' >>$file
+    _show_and_run echo 'Name=arduino-ide' >>$file
+    _show_and_run echo 'Comment=arduino-ide' >>$file
+    _show_and_run echo 'Exec=/usr/bin/arduino-ide' >>$file
+    _show_and_run echo 'Icon='$folder'/arduino-ide.xpm' >>$file
+    _show_and_run echo 'StartupNotify=false' >>$file
+    _show_and_run echo 'Type=Application' >>$file
+    _show_and_run echo 'Categories=Application;Development;' >>$file
+
+    _show_and_run sudo rm -rf $folder/$file
+    _show_and_run sudo mv $file $folder
+
+    _show_and_run sudo chmod +x $folder/$file
+}
+
 # =============================================================================
 function _dj_setup_arduino() {
     _pushd_quiet ${PWD}
@@ -154,6 +180,8 @@ function _dj_setup_arduino() {
     _show_and_run sudo ln -sf $soft_dir/arduino-$v/arduino-ide /usr/bin/arduino-ide
 
     _popd_quiet
+
+    _create_arduino_desktop_item
 }
 
 # =============================================================================
