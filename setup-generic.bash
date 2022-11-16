@@ -2,8 +2,8 @@
 
 setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost can-analyzer "
 setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools driver dropbox eigen3 "
-setup_list+="flamegraph fmt foxit-pdf-reader fsm-pro gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
-setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
+setup_list+="fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi "
+setup_list+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
 setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport "
 setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
 setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom "
@@ -316,6 +316,24 @@ function _dj_setup_eigen3() {
     _verify_header_files Eigen /usr/local/include/eigen3/Eigen
     _verify_header_files Eigen /usr/include/eigen3/Eigen
 
+    _popd_quiet
+}
+
+# =============================================================================
+function _dj_setup_fast_github() {
+    _show_and_run _pushd_quiet ${PWD}
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    _show_and_run rm -rf fast-github
+    _show_and_run git clone https://github.com/dj-zhou/fast-github.git
+
+    _show_and_run cd fast-github
+
+    if [[ $OSTYPE = "linux-gnu" && $(uname -m) = "x86_64" ]]; then
+        _show_and_run unzip fastgithub_linux-x64.zip
+        _show_and_run mv fastgithub_linux-x64 /opt/
+    fi
     _popd_quiet
 }
 
@@ -1876,6 +1894,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'eigen3' ]; then
         _dj_setup_eigen3
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'fast-github' ]; then
+        _dj_setup_fast_github
         return
     fi
     # --------------------------
