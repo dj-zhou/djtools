@@ -627,7 +627,7 @@ function _create_stm32cubemx_desktop_item() {
 
     if [ ! -f "$soft_dir/STM32CubeMX/STM32CubeMX" ]; then
         echo -e "${YLW}cubeMX is not installed to $soft_dir/STM32CubeMX/, you need to revise file:${NOC}"
-        echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
+        echo -e "${YLW}$folder/$file accordingly.${NOC}"
     fi
 }
 
@@ -684,7 +684,7 @@ function _create_stm32cube_programmer_desktop_item() {
 
     if [ ! -f "$target_dir/bin/STM32CubeProgrammer" ]; then
         echo -e "${YLW}cube-programmer is not installed to $target_dir/bin, you need to revise file:${NOC}"
-        echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
+        echo -e "${YLW}$folder/$file accordingly.${NOC}"
     fi
 }
 
