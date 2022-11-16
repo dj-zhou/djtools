@@ -610,15 +610,15 @@ function _create_stm32cubemx_desktop_item() {
     file="cubeMX.desktop"
     _show_and_run touch $file
 
-    echo '[Desktop Entry]' >>$file
-    echo 'Encoding=UTF-8' >>$file
-    echo 'Name=cube-MX' >>$file
-    echo 'Comment=cube-MX' >>$file
-    echo 'Exec='$soft_dir'/STM32CubeMX/STM32CubeMX' >>$file
-    echo 'Icon='$folder'/cubemx.xpm' >>$file
-    echo 'StartupNotify=false' >>$file
-    echo 'Type=Application' >>$file
-    echo 'Categories=Application;Development;' >>$file
+    _show_and_run echo '[Desktop Entry]' >>$file
+    _show_and_run echo 'Encoding=UTF-8' >>$file
+    _show_and_run echo 'Name=cube-mx' >>$file
+    _show_and_run echo 'Comment=cube-mx' >>$file
+    _show_and_run echo 'Exec='$soft_dir'/STM32CubeMX/STM32CubeMX' >>$file
+    _show_and_run echo 'Icon='$folder'/cubemx.xpm' >>$file
+    _show_and_run echo 'StartupNotify=false' >>$file
+    _show_and_run echo 'Type=Application' >>$file
+    _show_and_run echo 'Categories=Application;Development;' >>$file
 
     _show_and_run sudo rm -rf $folder/$file
     _show_and_run sudo mv $file $folder
