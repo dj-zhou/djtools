@@ -620,12 +620,12 @@ function _create_stm32cubemx_desktop_item() {
 
     _show_and_run sudo chmod +x $folder/$file
 
-    echo -e "${YLW}if cubeMX is not installed to $soft_dir/STM32CubeMX/, you need to revise file:${NOC}"
+    echo -e "${YLW}if cubeMX is not installed to $soft_dirSTM32CubeMX/, you need to revise file:${NOC}"
     echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
 }
 
 # =============================================================================
-function _dj_setup_stm32_cube_mx() {
+function _dj_setup_stm32_cubemx() {
     _show_and_run _pushd_quiet ${PWD}
 
     _show_and_run mkdir -p $soft_dir
@@ -633,6 +633,7 @@ function _dj_setup_stm32_cube_mx() {
 
     _show_and_run rm -rf stm32-cube-mx-v6.0.1
     _show_and_run git clone https://github.com/dj-zhou/stm32-cube-mx-v6.0.1.git
+
     _show_and_run cd stm32-cube-mx-v6.0.1/
     _show_and_run ./merge-file.sh
     # rm archive.tar.*
@@ -640,55 +641,6 @@ function _dj_setup_stm32_cube_mx() {
     _show_and_run ./SetupSTM32CubeMX-6.0.1.linux
 
     _create_stm32cubemx_desktop_item
-
-    _popd_quiet
-}
-
-# =============================================================================================
-function _create_stm32cube_programmer_desktop_item() {
-    folder="/usr/share/applications"
-
-    # copy the icon file
-    _show_and_run sudo cp $djtools_path/settings/stm32-cube-programmer.xpm $folder
-
-    file="stm32-cube-programmer.desktop"
-    _show_and_run touch $file
-
-    echo '[Desktop Entry]' >>$file
-    echo 'Encoding=UTF-8' >>$file
-    echo 'Name=cube-programmer' >>$file
-    echo 'Comment=cube-programmer' >>$file
-    echo 'Exec=/usr/local/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32CubeProgrammer' >>$file
-    echo 'Icon='$folder'/stm32-cube-programmer.xpm' >>$file
-    echo 'StartupNotify=false' >>$file
-    echo 'Type=Application' >>$file
-    echo 'Categories=Application;Development;' >>$file
-
-    _show_and_run sudo rm -rf $folder/$file
-    _show_and_run sudo mv $file $folder
-
-    _show_and_run sudo chmod +x $folder/$file
-
-    echo -e "${YLW}if cube-programmer is not installed to /usr/local/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin, you need to revise file:${NOC}"
-    echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
-}
-
-# =============================================================================
-function _dj_setup_stm32_cube_programmer() {
-    _show_and_run _pushd_quiet ${PWD}
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-
-    _show_and_run rm -rf stm32-cube-programer-v2-11
-    _show_and_run git clone git@github.com:dj-zhou/stm32-cube-programer-v2-11.git
-    _show_and_run cd stm32-cube-programer-v2-11
-    _show_and_run ./merge-file.sh
-    _show_and_run unzip en.stm32cubeprg-lin_v2-11-0.zip
-
-    _show_and_run sudo ./SetupSTM32CubeProgrammer-2.11.0.linux
-
-    _create_stm32cube_programmer_desktop_item
 
     _popd_quiet
 }
@@ -1714,6 +1666,17 @@ function _dj() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
+    setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost can-analyzer "
+    setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools driver dropbox eigen3 "
+    setup_list+="flamegraph fmt foxit-pdf-reader fsm-pro gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf "
+    setup_list+="gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
+    setup_list+="gtest g++-10 g++-11 i219-v kdiff3-meld kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport "
+    setup_list+="libsystemd mathpix matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
+    setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf picocom "
+    setup_list+="pip plotjuggler pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 ros-melodic ros-noetic ros2-foxy rpi-pico rust "
+    setup_list+="saleae-logic serial-console spdlog slack stm32-cubeMX stm32-tools sublime texlive tldr typora vim-env "
+    setup_list+="vscode vtk-8.2.0 windows-fonts wireshark wubi yaml-cpp you-complete-me "
+
     ACTIONS[setup]="$setup_list "
     for i in $setup_list; do
         ACTIONS[$i]=" "
