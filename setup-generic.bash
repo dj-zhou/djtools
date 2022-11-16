@@ -331,9 +331,14 @@ function _dj_setup_fast_github() {
     _show_and_run cd fast-github
 
     if [[ $OSTYPE = "linux-gnu" && $(uname -m) = "x86_64" ]]; then
+        _show_and_run sudo rm -rf /opt/fastgithub_linux-x64
         _show_and_run unzip fastgithub_linux-x64.zip
         _show_and_run mv fastgithub_linux-x64 /opt/
     fi
+
+    _show_and_run sudo rm -f /usr/local/bin/fastgithub
+    _show_and_run sudo ln -s /opt/fastgithub_linux-x64/fastgithub /usr/local/bin/fastgithub
+
     _popd_quiet
 }
 
