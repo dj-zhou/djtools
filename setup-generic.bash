@@ -1272,6 +1272,8 @@ function _dj_setup_nlohmann_json3_dev() {
 
     # install from source
 
+    _show_and_run sudo rm /usr/local/lib/pkgconfig/nlohmann_json.pc
+
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
@@ -1290,8 +1292,8 @@ function _dj_setup_nlohmann_json3_dev() {
 
     echo -e "${GRN}nlohmann-json3 $v${NOC} is installed:"
     _verify_header_files json.hpp /usr/local/include/nlohmann
-    _verify_cmake_files nlohmann_jsonConfig.cmake /usr/local/lib/cmake/nlohmann_json
-    _verify_pkgconfig_file nlohmann_json.pc /usr/local/lib/pkgconfig
+    _verify_cmake_files nlohmann_jsonConfig.cmake /usr/local/share/cmake/nlohmann_json
+    _verify_pkgconfig_file nlohmann_json.pc /usr/local/share/pkgconfig
 }
 
 # =============================================================================
