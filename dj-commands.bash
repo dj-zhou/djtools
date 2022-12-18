@@ -864,7 +864,7 @@ function _dj_setup_gtest() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    echo -e "\n${GRN}googletest $v${NOC} is installed."
+    echo -e "\n${GRN}googletest $v${NOC} is installed:"
     _verify_lib_installation libgtest.a /usr/local/lib
     _verify_lib_installation libgtest_main.a /usr/local/lib
     _verify_header_files gtest.h /usr/local/include/gtest
@@ -894,6 +894,7 @@ function _dj_setup_glog() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
+    echo -e "\n${GRN}glog $v${NOC} is installed:"
     _verify_lib_installation libglog.a /usr/local/lib
     _verify_lib_installation libglog.so /usr/local/lib
     _verify_header_files logging.h /usr/local/include/glog

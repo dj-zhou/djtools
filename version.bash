@@ -197,10 +197,10 @@ function _version_check_gcc() {
 # =============================================================================
 # I found /usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc
 # but it is from sudo apt-get install libgoogle-glog-dev
-# however, the source code installation does not generate this package config file:
-# https://github.com/google/glog/pull/239
+# dj setup glog will generate the file: /usr/local/lib/pkgconfig/libglog.pc
 function _version_check_glog() {
-    file="/usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc"
+    # file="/usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc"
+    file="/usr/local/lib/pkgconfig/libglog.pc"
     if [ ! -f $file ]; then
         echo "glog maybe not be installed correctly!"
         echo "note: source code installation does not have a libglog.pc file"
