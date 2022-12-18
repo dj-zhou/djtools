@@ -76,11 +76,16 @@ function _dj_replace() {
 # bug: it only works for files in current directory, not in the sub-directory
 function dj_clang_format_brush() {
     format_style=$1
-    echo $format_style
+    echo "clang_format_path=$clang_format_path"
     if [[ $format_style = 'file' ]]; then
-        find . \
-            -name *.h -o -iname *.hpp -o -iname *.cpp -o -iname *.c |
-            xargs clang-format -style=file -i
+        type_list="h hpp c cpp hh cc "
+        for tt in $type_list; do
+            a=$(find . -iname *.$tt)
+            if [ ! -z "$a" ]; then
+                echo -e "${BLU}format $tt files${NOC}"
+                find . -iname *.$tt | xargs $clang_format_path -i
+            fi
+        done
     elif [[ $format_style = 'google' ]]; then
         find . \
             -name *.h -o -iname *.hpp -o -iname *.cpp -o -iname *.c |
@@ -193,7 +198,7 @@ function _dj_setup_clang_llvm() {
 
     echo -e "Do you want to apply the default vscode settings? [Yes/No]"
     read asw
-    
+
     if [[ ($asw = 'n') || ($asw = 'N') || ($asw = 'NO') || (
         $asw = 'No') || ($asw = 'no') ]]; then
         echo "You can edit ~/.config/Code/User/settings.json manually."
@@ -208,6 +213,10 @@ function _dj_setup_clang_llvm() {
         echo "wrong answer, not setting applied!"
         echo "You can edit ~/.config/Code/User/settings.json manually."
     fi
+
+    echo '# ===========================================================' >>~/.bashrc
+    echo '# (djtools) clang-format LLVM setup' >>~/.bashrc
+    echo "clang_format_path=/opt/$target_dir/bin/clang-format" >>~/.bashrc
 
     _popd_quiet
 }
