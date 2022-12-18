@@ -18,7 +18,7 @@ libsystemd v248
 nlohmann-json3 v3.10.3 # Aug 26th, 2021
 nodejs 16.14.0 # Feb 1, 2022, (includes npm 8.3.1??)
 nvm v0.39.1 # Nov 17, 2021
-magic-enum v0.7.3
+magic-enum v0.8.2 # Dec. 9th, 2022
 matplotplusplus c088749434154c230ee7547c6871d65e58876dc6 # latest greatest master on Sep 18th, 2021
 meson 0.61.5 # June. 2nd, 2022, https://github.com/mesonbuild/meson/releases
 ninja v1.11.0 # May 15th, 2022, https://github.com/ninja-build/ninja/releases
