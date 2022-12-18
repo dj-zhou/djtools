@@ -1039,13 +1039,20 @@ function _dj_setup_magic_enum() {
     _show_and_run rm -rf magic_enum
 
     ver=$(_find_package_version magic-enum)
-    _show_and_run git clone https://github.com/Neargye/magic_enum
+    _show_and_run git clone https://github.com/Neargye/magic_enum.git
     _show_and_run cd magic_enum
     _show_and_run git checkout $ver
-    _show_and_run sudo cp include/magic_enum.hpp /usr/local/include/
+    _show_and_run rm build -rf
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     echo -e "${GRN}magic_enum $ver${NOC} is installed:"
     _verify_header_files magic_enum.hpp /usr/local/include
+    _verify_cmake_files magic_enumConfig.cmake /usr/local/lib/cmake/magic_enum
+    _verify_cmake_files magic_enumConfigVersion.cmake /usr/local/lib/cmake/magic_enum
     head -n 8 /usr/local/include/magic_enum.hpp
 
     _popd_quiet
