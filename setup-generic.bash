@@ -1,6 +1,6 @@
 #!/bin/bash
 
-setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-1.8.13 baidu-netdisk boost can-analyzer "
+setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-ide baidu-netdisk boost can-analyzer "
 setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools driver dropbox eigen3 "
 setup_list+="fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets gcc-arm-stm32 gcc-arm-linux-gnueabi "
 setup_list+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs gitg-gitk glfw3 glog gnome gnuplot google-repo grpc "
@@ -133,21 +133,55 @@ function _dj_setup_ansible() {
     sudo apt install ansible
 }
 
+# =============================================================================================
+function _create_arduino_desktop_item() {
+    folder="/usr/share/applications"
+
+    # copy the icon file
+    _show_and_run sudo cp $djtools_path/settings/arduino-ide.xpm $folder
+
+    file="arduino-ide.desktop"
+    _show_and_run touch $file
+
+    _show_and_run echo '[Desktop Entry]' >>$file
+    _show_and_run echo 'Encoding=UTF-8' >>$file
+    _show_and_run echo 'Name=arduino-ide' >>$file
+    _show_and_run echo 'Comment=arduino-ide' >>$file
+    _show_and_run echo 'Exec=/usr/bin/arduino-ide' >>$file
+    _show_and_run echo 'Icon='$folder'/arduino-ide.xpm' >>$file
+    _show_and_run echo 'StartupNotify=false' >>$file
+    _show_and_run echo 'Type=Application' >>$file
+    _show_and_run echo 'Categories=Application;Development;' >>$file
+
+    _show_and_run sudo rm -rf $folder/$file
+    _show_and_run sudo mv $file $folder
+
+    _show_and_run sudo chmod +x $folder/$file
+}
+
 # =============================================================================
-function _dj_setup_arduino_1_8_13() {
+function _dj_setup_arduino() {
     _pushd_quiet ${PWD}
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    rm arduino* -rf
-    filename="arduino-1.8.13-linux64.tar.xz"
-    url=https://downloads.arduino.cc/$filename
-    _wget_if_not_exist $filename "e4d2ff4da4ba1ddb5bc010cb38b5fbc1" $url
-    tar -xvf $filename
+    _show_and_run rm arduino* -rf
 
-    sudo ln -sf $soft_dir/arduino-1.8.13/arduino /usr/bin/arduino
+    v=$(_find_package_version arduino)
+    ide_name="arduino-ide_${v}_Linux_64bit"
+    url=https://downloads.arduino.cc/arduino-ide/${ide_name}.zip
+    _show_and_run _wget_if_not_exist ${ide_name}.zip "f9118378e198523fcfe0fc4d9864c3ef" $url
+    _show_and_run rm -rf $ide_name
+    _show_and_run unzip ${ide_name}.zip
+    _show_and_run rm -rf arduino-$v
+    _show_and_run mv $ide_name arduino-$v
+
+    _show_and_run sudo rm -f /usr/bin/arduino-ide
+    _show_and_run sudo ln -sf $soft_dir/arduino-$v/arduino-ide /usr/bin/arduino-ide
 
     _popd_quiet
+
+    _create_arduino_desktop_item
 }
 
 # =============================================================================
@@ -1809,8 +1843,8 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'arduino-1.8.13' ]; then
-        _dj_setup_arduino_1_8_13
+    if [ $1 = 'arduino-ide' ]; then
+        _dj_setup_arduino
         return
     fi
     # --------------------------
