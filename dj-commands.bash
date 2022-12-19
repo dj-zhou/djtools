@@ -610,15 +610,15 @@ function _create_stm32cubemx_desktop_item() {
     file="cubeMX.desktop"
     _show_and_run touch $file
 
-    echo '[Desktop Entry]' >>$file
-    echo 'Encoding=UTF-8' >>$file
-    echo 'Name=cube-MX' >>$file
-    echo 'Comment=cube-MX' >>$file
-    echo 'Exec='$soft_dir'/STM32CubeMX/STM32CubeMX' >>$file
-    echo 'Icon='$folder'/cubemx.xpm' >>$file
-    echo 'StartupNotify=false' >>$file
-    echo 'Type=Application' >>$file
-    echo 'Categories=Application;Development;' >>$file
+    _show_and_run echo '[Desktop Entry]' >>$file
+    _show_and_run echo 'Encoding=UTF-8' >>$file
+    _show_and_run echo 'Name=cube-mx' >>$file
+    _show_and_run echo 'Comment=cube-mx' >>$file
+    _show_and_run echo 'Exec='$soft_dir'/STM32CubeMX/STM32CubeMX' >>$file
+    _show_and_run echo 'Icon='$folder'/cubemx.xpm' >>$file
+    _show_and_run echo 'StartupNotify=false' >>$file
+    _show_and_run echo 'Type=Application' >>$file
+    _show_and_run echo 'Categories=Application;Development;' >>$file
 
     _show_and_run sudo rm -rf $folder/$file
     _show_and_run sudo mv $file $folder
@@ -627,7 +627,7 @@ function _create_stm32cubemx_desktop_item() {
 
     if [ ! -f "$soft_dir/STM32CubeMX/STM32CubeMX" ]; then
         echo -e "${YLW}cubeMX is not installed to $soft_dir/STM32CubeMX/, you need to revise file:${NOC}"
-        echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
+        echo -e "${YLW}$folder/$file accordingly.${NOC}"
     fi
 }
 
@@ -684,7 +684,7 @@ function _create_stm32cube_programmer_desktop_item() {
 
     if [ ! -f "$target_dir/bin/STM32CubeProgrammer" ]; then
         echo -e "${YLW}cube-programmer is not installed to $target_dir/bin, you need to revise file:${NOC}"
-        echo -e "${YLW}/usr/share/applications/$file accordingly.${NOC}"
+        echo -e "${YLW}$folder/$file accordingly.${NOC}"
     fi
 }
 
