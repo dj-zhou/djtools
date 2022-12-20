@@ -1,5 +1,8 @@
 #!/bin/bash
 
+function echo_warn() { echo -e "${YLW}$@${NOC}" 1>&2; }
+function echo_error() { echo -e "${RED}$@${NOC}" 1>&2; }
+
 # =============================================================================
 function _random_wallpaper() {
     cur_dir=${PWD}
