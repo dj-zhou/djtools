@@ -1605,6 +1605,18 @@ function dj() {
         echo 'dj git: argument not supported, exit.'
         return
     fi
+
+    # ------------------------------
+    if [ $1 = 'merge' ]; then
+        # ------------------------------
+        if [ $# -ge 2 ]; then
+            shift 1
+            _dj_merge "$@"
+            return
+        fi
+        echo "dj merge: argument not supported, exit."
+        return
+    fi
     # ------------------------------
     if [ $1 = 'open' ]; then
         _dj_open_file $2 $3 $4
@@ -1627,7 +1639,7 @@ function dj() {
         # ------------------------------
         if [[ $# -ge 2 ]]; then
             shift 1
-            _dj_replace $@
+            _dj_replace "$@"
             return
         fi
         echo "dj replace: argument not supported, exit."
@@ -1638,10 +1650,21 @@ function dj() {
         # ------------------------------
         if [ $# -ge 2 ]; then
             shift 1
-            _dj_setup $@
+            _dj_setup "$@"
             return
         fi
         echo "dj setup: argument not supported, exit."
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'split' ]; then
+        # ------------------------------
+        if [ $# -ge 2 ]; then
+            shift 1
+            _dj_split "$@"
+            return
+        fi
+        echo "dj split: argument not supported, exit."
         return
     fi
     # ------------------------------
@@ -1649,7 +1672,7 @@ function dj() {
         # ------------------------------
         if [ $2 = 'no-password' ]; then
             shift 2
-            _dj_ssh_general_no_password $@
+            _dj_ssh_general_no_password "$@"
             return
         fi
         return
@@ -1660,7 +1683,7 @@ function dj() {
         # ------------------------------
         if [ $# -ge 2 ]; then
             shift 1
-            _dj_udev $@
+            _dj_udev "$@"
             return
         fi
         _dj_udev_help
@@ -1670,7 +1693,7 @@ function dj() {
     if [ $1 = 'udevadm' ]; then
         if [ $# -ge 2 ]; then
             shift 1
-            _dj_udevadm $@
+            _dj_udevadm "$@"
             return
         fi
         _dj_udevadm_help $2 $3
@@ -1679,13 +1702,13 @@ function dj() {
     # ------------------------------
     if [ $1 = 'unpack' ]; then
         shift 1
-        _dj_unpack $@
+        _dj_unpack "$@"
         return
     fi
     # ------------------------------
     if [ $1 = 'work-check' ]; then
         shift 1
-        _dj_work_check $@
+        _dj_work_check "$@"
         return
     fi
     _dj_help
@@ -1704,11 +1727,13 @@ function _dj() {
         git
         grep
         help
+        merge
         open
         python3
         pack
         replace
         setup
+        split
         ssh-general
         udev
         udevadm
