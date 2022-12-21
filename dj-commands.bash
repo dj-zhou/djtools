@@ -658,6 +658,37 @@ function _dj_setup_stm32_cube_mx() {
     _popd_quiet
 }
 
+# =============================================================================
+function _create_stm32cube_ide_desktop_item() {
+    echo "TODO"
+}
+
+# =============================================================================
+function _dj_setup_stm32_cube_ide() {
+    _show_and_run _pushd_quiet ${PWD}
+
+    # tested on Ubuntu 20.04
+    _install_if_not_installed default-jre
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    _show_and_run rm -rf stm32-cube-ide
+    _show_and_run git clone https://github.com/dj-zhou/stm32-cube-ide.git
+
+    _show_and_run cd stm32-cube-ide/
+    _show_and_run ./merge-file.sh
+
+    _show_and_run unzip en.st-stm32cubeide-lin.zip
+
+    echo_warn "Please install to $soft_dir/ directory"
+    _show_and_run mv st-stm32cubeide_* st-stm32cubeide.sh
+    _show_and_run chmod +x st-stm32cubeide.sh
+    _show_and_run ./st-stm32cubeide.sh
+
+    _create_stm32cube_ide_desktop_item
+
+    _popd_quiet
+}
 # =============================================================================================
 function _create_stm32cube_programmer_desktop_item() {
     folder="/usr/share/applications"
