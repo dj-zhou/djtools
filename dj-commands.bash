@@ -601,11 +601,11 @@ function _dj_setup_qemu() {
 }
 
 # =============================================================================================
-function _create_stm32cubemx_desktop_item() {
+function _create_stm32_cube_mx_desktop_item() {
     folder="/usr/share/applications"
 
     # copy the icon file
-    _show_and_run sudo cp $djtools_path/settings/cubemx.xpm $folder
+    _show_and_run sudo cp $djtools_path/settings/stm32-cube-mx.xpm $folder
 
     file="cubeMX.desktop"
     _show_and_run touch $file
@@ -615,7 +615,7 @@ function _create_stm32cubemx_desktop_item() {
     _show_and_run echo 'Name=cube-mx' >>$file
     _show_and_run echo 'Comment=cube-mx' >>$file
     _show_and_run echo 'Exec='$soft_dir'/STM32CubeMX/STM32CubeMX' >>$file
-    _show_and_run echo 'Icon='$folder'/cubemx.xpm' >>$file
+    _show_and_run echo 'Icon='$folder'/stm32-cube-mx.xpm' >>$file
     _show_and_run echo 'StartupNotify=false' >>$file
     _show_and_run echo 'Type=Application' >>$file
     _show_and_run echo 'Categories=Application;Development;' >>$file
@@ -653,14 +653,40 @@ function _dj_setup_stm32_cube_mx() {
     _show_and_run chmod +x SetupSTM32CubeMX
     _show_and_run ./SetupSTM32CubeMX
 
-    _create_stm32cubemx_desktop_item
+    _create_stm32_cube_mx_desktop_item
 
     _popd_quiet
 }
 
 # =============================================================================
-function _create_stm32cube_ide_desktop_item() {
-    echo "TODO"
+function _create_stm32_cube_ide_desktop_item() {
+    folder="/usr/share/applications"
+
+    # copy the icon file
+    _show_and_run sudo cp $djtools_path/settings/stm32-cube-ide.xpm $folder
+
+    file="cubeIDE.desktop"
+    _show_and_run touch $file
+
+    _show_and_run echo '[Desktop Entry]' >>$file
+    _show_and_run echo 'Encoding=UTF-8' >>$file
+    _show_and_run echo 'Name=cube-ide' >>$file
+    _show_and_run echo 'Comment=cube-ide' >>$file
+    _show_and_run echo 'Exec='$soft_dir'/STM32CubeIDE/stm32cubeide' >>$file
+    _show_and_run echo 'Icon='$folder'/stm32-cube-ide.xpm' >>$file
+    _show_and_run echo 'StartupNotify=false' >>$file
+    _show_and_run echo 'Type=Application' >>$file
+    _show_and_run echo 'Categories=Application;Development;' >>$file
+
+    _show_and_run sudo rm -rf $folder/$file
+    _show_and_run sudo mv $file $folder
+
+    _show_and_run sudo chmod +x $folder/$file
+
+    if [ ! -f "$soft_dir/STM32CubeIDE/stm32cubeide" ]; then
+        echo_warn "cubeIDE is not installed to $soft_dir/STM32CubeIDE/, you need to revise file:"
+        echo_warn "$folder/$file accordingly."
+    fi
 }
 
 # =============================================================================
@@ -688,6 +714,8 @@ function _dj_setup_stm32_cube_ide() {
     _create_stm32cube_ide_desktop_item
 
     _popd_quiet
+
+    _create_stm32_cube_ide_desktop_item
 }
 # =============================================================================================
 function _create_stm32cube_programmer_desktop_item() {
