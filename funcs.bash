@@ -1,5 +1,7 @@
 #!/bin/bash
 
+function echo_info() { echo -e "${GRN}$@${NOC}" 1>&2; }
+function echo_highlight() { echo -e "${HGRN}$@${NOC}" 1>&2; }
 function echo_warn() { echo -e "${YLW}$@${NOC}" 1>&2; }
 function echo_error() { echo -e "${RED}$@${NOC}" 1>&2; }
 

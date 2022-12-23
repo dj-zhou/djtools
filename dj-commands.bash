@@ -18,13 +18,15 @@ function _dj_help() {
     echo " Create Date : Mar. 1st, 2020"
     echo "-----------------------------------------------------"
     echo -e "\nFirst level commands:"
-    echo "   setup         - to install some software"
-    echo "   clone         - clone a repo from github/bitbucket"
-    echo "   ssh-clone     - use ssh protocol to clone a repo from github/bitbucket"
-    echo "   udev          - udev rule setup for usb devices"
-    echo "   work-check    - check work status of all repos in a folder"
+    echo "   git        - git related features: cofnig. search, ssh-account, ssh clone"
+    echo "   merge      - merge splited files into a single file (reversion operation: split)"
+    echo "   split      - split a single file into small files (reversion operation: merge)"
+    echo "   setup      - to install some software"
+    echo "   format     - used to format code"
+    echo "   udev       - udev rule setup for usb devices"
+    echo "   work-check - check work status of all repos in a folder"
     echo -e ""
-    echo -e "  MORE IS COMMING"
+    echo -e "  ETC ETC"
     echo -e "All commands support tab completion"
 }
 
@@ -601,34 +603,33 @@ function _dj_setup_qemu() {
 }
 
 # =============================================================================================
-function _create_stm32_cube_mx_desktop_item() {
-    folder="/usr/share/applications"
+function _dj_setup_stm32_cube_mx_desktop_item() {
+    if [ ! -f STM32CubeMX ]; then
+        echo_warn "STM32CubeMX executable \"STM32CubeMX\" is not found in the current directory, exit!"
+        return
+    fi
+    desktop_item_dir="/usr/share/applications"
 
     # copy the icon file
-    _show_and_run sudo cp $djtools_path/settings/stm32-cube-mx.xpm $folder
+    _show_and_run sudo cp $djtools_path/settings/stm32-cube-mx.xpm $desktop_item_dir
 
-    file="cubeMX.desktop"
+    file="stm32-cube-mx.desktop"
     _show_and_run touch $file
 
     _show_and_run echo '[Desktop Entry]' >>$file
     _show_and_run echo 'Encoding=UTF-8' >>$file
     _show_and_run echo 'Name=cube-mx' >>$file
     _show_and_run echo 'Comment=cube-mx' >>$file
-    _show_and_run echo 'Exec='$soft_dir'/STM32CubeMX/STM32CubeMX' >>$file
-    _show_and_run echo 'Icon='$folder'/stm32-cube-mx.xpm' >>$file
+    _show_and_run echo 'Exec='${PWD}'/STM32CubeMX' >>$file
+    _show_and_run echo 'Icon='$desktop_item_dir'/stm32-cube-mx.xpm' >>$file
     _show_and_run echo 'StartupNotify=false' >>$file
     _show_and_run echo 'Type=Application' >>$file
     _show_and_run echo 'Categories=Application;Development;' >>$file
 
-    _show_and_run sudo rm -rf $folder/$file
-    _show_and_run sudo mv $file $folder
+    _show_and_run sudo rm -rf $desktop_item_dir/$file
+    _show_and_run sudo mv $file $desktop_item_dir
 
-    _show_and_run sudo chmod +x $folder/$file
-
-    if [ ! -f "$soft_dir/STM32CubeMX/STM32CubeMX" ]; then
-        echo -e "${YLW}cubeMX is not installed to $soft_dir/STM32CubeMX/, you need to revise file:${NOC}"
-        echo -e "${YLW}$folder/$file accordingly.${NOC}"
-    fi
+    _show_and_run sudo chmod +x $desktop_item_dir/$file
 }
 
 # =============================================================================
@@ -648,45 +649,45 @@ function _dj_setup_stm32_cube_mx() {
 
     _show_and_run unzip en.stm32cubemx-lin.zip
 
-    echo_warn "Please install to $soft_dir/ directory"
+    echo_highlight "Recommended to install to $soft_dir/STM32CubeMX directory"
     _show_and_run mv SetupSTM32CubeMX* SetupSTM32CubeMX
     _show_and_run chmod +x SetupSTM32CubeMX
     _show_and_run ./SetupSTM32CubeMX
 
-    _create_stm32_cube_mx_desktop_item
+    echo_info "Now you should navigate to the STM32CubeMX executable directory and run:"
+    echo_info "$ dj setup stm32-cube-mx-desktop-item"
 
     _popd_quiet
 }
 
 # =============================================================================
-function _create_stm32_cube_ide_desktop_item() {
-    folder="/usr/share/applications"
+function _dj_setup_stm32_cube_ide_desktop_item() {
+    if [ ! -f stm32cubeide ]; then
+        echo_warn "STM32CubeIDE executable \"stm32cubeide\" is not found in the current directory, exit!"
+        return
+    fi
+    desktop_item_dir="/usr/share/applications"
 
     # copy the icon file
-    _show_and_run sudo cp $djtools_path/settings/stm32-cube-ide.xpm $folder
+    _show_and_run sudo cp $djtools_path/settings/stm32-cube-ide.xpm $desktop_item_dir
 
-    file="cubeIDE.desktop"
+    file="stm32-cube-ide.desktop"
     _show_and_run touch $file
 
     _show_and_run echo '[Desktop Entry]' >>$file
     _show_and_run echo 'Encoding=UTF-8' >>$file
     _show_and_run echo 'Name=cube-ide' >>$file
     _show_and_run echo 'Comment=cube-ide' >>$file
-    _show_and_run echo 'Exec='$soft_dir'/STM32CubeIDE/stm32cubeide' >>$file
-    _show_and_run echo 'Icon='$folder'/stm32-cube-ide.xpm' >>$file
+    _show_and_run echo 'Exec='${PWD}'/stm32cubeide' >>$file
+    _show_and_run echo 'Icon='$desktop_item_dir'/stm32-cube-ide.xpm' >>$file
     _show_and_run echo 'StartupNotify=false' >>$file
     _show_and_run echo 'Type=Application' >>$file
     _show_and_run echo 'Categories=Application;Development;' >>$file
 
-    _show_and_run sudo rm -rf $folder/$file
-    _show_and_run sudo mv $file $folder
+    _show_and_run sudo rm -rf $desktop_item_dir/$file
+    _show_and_run sudo mv $file $desktop_item_dir
 
-    _show_and_run sudo chmod +x $folder/$file
-
-    if [ ! -f "$soft_dir/STM32CubeIDE/stm32cubeide" ]; then
-        echo_warn "cubeIDE is not installed to $soft_dir/STM32CubeIDE/, you need to revise file:"
-        echo_warn "$folder/$file accordingly."
-    fi
+    _show_and_run sudo chmod +x $desktop_item_dir/$file
 }
 
 # =============================================================================
@@ -711,18 +712,18 @@ function _dj_setup_stm32_cube_ide() {
     _show_and_run chmod +x st-stm32cubeide.sh
     _show_and_run ./st-stm32cubeide.sh
 
-    _create_stm32cube_ide_desktop_item
+    echo "Now you should navigate to the STM32CubeIDE executable directory and run:"
+    echo "$ dj setup stm32-cube-ide-desktop-item"
 
     _popd_quiet
-
-    _create_stm32_cube_ide_desktop_item
 }
+
 # =============================================================================================
-function _create_stm32cube_programmer_desktop_item() {
-    folder="/usr/share/applications"
+function _dj_setup_stm32_cube_programmer_desktop_item() {
+    desktop_item_dir="/usr/share/applications"
 
     # copy the icon file
-    _show_and_run sudo cp $djtools_path/settings/stm32-cube-programmer.xpm $folder
+    _show_and_run sudo cp $djtools_path/settings/stm32-cube-programmer.xpm $desktop_item_dir
 
     file="stm32-cube-programmer.desktop"
     _show_and_run touch $file
@@ -733,22 +734,17 @@ function _create_stm32cube_programmer_desktop_item() {
     echo 'Name=cube-programmer' >>$file
     echo 'Comment=cube-programmer' >>$file
     echo 'Exec='$target_dir'/bin/STM32CubeProgrammer' >>$file
-    echo 'Icon='$folder'/stm32-cube-programmer.xpm' >>$file
+    echo 'Icon='$desktop_item_dir'/stm32-cube-programmer.xpm' >>$file
     echo 'StartupNotify=false' >>$file
     echo 'Type=Application' >>$file
     echo 'Categories=Application;Development;' >>$file
 
-    _show_and_run sudo rm -rf $folder/$file
-    _show_and_run sudo mv $file $folder
+    _show_and_run sudo rm -rf $desktop_item_dir/$file
+    _show_and_run sudo mv $file $desktop_item_dir
 
-    _show_and_run sudo chmod +x $folder/$file
+    _show_and_run sudo chmod +x $desktop_item_dir/$file
 
     _show_and_run sudo cp $target_dir/Drivers/rules/*.rules /etc/udev/rules.d/
-
-    if [ ! -f "$target_dir/bin/STM32CubeProgrammer" ]; then
-        echo -e "${YLW}cube-programmer is not installed to $target_dir/bin, you need to revise file:${NOC}"
-        echo -e "${YLW}$folder/$file accordingly.${NOC}"
-    fi
 }
 
 # =============================================================================
@@ -758,15 +754,17 @@ function _dj_setup_stm32_cube_programmer() {
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
-    _show_and_run rm -rf stm32-cube-programer-v2-11
-    _show_and_run git clone git@github.com:dj-zhou/stm32-cube-programer-v2-11.git
-    _show_and_run cd stm32-cube-programer-v2-11
+    _show_and_run rm -rf stm32-cube-programer
+    _show_and_run git clone git@github.com:dj-zhou/stm32-cube-programer.git
+    _show_and_run cd stm32-cube-programer
     _show_and_run ./merge-file.sh
-    _show_and_run unzip en.stm32cubeprg-lin_v2-11-0.zip
+    _show_and_run unzip en.stm32cubeprg-lin.zip
 
-    _show_and_run sudo ./SetupSTM32CubeProgrammer-2.11.0.linux
+    _show_and_run mv SetupSTM32CubeProgrammer*.linux SetupSTM32CubeProgrammer.linux
+    _show_and_run sudo ./SetupSTM32CubeProgrammer.linux
 
-    _create_stm32cube_programmer_desktop_item
+    # stm32 cube programmer is installed to /usr/local/ directory, no need to choose
+    _dj_setup_stm32_cube_programmer_desktop_item
 
     _popd_quiet
 }
@@ -1159,7 +1157,7 @@ function _dj_setup_vtk_8_2_0() {
 # =============================================================================
 # call function in workspace-check.bash
 function _dj_work_check() {
-    _work_check $@
+    _work_check "$@"
 }
 
 # =============================================================================
@@ -1567,16 +1565,16 @@ function dj() {
     fi
     # ------------------------------
     if [ $1 = 'flame-graph' ]; then
-        shift
-        _dj_flame_grapah $@
+        shift 1
+        _dj_flame_grapah "$@"
         return
     fi
     # ------------------------------
     if [ $1 = 'format' ]; then
         # ------------------------------
         if [[ $# -ge 2 ]]; then
-            shift
-            _dj_format $@
+            shift 1
+            _dj_format "$@"
             return
         fi
         echo "dj format: argument not supported, exit."
@@ -1589,7 +1587,7 @@ function dj() {
             # ------------------------------
             if [[ $# -ge 3 ]]; then
                 shift 2
-                _dj_grep_package $@
+                _dj_grep_package "$@"
                 return
             fi
         fi
@@ -1637,7 +1635,7 @@ function dj() {
         if [ $2 = 'ssh-account' ]; then
             if [ $3 = '--activate' ]; then
                 shift 3
-                _dj_git_ssh_account_activate $@
+                _dj_git_ssh_account_activate "$@"
                 return
             fi
             if [ $3 = '--show-all' ]; then
@@ -1655,7 +1653,7 @@ function dj() {
             if [[ "$3" = 'bitbucket' ||
                 "$3" = 'github' ]]; then
                 shift 2
-                _dj_git_ssh_clone_from $@
+                _dj_git_ssh_clone_from "$@"
                 return
             fi
             _dj_clone_help
@@ -1684,7 +1682,7 @@ function dj() {
     # ------------------------------
     if [ $1 = 'pack' ]; then
         shift 1
-        _dj_pack $@
+        _dj_pack "$@"
         return
     fi
     # ------------------------------
@@ -1869,7 +1867,7 @@ function _dj() {
         ACTIONS[$i]=" "
     done
     # --------------------------------------------------------
-    format_list="brush enable disable show "
+    format_list="brush show "
     ACTIONS[format]="$format_list "
     for i in $format_list; do
         ACTIONS[$i]=" "
