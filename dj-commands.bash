@@ -655,7 +655,7 @@ function _dj_setup_stm32_cube_mx() {
     _show_and_run ./SetupSTM32CubeMX
 
     echo_info "Now you should navigate to the STM32CubeMX executable directory and run:"
-    echo_info "$ dj setup stm32-cube-mx-desktop-item"
+    echo_cmd "dj setup stm32-cube-mx-desktop-item"
 
     _popd_quiet
 }
@@ -712,8 +712,8 @@ function _dj_setup_stm32_cube_ide() {
     _show_and_run chmod +x st-stm32cubeide.sh
     _show_and_run ./st-stm32cubeide.sh
 
-    echo "Now you should navigate to the STM32CubeIDE executable directory and run:"
-    echo "$ dj setup stm32-cube-ide-desktop-item"
+    echo_info "Now you should navigate to the STM32CubeIDE executable directory and run:"
+    echo_cmd "dj setup stm32-cube-ide-desktop-item"
 
     _popd_quiet
 }

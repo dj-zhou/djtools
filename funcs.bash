@@ -1,6 +1,7 @@
 #!/bin/bash
 
-function echo_info() { echo -e "${GRN}$@${NOC}" 1>&2; }
+function echo_info() { echo -e "${CYN}$@${NOC}" 1>&2; }
+function echo_cmd() { echo -e "$ ${GRN}$@${NOC}" 1>&2; }
 function echo_highlight() { echo -e "${HGRN}$@${NOC}" 1>&2; }
 function echo_warn() { echo -e "${YLW}$@${NOC}" 1>&2; }
 function echo_error() { echo -e "${RED}$@${NOC}" 1>&2; }
@@ -52,7 +53,8 @@ function _ask_to_execute_cmd() {
     read answer
     if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || (
         $answer = 'No') || ($answer = 'no') ]]; then
-        echo 'Command "'$1'" is NOT executed!'
+        echo 'Command "'$1'" is NOT executed!'robot@dark: soft $ 
+
     elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || (
         $answer = 'Yes') || ($answer = 'yes') ]]; then
         echo 'Command "'$1'" is going to be executed!'
@@ -160,9 +162,8 @@ function _if_option_exist() {
 # example: _find_option_index -s hello world aa bb -s 100 -t 10
 # we want to search "-s" in arguments "hello world aa bb -s 100 -t 10"
 # so the return value is 5
-function _find_option_index() {
-    index=0
-    to_match="$1"
+function _find_option_index() {robot@dark: soft $ 
+
     shift 1
     for var in "$@"; do
         index=$((index + 1))
