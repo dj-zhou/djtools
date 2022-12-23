@@ -32,7 +32,6 @@ function _dj_format_clang_format_implement() {
 # =============================================================================
 function _dj_format_clang_format_show_camel() {
     cat <<eom
-
                     Camel Case
  +-----------------------------------------------------------+
  |          Code Element | Stype                             |
@@ -97,27 +96,24 @@ function dj_clang_format_brush() {
 function _dj_format() {
     _pushd_quiet ${PWD}
 
-    if [ $1 = 'brush' ]; then
-        dj_clang_format_brush $2 $3 $4 $5
+    if [[ $1 = 'brush' ]]; then
+        shift 1
+        dj_clang_format_brush "$@"
         return
     fi
-    if [ $1 = 'implement' ]; then
-        _dj_format_clang_format_implement $2 $3 $4 $5 $6 $7
+    if [[ $1 = 'implement' ]]; then
+        shift 1
+        _dj_format_clang_format_implement "$@"
         return
     fi
-    if [ $1 = 'show' ]; then
-        if [ $2 = 'camel' ]; then
-            _dj_format_clang_format_show_camel $3 $4 $5 $6 $7
+    if [[ $1 = 'show' ]]; then
+        shift 1
+        if [[ $2 = 'camel' ]]; then
+            shift 1
+            _dj_format_clang_format_show_camel "$@"
             return
         fi
-        return
-    fi
-    if [ $1 = 'enable' ]; then
-        _clang_vscode_setting_json_format_on_save "true"
-        return
-    fi
-    if [ $1 = 'disable' ]; then
-        _clang_vscode_setting_json_format_on_save "false"
+        echo "dj format show: need argument."
         return
     fi
 
