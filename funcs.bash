@@ -53,8 +53,7 @@ function _ask_to_execute_cmd() {
     read answer
     if [[ ($answer = 'n') || ($answer = 'N') || ($answer = 'NO') || (
         $answer = 'No') || ($answer = 'no') ]]; then
-        echo 'Command "'$1'" is NOT executed!'robot@dark: soft $ 
-
+        echo 'Command "'$1'" is NOT executed!'
     elif [[ ($answer = 'y') || ($answer = 'Y') || ($answer = 'YES') || (
         $answer = 'Yes') || ($answer = 'yes') ]]; then
         echo 'Command "'$1'" is going to be executed!'
@@ -162,8 +161,7 @@ function _if_option_exist() {
 # example: _find_option_index -s hello world aa bb -s 100 -t 10
 # we want to search "-s" in arguments "hello world aa bb -s 100 -t 10"
 # so the return value is 5
-function _find_option_index() {robot@dark: soft $ 
-
+function _find_option_index() {
     shift 1
     for var in "$@"; do
         index=$((index + 1))
