@@ -162,6 +162,8 @@ function _if_option_exist() {
 # we want to search "-s" in arguments "hello world aa bb -s 100 -t 10"
 # so the return value is 5
 function _find_option_index() {
+    index=0
+    to_match="$1"
     shift 1
     for var in "$@"; do
         index=$((index + 1))
