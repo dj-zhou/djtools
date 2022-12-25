@@ -699,15 +699,32 @@ function _dj_setup_stm32_cube_ide() {
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
-    _show_and_run rm -rf stm32-cube-ide
-    _show_and_run git clone https://github.com/dj-zhou/stm32-cube-ide.git
-
-    _show_and_run cd stm32-cube-ide/
+    local exist=0
+    if [ -d stm32-cube-ide ]; then
+        cd stm32-cube-ide
+        remote_v=$(git remote -v | grep fetch | awk '{print $2}')
+        if [ ! -z $remote_v ]; then
+            exist=1
+            cd ../
+        else
+            _show_and_run sudo rm stm32-cube-ide
+        fi
+    fi
+    if [ exist=1 ]; then
+        _show_and_run cd stm32-cube-ide
+        _show_and_run git pull
+    else
+        _show_and_run git clone https://github.com/dj-zhou/stm32-cube-ide.git
+        _show_and_run cd stm32-cube-ide/
+    fi
     _show_and_run ./merge-file.sh
 
     _show_and_run unzip en.st-stm32cubeide-lin.zip
 
     echo_warn "Please install to $soft_dir/ directory"
+    if [ -d $soft_dir/STM32CubeIDE ]; then
+        _show_and_run sudo rm -rf $soft_dir/STM32CubeIDE
+    fi
     _show_and_run mv st-stm32cubeide_* st-stm32cubeide.sh
     _show_and_run chmod +x st-stm32cubeide.sh
     _show_and_run ./st-stm32cubeide.sh
