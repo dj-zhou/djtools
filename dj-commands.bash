@@ -703,16 +703,16 @@ function _dj_setup_stm32_cube_ide_desktop_item() {
 function _dj_setup_stm32_cube_ide() {
     _show_and_run _pushd_quiet ${PWD}
 
-    # tested on Ubuntu 20.04
+    # tested on Ubuntu 20.04/22.04
     _install_if_not_installed default-jre
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
     local exist=0
     if [ -d stm32-cube-ide ]; then
-        echo_error "why I am here?"
         cd stm32-cube-ide
         remote_v=$(git remote -v | grep fetch | awk '{print $2}')
+        echo "remote_v=$remote_v"
         if [ ! -z $remote_v ]; then
             exist=1
             cd ../
@@ -720,7 +720,7 @@ function _dj_setup_stm32_cube_ide() {
             _show_and_run sudo rm stm32-cube-ide
         fi
     fi
-    if [ exist=1 ]; then
+    if [ $exist = 1 ]; then
         _show_and_run cd stm32-cube-ide
         _show_and_run git pull
     else
@@ -739,6 +739,8 @@ function _dj_setup_stm32_cube_ide() {
     _show_and_run chmod +x st-stm32cubeide.sh
     _show_and_run ./st-stm32cubeide.sh
 
+    echo_info "Despite of the license, I have installed the jlink udev rules into /etc/udev/rule.d/\n"
+    _show_and_run sudo cp $djtools_path/settings/99-jlink.rules /etc/udev/rule.d/
     echo_info "Now you should navigate to the STM32CubeIDE executable directory and run:"
     echo_cmd "dj setup stm32-cube-ide-desktop-item"
 
