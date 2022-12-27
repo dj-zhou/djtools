@@ -421,6 +421,7 @@ function _dj_setup_pangolin() {
 }
 
 # =============================================================================
+# it is failed on Ubuntu 22.04
 function _dj_setup_cutecom() {
     _pushd_quiet "${PWD}"
 
@@ -433,7 +434,7 @@ function _dj_setup_cutecom() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm -rf cutecom
+    _show_and_run sudo rm -rf cutecom
     _show_and_run git clone https://gitlab.com/cutecom/cutecom.git
     _show_and_run cd cutecom
     _show_and_run git checkout $v
@@ -808,10 +809,11 @@ function _dj_setup_stm32_tools() {
     echo -e "install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
     _press_enter_or_wait_s_continue 5
 
+    # remove a package that makes problem!
+    _show_and_run sudo apt remove brltty
     # install dependencies and some software ----------------
     packages="libusb-1.0.0-dev gtk+-3.0 cu putty screen cmake "
     _show_and_run _install_if_not_installed $packages
-
     # install cutecom from source ----------------
     _dj_setup_cutecom
 
@@ -827,7 +829,7 @@ function _dj_setup_stm32_tools() {
     _show_and_run cd stlink
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
         _show_and_run git checkout v1.7.0 # need test v1.7.0 before switch to it
-    elif [[ ${ubuntu_v} = *'20.04'* ]]; then
+    elif [[ ${ubuntu_v} = *'20.04'* || ${ubuntu_v} = *'22.04'* ]]; then
         _show_and_run git checkout v1.7.0
     else
         echo "${RED}NOT IMPLEMENTED YET${NOC}"
