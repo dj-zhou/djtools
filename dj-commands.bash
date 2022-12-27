@@ -176,8 +176,17 @@ function _dj_setup_cli11() {
 function _dj_setup_cmake() {
     # install dependencies
     _show_and_run _install_if_not_installed libssl-dev
-    v=$(_find_package_version cmake)
+    new_v=$(_find_package_version cmake)
+    v=v$new_v
     _echo_install CMake $v
+
+    current_v=$(version check cmake)
+    anw=$(_version_if_ge_than $current_v $new_v)
+    if [ "$anw" = "yes" ]; then
+        echo "CMake is as new as $current_v, no need to install $new_v"
+        return
+    fi
+    return
 
     _press_enter_or_wait_s_continue 5
 
@@ -251,7 +260,7 @@ function _dj_setup_gadgets() {
     _show_and_run _pushd_quiet ${PWD}
 
     v=$(version check eigen3)
-    if [ "$v" = "eigen3 is not installed"* ]; then
+    if [[ "$v" = "eigen3 is not installed"* ]]; then
         _show_and_run dj setup eigen3
     fi
     _show_and_run mkdir -p $soft_dir
@@ -701,6 +710,7 @@ function _dj_setup_stm32_cube_ide() {
 
     local exist=0
     if [ -d stm32-cube-ide ]; then
+        echo_error "why I am here?"
         cd stm32-cube-ide
         remote_v=$(git remote -v | grep fetch | awk '{print $2}')
         if [ ! -z $remote_v ]; then
