@@ -421,15 +421,21 @@ function _dj_setup_pangolin() {
 }
 
 # =============================================================================
-# it is failed on Ubuntu 22.04
 function _dj_setup_cutecom() {
     _pushd_quiet "${PWD}"
 
-    v=$(_find_package_version cutecom)
+    if [[ ${ubuntu_v} = *'18.04'* || ${ubuntu_v} = *'20.04'* ]]; then
+        v=$(_find_package_version cutecom)
+    elif [[ ${ubuntu_v} = *'22.04'* ]]; then
+        v="fe55f279a7da0b19948ebff6d1fb2990cccfd4fb"
+    fi
     _echo_install cutecom $v
     _press_enter_or_wait_s_continue 5
 
     # this is important
+    if [[ ${ubuntu_v} = *'18.04'* || ${ubuntu_v} = *'20.04'* ]]; then
+        _install_if_not_installed qt5-default
+    fi
     _install_if_not_installed qt5-default libqt5serialport5-dev
 
     _show_and_run mkdir -p $soft_dir
