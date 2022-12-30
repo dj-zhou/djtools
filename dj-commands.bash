@@ -176,8 +176,17 @@ function _dj_setup_cli11() {
 function _dj_setup_cmake() {
     # install dependencies
     _show_and_run _install_if_not_installed libssl-dev
-    v=$(_find_package_version cmake)
+    new_v=$(_find_package_version cmake)
+    v=v$new_v
     _echo_install CMake $v
+
+    current_v=$(version check cmake)
+    anw=$(_version_if_ge_than $current_v $new_v)
+    if [ "$anw" = "yes" ]; then
+        echo "CMake is as new as $current_v, no need to install $new_v"
+        return
+    fi
+    return
 
     _press_enter_or_wait_s_continue 5
 
@@ -251,7 +260,7 @@ function _dj_setup_gadgets() {
     _show_and_run _pushd_quiet ${PWD}
 
     v=$(version check eigen3)
-    if [ "$v" = "eigen3 is not installed"* ]; then
+    if [[ "$v" = "eigen3 is not installed"* ]]; then
         _show_and_run dj setup eigen3
     fi
     _show_and_run mkdir -p $soft_dir
@@ -415,16 +424,23 @@ function _dj_setup_pangolin() {
 function _dj_setup_cutecom() {
     _pushd_quiet "${PWD}"
 
-    v=$(_find_package_version cutecom)
+    if [[ ${ubuntu_v} = *'18.04'* || ${ubuntu_v} = *'20.04'* ]]; then
+        v=$(_find_package_version cutecom)
+    elif [[ ${ubuntu_v} = *'22.04'* ]]; then
+        v="fe55f279a7da0b19948ebff6d1fb2990cccfd4fb"
+    fi
     _echo_install cutecom $v
     _press_enter_or_wait_s_continue 5
 
     # this is important
+    if [[ ${ubuntu_v} = *'18.04'* || ${ubuntu_v} = *'20.04'* ]]; then
+        _install_if_not_installed qt5-default
+    fi
     _install_if_not_installed qt5-default libqt5serialport5-dev
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm -rf cutecom
+    _show_and_run sudo rm -rf cutecom
     _show_and_run git clone https://gitlab.com/cutecom/cutecom.git
     _show_and_run cd cutecom
     _show_and_run git checkout $v
@@ -655,7 +671,7 @@ function _dj_setup_stm32_cube_mx() {
     _show_and_run ./SetupSTM32CubeMX
 
     echo_info "Now you should navigate to the STM32CubeMX executable directory and run:"
-    echo_info "$ dj setup stm32-cube-mx-desktop-item"
+    echo_cmd "dj setup stm32-cube-mx-desktop-item"
 
     _popd_quiet
 }
@@ -694,26 +710,46 @@ function _dj_setup_stm32_cube_ide_desktop_item() {
 function _dj_setup_stm32_cube_ide() {
     _show_and_run _pushd_quiet ${PWD}
 
-    # tested on Ubuntu 20.04
+    # tested on Ubuntu 20.04/22.04
     _install_if_not_installed default-jre
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
-    _show_and_run rm -rf stm32-cube-ide
-    _show_and_run git clone https://github.com/dj-zhou/stm32-cube-ide.git
-
-    _show_and_run cd stm32-cube-ide/
+    local exist=0
+    if [ -d stm32-cube-ide ]; then
+        cd stm32-cube-ide
+        remote_v=$(git remote -v | grep fetch | awk '{print $2}')
+        echo "remote_v=$remote_v"
+        if [ ! -z $remote_v ]; then
+            exist=1
+            cd ../
+        else
+            _show_and_run sudo rm stm32-cube-ide
+        fi
+    fi
+    if [ $exist = 1 ]; then
+        _show_and_run cd stm32-cube-ide
+        _show_and_run git pull
+    else
+        _show_and_run git clone https://github.com/dj-zhou/stm32-cube-ide.git
+        _show_and_run cd stm32-cube-ide/
+    fi
     _show_and_run ./merge-file.sh
 
     _show_and_run unzip en.st-stm32cubeide-lin.zip
 
     echo_warn "Please install to $soft_dir/ directory"
+    if [ -d $soft_dir/STM32CubeIDE ]; then
+        _show_and_run sudo rm -rf $soft_dir/STM32CubeIDE
+    fi
     _show_and_run mv st-stm32cubeide_* st-stm32cubeide.sh
     _show_and_run chmod +x st-stm32cubeide.sh
     _show_and_run ./st-stm32cubeide.sh
 
-    echo "Now you should navigate to the STM32CubeIDE executable directory and run:"
-    echo "$ dj setup stm32-cube-ide-desktop-item"
+    echo_info "Despite of the license, I have installed the jlink udev rules into /etc/udev/rule.d/\n"
+    _show_and_run sudo cp $djtools_path/settings/99-jlink.rules /etc/udev/rule.d/
+    echo_info "Now you should navigate to the STM32CubeIDE executable directory and run:"
+    echo_cmd "dj setup stm32-cube-ide-desktop-item"
 
     _popd_quiet
 }
@@ -779,10 +815,11 @@ function _dj_setup_stm32_tools() {
     echo -e "install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
     _press_enter_or_wait_s_continue 5
 
+    # remove a package that makes problem!
+    _show_and_run sudo apt remove brltty
     # install dependencies and some software ----------------
     packages="libusb-1.0.0-dev gtk+-3.0 cu putty screen cmake "
     _show_and_run _install_if_not_installed $packages
-
     # install cutecom from source ----------------
     _dj_setup_cutecom
 
@@ -798,7 +835,7 @@ function _dj_setup_stm32_tools() {
     _show_and_run cd stlink
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
         _show_and_run git checkout v1.7.0 # need test v1.7.0 before switch to it
-    elif [[ ${ubuntu_v} = *'20.04'* ]]; then
+    elif [[ ${ubuntu_v} = *'20.04'* || ${ubuntu_v} = *'22.04'* ]]; then
         _show_and_run git checkout v1.7.0
     else
         echo "${RED}NOT IMPLEMENTED YET${NOC}"
