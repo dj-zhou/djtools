@@ -326,7 +326,7 @@ function _wget_if_not_exist() { # $filename $md5sum $url $option
 # =============================================================================
 # https://stackoverflow.com/questions/1298066/check-if-an-apt-get-package-is-installed-and-then-install-it-if-its-not-on-linu
 function _check_if_package_installed() {
-    PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $1 | grep "install ok installed")
+    PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $1 2>/dev/null | grep "install ok installed")
     if [ "" = "$PKG_OK" ]; then
         echo "no"
     else
