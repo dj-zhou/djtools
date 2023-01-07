@@ -1036,6 +1036,7 @@ function _dj_setup_grpc() {
 # default compiles:
 # Ubuntu 18.04: g++-7
 # Ubuntu 20.04: g++-9
+# Ubuntu 22.04: g++ 11.3.0
 # make this function to install g++-9 on Ubuntu 18.04 as well!
 function _dj_setup_gpp_10() {
     # install g++10/gcc-10
@@ -1075,7 +1076,7 @@ function _dj_setup_gpp_10() {
 
 # =============================================================================
 function _dj_setup_gpp_11() {
-    # install g++10/gcc-10
+    # install g++11/gcc-11
     echo -e "install ${GRN}gcc-11${NOC}, ${GRN}g++-11${NOC}"
     _press_enter_or_wait_s_continue 5
 
