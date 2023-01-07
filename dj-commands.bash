@@ -25,7 +25,7 @@ function _dj_help() {
     echo "   format     - used to format code"
     echo "   udev       - udev rule setup for usb devices"
     echo "   work-check - check work status of all repos in a folder"
-    echo -e ""g
+    echo -e ""
     echo -e "  ETC ETC"
     echo -e "All commands support tab completion"
 }
