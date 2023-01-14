@@ -1265,14 +1265,13 @@ Check if MongoDB is running:
     $ sudo systemctl status mongod
 
 Check if MongoDB is installed:
-    $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+    $ mongosh --eval 'db.runCommand({ connectionStatus: 1 })'
 --------------------------------------------
 eom
 
 }
 
 # =============================================================================
-
 function _dj_stup_network_tools() {
     echo -e "install ${GRN}nethogs${NOC}, ${GRN}iptraf${NOC}"
     _show_and_run _install_if_not_installed nethogs iptraf
