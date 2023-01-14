@@ -1265,6 +1265,8 @@ Check if MongoDB is running:
     $ sudo systemctl status mongod
 
 Check if MongoDB is installed:
+    $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+    or
     $ mongosh --eval 'db.runCommand({ connectionStatus: 1 })'
 --------------------------------------------
 eom
