@@ -1219,58 +1219,61 @@ function _dj_setup_meson_ninjia() {
 }
 
 # =============================================================================
-# reference: https://andyfelong.com/2020/10/mongodb-4-4-ubuntu-20-04-on-raspberry-pi-4/
-# problem: if libyaml-cpp is installed first (0.6.3), then it cannot install
-# mongodb, don't know why
+# https://wiki.crowncloud.net/How_To_Install_Duf_On_Ubuntu_22_04?How_to_Install_Latest_MongoDB_on_Ubuntu_22_04
 function _dj_setup_mongodb() {
     sudo apt-get update -y
     uname_a=$(uname -a)
-    if [[ "${ubuntu_v}" = *'20.04'* ]]; then
-        # install v4.4 on x86 and aarch64 system
-        wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-        if [[ "${uname_a}" = *'aarch64'* ]]; then
-            echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" |
-                sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-        elif [[ "${uname_a}" = *'x86_64'* ]]; then
-            echo "deb [ arch=amd64] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" |
-                sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
-        fi
+    if [[ ! "${ubuntu_v}" = *'20.04'* || "${ubuntu_v}" = *'22.04'* || ! "${uname_a}" = *'x86_64'* ]]; then
+        echo_warn "only tested on x86_64 Ubuntu 20.04/22.04, exit"
+        return
+    fi
 
-        # install
-        sudo apt-get -y update
-        _show_and_run _install_if_not_installed mongodb-org
+    _show_and_run _install_if_not_installed dirmngr gnupg apt-transport-https \
+        ca-certificates software-properties-common
+    # install libssl1.1 (https://askubuntu.com/a/1403683)
+    echo "deb http://security.ubuntu.com/ubuntu focal-security main" |
+        sudo tee /etc/apt/sources.list.d/focal-security.list
 
-        # Enable and start MongoDB Deamon program
-        sudo systemctl enable --now mongod
+    _show_and_run sudo apt-get update
+    _show_and_run _install_if_not_installed libssl1.1
 
-        cat <<eom
+    v=$(_find_package_version mongodb)
+    _echo_install mongodb $v
+    wget -qO - https://www.mongodb.org/static/pgp/server-$v.asc | sudo apt-key add -
+    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/$v multiverse" |
+        sudo tee /etc/apt/sources.list.d/mongodb-org.list
+
+    _show_and_run sudo apt update
+    _show_and_run sudo apt install -y mongodb-org
+    # Enable and start MongoDB Deamon program
+    sudo systemctl enable --now mongod
+
+    cat <<eom
 --------------------------------------------
-MongoDB istall:
+MongoDB install:
     mongodb-org-server - mongodb守护程序以及相应的初始化脚本和配置
     mongodb-org-mongos - mongos守护程序
-    mongodb-org-shell  - mongo shell，它是MongoDB的交互式JavaScript接口。
+    mongodb-org-shell  - mongo shell, 它是MongoDB的交互式JavaScript接口。
                          它用于执行命令行中的管理任务。
-    mongodb-org-tools  - 包含几个用于导入和导出数据，统计信息以及其他实用程序的MongoDB工具
+    mongodb-org-tools  - 包含几个用于导入和导出数据, 统计信息以及其他实用程序的MongoDB工具
 
 Enable and start MongoDB Deamon program:
     $ sudo systemctl enable --now mongod
     $ sudo systemctl start mongod
 
 Check if MongoDB is running:
-    $ sudo service mongod status
+    $ sudo systemctl status mongod
 
 Check if MongoDB is installed:
     $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+    or
+    $ mongosh --eval 'db.runCommand({ connectionStatus: 1 })'
 --------------------------------------------
 eom
-    else
-        echo -e "\n${YLW} TO BE IMPLEMENTED${NOC}\n"
-        return
-    fi
+
 }
 
 # =============================================================================
-
 function _dj_stup_network_tools() {
     echo -e "install ${GRN}nethogs${NOC}, ${GRN}iptraf${NOC}"
     _show_and_run _install_if_not_installed nethogs iptraf
