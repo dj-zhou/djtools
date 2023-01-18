@@ -823,7 +823,7 @@ function _dj_setup_stm32_tools() {
     _dj_setup_cutecom
 
     # install stlink ----------------
-    echo -e "install ${GRN}stlink${NOC}"
+    _echo_install "stlink"
     _press_enter_or_wait_s_continue 5
 
     _show_and_run mkdir -p $soft_dir
@@ -847,7 +847,7 @@ function _dj_setup_stm32_tools() {
     _show_and_run sudo ldconfig
 
     # install stm32flash ----------------
-    echo -e "install  stm32flash ..."
+    _echo_install "stm32flash"
     _press_enter_or_wait_s_continue 5
     _show_and_run cd $soft_dir
     _show_and_run rm stm32-tools -rf
@@ -873,10 +873,9 @@ function _dj_setup_stm32_tools() {
 
 # =============================================================================
 function _dj_setup_glfw3() {
+    _echo_install "glfw3"
+
     _show_and_run _pushd_quiet ${PWD}
-
-    echo -e "install glfw3 ..."
-
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
@@ -931,11 +930,9 @@ function _dj_setup_google_repo() {
     fi
 
     cat <<eom
-
 -----------------------------------------------------------------
   Google tool "repo" is installed into directory: /bin/
 -----------------------------------------------------------------
-
 eom
     _popd_quiet
 }
