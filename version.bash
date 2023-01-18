@@ -72,6 +72,11 @@ _version_if_ge_than() { # current version #  required version
 }
 
 # =============================================================================
+function _echo_not_installed() {
+    echo -e "$1 ${YLW}maybe not be installed correctly!${NOC}"
+}
+
+# =============================================================================
 function _version_check_arm_linux_gnueabi_gcc() {
     v=$(arm-linux-gnueabi-gcc --version | awk '{ print $4 }')
     vv=$(echo $v | awk '{ print $1 }')
@@ -104,7 +109,7 @@ function _version_check_boost() {
     file="/usr/local/include/boost/version.hpp"
 
     if [ ! -f $file ]; then
-        echo "boost is not installed."
+        _echo_not_installed "boost"
     fi
 
     boost_v=$(cat $file | grep "define BOOST_LIB_VERSION" | awk '{print $3}')
@@ -132,7 +137,7 @@ function _version_check_cli11() {
         fi
     done
     if [ $file_is_found='0' ]; then
-        echo "cli11 is not installed."
+        _echo_not_installed "cli11"
     fi
 }
 
@@ -172,7 +177,7 @@ function _version_check_eigen3() {
         fi
     done
     if [ $file_is_found='0' ]; then
-        echo "eigen3 is not installed."
+        _echo_not_installed "eigen3"
     fi
 }
 
@@ -180,7 +185,7 @@ function _version_check_eigen3() {
 function _version_check_fmt() {
     file="/usr/local/lib/pkgconfig/fmt.pc"
     if [ ! -f $file ]; then
-        echo "fmt maybe not be installed correctly!"
+        _echo_not_installed "fmt"
         return
     fi
 
@@ -202,7 +207,7 @@ function _version_check_glog() {
     # file="/usr/lib/x86_64-linux-gnu/pkgconfig/libglog.pc"
     file="/usr/local/lib/pkgconfig/libglog.pc"
     if [ ! -f $file ]; then
-        echo "glog maybe not be installed correctly!"
+        _echo_not_installed "glog"
         echo "note: source code installation does not have a libglog.pc file"
         return
     fi
@@ -214,7 +219,7 @@ function _version_check_glog() {
 function _version_check_grpc() {
     file="/usr/local/lib/pkgconfig/grpc++.pc"
     if [ ! -f $file ]; then
-        echo "grpc maybe not be installed correctly!"
+        _echo_not_installed "grpc"
         return
     fi
 
@@ -226,7 +231,7 @@ function _version_check_grpc() {
 function _version_check_gtest() {
     file="/usr/local/lib/pkgconfig/gtest.pc"
     if [ ! -f $file ]; then
-        echo "gtest may not be installed correctly!"
+        _echo_not_installed "gtest"
         return
     fi
 
@@ -251,7 +256,7 @@ function _version_check_gnome() {
 function _version_check_magic_enum() {
     file="/usr/local/include/magic_enum.hpp"
     if [ ! -f $file ]; then
-        echo "magic-enum maybe not installed!"
+        _echo_not_installed "magic-enum"
         return
     fi
 
@@ -274,7 +279,7 @@ function _version_check_nlohmann_json3() {
     # nlohmann_json.pc /usr/local/lib/pkgconfig
     file="/usr/local/lib/pkgconfig/nlohmann_json.pc"
     if [ ! -f $file ]; then
-        echo "nlohmann-json3 maybe not be installed correctly!"
+        _echo_not_installed "nlohmann-json3"
         return
     fi
     _find_version_from_pkgconfig_file $file
@@ -332,7 +337,7 @@ function _version_check_opencv() {
         fi
     done
     if [ $file_is_found='0' ]; then
-        echo "opencv is not installed."
+        _echo_not_installed "opencv"
     fi
 }
 
@@ -346,7 +351,7 @@ function _version_check_opengl() {
 function _version_check_python3() {
     anw=$(_check_if_package_installed python3)
     if [[ "$anw" = "no" ]]; then
-        echo "python3 is not installed"
+        _echo_not_installed "python3"
         return
     fi
     echo $(python3 --version | awk '{ print $2 }')
@@ -356,7 +361,7 @@ function _version_check_python3() {
 function _version_check_spdlog() {
     file="/usr/local/lib/pkgconfig/spdlog.pc"
     if [ ! -f $file ]; then
-        echo "spdlog maybe not be installed correctly!"
+        _echo_not_installed "spdlog"
         return
     fi
     _find_version_from_pkgconfig_file $file
@@ -366,7 +371,7 @@ function _version_check_spdlog() {
 function _version_check_libsystemd() {
     file="/usr/lib/x86_64-linux-gnu/pkgconfig/libsystemd.pc"
     if [ ! -f $file ]; then
-        echo "libsystemd maybe not be installed correctly!"
+        _echo_not_installed "libsystemd"
         return
     fi
     _find_version_from_pkgconfig_file $file
@@ -383,7 +388,7 @@ function _version_check_ubuntu() {
 function _version_check_yaml_cpp() {
     file="/usr/local/lib/pkgconfig/yaml-cpp.pc"
     if [ ! -f $file ]; then
-        echo "libyaml-cpp maybe not be installed correctly!"
+        _echo_not_installed "libyaml-cpp"
         return
     fi
     _find_version_from_pkgconfig_file $file

@@ -260,7 +260,7 @@ function _dj_setup_gadgets() {
     _show_and_run _pushd_quiet ${PWD}
 
     v=$(version check eigen3)
-    if [[ "$v" = "eigen3 is not installed"* ]]; then
+    if [[ "$v" = *"not be installed"* ]]; then
         _show_and_run dj setup eigen3
     fi
     _show_and_run mkdir -p $soft_dir
@@ -277,7 +277,7 @@ function _dj_setup_gadgets() {
 
     # check dependency
     v=$(version check cli11)
-    if [[ "$v" = *"cli11 is not installed"* ]]; then
+    if [[ "$v" = *"not be installed"* ]]; then
         _show_and_run dj setup cli11
     fi
 
@@ -1004,7 +1004,7 @@ function _dj_setup_glog() {
 # instlal gnome, need more test
 function _dj_setup_gnome() {
     echo -e "install gnome on Ubuntu"
-    _press_enter_or_wait_s_continue 20
+    _press_enter_or_wait_s_continue 5
 
     _show_and_run _install_if_not_installed tasksel gnome-session ubuntu-desktop
 
@@ -1041,7 +1041,7 @@ function _dj_setup_grpc() {
 function _dj_setup_gpp_10() {
     # install g++10/gcc-10
     echo -e "install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC}"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
 
     if ! compgen -G "/etc/apt/sources.list.d/ubuntu-toolchain-r*.list" >/dev/null; then
         _show_and_run sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -1412,7 +1412,7 @@ function _dj_git_ssh_account_show_current() {
 # =============================================================================
 function _dj_setup_vim_env() {
     echo -e "setup the vim as an IDE"
-    _press_enter_or_wait_s_continue 20
+    _press_enter_or_wait_s_continue 10
 
     _pushd_quiet ${PWD}
 

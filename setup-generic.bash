@@ -459,7 +459,7 @@ function _dj_setup_foxit_reader() {
 
     echo -e "install Foxit Reader ..."
     echo -e "  recommended location: /opt/foxitsoftware/foxitreader\n"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
@@ -506,7 +506,7 @@ function _dj_setup_gcc_aarch64_linux() {
     _pushd_quiet ${PWD}
 
     echo -e "install gcc-aarch64-linux-gnu ...\n"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
     # common
     _show_and_run _install_if_not_installed libssl-dev # needed for compiling the Linux Kernel for ARMv8
     _show_and_run _install_if_not_installed gcc-aarch64-linux-gnu
@@ -542,7 +542,7 @@ function _dj_setup_gcc_arm_stm32() {
     _show_and_run _pushd_quiet ${PWD}
 
     echo -e "remove ${RED}gcc-arm-none-eabi${NOC}, and install ${GRN}gcc-arm-embedded${NOC} ...\n"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
@@ -600,7 +600,7 @@ function _dj_setup_gcc_arm_linux_gnueabi() {
     _pushd_quiet ${PWD}
 
     echo -e "install gcc-arm-linux-gnueabi ..."
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
     _show_and_run _install_if_not_installed libncurses5-dev
     _show_and_run _install_if_not_installed build-essential
     # commonly available
@@ -643,7 +643,7 @@ function _dj_setup_gcc_arm_linux_gnueabihf() {
     _pushd_quiet ${PWD}
 
     echo -e "install gcc-arm-linux-gnueabihf ..."
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
     _show_and_run _install_if_not_installed libncurses5-dev
     _show_and_run _install_if_not_installed build-essential
 
@@ -695,7 +695,7 @@ function _dj_setup_gitg_gitk() {
     _pushd_quiet ${PWD}
 
     echo -e "install gitg and gitk ..."
-    _press_enter_or_wait_s_continue 10 # to check the key pressed TODO
+    _press_enter_or_wait_s_continue 5 # to check the key pressed TODO
     _show_and_run _install_if_not_installed gitg
     _show_and_run _install_if_not_installed gitk
     git config --global credential.helper store
@@ -1458,7 +1458,7 @@ function _dj_setup_qt_5_13_1() {
     chmod +x $filename
 
     echo -e "It is recommended to install the Qt into ${HOME}/Qt5.13.1/"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
 
     ./$filename
 
@@ -1478,7 +1478,7 @@ function _dj_setup_qt_5_14_2() {
     _show_and_run _pushd_quiet ${PWD}
 
     echo -e "\nInstall Qt 5.14.2\n"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
 
     # install serialport module
     _show_and_run _install_if_not_installed libqt5serialport5-dev
@@ -1493,7 +1493,7 @@ function _dj_setup_qt_5_14_2() {
     _show_and_run chmod +x $filename
 
     echo -e "It is recommended to install the Qt into ${HOME}/Qt5.14.2/"
-    _press_enter_or_wait_s_continue 20
+    _press_enter_or_wait_s_continue 10
 
     _show_and_run ./$filename
 
@@ -1752,7 +1752,7 @@ function _dj_setup_vscode() {
 # =============================================================================
 function _dj_setup_windows_fonts() {
     echo -e "going to support Windows fonts\n"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
     _show_and_run _install_if_not_installed ttf-mscorefonts-installer
     _show_and_run _install_if_not_installed msttcorefonts
     _show_and_run _install_if_not_installed gtk2-engines-pixbuf # works for solving the GTK warning
