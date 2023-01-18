@@ -186,7 +186,6 @@ function _dj_setup_cmake() {
         echo "CMake is as new as $current_v, no need to install $new_v"
         return
     fi
-    return
 
     _press_enter_or_wait_s_continue 5
 
@@ -199,7 +198,7 @@ function _dj_setup_cmake() {
     _show_and_run cd CMake
     _show_and_run git checkout $v
 
-    _show_and_run ./bootstrap --prefix=/usr/local
+    _show_and_run ./bootstrap --prefix=/usr/local --parallel=$(nproc)
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
     echo -e "${GRN}cmake${NOC} is installed to ${GRN}/usr/local/bin${NOC}"
@@ -242,7 +241,7 @@ function _dj_setup_kermit() {
     _show_and_run echo 'set modem none' >>$kermrc_file
     _show_and_run echo 'set protocol zmodem' >>$kermrc_file
     _show_and_run echo 'connect' >>$kermrc_file
-    _show_and_run mv $kermrc_file ~/
+    _show_and_run mv $kermrc_file ~/.kermrc
 
     _show_and_run sudo cp $djtools_path/scripts/kermit-serial /usr/bin
     _show_and_run sudo chmod +x /usr/bin/kermit-serial
@@ -260,7 +259,7 @@ function _dj_setup_gadgets() {
     _show_and_run _pushd_quiet ${PWD}
 
     v=$(version check eigen3)
-    if [[ "$v" = "eigen3 is not installed"* ]]; then
+    if [[ "$v" = *"not be installed"* ]]; then
         _show_and_run dj setup eigen3
     fi
     _show_and_run mkdir -p $soft_dir
@@ -277,7 +276,7 @@ function _dj_setup_gadgets() {
 
     # check dependency
     v=$(version check cli11)
-    if [[ "$v" = *"cli11 is not installed"* ]]; then
+    if [[ "$v" = *"not be installed"* ]]; then
         _show_and_run dj setup cli11
     fi
 
@@ -824,7 +823,7 @@ function _dj_setup_stm32_tools() {
     _dj_setup_cutecom
 
     # install stlink ----------------
-    echo -e "install ${GRN}stlink${NOC}"
+    _echo_install "stlink"
     _press_enter_or_wait_s_continue 5
 
     _show_and_run mkdir -p $soft_dir
@@ -848,7 +847,7 @@ function _dj_setup_stm32_tools() {
     _show_and_run sudo ldconfig
 
     # install stm32flash ----------------
-    echo -e "install  stm32flash ..."
+    _echo_install "stm32flash"
     _press_enter_or_wait_s_continue 5
     _show_and_run cd $soft_dir
     _show_and_run rm stm32-tools -rf
@@ -874,10 +873,9 @@ function _dj_setup_stm32_tools() {
 
 # =============================================================================
 function _dj_setup_glfw3() {
+    _echo_install "glfw3"
+
     _show_and_run _pushd_quiet ${PWD}
-
-    echo -e "install glfw3 ..."
-
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
@@ -932,11 +930,9 @@ function _dj_setup_google_repo() {
     fi
 
     cat <<eom
-
 -----------------------------------------------------------------
   Google tool "repo" is installed into directory: /bin/
 -----------------------------------------------------------------
-
 eom
     _popd_quiet
 }
@@ -1004,7 +1000,7 @@ function _dj_setup_glog() {
 # instlal gnome, need more test
 function _dj_setup_gnome() {
     echo -e "install gnome on Ubuntu"
-    _press_enter_or_wait_s_continue 20
+    _press_enter_or_wait_s_continue 5
 
     _show_and_run _install_if_not_installed tasksel gnome-session ubuntu-desktop
 
@@ -1041,7 +1037,7 @@ function _dj_setup_grpc() {
 function _dj_setup_gpp_10() {
     # install g++10/gcc-10
     echo -e "install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC}"
-    _press_enter_or_wait_s_continue 10
+    _press_enter_or_wait_s_continue 5
 
     if ! compgen -G "/etc/apt/sources.list.d/ubuntu-toolchain-r*.list" >/dev/null; then
         _show_and_run sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -1412,7 +1408,7 @@ function _dj_git_ssh_account_show_current() {
 # =============================================================================
 function _dj_setup_vim_env() {
     echo -e "setup the vim as an IDE"
-    _press_enter_or_wait_s_continue 20
+    _press_enter_or_wait_s_continue 10
 
     _pushd_quiet ${PWD}
 
