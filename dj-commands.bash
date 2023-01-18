@@ -242,7 +242,7 @@ function _dj_setup_kermit() {
     _show_and_run echo 'set modem none' >>$kermrc_file
     _show_and_run echo 'set protocol zmodem' >>$kermrc_file
     _show_and_run echo 'connect' >>$kermrc_file
-    _show_and_run mv $kermrc_file ~/
+    _show_and_run mv $kermrc_file ~/.kermrc
 
     _show_and_run sudo cp $djtools_path/scripts/kermit-serial /usr/bin
     _show_and_run sudo chmod +x /usr/bin/kermit-serial
