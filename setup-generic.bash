@@ -1223,8 +1223,8 @@ function _dj_setup_meson_ninjia() {
 function _dj_setup_mongodb() {
     sudo apt-get update -y
     uname_a=$(uname -a)
-    if [[ ! "${ubuntu_v}" = *'22.04'* || ! "${uname_a}" = *'x86_64'* ]]; then
-        echo_warn "only tested on x86_64 Ubuntu 22.04, exit"
+    if [[ ! "${ubuntu_v}" = *'20.04'* || "${ubuntu_v}" = *'22.04'* || ! "${uname_a}" = *'x86_64'* ]]; then
+        echo_warn "only tested on x86_64 Ubuntu 20.04/22.04, exit"
         return
     fi
 
