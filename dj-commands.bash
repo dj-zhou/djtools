@@ -186,7 +186,6 @@ function _dj_setup_cmake() {
         echo "CMake is as new as $current_v, no need to install $new_v"
         return
     fi
-    return
 
     _press_enter_or_wait_s_continue 5
 
@@ -199,7 +198,7 @@ function _dj_setup_cmake() {
     _show_and_run cd CMake
     _show_and_run git checkout $v
 
-    _show_and_run ./bootstrap --prefix=/usr/local
+    _show_and_run ./bootstrap --prefix=/usr/local --parallel=$(nproc)
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
     echo -e "${GRN}cmake${NOC} is installed to ${GRN}/usr/local/bin${NOC}"
