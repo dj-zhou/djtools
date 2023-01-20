@@ -1729,7 +1729,7 @@ function _dj_setup_typora() {
     sudo add-apt-repository 'deb https://typora.io/linux ./'
     sudo apt-get -y update
     # install typora
-    _show_and_run _install_if_not_installed typora
+    _show_and_run sudo apt install -y typora
 }
 
 # =============================================================================
