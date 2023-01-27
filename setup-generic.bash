@@ -270,7 +270,6 @@ function _dj_setup_computer() {
     # -----------------------------------
     echo -e "${CYN}time & date control, please run command:${NOC}"
     echo "$ timedatectl set-local-rtc 1"
-    
 
     _popd_quiet
 }
@@ -716,13 +715,13 @@ function _dj_setup_htop() {
 
     local v=$(_find_package_version htop)
     _show_and_run rm -rf htop
-   _show_and_run git clone https://github.com/htop-dev/htop.git
-   _show_and_run cd htop
-   _show_and_run git checkout $v
-   _show_and_run ./autogen.sh
-   _show_and_run ./configure
-   _show_and_run make -j$(nproc)
-   _show_and_run sudo make install
+    _show_and_run git clone https://github.com/htop-dev/htop.git
+    _show_and_run cd htop
+    _show_and_run git checkout $v
+    _show_and_run ./autogen.sh
+    _show_and_run ./configure
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 }
 
 # =============================================================================
@@ -1094,12 +1093,19 @@ function _dj_setup_magic_enum() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm -rf magic_enum
+    _show_and_run sudo rm -rf magic_enum
 
-    ver=$(_find_package_version magic-enum)
+    gpp_v=$(version check g++)
+    anw=$(_version_if_ge_than $gpp_v "12.0.0")
+    if [ $anw="yes" ]; then
+        echo_warn "g++ > 12.0.0 does not support extended characters"
+        ver="0.7.3"
+    else
+        ver=$(_find_package_version magic-enum)
+    fi
     _show_and_run git clone https://github.com/Neargye/magic_enum.git
     _show_and_run cd magic_enum
-    _show_and_run git checkout $ver
+    _show_and_run git checkout v$ver
     _show_and_run rm build -rf
     _show_and_run mkdir build
     _show_and_run cd build
