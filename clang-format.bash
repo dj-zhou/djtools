@@ -149,6 +149,7 @@ function _dj_setup_clang_format() {
 # Ubuntu 16.04: give up
 # Ubuntu 18.04: 11.1.0 (tested), https://github.com/llvm/llvm-project/releases/tag/llvmorg-11.1.0
 # Ubuntu 20.04: 12.0.0 (tested), https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.0
+# Ubuntu 20.10: 12.0.0 (tested), https://github.com/llvm/llvm-project/releases/tag/llvmorg-12.0.0
 function _dj_setup_clang_llvm() {
     _show_and_run _pushd_quiet ${PWD}
 
@@ -166,7 +167,7 @@ function _dj_setup_clang_llvm() {
         repo="$target_dir-x86-64-ubuntu-1604"
         # this should be correct!
         folder_unpacked="clang+llvm-11.1.0-x86_64-linux-gnu-ubuntu-16.04"
-    elif [[ ${ubuntu_v} = *'20.04'* || ${ubuntu_v} = *'22.04'* ]]; then
+    elif [[ ${ubuntu_v} = *'20.04'* || ${ubuntu_v} = *'22'* ]]; then
         target_dir="clang-llvm-12.0.0"
         repo="$target_dir-x86-64-ubuntu-2004"
         folder_unpacked="clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04"
@@ -202,7 +203,7 @@ function _dj_setup_clang_llvm() {
         $asw = 'Yes') || ($asw = 'yes') ]]; then
         if [[ ${ubuntu_v} = *'18.04'* ]]; then
             _show_and_run cp ${djtools_path}/settings/vscode-settings-1804.json ~/.config/Code/User/settings.json
-        elif [[ ${ubuntu_v} = *'20.04'* || ${ubuntu_v} = *'22.04'* ]]; then
+        elif [[ ${ubuntu_v} = *'20.04'* || ${ubuntu_v} = *'22'* ]]; then
             _show_and_run cp ${djtools_path}/settings/vscode-settings-2004.json ~/.config/Code/User/settings.json
         fi
     else
