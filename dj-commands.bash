@@ -1552,7 +1552,7 @@ function dj() {
                 _dj_git_ssh_clone_from "$@"
                 return
             fi
-            _dj_clone_help
+            _dj_ssh_clone_help
             return
         fi
         echo 'dj git: argument not supported, exit.'
