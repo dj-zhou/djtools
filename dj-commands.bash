@@ -175,7 +175,7 @@ function _dj_setup_cli11() {
 # setting a fixed version is not a good idea, but ...
 function _dj_setup_cmake() {
     # install dependencies
-    _show_and_run _install_if_not_installed libssl-dev
+    _show_and_run _install_if_not_installed libssl-dev gcc g++
     new_v=$(_find_package_version cmake)
     v=v$new_v
     _echo_install CMake $v
@@ -569,7 +569,8 @@ function _dj_setup_python_3_9() {
         _show_and_run sudo add-apt-repository ppa:deadsnakes/ppa
         _show_and_run sudo apt-get -y update
     fi
-    _show_and_run _install_if_not_installed python3.9 python3.8
+    _show_and_run _install_if_not_installed python3.9
+    _show_and_run _install_if_not_installed python3.8
 
     # ----------------------
     echo -e "run update-alternatives:"
@@ -589,6 +590,36 @@ function _dj_setup_python_3_9() {
     # others ------------
     _show_and_run _install_if_not_installed python3-pip
     _show_and_run pip3 install --upgrade setuptools
+}
+
+# =============================================================================
+function _dj_setup_python_3_10() {
+    if [[ ! -f /etc/apt/sources.list.d/deadsnake*.list ]]; then
+        _show_and_run sudo add-apt-repository ppa:deadsnakes/ppa
+        _show_and_run sudo apt-get -y update
+    fi
+    _show_and_run _install_if_not_installed python3.10
+    _show_and_run _install_if_not_installed python3.9
+
+    # ----------------------
+    echo -e "run update-alternatives:"
+    for i in 3 4 6 7 8 9 10; do
+        if [ -f /usr/bin/python3.$i ]; then
+            _show_and_run sudo update-alternatives --install \
+                /usr/bin/python3 python3 /usr/bin/python3.$i $i
+        fi
+    done
+
+    # ----------------------
+    _show_and_run sudo update-alternatives --config python3
+
+    # install some related software package
+    _show_and_run _install_if_not_installed python3.10-distutils
+    _show_and_run _install_if_not_installed python3.9-distutils
+
+    # others ------------
+    _show_and_run _install_if_not_installed python3-pip
+    # _show_and_run pip3 install --upgrade setuptools # not working
 }
 
 # =============================================================================

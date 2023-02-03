@@ -7,8 +7,8 @@ setup_list+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aar
 setup_list+="gitg-gitk glfw3 glog gnome gnuplot google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd mathpix "
 setup_list+="matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
-setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 "
-setup_list+="pangolin perf picocom pip plotjuggler protobuf pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 "
+setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf "
+setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu qt-5.13.1 qt-5.14.2 "
 setup_list+="ros-melodic ros-noetic ros2-foxy rpi-pico rust saleae-logic serial-console spdlog slack "
 setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
 setup_list+="stm32-cube-programmer stm32-tools sublime texlive tldr typora vscode vtk-8.2.0 "
@@ -1204,6 +1204,7 @@ function _dj_setup_meson_ninjia() {
 
     # install needed software
     _show_and_run _install_if_not_installed python3
+    _show_and_run _install_if_not_installed python3-pip
 
     # meson release: https://github.com/mesonbuild/meson/releases
     _show_and_run python3 -m pip install meson==$meson_v
@@ -2263,6 +2264,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'python3.9' ]; then
         _dj_setup_python_3_9
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'python3.10' ]; then
+        _dj_setup_python_3_10
         return
     fi
     # --------------------------
