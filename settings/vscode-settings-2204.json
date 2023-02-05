@@ -1,0 +1,19 @@
+{
+    "files.hotExit": "onExit",
+    "files.autoSave": "afterDelay",
+    "editor.detectIndentation": false,
+    "editor.tabSize": 4,
+    "editor.tabCompletion": "on",
+    "editor.fontSize": 14,
+    "Clang_format_style": "file",
+    "C_Cpp.default.cppStandard": "c++20",
+    "C_Cpp.clang_format_path": "/opt/clang-llvm-15.0.6/bin/clang-format",
+    "clang-format.executable": "/opt/clang-llvm-15.0.6/bin/clang-format",
+    "clang.executable": "/opt/clang-llvm-15.0.6/bin/clang",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "on",
+    "gitlens.blame.line.enabled": false,
+    "gitlens.currentLine.enabled": true,
+    "gitlens.codeLens.authors.enabled": false,
+    "gitlens.codeLens.recentChange.enabled": false
+}

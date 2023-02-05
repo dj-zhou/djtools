@@ -167,10 +167,14 @@ function _dj_setup_clang_llvm() {
         repo="$target_dir-x86-64-ubuntu-1604"
         # this should be correct!
         folder_unpacked="clang+llvm-11.1.0-x86_64-linux-gnu-ubuntu-16.04"
-    elif [[ ${ubuntu_v} = *'20.04'* || ${ubuntu_v} = *'22'* ]]; then
+    elif [[ ${ubuntu_v} = *'20.04'* ]]; then
         target_dir="clang-llvm-12.0.0"
         repo="$target_dir-x86-64-ubuntu-2004"
         folder_unpacked="clang+llvm-12.0.0-x86_64-linux-gnu-ubuntu-20.04"
+    elif [[ ${ubuntu_v} = *'22'* ]]; then
+        target_dir="clang-llvm-15.0.6"
+        repo="$target_dir-x86_64-ubuntu-2204"
+        folder_unpacked="clang+llvm-15.0.6-x86_64-linux-gnu-ubuntu-18.04"
     fi
 
     # just move all things to dj-zhou github
@@ -183,7 +187,7 @@ function _dj_setup_clang_llvm() {
     _show_and_run rm $repo -rf
     _show_and_run git clone $url
     _show_and_run cd $repo
-    _show_and_run cat clang-llvm* >$repo.tar.xz
+    _show_and_run ./merge-file.sh
 
     _show_and_run tar xf ${repo}.tar.xz
     _show_and_run sudo rm -rf /opt/$target_dir/
@@ -203,8 +207,10 @@ function _dj_setup_clang_llvm() {
         $asw = 'Yes') || ($asw = 'yes') ]]; then
         if [[ ${ubuntu_v} = *'18.04'* ]]; then
             _show_and_run cp ${djtools_path}/settings/vscode-settings-1804.json ~/.config/Code/User/settings.json
-        elif [[ ${ubuntu_v} = *'20.04'* || ${ubuntu_v} = *'22'* ]]; then
+        elif [[ ${ubuntu_v} = *'20.04'* ]]; then
             _show_and_run cp ${djtools_path}/settings/vscode-settings-2004.json ~/.config/Code/User/settings.json
+        elif [[ ${ubuntu_v} = *'22'* ]]; then
+            _show_and_run cp ${djtools_path}/settings/vscode-settings-2204.json ~/.config/Code/User/settings.json
         fi
     else
         echo "wrong answer, not setting applied!"
