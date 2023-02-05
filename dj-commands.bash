@@ -175,7 +175,7 @@ function _dj_setup_cli11() {
 # setting a fixed version is not a good idea, but ...
 function _dj_setup_cmake() {
     # install dependencies
-    _show_and_run _install_if_not_installed libssl-dev
+    _show_and_run _install_if_not_installed libssl-dev gcc g++
     new_v=$(_find_package_version cmake)
     v=v$new_v
     _echo_install CMake $v
@@ -569,7 +569,8 @@ function _dj_setup_python_3_9() {
         _show_and_run sudo add-apt-repository ppa:deadsnakes/ppa
         _show_and_run sudo apt-get -y update
     fi
-    _show_and_run _install_if_not_installed python3.9 python3.8
+    _show_and_run _install_if_not_installed python3.9
+    _show_and_run _install_if_not_installed python3.8
 
     # ----------------------
     echo -e "run update-alternatives:"
@@ -589,6 +590,36 @@ function _dj_setup_python_3_9() {
     # others ------------
     _show_and_run _install_if_not_installed python3-pip
     _show_and_run pip3 install --upgrade setuptools
+}
+
+# =============================================================================
+function _dj_setup_python_3_10() {
+    if [[ ! -f /etc/apt/sources.list.d/deadsnake*.list ]]; then
+        _show_and_run sudo add-apt-repository ppa:deadsnakes/ppa
+        _show_and_run sudo apt-get -y update
+    fi
+    _show_and_run _install_if_not_installed python3.10
+    _show_and_run _install_if_not_installed python3.9
+
+    # ----------------------
+    echo -e "run update-alternatives:"
+    for i in 3 4 6 7 8 9 10; do
+        if [ -f /usr/bin/python3.$i ]; then
+            _show_and_run sudo update-alternatives --install \
+                /usr/bin/python3 python3 /usr/bin/python3.$i $i
+        fi
+    done
+
+    # ----------------------
+    _show_and_run sudo update-alternatives --config python3
+
+    # install some related software package
+    _show_and_run _install_if_not_installed python3.10-distutils
+    _show_and_run _install_if_not_installed python3.9-distutils
+
+    # others ------------
+    _show_and_run _install_if_not_installed python3-pip
+    # _show_and_run pip3 install --upgrade setuptools # not working
 }
 
 # =============================================================================
@@ -1406,144 +1437,6 @@ function _dj_git_ssh_account_show_current() {
 }
 
 # =============================================================================
-function _dj_setup_vim_env() {
-    echo -e "setup the vim as an IDE"
-    _press_enter_or_wait_s_continue 10
-
-    _pushd_quiet ${PWD}
-
-    VIMRC=~/.vimrc
-
-    # install software, if not installed already
-    packages="vim ctags cscope build-essential cmake python-dev python3-dev "
-    _show_and_run _install_if_not_installed $packages
-
-    # install Vundle -- plugin manager
-    rm -rf ~/.vim/bundle/Vundle.vim
-    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-
-    # configure Vundle in ${VIMRC}
-    # also configure tagbar, nerdtree, ALE
-    rm -rf ${VIMRC}
-    echo '" ===========================================================' >>${VIMRC}
-    echo '" Vundle manage' >>${VIMRC}
-    echo 'set nocompatible      " be iMproved, required' >>${VIMRC}
-    echo -e 'filetype off          " required\n' >>${VIMRC}
-    echo '" set the runtime path to include Vundle and initialize' >>${VIMRC}
-    echo 'set rtp+=~/.vim/bundle/Vundle.vim' >>${VIMRC}
-    echo -e 'call vundle#begin()\n' >>${VIMRC}
-    echo '" let Vundle manage Vundle, required' >>${VIMRC}
-    printf "Plugin 'VundleVim/Vundle.vim'" >>${VIMRC}
-    printf "Plugin 'majutsushi/tagbar'" >>${VIMRC}
-    printf "Plugin 'scrooloose/nerdtree'" >>${VIMRC}
-    printf "Plugin 'w0rp/ale'" >>${VIMRC}
-    printf "Plugin 'Valloric/YouCompleteMe'" >>${VIMRC}
-    printf "Plugin 'ludovicchabant/vim-gutentags'\n" >>${VIMRC}
-    echo '" All of your Plugins must be added before the following line' >>${VIMRC}
-    echo 'call vundle#end()         " required' >>${VIMRC}
-    echo -e 'filetype plugin indent on " required\n\n' >>${VIMRC}
-    echo '" ===========================================================' >>${VIMRC}
-    echo '" cscope setup' >>${VIMRC}
-    echo '"-------------------------------------------' >>${VIMRC}
-    echo '" cscope to create database: cscope -Rbq' >>${VIMRC}
-    echo '" F5: to look for C symbol                              (s)' >>${VIMRC}
-    echo '" F6: to look for a string                              (t)' >>${VIMRC}
-    echo '" F7: to look for function definition                   (g)' >>${VIMRC}
-    echo '" F8: to look for which function calls current function (c)' >>${VIMRC}
-    echo '"-------------------------------------------' >>${VIMRC}
-    echo 'if has("cscope")' >>${VIMRC}
-    echo '  set csprg=/usr/bin/cscope' >>${VIMRC}
-    echo '  set csto=1' >>${VIMRC}
-    echo '  set cst' >>${VIMRC}
-    echo '  set nocsverb' >>${VIMRC}
-    echo '  " add any database in current directory' >>${VIMRC}
-    echo '  if filereadable("cscope.out")' >>${VIMRC}
-    echo '    cs add cscope.out' >>${VIMRC}
-    echo '  endif' >>${VIMRC}
-    echo '  set csverb' >>${VIMRC}
-    echo -e 'endif\n' >>${VIMRC}
-
-    echo ':set cscopequickfix=s-,c-,d-,i-,t-,e-' >>${VIMRC}
-    echo '"nmap <C-_>s :cs find s <C-R>=expand("<cword>")<CR><CR>' >>${VIMRC}
-    echo 'nmap <silent> <F5> :cs find s <C-R>=expand("<cword>")<CR><CR>' >>${VIMRC}
-    echo 'nmap <silent> <F6> :cs find g <C-R>=expand("<cword>")<CR><CR>' >>${VIMRC}
-    echo 'nmap <silent> <F7> :cs find t <C-R>=expand("<cword>")<CR><CR>' >>${VIMRC}
-    echo 'nmap <silent> <F8> :cs find c <C-R>=expand("<cword>")<CR><CR>' >>${VIMRC}
-    echo -e '\n' >>${VIMRC}
-    echo '" ===========================================================' >>${VIMRC}
-    echo '" Tagbar setup' >>${VIMRC}
-    echo 'let g:tagbar_width=25' >>${VIMRC}
-    echo 'autocmd BufReadPost *.cpp,*.c,*.hpp,s*.h,*.cc,*.cxx call tagbar#autoopen()' >>${VIMRC}
-    echo -e '\n' >>${VIMRC}
-    echo '" ===========================================================' >>${VIMRC}
-    echo '" Nerdtree setup' >>${VIMRC}
-    echo 'autocmd StdinReadPre * let s:std_in=1' >>${VIMRC}
-    echo -e 'autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif' >>${VIMRC} # this line does not work?
-    echo -e 'let NERDTreeWinSize=15' >>${VIMRC}
-    echo -e 'let NERDTreeShowLineNumbers=1' >>${VIMRC}
-    echo -e 'let NERDTreeAutoCenter=1' >>${VIMRC}
-    echo -e 'let NERDTreeShowBookmarks=1' >>${VIMRC}
-    echo -e '\n' >>${VIMRC}
-    echo '" ===========================================================' >>${VIMRC}
-    echo '" ALE (Asynchronization Line Engine) setup' >>${VIMRC}
-    printf "let g:ale_sign_column_always = 1" >>${VIMRC}
-    printf "let g:ale_sign_error = '>>'" >>${VIMRC}
-    printf "let g:ale_sign_warning = '--'" >>${VIMRC}
-    printf "let g:ale_statusline_format = ['x %%d', 'z %%d', 'y OK']" >>${VIMRC}
-    printf "let g:ale_echo_msg_format = '[%%linter%%] %%code: %%%%s'" >>${VIMRC}
-    printf "let g:ale_lint_on_text_changed = 'normal'" >>${VIMRC}
-    printf "let g:ale_lint_on_insert_leave = 1" >>${VIMRC}
-    printf "let g:ale_c_gcc_options = '-Wall -O2 -std=c99'" >>${VIMRC}
-    printf "let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++20'" >>${VIMRC}
-    printf "let g:ale_c_cppcheck_options = ' '" >>${VIMRC}
-    printf "let g:ale_cpp_cppcheck_options = ' '" >>${VIMRC}
-    echo -e '\n' >>${VIMRC}
-    echo '" ===========================================================' >>${VIMRC}
-    echo '" YouCompleteMe setup' >>${VIMRC}
-    printf "let g:ycm_server_python_interpreter='/usr/bin/python3'" >>${VIMRC}
-    printf "let g:ycm_global_ycm_extra_conf='~/.vim/.ycm_extra_conf.py'" >>${VIMRC}
-    echo -e '\n\n' >>${VIMRC}
-    echo '" ===========================================================' >>${VIMRC}
-    echo '" vim-gutentags setup' >>${VIMRC}
-    printf "let g:gutentags_project_root= ['.root', '.svn', '.git', '.hg',  '.project']" >>${VIMRC}
-    printf "let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']" >>${VIMRC}
-    printf "let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']" >>${VIMRC}
-    printf "let g:gutentags_ctags_extra_args += ['--c-kinds=+px']" >>${VIMRC}
-    echo -e '\n' >>${VIMRC}
-    echo '" ===========================================================' >>${VIMRC}
-    echo '" some other setup' >>${VIMRC}
-    echo 'set nu! " display line number' >>${VIMRC}
-    echo 'syntax enable' >>${VIMRC}
-    echo 'syntax on' >>${VIMRC}
-    echo 'colorscheme desert' >>${VIMRC}
-    echo -e ':set autowrite "auto save\n\n' >>${VIMRC}
-
-    echo -e "\n\n to make effects of the plugins, start vim, and enter:"
-    echo -e " :PluginInstall"
-    echo -e "YouCompleteMe needs to be compiled after the plugins are installed:"
-    echo -e "  dj setup you-complete-me"
-
-    _popd_quiet
-}
-
-# =============================================================================
-function _dj_setup_you_complete_me() {
-    _show_and_run _pushd_quiet ${PWD}
-
-    folder=~/.vim/bundle/YouCompleteMe
-    if [ -d $folder ]; then
-        cd $folder
-        ./install.py --clang-completer
-        cp third_party/ycmd/examples/.ycm_extra_conf.py ~/.vim/
-    else
-        echo "You need to install the YouCompleteMe plugin for Vim by"
-        echo -e "dj setup vim-env"
-    fi
-
-    _popd_quiet
-}
-
-# =============================================================================
 function _dj_flame_grapah() {
     if [ "$1" = 'clear' ]; then
         _show_and_run sudo rm -f perf.data.old
@@ -1690,7 +1583,7 @@ function dj() {
                 _dj_git_ssh_clone_from "$@"
                 return
             fi
-            _dj_clone_help
+            _dj_ssh_clone_help
             return
         fi
         echo 'dj git: argument not supported, exit.'

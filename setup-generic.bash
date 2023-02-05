@@ -4,15 +4,15 @@ setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-ide baidu-netdi
 setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools "
 setup_list+="driver dropbox eigen3 fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
 setup_list+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-setup_list+="gitg-gitk glfw3 glog gnome gnuplot google-repo grpc gtest g++-10 g++-11 i219-v kdiff3-meld "
+setup_list+="gitg-gitk glfw3 glog gnome gnuplot google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd mathpix "
 setup_list+="matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
-setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 "
-setup_list+="pangolin perf picocom pip plotjuggler protobuf pycharm python3.9 qemu qt-5.13.1 qt-5.14.2 "
+setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf "
+setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu qt-5.13.1 qt-5.14.2 "
 setup_list+="ros-melodic ros-noetic ros2-foxy rpi-pico rust saleae-logic serial-console spdlog slack "
 setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
-setup_list+="stm32-cube-programmer stm32-tools sublime texlive tldr typora vim-env vscode vtk-8.2.0 "
-setup_list+="windows-fonts wireshark wubi yaml-cpp you-complete-me "
+setup_list+="stm32-cube-programmer stm32-tools sublime texlive tldr typora vscode vtk-8.2.0 "
+setup_list+="windows-fonts wireshark wubi yaml-cpp "
 
 # =============================================================================
 function _dj_setup_help() {
@@ -220,8 +220,8 @@ function _dj_setup_computer() {
 
     # -----------------------------------
     _press_enter_or_wait_s_continue 5
-    packages="ark cmake curl dconf-editor dconf-tools git "
-    packages+="git-lfs g++ htop libgtk2.0-dev libncurses5-dev lsb-core "
+    packages="ark cmake curl dconf-editor dconf-tools gedit git "
+    packages+="git-lfs g++ kazam libgtk2.0-dev libncurses5-dev lsb-core "
     packages+="scrot terminator tree vlc vim wmctrl xclip yasm "
     _show_and_run _install_if_not_installed $packages
 
@@ -265,6 +265,8 @@ function _dj_setup_computer() {
         _press_enter_or_wait_s_continue 5
         _show_and_run _install_if_not_installed gnome-screensaver
     fi
+
+    _show_and_run dj setup htop
     # -----------------------------------
     echo -e "${CYN}time & date control, please run command:${NOC}"
     echo "$ timedatectl set-local-rtc 1"
@@ -705,6 +707,24 @@ function _dj_setup_gitg_gitk() {
 }
 
 # =============================================================================
+function _dj_setup_htop() {
+    _pushd_quiet ${PWD}
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    local v=$(_find_package_version htop)
+    _show_and_run rm -rf htop
+    _show_and_run git clone https://github.com/htop-dev/htop.git
+    _show_and_run cd htop
+    _show_and_run git checkout $v
+    _show_and_run ./autogen.sh
+    _show_and_run ./configure
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
+}
+
+# =============================================================================
 # make sure the related package is public available in dj-zhou's github
 function _dj_setup_i219_v() {
     _show_and_run _pushd_quiet ${PWD}
@@ -1073,12 +1093,19 @@ function _dj_setup_magic_enum() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm -rf magic_enum
+    _show_and_run sudo rm -rf magic_enum
 
-    ver=$(_find_package_version magic-enum)
+    gpp_v=$(version check g++)
+    anw=$(_version_if_ge_than $gpp_v "12.0.0")
+    if [ $anw="yes" ]; then
+        echo_warn "g++ > 12.0.0 does not support extended characters"
+        ver="0.7.3"
+    else
+        ver=$(_find_package_version magic-enum)
+    fi
     _show_and_run git clone https://github.com/Neargye/magic_enum.git
     _show_and_run cd magic_enum
-    _show_and_run git checkout $ver
+    _show_and_run git checkout v$ver
     _show_and_run rm build -rf
     _show_and_run mkdir build
     _show_and_run cd build
@@ -1177,6 +1204,7 @@ function _dj_setup_meson_ninjia() {
 
     # install needed software
     _show_and_run _install_if_not_installed python3
+    _show_and_run _install_if_not_installed python3-pip
 
     # meson release: https://github.com/mesonbuild/meson/releases
     _show_and_run python3 -m pip install meson==$meson_v
@@ -1729,7 +1757,7 @@ function _dj_setup_typora() {
     sudo add-apt-repository 'deb https://typora.io/linux ./'
     sudo apt-get -y update
     # install typora
-    _show_and_run _install_if_not_installed typora
+    _show_and_run sudo apt install -y typora
 }
 
 # =============================================================================
@@ -2060,6 +2088,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'htop' ]; then
+        _dj_setup_htop
+        return
+    fi
+    # --------------------------
     if [ $1 = 'i219-v' ]; then
         _dj_setup_i219_v $2
         return
@@ -2234,6 +2267,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'python3.10' ]; then
+        _dj_setup_python_3_10
+        return
+    fi
+    # --------------------------
     if [ $1 = 'qemu' ]; then
         _dj_setup_qemu $2 $3 $4 $5
         return
@@ -2351,11 +2389,6 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'vim-env' ]; then
-        _dj_setup_vim_env
-        return
-    fi
-    # --------------------------
     if [ $1 = 'vscode' ]; then
         _dj_setup_vscode
         return
@@ -2379,11 +2412,6 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'wubi' ]; then
         _dj_setup_wubi
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'you-complete-me' ]; then
-        _dj_setup_you_complete_me
         return
     fi
     # --------------------------

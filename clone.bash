@@ -17,17 +17,16 @@ function _dj_clone_repo_list() { # platform
 }
 
 # =============================================================================
-function _dj_clone_help() {
+function _dj_ssh_clone_help() {
     _dj_help
     cat <<eom
-
- ---------------------- dj clone/ssh-clone ------------------------
+ ------------------------- dj ssh-clone ---------------------------
  Second level commands:
     bitbuket - to clone repo from BitBucket
     github   - to clone repo from GitHub
 
  Third level argument:
-    --add        - to add the $4 argument into a repo file in ~ directory
+    --add        - to add the an argument into a repo file in ~ directory
                    such that the command "dj ssh-clone github" can tab-complete with
                    repo names
     <repo name>  - to clone a repo from a platform
@@ -81,7 +80,7 @@ function _dj_git_ssh_clone_from() {
     # if not, ask if add it to it
     listed_repos="$(_dj_clone_repo_list $platform)"
     if [[ ! "$listed_repos" = *"$repo_name"* ]]; then
-        echo -e "do you want to add ${GRN}$repo_name${NOC} to ${GRN}~/.$platform-repos-$uname${NOC}[y/n]?"
+        echo -e "do you want to add ${GRN}$repo_name${NOC} to ${GRN}~/.$platform-repos-$uname${NOC} [y/n]?"
         read asw
         if [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || (
             $asw = 'Yes') || ($asw = 'yes') ]]; then

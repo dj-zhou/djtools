@@ -9,6 +9,7 @@ fmt 9.1.0
 glog v0.6.0       # April 5th, 2022
 googletest 1.11.0 # June 11, 2021
 grpc 1.50.1  # Oct. 27th, 2022
+htop 3.0.1
 lcm 501bb446d42c9a57f9e5ddf3c41ba78f4735c9f2 # master on Dec. 1st, 2020
 libbpf v0.7.0 #Feb. 10th, 2022
 libev 4.33
@@ -19,11 +20,11 @@ libsystemd v248
 nlohmann-json3 v3.11.1 # Aug 1st, 2022
 nodejs 16.14.0 # Feb 1, 2022, (includes npm 8.3.1??)
 nvm v0.39.1 # Nov 17, 2021
-magic-enum v0.8.2 # Dec. 9th, 2022
+magic-enum 0.8.2 # Dec. 9th, 2022
 matplotplusplus c088749434154c230ee7547c6871d65e58876dc6 # latest greatest master on Sep 18th, 2021
 meson 0.61.5 # June. 2nd, 2022, https://github.com/mesonbuild/meson/releases
 mongodb 4.4
-ninja v1.11.0 # May 15th, 2022, https://github.com/ninja-build/ninja/releases
+ninja 1.11.0 # May 15th, 2022, https://github.com/ninja-build/ninja/releases
 picocom 3.1   # March 1st, 2018
 pico-sdk 1.3.0 # Nov.1st, 2021
 pico-examples sdk-1.3.0 # Nov.1st, 2021
