@@ -2,7 +2,7 @@
 
 setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-ide baidu-netdisk boost can-analyzer "
 setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools "
-setup_list+="driver dropbox eigen3 fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
+setup_list+="driver dropbox eigen3 esp32-idf fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
 setup_list+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
 setup_list+="gitg-gitk glfw3 glog gnome gnuplot google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd mathpix "
@@ -355,6 +355,53 @@ function _dj_setup_eigen3() {
     _verify_header_files Eigen /usr/local/include/eigen3/Eigen
     _verify_header_files Eigen /usr/include/eigen3/Eigen
 
+    _popd_quiet
+}
+
+# =============================================================================
+function _dj_setup_esp32_idf() {
+    _show_and_run _pushd_quiet ${PWD}
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    _show_and_run _install_if_not_installed git wget flex bison gperf python3 python3-venv python3-setuptools cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+
+    # make sure CMake is newer than 3.16
+    cmake_v=$(version check cmake)
+    anw=$(_version_if_ge_than $cmake_v "3.16")
+    if [[ "$anw" = 'no' ]]; then
+        echo_info "need to install new version of CMake"
+        dj setup cmake
+    fi
+
+    # make sure ninja is installed
+    which_meson=$(which meson)
+    which_ninja=$(which ninja)
+    if [[ -z "$which_meson" || -z "$which_ninja" ]]; then
+        _show_and_run dj setup meson-ninja
+    else
+        echo "meson version: $(meosn --version)"
+        echo "ninja version: $(ninja --version)"
+    fi
+
+    # clone esp repo
+    if [ -d "esp-idf" ]; then
+        _show_and_run cd esp-idf
+        _show_and_run git checkout master
+        _show_and_run git pull
+    else
+        _show_and_run git clone --recursive https://github.com/espressif/esp-idf.git
+        _show_and_run cd esp-idf
+    fi
+
+    # setup for all target
+    _show_and_run ./install.sh all # esp32s3, etc
+    # ./install.sh esp32,esp32s2
+
+    # setup env, this is not a good idea! We should only source it when develop ESP32 chips
+    # _show_and_run write_in_file "source $soft_dir/esp-idf/export.sh" ${HOME}/.bashrc
+    # this is better:
+    _show_and_run write_in_file "alias get_esp32_idf='source $soft_dir/esp-idf/export.sh'" ${HOME}/.bashrc
     _popd_quiet
 }
 
@@ -1978,6 +2025,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'eigen3' ]; then
         _dj_setup_eigen3
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'esp32-idf' ]; then
+        _dj_setup_esp32_idf
         return
     fi
     # --------------------------

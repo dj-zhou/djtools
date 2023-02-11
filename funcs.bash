@@ -525,3 +525,11 @@ function tic-toc() {
     fi
     echo "$us s)"
 }
+
+# =============================================================================
+# write text $1 into file $2, if $1 does not exits in $2
+write_in_file() {
+    if ! grep -Fxq "$1" "$2"; then
+        echo "$1" >>"$2"
+    fi
+}
