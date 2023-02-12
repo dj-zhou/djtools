@@ -2,7 +2,7 @@
 
 setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-ide baidu-netdisk boost can-analyzer "
 setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools "
-setup_list+="driver dropbox eigen3 esp32-idf fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
+setup_list+="driver dropbox eigen3 esp-idf fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
 setup_list+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
 setup_list+="gitg-gitk glfw3 glog gnome gnuplot google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd mathpix "
@@ -359,7 +359,7 @@ function _dj_setup_eigen3() {
 }
 
 # =============================================================================
-function _dj_setup_esp32_idf() {
+function _dj_setup_esp_idf() {
     _show_and_run _pushd_quiet ${PWD}
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
@@ -2028,8 +2028,8 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'esp32-idf' ]; then
-        _dj_setup_esp32_idf
+    if [ $1 = 'esp-idf' ]; then
+        _dj_setup_esp_idf
         return
     fi
     # --------------------------
