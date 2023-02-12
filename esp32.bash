@@ -34,7 +34,6 @@ function _esp32_build() {
 
     _show_and_run idf.py set-target $target
     _show_and_run idf.py build
-    # _show_and_run $ idf.py -p /dev/ttyACM0 flash
 }
 
 # =============================================================================
@@ -43,8 +42,16 @@ function _esp32_flash() {
     local dev="$1"
     _esp32_source_env
 
-    source ~/soft/esp-idf/export.sh
     _show_and_run idf.py -p $dev flash
+}
+
+# =============================================================================
+# note: it seems the start address is different for different esp32 chips
+function _esp32_monitor() {
+    local dev="$1"
+    _esp32_source_env
+    # _show_and_run source ~/soft/esp-idf/export.sh
+    _show_and_run idf.py -p $dev monitor
 }
 
 # =============================================================================
@@ -61,6 +68,12 @@ function esp32() {
         _esp32_flash "$@"
         return
     fi
+    # ------------------------------
+    if [ $1 = 'monitor' ]; then
+        shift 1
+        _esp32_monitor "$@"
+        return
+    fi
 
     echo -e "${GRN}esp32${NOC}: argument ${RED}$1${NOC} not supported."
     return
@@ -71,7 +84,7 @@ function _esp32() {
     COMPREPLY=()
 
     # All possible first values in command line
-    service="build flash "
+    service="build flash monitor "
     local SERVICES=("
         $service
     ")
@@ -90,6 +103,13 @@ function _esp32() {
     # flash_list+="$(ls /dev/ttyUSB*) "
     ACTIONS[flash]="$flash_list "
     for i in $flash_list; do
+        ACTIONS[$i]=" "
+    done
+    # -----------------------------------------------------
+    monitor_list="$flash_list "
+    # flash_list+="$(ls /dev/ttyUSB*) "
+    ACTIONS[monitor]="$monitor_list "
+    for i in $monitor_list; do
         ACTIONS[$i]=" "
     done
 
