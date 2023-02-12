@@ -1,25 +1,6 @@
 #!/bin/bash
 
 # =============================================================================
-function _esp32_build() {
-    local target="$1"
-    if [ -z "$IDF_PATH" ]; then
-        # todo: use some good path
-        if [ -f ~/soft/esp-idf/export.sh ]; then
-            source ~/soft/esp-idf/export.sh
-        else
-            echo_error "ESP-IDF is not setup yet"
-            echo_info "run \"dj setup esp-idf\" to set it up"
-            return
-        fi
-    fi
-
-    _show_and_run idf.py set-target $target
-    _show_and_run idf.py build
-    # _show_and_run $ idf.py -p /dev/ttyACM0 flash
-}
-
-# =============================================================================
 function _esp32_find_serial_port() {
     ls -l /dev/ttyUSB* 2>/dev/null | grep -q ttyUSB
     if [ $? -eq 0 ]; then
@@ -31,20 +12,37 @@ function _esp32_find_serial_port() {
         echo "$(ls /dev/ttyACM*) "
     fi
 }
+
 # =============================================================================
-# note: it seems the start address is different for different esp32 chips
-function _esp32_flash() {
-    local dev="$1"
+function _esp32_source_env() {
     if [ -z "$IDF_PATH" ]; then
         # todo: use some good path
         if [ -f ~/soft/esp-idf/export.sh ]; then
-            source ~/soft/esp-idf/export.sh
+            _show_and_run source ~/soft/esp-idf/export.sh
         else
             echo_error "ESP-IDF is not setup yet"
             echo_info "run \"dj setup esp-idf\" to set it up"
             return
         fi
     fi
+}
+
+# =============================================================================
+function _esp32_build() {
+    local target="$1"
+    _esp32_source_env
+
+    _show_and_run idf.py set-target $target
+    _show_and_run idf.py build
+    # _show_and_run $ idf.py -p /dev/ttyACM0 flash
+}
+
+# =============================================================================
+# note: it seems the start address is different for different esp32 chips
+function _esp32_flash() {
+    local dev="$1"
+    _esp32_source_env
+
     source ~/soft/esp-idf/export.sh
     _show_and_run idf.py -p $dev flash
 }
