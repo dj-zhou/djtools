@@ -1698,6 +1698,10 @@ function _dj_setup_saleae_logic() {
 function _dj_setup_serial_console() {
     _show_and_run _pushd_quiet "${PWD}"
 
+    if [[ ${ubuntu_v} = *'22.04'* ]]; then
+        _show_and_run sudo apt remove brltty
+    fi
+
     _show_and_run _install_if_not_installed cu screen putty screen
 
     _show_and_run _dj_setup_cutecom

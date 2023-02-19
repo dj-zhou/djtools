@@ -846,12 +846,24 @@ function _dj_setup_stm32_tools() {
     _press_enter_or_wait_s_continue 5
 
     # remove a package that makes problem!
-    _show_and_run sudo apt remove brltty
+    if [[ ${ubuntu_v} = *'22.04'* ]]; then
+        _show_and_run sudo apt remove brltty
+    fi
     # install dependencies and some software ----------------
     packages="libusb-1.0.0-dev gtk+-3.0 cu putty screen cmake "
     _show_and_run _install_if_not_installed $packages
     # install cutecom from source ----------------
     _dj_setup_cutecom
+
+    # install ch340 driver ----------------
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm -rf CH341SER
+    _show_and_run git clone https://github.com/juliagoda/CH341SER.git
+    _show_and_run cd CH341SER
+    _show_and_run make
+    _show_and_run make load
 
     # install stlink ----------------
     _echo_install "stlink"
