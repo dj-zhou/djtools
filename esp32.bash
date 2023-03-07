@@ -46,6 +46,11 @@ function _esp32_flash() {
 }
 
 # =============================================================================
+function _esp32_get_env() {
+    _esp32_source_env
+}
+
+# =============================================================================
 # note: it seems the start address is different for different esp32 chips
 function _esp32_monitor() {
     local dev="$1"
@@ -69,6 +74,11 @@ function esp32() {
         return
     fi
     # ------------------------------
+    if [ $1 = 'get-env' ]; then
+        _esp32_get_env
+        return
+    fi
+    # ------------------------------
     if [ $1 = 'monitor' ]; then
         shift 1
         _esp32_monitor "$@"
@@ -84,7 +94,7 @@ function _esp32() {
     COMPREPLY=()
 
     # All possible first values in command line
-    service="build flash monitor "
+    service="build flash get-env monitor "
     local SERVICES=("
         $service
     ")
@@ -105,6 +115,8 @@ function _esp32() {
     for i in $flash_list; do
         ACTIONS[$i]=" "
     done
+    # -----------------------------------------------------
+    ACTIONS["get-env"]="  "
     # -----------------------------------------------------
     monitor_list="$flash_list "
     # flash_list+="$(ls /dev/ttyUSB*) "

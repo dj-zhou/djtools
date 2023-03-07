@@ -401,7 +401,7 @@ function _dj_setup_esp_idf() {
     # setup env, this is not a good idea! We should only source it when develop ESP32 chips
     # _show_and_run write_in_file "source $soft_dir/esp-idf/export.sh" ${HOME}/.bashrc
     # this is better:
-    _show_and_run write_in_file "alias get_esp32_idf='source $soft_dir/esp-idf/export.sh'" ${HOME}/.bashrc
+    _show_and_run write_in_file "alias get_esp_idf='source $soft_dir/esp-idf/export.sh'" ${HOME}/.bashrc
     _popd_quiet
 }
 
