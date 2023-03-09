@@ -1814,8 +1814,8 @@ function _dj_setup_thermal_printer() {
     _show_and_run cd rollo
     _show_and_run wget https://www.rollo.com/driver-dl/beta/rollo-driver-raspberrypi-beta.zip
     _show_and_run unzip rollo-driver-raspberrypi-beta.zip
-    _show_and_run chmod +x install.sh
-    _show_and_run sudo ./install.sh
+    _show_and_run chmod +x install.run
+    _show_and_run sudo ./install.run
 
     _show_and_run sudo cupsctl --remote-admin --remote-any --share-printers
     _show_and_run sudo /etc/init.d/cups restart
