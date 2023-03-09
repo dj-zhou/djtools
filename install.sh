@@ -44,3 +44,5 @@ echo -e "usernames set wrong, you can still edit them in ~/.bashrc"
 echo "source $djtools_path/djtools.bash" >>~/.bashrc
 echo -e "djtools installation finished."
 echo -e "\n" >>~/.bashrc
+
+mkdir -p ~/.ssh
