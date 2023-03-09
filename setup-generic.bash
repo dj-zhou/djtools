@@ -2454,7 +2454,7 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'therma-printer' ]; then
+    if [ $1 = 'thermal-printer' ]; then
         _dj_setup_thermal_printer
         return
     fi
