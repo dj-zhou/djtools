@@ -1797,7 +1797,7 @@ function _dj_setup_texlive() {
 # =============================================================================
 function _dj_setup_thermal_printer() {
     if [[ ! "${ubuntu_v}" = *'Raspbian'*'bullseye'* ]]; then
-        echo "ony tested on Raspbian (bullseye), exit."
+        echo_warn "only tested on Raspbian (bullseye), exit."
         return
     fi
 
