@@ -1800,10 +1800,18 @@ function _dj_setup_thermal_printer() {
         echo "ony tested on Raspbian (bullseye), exit."
         return
     fi
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
     _show_and_run sudo apt-get update -y
     _show_and_run sudo apt-get upgrade -y
     _show_and_run sudo apt install cups
     _show_and_run sudo usermod -a -G lpadmin $USER
+
+    _show_and_run rm -rf rollo
+    _show_and_run mkdir rollo
+    _show_and_run cd rollo
     _show_and_run wget https://www.rollo.com/driver-dl/beta/rollo-driver-raspberrypi-beta.zip
     _show_and_run unzip rollo-driver-raspberrypi-beta.zip
     _show_and_run chmod +x install.sh
@@ -1811,6 +1819,8 @@ function _dj_setup_thermal_printer() {
 
     _show_and_run sudo cupsctl --remote-admin --remote-any --share-printers
     _show_and_run sudo /etc/init.d/cups restart
+
+    _popd_quiet
 }
 
 # =============================================================================
