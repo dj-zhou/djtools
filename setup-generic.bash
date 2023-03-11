@@ -11,7 +11,7 @@ setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv
 setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu qt-5.13.1 qt-5.14.2 "
 setup_list+="ros-melodic ros-noetic ros2-foxy rpi-pico rust saleae-logic serial-console spdlog slack "
 setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
-setup_list+="stm32-cube-programmer stm32-tools sublime texlive tldr typora vscode vtk-8.2.0 "
+setup_list+="stm32-cube-programmer stm32-tools sublime texlive thermal-printer tldr typora vscode vtk-8.2.0 "
 setup_list+="windows-fonts wireshark wubi yaml-cpp "
 
 # =============================================================================
@@ -1795,6 +1795,41 @@ function _dj_setup_texlive() {
 }
 
 # =============================================================================
+function _dj_setup_thermal_printer() {
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    _show_and_run sudo apt-get update -y
+    _show_and_run sudo apt-get upgrade -y
+    _show_and_run sudo apt install cups
+    _show_and_run sudo usermod -a -G lpadmin $USER
+
+    _show_and_run rm -rf rollo
+    _show_and_run mkdir rollo
+    _show_and_run cd rollo
+    if [[ "${ubuntu_v}" = *'Raspbian'*'bullseye'* ]]; then
+        _show_and_run wget https://www.rollo.com/driver-dl/beta/rollo-driver-raspberrypi-beta.zip
+        _show_and_run unzip rollo-driver-raspberrypi-beta.zip
+        _show_and_run chmod +x install.run
+        _show_and_run sudo ./install.run
+    elif [[ "${ubuntu_v}" = *'Ubuntu'*'22'* ]]; then
+        local f="rollo-driver-ubuntu_x86_64_v1.0.2"
+        _show_and_run wget https://rollo-main.b-cdn.net/driver-dl/beta/${f}.tar.gz
+        _show_and_run dj unpack tar.gz ${f}.tar.gz
+        _show_and_run cd ${f}/${f}/ubuntu_x86_64_v1.0.2
+        _show_and_run sudo ./install
+    else
+        echo_warn "Not tested platform, exit."
+        return
+    fi
+
+    _show_and_run sudo cupsctl --remote-admin --remote-any --share-printers
+    _show_and_run sudo /etc/init.d/cups restart
+
+    _popd_quiet
+}
+
+# =============================================================================
 function _dj_setup_tldr() {
     _show_and_run _install_if_not_installed tldr
     echo "example: $ tldr tar"
@@ -2432,6 +2467,11 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'texlive' ]; then
         _dj_setup_texlive
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'thermal-printer' ]; then
+        _dj_setup_thermal_printer
         return
     fi
     # --------------------------
