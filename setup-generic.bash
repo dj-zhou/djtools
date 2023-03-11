@@ -1796,11 +1796,6 @@ function _dj_setup_texlive() {
 
 # =============================================================================
 function _dj_setup_thermal_printer() {
-    if [[ ! "${ubuntu_v}" = *'Raspbian'*'bullseye'* ]]; then
-        echo_warn "only tested on Raspbian (bullseye), exit."
-        return
-    fi
-
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
@@ -1812,10 +1807,21 @@ function _dj_setup_thermal_printer() {
     _show_and_run rm -rf rollo
     _show_and_run mkdir rollo
     _show_and_run cd rollo
-    _show_and_run wget https://www.rollo.com/driver-dl/beta/rollo-driver-raspberrypi-beta.zip
-    _show_and_run unzip rollo-driver-raspberrypi-beta.zip
-    _show_and_run chmod +x install.run
-    _show_and_run sudo ./install.run
+    if [[ "${ubuntu_v}" = *'Raspbian'*'bullseye'* ]]; then
+        _show_and_run wget https://www.rollo.com/driver-dl/beta/rollo-driver-raspberrypi-beta.zip
+        _show_and_run unzip rollo-driver-raspberrypi-beta.zip
+        _show_and_run chmod +x install.run
+        _show_and_run sudo ./install.run
+    elif [[ "${ubuntu_v}" = *'Ubuntu'*'22'* ]]; then
+        local f="rollo-driver-ubuntu_x86_64_v1.0.2"
+        _show_and_run wget https://rollo-main.b-cdn.net/driver-dl/beta/${f}.tar.gz
+        _show_and_run dj unpack tar.gz ${f}.tar.gz
+        _show_and_run cd ${f}/${f}/ubuntu_x86_64_v1.0.2
+        _show_and_run sudo ./install
+    else
+        echo_warn "Not tested platform, exit."
+        return
+    fi
 
     _show_and_run sudo cupsctl --remote-admin --remote-any --share-printers
     _show_and_run sudo /etc/init.d/cups restart
