@@ -154,7 +154,7 @@ function _dj_setup_ros2_foxy_from_deb_package() {
     curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 
     # setup sources.list ---------------
-    if [ ! -f /etc/apt/sources.list.d/ros2-latest.list ]; then
+    if [[ ! -f /etc/apt/sources.list.d/ros2-latest.list ]]; then
         sudo sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
     fi
 
@@ -174,7 +174,7 @@ function _dj_setup_ros2_foxy_from_deb_package() {
         fi
     done <~/.bashrc
 
-    if [ $installed = 0 ]; then
+    if [[ $installed = 0 ]]; then
         echo -e '\n' >>~/.bashrc
         echo '# ===========================================================' >>~/.bashrc
         echo '# (djtools) ROS 2 setup' >>~/.bashrc
@@ -202,11 +202,11 @@ eom
 
 # =============================================================================
 function _dj_setup_ros2_foxy() {
-    if [ $1 = '--from-deb-package' ]; then
+    if [[  $# = 0  || $1 = '--from-deb-package' ]]; then
         _dj_setup_ros2_foxy_from_deb_package
         return
     fi
-    if [ $1 = '--from-source' ]; then
+    if [[ $1 = '--from-source' ]]; then
         echo "from source: todo"
         return
     fi

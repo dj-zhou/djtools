@@ -142,9 +142,8 @@ function _system_wallpaper_random() {
     done <~/.bashrc
 
     if [ $wallpaper_folder_is_set = 0 ]; then
-        echo -e "variable ${GRN}wallpaper_folder${NOC} is NOT set. please enter a path of the wallpapers: "
+        echo -e "variable ${GRN}wallpaper_folder${NOC} is NOT set, please enter a path of the wallpapers: "
         read answer
-
         echo '# ===========================================================' >>~/.bashrc
         echo '# (djtools) wallpaper setup' >>~/.bashrc
         echo 'wallpaper_folder='$answer >>~/.bashrc
