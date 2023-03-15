@@ -1479,6 +1479,8 @@ function _dj_setup_nvidia() {
         _show_and_run _install_if_not_installed nvidia-driver-455 nvidia-settings
     elif [[ "${ubuntu_v}" = *'20.04'* ]]; then
         _show_and_run _install_if_not_installed nvidia-driver-470 nvidia-settings
+    elif [[ "${ubuntu_v}" = *'22.04'* ]]; then
+        _show_and_run _install_if_not_installed nvidia-driver-470 nvidia-settings
     fi
     cat <<eom
 --------------------------------------------
@@ -1494,20 +1496,25 @@ eom
 # =============================================================================
 function _dj_setup_nvtop() {
     _show_and_run _pushd_quiet ${PWD}
-
-    if [[ "${ubuntu_v}" = *'18.04'* ||
-        "${ubuntu_v}" = *'20.04'* ]]; then
-        _show_and_run mkdir -p $soft_dir
-        _show_and_run cd $soft_dir
-        _show_and_run rm nvtop -rf
-        _show_and_run git clone https://github.com/Syllo/nvtop.git
-        _show_and_run cd nvtop
-        _show_and_run mkdir build
-        _show_and_run cd build
-        _show_and_run cmake .. -DNVML_RETRIEVE_HEADER_ONLINE=True
-        _show_and_run make -j$(nproc)
-        _show_and_run sudo make install
+    if [[ "${ubuntu_v}" != *'18.04'* &&
+        "${ubuntu_v}" != *'20.04'* &&
+        "${ubuntu_v}" != *'22.04'* ]]; then
+        echo_error "not tested platform, exit"
+        return
     fi
+
+    _install_if_not_installed libudev-dev libdrm-dev libdrm-amdgpu1
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm nvtop -rf
+    _show_and_run git clone https://github.com/Syllo/nvtop.git
+    _show_and_run cd nvtop
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake .. -DNVML_RETRIEVE_HEADER_ONLINE=True
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     _popd_quiet
 }
