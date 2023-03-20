@@ -6,8 +6,28 @@ function _rpi_help() {
 }
 
 # =============================================================================
-function _rpi_setup_waveshare_7_inch_screen() {
-    echo "_rpi_setup_waveshare_7_inch_screen: todo"
+# https://www.waveshare.com/wiki/7inch_DSI_LCD_(C)
+function _rpi_setup_waveshare_dsi_lcd() {
+    _show_and_run _pushd_quiet ${PWD}
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm -rf Waveshare-DSI-LCD
+    _show_and_run git clone https://github.com/waveshare/Waveshare-DSI-LCD
+    _show_and_run cd Waveshare-DSI-LCD
+
+    release="$(uname -r)"
+    if [[ "${release}" = "5.15.61"* ]]; then
+        cd "5.15.61"
+    elif [[ "${release}" = "5.15.76"* ]]; then
+        cd "5.15.76"
+    elif [[ "${release}" = "5.15.84"* ]]; then
+        cd "5.15.84"
+    else
+        echo_warn "${release} is not supported, exit."
+        return
+    fi
+    _popd_quiet
 }
 
 # =============================================================================
@@ -20,9 +40,9 @@ function rpi() {
 
     # ------------------------------
     if [ $1 = 'setup' ]; then
-        if [ $2 = 'wave-share-7-inch-screen' ]; then
+        if [ $2 = 'waveshare-dsi-lcd' ]; then
             shift 1
-            _rpi_setup_waveshare_7_inch_screen "$@"
+            _rpi_setup_waveshare_dsi_lcd "$@"
             return
         fi
         echo "rpi setup: $2 is not supported"
@@ -47,7 +67,7 @@ function _rpi() {
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
-    setup_list="wave-share-7-inch-screen "
+    setup_list="waveshare-dsi-lcd "
     ACTIONS["setup"]+="$setup_list "
     for i in $setup_list; do
         ACTIONS[$i]=" "
