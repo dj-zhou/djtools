@@ -1,13 +1,13 @@
 #!/bin/bash
 
 setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-ide baidu-netdisk boost can-analyzer "
-setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cutecom devtools "
+setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cuda cutecom devtools "
 setup_list+="driver dropbox eigen3 esp-idf fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
 setup_list+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
 setup_list+="gitg-gitk glfw3 glog gnome gnuplot google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd mathpix "
 setup_list+="matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
-setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.1.1 opencv-4.2.0 pangolin perf "
+setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.5.5 pangolin perf "
 setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu qt-5.13.1 qt-5.14.2 "
 setup_list+="ros-melodic ros-noetic ros2-foxy rpi-pico rust saleae-logic serial-console spdlog slack "
 setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
@@ -1470,18 +1470,19 @@ function _dj_setup_nodejs() {
 # this may only work on desktop computer
 # nvidia-driver-455 is good at time of this commit
 function _dj_setup_nvidia() {
-    _show_and_run sudo apt-get purge nvidia*
     _show_and_run _install_if_not_installed libncurses5-dev
-    if [[ "${ubuntu_v}" = *'18.04'* ||
-        "${ubuntu_v}" = *'20.04'* ]]; then
-        if [[ ! -f /etc/apt/sources.list.d/graphics-drivers*.list ]]; then
-            _show_and_run sudo add-apt-repository ppa:graphics-drivers/ppa
-            _show_and_run sudo apt-get -y update
-        fi
+    if [[ ! -f /etc/apt/sources.list.d/graphics-drivers*.list ]]; then
+        _show_and_run sudo add-apt-repository ppa:graphics-drivers/ppa
+        _show_and_run sudo apt-get -y update
+    fi
+    if [[ "${ubuntu_v}" = *'18.04'* ]]; then
         _show_and_run _install_if_not_installed nvidia-driver-455 nvidia-settings
+    elif [[ "${ubuntu_v}" = *'20.04'* ]]; then
+        _show_and_run _install_if_not_installed nvidia-driver-470 nvidia-settings
+    elif [[ "${ubuntu_v}" = *'22.04'* ]]; then
+        _show_and_run _install_if_not_installed nvidia-driver-470 nvidia-settings
     fi
     cat <<eom
-
 --------------------------------------------
 Now you need to reboot the computer
 and you can run:
@@ -1489,27 +1490,31 @@ and you can run:
 or
   $ cat /proc/driver/nvidia/gpus/{tab}/information
 --------------------------------------------
-
 eom
 }
 
 # =============================================================================
 function _dj_setup_nvtop() {
     _show_and_run _pushd_quiet ${PWD}
-
-    if [[ "${ubuntu_v}" = *'18.04'* ||
-        "${ubuntu_v}" = *'20.04'* ]]; then
-        _show_and_run mkdir -p $soft_dir
-        _show_and_run cd $soft_dir
-        _show_and_run rm nvtop -rf
-        _show_and_run git clone https://github.com/Syllo/nvtop.git
-        _show_and_run cd nvtop
-        _show_and_run mkdir build
-        _show_and_run cd build
-        _show_and_run cmake .. -DNVML_RETRIEVE_HEADER_ONLINE=True
-        _show_and_run make -j$(nproc)
-        _show_and_run sudo make install
+    if [[ "${ubuntu_v}" != *'18.04'* &&
+        "${ubuntu_v}" != *'20.04'* &&
+        "${ubuntu_v}" != *'22.04'* ]]; then
+        echo_error "not tested platform, exit"
+        return
     fi
+
+    _install_if_not_installed libudev-dev libdrm-dev libdrm-amdgpu1
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm nvtop -rf
+    _show_and_run git clone https://github.com/Syllo/nvtop.git
+    _show_and_run cd nvtop
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake .. -DNVML_RETRIEVE_HEADER_ONLINE=True
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
 
     _popd_quiet
 }
@@ -2041,6 +2046,11 @@ function _dj_setup() {
     fi
 
     # --------------------------
+    if [ $1 = 'cuda' ]; then
+        _dj_setup_cuda
+        return
+    fi
+    # --------------------------
     if [ $1 = 'cutecom' ]; then
         _dj_setup_cutecom
         return
@@ -2303,18 +2313,14 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'opencv-4.1.1' ]; then
-        _dj_setup_opencv_4_1_1 $2 $3 $4 $5
-        return
-    fi
-    # --------------------------
     if [ $1 = 'opencv-3.4.13' ]; then
         _dj_setup_opencv_3_4_13 $2 $3 $4 $5
         return
     fi
     # --------------------------
-    if [ $1 = 'opencv-4.2.0' ]; then
-        _dj_setup_opencv_4_2_0 $2 $3 $4 $5
+    if [ $1 = 'opencv-4.5.5' ]; then
+        shift 1
+        _dj_setup_opencv_4_5_5 "$@"
         return
     fi
     # --------------------------

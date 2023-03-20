@@ -340,11 +340,11 @@ function _install_if_not_installed() {
     local cur_dir_install=$PWD
     for package in "$@"; do
         if [[ "no" = $(_check_if_package_installed $package) ]]; then
-            echo -e "${CYN}installing $package$NOC"
+            echo -e "${YLW}installing${NOC} $package"
             # bug: /var/lib/dpkg/lock-frontend, etc, errors will not be seen
             sudo apt-get install -y $package &>/dev/null
         else
-            echo -e "$CYN$package is already installed$NOC"
+            echo -e "$package ${CYN}is already installed${NOC}"
         fi
     done
     cd $cur_dir_install
@@ -387,7 +387,7 @@ function _verify_pkgconfig_file() {
     if [ ! -f "$2/$1" ]; then
         echo -e "${RED}pkgconfig file $1 is not found in $2${NOC}"
     else
-        echo -e "   pkgconfig file: ${GRN}$2/$1${NOC}"
+        echo -e "   pkgconfig file:$ ${GRN}$2/$1${NOC}"
     fi
 }
 

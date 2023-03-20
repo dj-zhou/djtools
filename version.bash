@@ -276,8 +276,7 @@ function _version_check_magic_enum() {
 
 # =============================================================================
 function _version_check_nlohmann_json3() {
-    # nlohmann_json.pc /usr/local/lib/pkgconfig
-    file="/usr/local/lib/pkgconfig/nlohmann_json.pc"
+    file="/usr/local/share/pkgconfig/nlohmann_json.pc"
     if [ ! -f $file ]; then
         _echo_not_installed "nlohmann-json3"
         return
@@ -316,7 +315,7 @@ function _version_check_opencv() {
     # #define CV_VERSION_REVISION 13
 
     files="/usr/local/include/opencv2/core/version.hpp "
-    files+="/usr/include/opencv2/core/version.hpp"
+    files+="/usr/include/opencv4/opencv2/core/version.hpp"
     file_is_found=0
     for file in $files; do
         if [[ -f "$file" ]]; then
