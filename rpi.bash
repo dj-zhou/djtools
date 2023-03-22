@@ -16,15 +16,15 @@ function _rpi_setup_waveshare_dsi_lcd() {
     _show_and_run git clone https://github.com/waveshare/Waveshare-DSI-LCD
     _show_and_run cd Waveshare-DSI-LCD
 
-    release="$(uname -r)"
-    if [[ "${release}" = "5.15.61"* ]]; then
-        cd "5.15.61"
-    elif [[ "${release}" = "5.15.76"* ]]; then
-        cd "5.15.76"
-    elif [[ "${release}" = "5.15.84"* ]]; then
-        cd "5.15.84"
+    uname_r="$(uname -r)"
+    if [[ "${uname_r}" = "5.15.61"* ]]; then
+        _show_and_run cd "5.15.61"
+    elif [[ "${uname_r}" = "5.15.76"* ]]; then
+        _show_and_run cd "5.15.76"
+    elif [[ "${uname_r}" = "5.15.84"* ]]; then
+        _show_and_run cd "5.15.84"
     else
-        echo_warn "${release} is not supported, exit."
+        echo_warn "Kernel ${uname_r} is not supported, exit."
         _popd_quiet
         return
     fi
