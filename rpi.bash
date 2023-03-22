@@ -30,7 +30,7 @@ function _rpi_setup_waveshare_dsi_lcd() {
     fi
     uname_m=$(uname -m)
     if [[ "${uname_m}" = "armv7l"* ]]; then
-        echo "yes!"
+        _show_and_run cd 32
     else
         echo_warn "Uknown architecture, exit."
         _popd_quiet
