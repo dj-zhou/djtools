@@ -36,6 +36,11 @@ function _rpi_setup_waveshare_dsi_lcd() {
         _popd_quiet
         return
     fi
+
+    _show_and_run sudo bash ./WS_xinchDSI_MAIN.sh 70C I2C1
+
+    echo "Waveshare DSI LCD driver installed, reboot in 5 seconds ..."
+    nohup sh -c "sleep 5 && reboot" >/dev/null 2>&1 &
     _popd_quiet
 }
 
