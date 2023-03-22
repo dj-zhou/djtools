@@ -27,7 +27,7 @@ function _rpi_setup_waveshare_dsi_lcd() {
         echo_warn "${release} is not supported, exit."
         return
     fi
-    uname_m=$(name -m)
+    uname_m=$(uname -m)
     if [[ "${uname_m}" = "armv7l"* ]]; then
         echo "yes!"
     else
