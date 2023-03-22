@@ -25,6 +25,7 @@ function _rpi_setup_waveshare_dsi_lcd() {
         cd "5.15.84"
     else
         echo_warn "${release} is not supported, exit."
+        _popd_quiet
         return
     fi
     uname_m=$(uname -m)
@@ -32,6 +33,7 @@ function _rpi_setup_waveshare_dsi_lcd() {
         echo "yes!"
     else
         echo_warn "Uknown architecture, exit."
+        _popd_quiet
         return
     fi
     _popd_quiet
