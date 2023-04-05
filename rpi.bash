@@ -62,7 +62,15 @@ function rpi() {
         return
     fi
     # ------------------------------
-
+    if [ $1 = 'shrink' ]; then
+        _mirror_shrink $2
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'backup' ]; then
+        _mirror_backup $2 $3 $4
+        return
+    fi
     echo 'rpi : "'$1 '"command not supported'
     _rpi_help
 }
@@ -73,16 +81,35 @@ function _rpi() {
 
     # All possible first values in command line
     local SERVICES=("
+        backup
         setup
+        shrink
     ")
 
     # declare an associative array for options
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
+    backup_list="/dev/sda /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg "
+    ACTIONS[backup]="$backup_list "
+    for i in $backup_list; do
+        backup_file_lit="$(ls | grep img) "
+        ACTIONS[$i]="$backup_file_lit"
+        for j in $backup_file_lit; do
+            ACTIONS[$j]=" "
+        done
+    done
+    # ------------------------------------------------------------------------
     setup_list="waveshare-dsi-lcd "
     ACTIONS["setup"]+="$setup_list "
     for i in $setup_list; do
+        ACTIONS[$i]=" "
+    done
+
+    # ------------------------------------------------------------------------
+    shrink_list="$(ls | grep img) "
+    ACTIONS[shrink]="$shrink_list "
+    for i in $shrink_list; do
         ACTIONS[$i]=" "
     done
 
