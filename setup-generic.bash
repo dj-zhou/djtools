@@ -1476,11 +1476,11 @@ function _dj_setup_nvidia() {
         _show_and_run sudo apt-get -y update
     fi
     if [[ "${ubuntu_v}" = *'18.04'* ]]; then
-        _show_and_run _install_if_not_installed nvidia-driver-455 nvidia-settings
+        _show_and_run sudo apt install -y nvidia-driver-455 nvidia-settings
     elif [[ "${ubuntu_v}" = *'20.04'* ]]; then
-        _show_and_run _install_if_not_installed nvidia-driver-470 nvidia-settings
+        _show_and_run sudo apt install -y nvidia-driver-470 nvidia-settings
     elif [[ "${ubuntu_v}" = *'22.04'* ]]; then
-        _show_and_run _install_if_not_installed nvidia-driver-470 nvidia-settings
+        _show_and_run sudo apt install -y nvidia-driver-525 nvidia-settings
     fi
     cat <<eom
 --------------------------------------------
