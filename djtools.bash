@@ -40,6 +40,7 @@ source $djtools_path/mark-down.bash
 source $djtools_path/m.bash
 source $djtools_path/mirror.bash
 source $djtools_path/pack-unpack.bash
+source $djtools_path/rpi.bash
 source $djtools_path/split-merge.bash
 source $djtools_path/system.bash
 source $djtools_path/terminal-format.bash

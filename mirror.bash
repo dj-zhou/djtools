@@ -280,6 +280,7 @@ function _mirror_shrink() {
 
     # gather _rpi_shrink_info
     _rpi_shrink_info "Gathering data"
+    echo_error "hello world 11"
     beforesize="$(ls -lh "$img" | cut -d ' ' -f 5)"
     parted_output="$(parted -ms "$img" unit B print)"
     rc=$?
@@ -305,7 +306,6 @@ function _mirror_shrink() {
         return
     fi
 
-    return
     currentsize="$(echo "$tune2fs_output" | grep '^Block count:' | tr -d ' ' | cut -d ':' -f 2)"
     blocksize="$(echo "$tune2fs_output" | grep '^Block size:' | tr -d ' ' | cut -d ':' -f 2)"
 
@@ -447,74 +447,13 @@ function _mirror_shrink() {
 # =============================================================================
 function _mirror_backup() {
     if [ $# -le 1 ]; then
-        echo " usage: rpi backup /dev/sda image.img"
+        echo " usage example: rpi backup /dev/sda image.img"
         return
     fi
     blk=$1
     file=$2
-    echo -e " backing up $GRN$blk$NOC to $GRN$file$NOC"
-    sudo dd bs=4M if="$blk" of="$file" status=progress
-    sudo chown $USER "$file"
+    _show_and_run echo -e " backing up $GRN$blk$NOC to $GRN$file$NOC"
+    _show_and_run sudo dd bs=4M if="$blk" of="$file" status=progress
+    _show_and_run sudo chown $USER "$file"
     echo -e " you can run $PRP mirror shrink $file$NOC to make the file smaller"
 }
-
-# =============================================================================
-function mirror() {
-    # ------------------------------
-    if [ $# -eq 0 ]; then
-        echo "to implement"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'shrink' ]; then
-        _mirror_shrink $2
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'backup' ]; then
-        _mirror_backup $2 $3 $4
-        return
-    fi
-    # ------------------------------
-}
-
-# =============================================================================
-function _mirror() {
-    COMPREPLY=()
-
-    # All possible first values in command line
-    local SERVICES=("
-        shrink
-        backup
-    ")
-
-    # declare an associative array for options
-    declare -A ACTIONS
-
-    # ------------------------------------------------------------------------
-    shrink_list="$(ls | grep img) "
-    ACTIONS[shrink]="$shrink_list "
-    for i in $shrink_list; do
-        ACTIONS[$i]=" "
-    done
-    # ------------------------------------------------------------------------
-    backup_list="/dev/sda /dev/sdb /dev/sdc /dev/sdd /dev/sde /dev/sdf /dev/sdg "
-    ACTIONS[backup]="$backup_list "
-    for i in $backup_list; do
-        backup_file_lit="$(ls | grep img) "
-        ACTIONS[$i]="$backup_file_lit"
-        for j in $backup_file_lit; do
-            ACTIONS[$j]=" "
-        done
-    done
-    # ------------------------------------------------------------------------
-    local cur=${COMP_WORDS[COMP_CWORD]}
-    if [ ${ACTIONS[$3]+1} ]; then
-        COMPREPLY=($(compgen -W "${ACTIONS[$3]}" -- $cur))
-    else
-        COMPREPLY=($(compgen -W "${SERVICES[*]}" -- $cur))
-    fi
-}
-
-# =============================================================================
-complete -F _mirror mirror
