@@ -26,7 +26,7 @@ function _dj_setup_opencv_2_4_13() {
         -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON \
         WITH_OPENCL=ON WITH_GDAL=ON WITH_IPP=ON BUILD_JASPER=ON BUILD_JPEG=ON \
         BUILD_PNG=ON BUIILD_TIFF=ON WITH_OPENMP=ON ..
-    _show_and_run make -j$(nproc)
+    _show_and_run make -j$(($(nproc)/2))
     _show_and_run sudo make install
 
     _ask_to_remove_a_folder opencv-2.4.13
@@ -143,7 +143,7 @@ function _dj_setup_opencv_3_4_13() {
         -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
         -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include ..
 
-    _show_and_run make -j$(nproc)
+    _show_and_run make -j$(($(nproc)/2))
     _show_and_run sudo make install
 
     cat <<eom
@@ -236,7 +236,7 @@ function _dj_setup_opencv_4_5_5() {
     # -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
     # -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include ..
 
-    _show_and_run make -j$(nproc)
+    _show_and_run make -j$(($(nproc)/2))
     _show_and_run sudo make install
 
     _show_and_run sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
