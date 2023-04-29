@@ -392,7 +392,7 @@ function _dj_setup_pangolin() {
     # dependency installation
     packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
     _show_and_run _install_if_not_installed $packages
-
+    _show_and_run dj setup glfw3
     local v=$(_find_package_version pangolin)
 
     # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
@@ -412,14 +412,9 @@ function _dj_setup_pangolin() {
     _show_and_run sudo make install
     _show_and_run sudo cp libpango_* /usr/local/lib
 
-    _verify_lib_installation libpangolin.so /usr/local/lib
+    _verify_lib_installation libpango_core.so /usr/local/lib
+    _verify_lib_installation libpango_geometry.so /usr/local/lib
     _verify_header_files pangolin.h /usr/local/include/pangolin
-
-    echo -e "If you see error: ${YLW}Could not find GLEW${NOC}"
-    echo "you should run the following commands:"
-    echo "   \$ dj setup glfw3"
-    echo "   \$ dj setup gtest"
-    echo "   \$ dj setup glog"
 
     _popd_quiet
 }

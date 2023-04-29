@@ -66,7 +66,7 @@ alias maek="make"
 alias ccc="clear"
 alias logout="gnome-session-quit"
 alias lock="gnome-screensaver-command -l"
-alias .b="source ~/.bashrc"
+alias .b="_show_and_run source ~/.bashrc"
 
 # folder alias ----------------------------------------------
 alias cddj="cd "$djtools_path
