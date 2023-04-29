@@ -69,8 +69,7 @@ function _setup_opencv_dependencies() {
     # Optimization libraries for OpenCV
     packages+="libatlas-base-dev gfortran "
     # Optional libraries
-    packages+="libprotobuf-dev protobuf-compiler "
-    packages+="libgoogle-glog-dev libgflags-dev "
+    packages+="libprotobuf-dev protobuf-compiler libgflags-dev "
     packages+="libgphoto2-dev libeigen3-dev libhdf5-dev doxygen "
     # Install OpenCL SDK related things
     packages+="ocl-icd-opencl-dev "
