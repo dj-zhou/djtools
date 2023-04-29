@@ -1387,7 +1387,7 @@ function _dj_setup_nlohmann_json3_dev() {
 
     # install from source
 
-    _show_and_run sudo rm /usr/local/lib/pkgconfig/nlohmann_json.pc
+    _show_and_run sudo rm -rf /usr/local/lib/pkgconfig/nlohmann_json.pc
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
