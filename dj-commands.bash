@@ -399,7 +399,7 @@ function _dj_setup_pangolin() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run sudo rm -rf Pangolin/
+    _show_and_run sudo rm -rf Pangolin/ # somehow it generate build/CMakeFiles/Progress/ as root
     _show_and_run git clone --recursive https://github.com/stevenlovegrove/Pangolin.git
     _show_and_run cd Pangolin
     _show_and_run git checkout v$v
