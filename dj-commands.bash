@@ -393,25 +393,29 @@ function _dj_setup_pangolin() {
     packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
     _show_and_run _install_if_not_installed $packages
 
+    local v=$(_find_package_version pangolin)
+
     # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm -rf Pangolin/
-    _show_and_run git clone https://github.com/stevenlovegrove/Pangolin.git
+    _show_and_run sudo rm -rf Pangolin/
+    _show_and_run git clone --recursive https://github.com/stevenlovegrove/Pangolin.git
     _show_and_run cd Pangolin
-    _show_and_run git checkout v0.6 # released on Apr 22, 2021, need test
+    _show_and_run git checkout v$v
+    _show_and_run ./scripts/install_prerequisites.sh
     _show_and_run rm -rf build/
     _show_and_run mkdir build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
+    _show_and_run sudo cp libpango_* /usr/local/lib
 
     _verify_lib_installation libpangolin.so /usr/local/lib
     _verify_header_files pangolin.h /usr/local/include/pangolin
 
-    echo -e "If you see error: ${RED}Could not find GLEW${NOC}"
+    echo -e "If you see error: ${YLW}Could not find GLEW${NOC}"
     echo "you should run the following commands:"
     echo "   \$ dj setup glfw3"
     echo "   \$ dj setup gtest"
