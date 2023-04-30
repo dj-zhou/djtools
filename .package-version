@@ -1,4 +1,5 @@
 abseil-cpp 20210324.2
+anaconda 2023.03-1
 arduino 2.0.1
 boost 1.78.0
 cli11 2.1.1 # (no "v" in front!) released Sep. 29th, 2021

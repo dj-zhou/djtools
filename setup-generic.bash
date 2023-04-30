@@ -116,9 +116,12 @@ function _dj_setup_anaconda() {
         return
     fi
 
-    file=Anaconda3-2020.11-Linux-x86_64.sh
+
+    v=$(_find_package_version anaconda)
+
+    file=Anaconda3-$v-Linux-x86_64.sh
     url=https://repo.anaconda.com/archive/$file
-    _show_and_run _wget_if_not_exist $file "4cd48ef23a075e8555a8b6d0a8c4bae2" $url
+    _show_and_run _wget_if_not_exist $file "95102d7c732411f1458a20bdf47e4c1b0b6c8a21a2edfe4052ca370aaae57bab" $url
     _show_and_run chmod +x $file
 
     echo -e "${YLW}You need to install Anaconda to ~/.anaconda3 directory!${NOC}"

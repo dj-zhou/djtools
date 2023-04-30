@@ -307,18 +307,32 @@ function _size_human_readable() { # $fz_byte $output_control
 # =============================================================================
 function _wget_if_not_exist() { # $filename $md5sum $url $option
     filename=$1
-    md5sum_passed_in=$2
+    checksum_passed_in=$2
     url=$3
     option=$4
-    unset md5checksum
+    local md5_checksum=""
     if [[ -f "$filename" ]]; then
-        md5checksum=$(md5sum "$filename")
+        md5_checksum=$(md5sum "$filename")
     else
-        md5checksum=" "
+        md5_checksum=" "
     fi
-    if [[ "$md5checksum" = *"$md5sum_passed_in"* ]]; then
-        echo "file exists, no need to wget again"
+    local sha256_checksum=""
+    if [[ -f "$filename" ]]; then
+        sha256_checksum=$(sha256sum "$filename")
     else
+        sha256_checksum=" "
+    fi
+    need_to_download=1
+    if [[ "$md5_checksum" = *"$checksum_passed_in"* ]]; then
+        echo "file exists, md5 checksum matches, no need to download again"
+        need_to_download=0
+    fi
+    if [[ "$sha256_checksum" = *"$checksum_passed_in"* ]]; then
+        echo "file exists, sha256 checksum matches, no need to download again"
+        need_to_download=0
+    fi
+    # finally, download it if necessary
+    if [[ "$need_to_download" = "1" ]]; then
         wget $option $filename "${url}"
     fi
 }

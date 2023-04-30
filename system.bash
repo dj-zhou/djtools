@@ -154,11 +154,10 @@ function _system_wallpaper_random() {
 
     cd $wallpaper_folder
     set -- *
-    length=$#
     random_num=$((($RANDOM % ($length)) + 1))
     # it only works for gnome
-    gsettings set org.gnome.desktop.background picture-uri "file://$wallpaper_folder/${!random_num}"
-
+    # don't know why it failed to work for 22.04
+    # _show_and_run gsettings set org.gnome.desktop.background picture-uri-dark "file://$wallpaper_folder/${!random_num}"
     _popd_quiet
 }
 
