@@ -36,7 +36,8 @@ function _dj_setup_abseil_cpp() {
     _show_and_run cd abseil-cpp
     _show_and_run git checkout $abseil_v
     _show_and_run mkdir build
-    _show_and_run cd build && cmake ..
+    _show_and_run cd build 
+    _show_and_run cmake ..
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
