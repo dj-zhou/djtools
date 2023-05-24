@@ -36,7 +36,7 @@ function _dj_setup_abseil_cpp() {
     _show_and_run cd abseil-cpp
     _show_and_run git checkout $abseil_v
     _show_and_run mkdir build
-    _show_and_run cd build 
+    _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
@@ -116,7 +116,6 @@ function _dj_setup_anaconda() {
         return
     fi
 
-
     v=$(_find_package_version anaconda)
 
     file=Anaconda3-$v-Linux-x86_64.sh
@@ -134,10 +133,10 @@ function _dj_setup_anaconda() {
 
 # =============================================================================
 function _dj_setup_ansible() {
-    sudo apt update
-    sudo apt install software-properties-common
-    sudo add-apt-repository --yes --update ppa:ansible/ansible
-    sudo apt install ansible
+    _show_and_run sudo apt update
+    _show_and_run sudo apt install software-properties-common
+    _show_and_run sudo add-apt-repository --yes --update ppa:ansible/ansible
+    _show_and_run sudo apt install ansible
 }
 
 # =============================================================================================
@@ -1419,55 +1418,37 @@ function _dj_setup_nlohmann_json3_dev() {
 # use nvm (node version management) to install nodejs
 # https://github.com/nvm-sh/nvm#installing-and-updating
 function _dj_setup_nodejs() {
-    # _pushd_quiet ${PWD}
-    # cd ~ && mkdir -p soft/ && cd soft/
-
-    # # install nvm to ${HOME}/.nvm -----------
-    # if [ ! -d ${HOME}/.nvm ]; then
-    #     nvm_v=$(_find_package_version nvm)
-    #     _echo_install nvm $nvm_v
-    #     _press_enter_or_wait_s_continue 2
-
-    #     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_v/install.sh | bash
-    #     export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" ||
-    #         printf %s "${XDG_CONFIG_HOME}/nvm")"
-    #     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    # fi
-    # # install nodejs -----------
-    # nodejs_v=$(_find_package_version nodejs)
-    # _echo_install nodejs $nodejs_v
-    # _press_enter_or_wait_s_continue 2
-
-    # nvm install $nodejs_v
-
-    # _popd_quiet
 
     # https://stackoverflow.com/a/36401038
-    if [[ "${ubuntu_v}" = *'18.04'* || "${ubuntu_v}" = *'20.04'* ]]; then
-        _show_and_run _install_if_not_installed git-core curl build-essential openssl libssl-dev
-        _show_and_run _pushd_quiet ${PWD}
-        _show_and_run mkdir -p $soft_dir
-        _show_and_run cd $soft_dir
-
-        v=$(_find_package_version nodejs)
-        # nodejs is a huge package, do not build it from scratch
-        if [[ ! -d node ]]; then
-            _show_and_run git clone https://github.com/nodejs/node.git
-            _show_and_run cd node
-        else
-            _show_and_run cd node
-            _show_and_run git checkout master
-            _show_and_run git fetch -p
-            _show_and_run git pull
-        fi
-        _show_and_run git checkout v$v
-        _show_and_run ./configure
-        _show_and_run make -j$(nproc)
-        _show_and_run sudo make install
-
-        _popd_quiet
+    if [[ "${ubuntu_v}" = *'18.04'* &&
+        "${ubuntu_v}" = *'20.04'* &&
+        "${ubuntu_v}" = *'22.04'* ]]; then
+        echo_warn "dj setup nodejs: not tested system, exit."
         return
     fi
+
+    _show_and_run _install_if_not_installed git-core curl build-essential openssl libssl-dev
+    _show_and_run _pushd_quiet ${PWD}
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    v=$(_find_package_version nodejs)
+    # nodejs is a huge package, do not build it from scratch
+    if [[ ! -d node ]]; then
+        _show_and_run git clone https://github.com/nodejs/node.git
+        _show_and_run cd node
+    else
+        _show_and_run cd node
+        _show_and_run git checkout master
+        _show_and_run git fetch -p
+        _show_and_run git pull
+    fi
+    _show_and_run git checkout v$v
+    _show_and_run ./configure
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
+
+    _popd_quiet
 }
 
 # =============================================================================

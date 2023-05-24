@@ -309,7 +309,7 @@ function _dj_setup_devtools() {
 # https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04
 # this is only tested in Ubuntu 18.04
 function _dj_setup_container_docker() {
-    _pushd_quiet ${PWD}
+    _show_and_run _pushd_quiet ${PWD}
 
     # Install a few prerequisite packages
     packages="apt-transport-https ca-certificates curl software-properties-common "
@@ -318,42 +318,50 @@ function _dj_setup_container_docker() {
     docker_url="https://download.docker.com/linux/ubuntu"
 
     # Add the GPG key for the official Docker repository
-    curl -fsSL $docker_url/gpg | sudo apt-key add -
+    _show_and_run curl -fsSL $docker_url/gpg | sudo apt-key add -
 
     # Add the Docker repository to APT sources
-    sudo add-apt-repository \
+    _show_and_run sudo add-apt-repository \
         "deb [arch=amd64] $docker_url $(lsb_release -cs) stable"
-    sudo apt-get -y update
+    _show_and_run sudo apt-get -y update
 
     # Install
     _show_and_run _install_if_not_installed docker-ce
 
     # check the status -- not sure if the "active status" need a system reboot
-    sudo systemctl status docker
+    _show_and_run sudo systemctl status docker
 
     # ----------------------------------------------
     # add current user to the docker group, which was created from above scripts
     # to avoid typing "sudo" whenever run the docker command
     # (to remove a user from a group: sudo gpasswd -d user group, need log in/out)
-    sudo usermod -aG docker ${USER}
-    su - ${USER}
+    _show_and_run sudo usermod -aG docker ${USER}
+    _show_and_run su - ${USER}
 
     # to solve a problem: dial unix /var/run/docker.sock: connect: permission denied
-    sudo chmod 666 /var/run/docker.sock
-    echo -e "you need to reboot computer so docker does not need sudo to run"
+    _show_and_run sudo chmod 666 /var/run/docker.sock
+    echo -e "you need to reboot your computer so docker does not need sudo to run"
 
     _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_container_docker_compose() {
+    _show_and_run sudo apt install golang-go
 
-    url="https://github.com/docker/compose/releases/download"
-    v="1.29.2"
-    echo "installing docker-compose v$v (version hardcoded)"
-    sudo curl -L "${url}/$v/docker-compose-$(uname -s)-$(uname -m)" \
-        -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
+    _show_and_run _pushd_quiet ${PWD}
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    _show_and_run rm compose -rf
+    _show_and_run git clone https://github.com/docker/compose.git
+    _show_and_run cd compose
+    local v=$(_find_package_version docker-compose)
+    _show_and_run git checkout v$v
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo cp bin/build/docker-compose /usr/local/bin
+
+    _popd_quiet
 }
 
 # =============================================================================

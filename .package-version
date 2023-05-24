@@ -3,8 +3,9 @@ anaconda 2023.03-1
 arduino 2.0.1
 boost 1.78.0
 cli11 2.1.1 # (no "v" in front!) released Sep. 29th, 2021
-cmake 3.22.3
+cmake 3.26.3
 cutecom v0.50.0 # Aug. 6th, 2018
+docker-compose 2.17.3
 eigen3 3.4.0 # Aug. 18th, 2021
 fmt 9.1.0
 glog v0.6.0       # April 5th, 2022
