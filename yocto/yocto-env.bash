@@ -42,17 +42,17 @@ function _yocto_setup_dev_env()
     packages+="python3-dev python3-sphinx texlive-fonts-recommended "
     packages+="texlive-latex-extra zlib1g-dev"
     for package in $packages ; do
-        _install_if_not_installed $package
+        _show_and_run _install_if_not_installed $package
     done
 
     if [[ "${ubuntu_v}" != *'20.04'* ]] ; then
         packages="libstdc++-5-dev python-git "
         for package in $packages ; do
-            _install_if_not_installed $package
+            _show_and_run _install_if_not_installed $package
         done
     fi
 
-    sudo pip3 install reportlab sphinxcontrib-blockdiag &> /dev/null
+    _show_and_run sudo pip3 install reportlab sphinxcontrib-blockdiag &> /dev/null
 
     echo "Yocto build environment dependencies are installed"
 }
