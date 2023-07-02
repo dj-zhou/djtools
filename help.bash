@@ -63,15 +63,11 @@ eom
 function _dj_help_auto_unmount() {
     cat <<eom
 -----------------------------------------
-1. revise /etc/fstab, revise the following (to be verified)
-   UUID=a664dd10-945e-4137-b97c-5d18f9119971 a/path ext4 nosuid,nodev,nofail,x-gvfs-show 0 0
-   to
-   UUID=a664dd10-945e-4137-b97c-5d18f9119971 a/path ext4 nosuid,nodev,nofail,x-gvfs-show 0 2
-
-2. create a systemd service
+1. create a systemd service
    $ cd /etc/systemd/system
    $ sudo touch ssd-unmount.service
    then add the following (to be revised)
+
 [Unit]
 Description=Unmount SSD during shutdown
 DefaultDependencies=no
@@ -84,8 +80,10 @@ ExecStop=/bin/umount -l a/path
 
 [Install]
 WantedBy=shutdown.target
+
    then enable this service by
    $ sudo systemctl enable ssd-unmount.service
+
 -----------------------------------------
 eom
 }
