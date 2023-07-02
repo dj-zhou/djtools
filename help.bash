@@ -1,6 +1,6 @@
 #!/bin/bash
 
-_help_list="apt_pkg auto-mount cu ffmpeg jupyter pipocom screen wireshark "
+_help_list="apt_pkg auto-mount auto-unmount cu ffmpeg jupyter pipocom screen wireshark "
 
 # =============================================================================
 function _dj_help_apt_pkg_error() {
@@ -27,24 +27,65 @@ eom
 function _dj_help_auto_mount() {
     cat <<eom
 -----------------------------------------
-auto mount a disk:
-1. locate the partition to be mounted
+auto mount a disk, make sure the disk is formatted, and then:
+1. locate the partition to be mounted, it should show the disk model.
    $ sudo fdisk -l
+   for example, I see this:
+    Disk /dev/nvme1n1: 1.82 TiB, 2000398934016 bytes, 3907029168 sectors
+    Disk model: CT2000P3PSSD8                           
+    Units: sectors of 1 * 512 = 512 bytes
+    Sector size (logical/physical): 512 bytes / 512 bytes
+    I/O size (minimum/optimal): 512 bytes / 512 bytes
+
 2. find the UUID (Universal Unique Identifier) of the drive:
-   $ sudo blkid
-3. create a mount point
+   $ sudo blkid | grep nvme1n1
+    /dev/nvme1n1: UUID="6fe254d6-aac7-4b7f-8764-ee05122933fe" BLOCK_SIZE="4096" TYPE="ext4"
+
+3. create a mount point (a directory), and change its ownership:
    $ sudo mkdir <a/path>
-4. change the ownership of the mountpoint
-   $ sudo chown -R <usr name> <a/path>
-5. revise fstab
-   $ sudo gedit /etc/fstab
-6. add the following (need to revise)
-   UUID=a664dd10-945e-4137-b97c-5d18f9119971 /home/mamba/soft ext4 nosuid,nodev,nofail,x-gvfs-show 0 0
-7. reference
-   https://www.techrepublic.com/article/how-to-properly-automount-a-drive-in-ubuntu-linux/
-8. manual mount
+   $ sudo chown -R <user name> <a/path>
+
+4. revise /etc/fstab, add the following:
+   UUID=a664dd10-945e-4137-b97c-5d18f9119971 a/path ext4 nosuid,nodev,nofail,x-gvfs-show 0 0
+
+5. manual mount to verify:
    $ sudo mount -a
-9. reboot to verify
+   then reboot the computer to see if it is auto-mounted.
+
+*. reference
+   https://www.techrepublic.com/article/how-to-properly-automount-a-drive-in-ubuntu-linux/
+
+-----------------------------------------
+eom
+}
+
+# =============================================================================
+function _dj_help_auto_unmount() {
+    cat <<eom
+-----------------------------------------
+1. revise /etc/fstab, revise the following (to be verified)
+   UUID=a664dd10-945e-4137-b97c-5d18f9119971 a/path ext4 nosuid,nodev,nofail,x-gvfs-show 0 0
+   to
+   UUID=a664dd10-945e-4137-b97c-5d18f9119971 a/path ext4 nosuid,nodev,nofail,x-gvfs-show 0 2
+
+2. create a systemd service
+   $ cd /etc/systemd/system
+   $ sudo touch ssd-unmount.service
+   then add the following (to be revised)
+[Unit]
+Description=Unmount SSD during shutdown
+DefaultDependencies=no
+Before=shutdown.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/true
+ExecStop=/bin/umount -l a/path
+
+[Install]
+WantedBy=shutdown.target
+   then enable this service by
+   $ sudo systemctl enable ssd-unmount.service
 -----------------------------------------
 eom
 }
@@ -128,6 +169,10 @@ function _dj_help_skill() {
     fi
     if [ $1 = 'auto-mount' ]; then
         _dj_help_auto_mount
+        return
+    fi
+    if [ $1 = 'auto-unmount' ]; then
+        _dj_help_auto_unmount
         return
     fi
     if [ $1 = 'cu' ]; then
