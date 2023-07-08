@@ -4,30 +4,30 @@
 function _dj_unpack_tar_xz() {
     tar_xz_file=$1
     folder=${tar_xz_file%".tar.xz"*}
-    rm $folder -rf
+    _show_and_run rm $folder -rf
     echo -e "unpack ${GRN}$tar_xz_file${NOC} to directory ${GRN}${folder}/${NOC}\n"
 
     _press_enter_or_wait_s_continue 10
-    tar -xvf $tar_xz_file
+    _show_and_run tar -xvf $tar_xz_file
 }
 
 # =============================================================================
 function _dj_unpack_tar_gz() {
     tar_gz_file=$1
     folder=${tar_gz_file%".tar.gz"*}
-    rm $folder -rf
-    mkdir -p $folder
+    _show_and_run rm $folder -rf
+    _show_and_run mkdir -p $folder
     echo -e "unpack ${GRN}$tar_gz_file${NOC} to directory ${GRN}${folder}/${NOC}"
 
     _press_enter_or_wait_s_continue 10
-    tar -xvf $tar_gz_file -C ./$folder
+    _show_and_run tar -xvf $tar_gz_file -C ./$folder
 }
 
 # =============================================================================
 # todo: use `*`, or multiple files
 function _dj_pack_tar_gz() {
     filename=$(basename $1)
-    tar -czvf $filename.tar.gz $1
+    _show_and_run tar -czvf $filename.tar.gz $1
 }
 
 # =============================================================================
