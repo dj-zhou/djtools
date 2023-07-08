@@ -317,38 +317,41 @@ function _yocto_find_bmap_file() { # $wic_file
 # =============================================================================
 # find a file in current directory, excluding the build directory
 function _yocto_show_bb_or_inc() { # file_full_name filter
-    cur_dir=${PWD}
+    base_dir=${PWD}
 
     file_full_name=$1
     filter=$2
     for item in ./*; do
-        cd $cur_dir
+        # always start from the base directory
+        cd $base_dir
         if [[ ! -d $item ]]; then
             continue
         fi
+
         cd $item
         folder_name=$(basename $item)
+        # filter out the build directory
         if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
             continue
         fi
-        find_files=$(find -name "*$file_full_name")
+        # sometimes, the file pattern can be found from files other than *bb or *.inc
+        find_files=$(find -type f \( -name "*.bb" -o -name "*.inc" \) -name "*$file_full_name"*)
         not_shown_folder_name=1
         if [ ! -z "$find_files" ]; then
             for file in $find_files; do
                 if [[ "$file" = *"$filter"* ]]; then
                     if [ $not_shown_folder_name = 1 ]; then
-                        echo -e "\n---------------------------------------"
+                        echo -e "\n-------------------------------------------------------"
                         echo -e "${HGRN}$folder_name${NOC}"
                         not_shown_folder_name=0
                     fi
-                    if [[ "$file" = *".bb" || "$file" = *".inc" ]]; then
-                        echo "$file"
-                    fi
+                    echo "$file"
                 fi
             done
         fi
     done
-    cd $cur_dir
+    # return back to base directory
+    cd $base_dir
 }
 
 # =============================================================================
