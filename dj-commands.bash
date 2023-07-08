@@ -944,7 +944,7 @@ function _dj_setup_google_repo() {
         _show_and_run sudo chmod a+x /bin/repo
     else
         echo -e "fetch from google "
-        _show_and_run curl https://storage.googleapis.com/git-repo-downloads/repo >repo
+        _show_and_run curl https://commondatastorage.googleapis.com/git-repo-downloads/repo >repo
         _show_and_run chmod a+x repo
         _show_and_run sudo mv repo /bin/
     fi

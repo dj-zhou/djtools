@@ -246,6 +246,10 @@ function yocto() {
             _yocto_help
             return
         fi
+        if [ $# -lt 3 ]; then
+            echo_warn "need more argument, exit!"
+            return
+        fi
         if [ $2 = 'distro-conf' ]; then
             _yocto_show_conf $3 "distro" $4 $5 $6 $7 $8 $9
             return
