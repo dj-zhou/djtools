@@ -313,6 +313,46 @@ function _yocto_find_bmap_file() { # $wic_file
 }
 
 # =============================================================================
+# this function is duplicated from _yocto_show_bb_or_inc(), will be simplified later
+function _yocto_show_conf_or_inc() { # file_full_name filter
+    base_dir=${PWD}
+
+    file_full_name=$1
+    filter=$2
+    for item in ./*; do
+        # always start from the base directory
+        cd $base_dir
+        if [[ ! -d $item ]]; then
+            continue
+        fi
+
+        cd $item
+        folder_name=$(basename $item)
+        # filter out the build directory
+        if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
+            continue
+        fi
+        # sometimes, the file pattern can be found from files other than *bb or *.inc
+        find_files=$(find -type f \( -name "*.conf" -o -name "*.inc" \) -name *"$file_full_name"*)
+        not_shown_folder_name=1
+        if [ ! -z "$find_files" ]; then
+            for file in $find_files; do
+                if [[ "$file" = *"$filter"* ]]; then
+                    if [ $not_shown_folder_name = 1 ]; then
+                        echo -e "\n-------------------------------------------------------"
+                        echo -e "${HGRN}$folder_name${NOC}"
+                        not_shown_folder_name=0
+                    fi
+                    echo "$file"
+                fi
+            done
+        fi
+    done
+    # return back to base directory
+    cd $base_dir
+}
+
+# =============================================================================
 # find a file in current directory, excluding the build directory
 function _yocto_show_bb_or_inc() { # file_full_name filter
     base_dir=${PWD}
@@ -333,7 +373,7 @@ function _yocto_show_bb_or_inc() { # file_full_name filter
             continue
         fi
         # sometimes, the file pattern can be found from files other than *bb or *.inc
-        find_files=$(find -type f \( -name "*.bb" -o -name "*.inc" \) -name "*$file_full_name"*)
+        find_files=$(find -type f \( -name "*.bb" -o -name "*.inc" \) -name *"$file_full_name"*)
         not_shown_folder_name=1
         if [ ! -z "$find_files" ]; then
             for file in $find_files; do
@@ -356,40 +396,27 @@ function _yocto_show_bb_or_inc() { # file_full_name filter
 # it should not be started in a build directory
 function _yocto_show_conf() { # filter
     if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
-        echo -e "\n this is a build directory, stop searching, exit!!\n" >&2
+        echo_warn "this is a build directory, stop searching, exit!!" >&2
         return
     fi
 
     conf_name=$1
     filter=$2
-    exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
 
-    if [ "$exact_vague" = "exact" ]; then
-        conf_full_name="$conf_name.conf"
-    else
-        conf_full_name="$conf_name*.conf"
-    fi
-
-    _yocto_show_bb_or_inc $conf_full_name $filter
+    _yocto_show_conf_or_inc $conf_name $filter
 }
 
 # =============================================================================
 function _yocto_show_bb_file() { #filter
     if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
-        echo -e "${YLW}this is a build directory, stop searching, exit!!${NOC}" >&2
+        echo_warn "this is a build directory, stop searching, exit!!" >&2
         return
     fi
 
     bb_name=$1
     filter=$2
-    exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
-    # find bb file ---------------
-    if [ "$exact_vague" = "exact" ]; then
-        bb_full_name="$bb_name"
-    else
-        bb_full_name="$bb_name*"
-    fi
-    _yocto_show_bb_or_inc $bb_full_name $filter
+
+    _yocto_show_bb_or_inc $bb_name $filter
 }
 
 # =============================================================================

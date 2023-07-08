@@ -348,9 +348,6 @@ function _yocto() {
     for i in $show_list; do
         ACTIONS[$i]=" "
     done
-    ACTIONS[-e]="exact vague "
-    ACTIONS[exact]=" "
-    ACTIONS[vague]=" "
 
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}
