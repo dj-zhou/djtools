@@ -69,18 +69,16 @@ function _yocto_find_MACHINE() {
 # or it is the default one, tmp/, in the build directory
 function _yocto_find_TMPDIR() {
     if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
-        tmp_dir=$(_yocto_find_variable_in_file "TMPDIR" conf/local.conf)
-        if [ ! -z $tmp_dir ]; then
-            echo $tmp_dir
-        elif [ -d tmp/ ]; then
-            echo "tmp"
-        else
-            # echo "no tmp/ directory, return empty string " >&2
-            echo " "
-        fi
-    else
-        # echo "not in a build directory, return empty string " >&2
+        echo "not in a build directory, return empty string " >&2
         echo " "
+    fi
+    if [ -d "tmp/" ]; then
+        echo "tmp"
+    elif [ -d "tmp-glibc/" ]; then
+        echo "tmp-glibc"
+    else
+        echo "no \"tmp/\" or \"tmp-glibc/\" directory, return empty string " >&2
+        echo ""
     fi
 }
 
