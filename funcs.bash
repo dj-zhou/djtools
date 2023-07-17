@@ -276,32 +276,17 @@ function _find_ch_index_in_str_start_from() {
 }
 
 # =============================================================================
-function _size_human_readable() { # $fz_byte $output_control
+function _size_human_readable() {
     fz_byte=$1
-    output_control=$2
-    if [[ $output_control = 'true' ]]; then
-        echo $fz_byte
-    elif [[ $output_control = 'false' ]]; then
-        fz_kbyte=$(awk "BEGIN {print $((fz_byte)) / 1024}" | awk '{printf("%d",$0);}')
-        fz_kbyte_int=${fz_kbyte%.*}
-        fz_mbyte=$(awk "BEGIN {print $((fz_kbyte_int)) / 1024}" | awk '{printf("%d",$0);}')
-        fz_mbyte_int=${fz_mbyte%.*}
-        fz_gbyte=$(awk "BEGIN {print $((fz_mbyte_int)) / 1024}" | awk '{printf("%d",$0);}')
-        fz_gbyte_int=${fz_gbyte%.*}
-        fz_tbyte=$(awk "BEGIN {print $((fz_gbyte_int)) / 1024}" | awk '{printf("%d",$0);}')
-        fz_tbyte_int=${fz_tbyte%.*}
-        if [[ $fz_kbyte_int = '0' ]]; then
-            echo "$fz_byte bytes"
-        elif [[ $fz_mbyte_int = '0' ]]; then
-            echo "$fz_kbyte KiB"
-        elif [[ $fz_gbyte_int = '0' ]]; then
-            echo "$fz_mbyte MiB"
-        elif [[ $fz_tbyte_int = '0' ]]; then
-            echo "$fz_gbyte GiB"
-        else
-            echo "$fz_tbyte TiB"
-        fi
-    fi
+    units=("bytes" "KiB" "MiB" "GiB" "TiB")
+    unit_index=0
+    
+    while (( fz_byte >= 1024 && unit_index < ${#units[@]} )); do
+        fz_byte=$(( fz_byte / 1024 ))
+        (( unit_index++ ))
+    done
+    
+    echo "$fz_byte ${units[unit_index]}"
 }
 
 # =============================================================================
