@@ -280,13 +280,22 @@ function _size_human_readable() {
     fz_byte=$1
     units=("bytes" "KiB" "MiB" "GiB" "TiB")
     unit_index=0
-    
-    while (( fz_byte >= 1024 && unit_index < ${#units[@]} )); do
-        fz_byte=$(( fz_byte / 1024 ))
-        (( unit_index++ ))
+
+    while ((fz_byte >= 1024 && unit_index < ${#units[@]})); do
+        fz_byte=$((fz_byte / 1024))
+        ((unit_index++))
     done
-    
-    echo "$fz_byte ${units[unit_index]}"
+    highest_index=$unit_index
+    fz_byte_round=$fz_byte
+    base=1
+    while ((unit_index > 0)); do
+        fz_byte_round=$((fz_byte_round * 1024))
+        base=$((base * 1024))
+        ((unit_index--))
+    done
+    left=$(($(($1 - $fz_byte_round))*100))
+    percent=$(( $left / $base ))
+    echo "${fz_byte}.${percent} ${units[highest_index]}"
 }
 
 # =============================================================================
