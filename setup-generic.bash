@@ -225,7 +225,7 @@ function _dj_setup_computer() {
     _press_enter_or_wait_s_continue 5
     packages="ark cmake curl dconf-editor dconf-tools gedit git "
     packages+="git-lfs g++ kazam libgtk2.0-dev libncurses5-dev lsb-core "
-    packages+="scrot terminator tree vlc vim wmctrl xclip yasm "
+    packages+="scrot silversearcher-ag terminator tree vlc vim wmctrl xclip yasm "
     _show_and_run _install_if_not_installed $packages
 
     # -----------------------------------
