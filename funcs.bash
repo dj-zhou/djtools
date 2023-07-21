@@ -277,25 +277,26 @@ function _find_ch_index_in_str_start_from() {
 
 # =============================================================================
 function _size_human_readable() {
-    fz_byte=$1
+    size=$1
     units=("bytes" "KiB" "MiB" "GiB" "TiB")
-    unit_index=0
 
-    while ((fz_byte >= 1024 && unit_index < ${#units[@]})); do
-        fz_byte=$((fz_byte / 1024))
+    unit_index=0
+    while ((size >= 1024 && unit_index < ${#units[@]})); do
+        size=$((size / 1024))
         ((unit_index++))
     done
     highest_index=$unit_index
-    fz_byte_round=$fz_byte
+
+    round_size=$size
     base=1
     while ((unit_index > 0)); do
-        fz_byte_round=$((fz_byte_round * 1024))
+        round_size=$((round_size * 1024))
         base=$((base * 1024))
         ((unit_index--))
     done
-    left=$(($(($1 - $fz_byte_round))*100))
-    percent=$(( $left / $base ))
-    echo "${fz_byte}.${percent} ${units[highest_index]}"
+    remain=$(( ($1 - $round_size) * 100))
+    percent=$(($remain / $base))
+    echo "${size}.${percent} ${units[highest_index]}"
 }
 
 # =============================================================================

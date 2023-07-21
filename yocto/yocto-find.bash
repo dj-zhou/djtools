@@ -457,11 +457,14 @@ function _yocto_list_resources() {
     if [ -d .git ]; then
         echo -e "\n${GRN}----------------------------------------------${NOC}"
         folder_name=$(basename $PWD)
-        echo -e "${GRN}$folder_name${NOC} (root)"
+        echo -e "${HGRN}$folder_name${NOC} (root)"
         branch_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
         echo "remote: $(git remote -v | grep fetch | awk '{print $2}')"
         echo "branch: $branch_name"
-        git log --decorate=short --pretty=oneline -n1
+        echo "  date: $(git log -1 --format=%cd)"
+        echo "commit: $(git log -1 --format=%H)"
+        echo "$(git log -1 --format=%B)"
+        # git log --decorate=short --pretty=oneline -n1
     fi
 
     # iterate all folders ----------
@@ -481,7 +484,10 @@ function _yocto_list_resources() {
             branch_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
             echo "remote: $(git remote -v | grep fetch | awk '{print $2}')"
             echo "branch: $branch_name"
-            git log --decorate=short --pretty=oneline -n1
+            echo "  date: $(git log -1 --format=%cd)"
+            echo "commit: $(git log -1 --format=%H)"
+        echo "$(git log -1 --format=%B)"
+            # git log --decorate=short --pretty=oneline -n1
             cd $cur_dir
         fi
     done
