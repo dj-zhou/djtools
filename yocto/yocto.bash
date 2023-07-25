@@ -259,11 +259,11 @@ function yocto() {
             return
         fi
         if [ $2 = 'image-bb-inc' ]; then
-            _yocto_show_bb_file $3 "image" $4 $5 $6 $7 $8 $9
+            _yocto_show_bb_file $3 "image"
             return
         fi
         if [ $2 = 'recipe-bb-inc' ]; then
-            _yocto_show_bb_file $3 "recipe" -e vague
+            _yocto_show_bb_file $3 "recipe"
             return
         fi
         return
