@@ -69,18 +69,16 @@ function _yocto_find_MACHINE() {
 # or it is the default one, tmp/, in the build directory
 function _yocto_find_TMPDIR() {
     if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
-        tmp_dir=$(_yocto_find_variable_in_file "TMPDIR" conf/local.conf)
-        if [ ! -z $tmp_dir ]; then
-            echo $tmp_dir
-        elif [ -d tmp/ ]; then
-            echo "tmp"
-        else
-            # echo "no tmp/ directory, return empty string " >&2
-            echo " "
-        fi
-    else
-        # echo "not in a build directory, return empty string " >&2
+        echo "not in a build directory, return empty string " >&2
         echo " "
+    fi
+    if [ -d "tmp/" ]; then
+        echo "tmp"
+    elif [ -d "tmp-glibc/" ]; then
+        echo "tmp-glibc"
+    else
+        echo "no \"tmp/\" or \"tmp-glibc/\" directory, return empty string " >&2
+        echo ""
     fi
 }
 
@@ -315,80 +313,110 @@ function _yocto_find_bmap_file() { # $wic_file
 }
 
 # =============================================================================
-# find a file in current directory, excluding the build directory
-function _yocto_show_bb_or_inc() { # file_full_name filter
-    cur_dir=${PWD}
+# this function is duplicated from _yocto_show_bb_or_inc(), will be simplified later
+function _yocto_show_conf_or_inc() { # file_full_name filter
+    base_dir=${PWD}
 
     file_full_name=$1
     filter=$2
     for item in ./*; do
-        cd $cur_dir
+        # always start from the base directory
+        cd $base_dir
         if [[ ! -d $item ]]; then
             continue
         fi
+
         cd $item
         folder_name=$(basename $item)
+        # filter out the build directory
         if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
             continue
         fi
-        find_files=$(find -name "*$file_full_name")
+        # sometimes, the file pattern can be found from files other than *bb or *.inc
+        find_files=$(find -type f \( -name "*.conf" -o -name "*.inc" \) -name *"$file_full_name"*)
         not_shown_folder_name=1
         if [ ! -z "$find_files" ]; then
             for file in $find_files; do
                 if [[ "$file" = *"$filter"* ]]; then
                     if [ $not_shown_folder_name = 1 ]; then
-                        echo -e "\n---------------------------------------"
+                        echo -e "\n-------------------------------------------------------"
                         echo -e "${HGRN}$folder_name${NOC}"
                         not_shown_folder_name=0
                     fi
-                    if [[ "$file" = *".bb" || "$file" = *".inc" ]]; then
-                        echo "$file"
-                    fi
+                    echo "$file"
                 fi
             done
         fi
     done
-    cd $cur_dir
+    # return back to base directory
+    cd $base_dir
+}
+
+# =============================================================================
+# find a file in current directory, excluding the build directory
+function _yocto_show_bb_or_inc() { # file_full_name filter
+    base_dir=${PWD}
+
+    file_full_name=$1
+    filter=$2
+    for item in ./*; do
+        # always start from the base directory
+        cd $base_dir
+        if [[ ! -d $item ]]; then
+            continue
+        fi
+
+        cd $item
+        folder_name=$(basename $item)
+        # filter out the build directory
+        if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
+            continue
+        fi
+        # sometimes, the file pattern can be found from files other than *bb or *.inc
+        find_files=$(find -type f \( -name "*.bb" -o -name "*.inc" \) -name *"$file_full_name"*)
+        not_shown_folder_name=1
+        if [ ! -z "$find_files" ]; then
+            for file in $find_files; do
+                if [[ "$file" = *"$filter"* ]]; then
+                    if [ $not_shown_folder_name = 1 ]; then
+                        echo -e "\n-------------------------------------------------------"
+                        echo -e "${HGRN}$folder_name${NOC}"
+                        not_shown_folder_name=0
+                    fi
+                    echo "$file"
+                fi
+            done
+        fi
+    done
+    # return back to base directory
+    cd $base_dir
 }
 
 # =============================================================================
 # it should not be started in a build directory
 function _yocto_show_conf() { # filter
     if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
-        echo -e "\n this is a build directory, stop searching, exit!!\n" >&2
+        echo_warn "this is a build directory, stop searching, exit!!" >&2
         return
     fi
 
     conf_name=$1
     filter=$2
-    exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
 
-    if [ "$exact_vague" = "exact" ]; then
-        conf_full_name="$conf_name.conf"
-    else
-        conf_full_name="$conf_name*.conf"
-    fi
-
-    _yocto_show_bb_or_inc $conf_full_name $filter
+    _yocto_show_conf_or_inc $conf_name $filter
 }
 
 # =============================================================================
 function _yocto_show_bb_file() { #filter
     if [ $(_yocto_check_is_a_build_directory) = 'true' ]; then
-        echo -e "${YLW}this is a build directory, stop searching, exit!!${NOC}" >&2
+        echo_warn "this is a build directory, stop searching, exit!!" >&2
         return
     fi
 
     bb_name=$1
     filter=$2
-    exact_vague=$(_find_argument_after_option -e $1 $2 $3 $4 $5 $6 $7 $8)
-    # find bb file ---------------
-    if [ "$exact_vague" = "exact" ]; then
-        bb_full_name="$bb_name"
-    else
-        bb_full_name="$bb_name*"
-    fi
-    _yocto_show_bb_or_inc $bb_full_name $filter
+
+    _yocto_show_bb_or_inc $bb_name $filter
 }
 
 # =============================================================================
@@ -429,11 +457,14 @@ function _yocto_list_resources() {
     if [ -d .git ]; then
         echo -e "\n${GRN}----------------------------------------------${NOC}"
         folder_name=$(basename $PWD)
-        echo -e "${GRN}$folder_name${NOC} (root)"
+        echo -e "${HGRN}$folder_name${NOC} (root)"
         branch_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
         echo "remote: $(git remote -v | grep fetch | awk '{print $2}')"
         echo "branch: $branch_name"
-        git log --decorate=short --pretty=oneline -n1
+        echo "  date: $(git log -1 --format=%cd)"
+        echo "commit: $(git log -1 --format=%H)"
+        echo "$(git log -1 --format=%B)"
+        # git log --decorate=short --pretty=oneline -n1
     fi
 
     # iterate all folders ----------
@@ -453,7 +484,10 @@ function _yocto_list_resources() {
             branch_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
             echo "remote: $(git remote -v | grep fetch | awk '{print $2}')"
             echo "branch: $branch_name"
-            git log --decorate=short --pretty=oneline -n1
+            echo "  date: $(git log -1 --format=%cd)"
+            echo "commit: $(git log -1 --format=%H)"
+        echo "$(git log -1 --format=%B)"
+            # git log --decorate=short --pretty=oneline -n1
             cd $cur_dir
         fi
     done

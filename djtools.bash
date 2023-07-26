@@ -53,19 +53,20 @@ source $djtools_path/zephyr.bash
 
 # =============================================================================
 # alias ----------------------------------------------
-alias lc="ls -lh --color=always"
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-alias eixt="exit"
-alias amke="make"
-alias maek="make"
-alias mkae="make"
-alias amke="make"
-alias maek="make"
-alias ccc="clear"
-alias logout="gnome-session-quit"
-alias lock="gnome-screensaver-command -l"
+alias lc="_show_and_run ls -lh --color=always"
+alias ll='_show_and_run ls -alF'
+alias la='_show_and_run ls -A'
+alias l='_show_and_run ls -CF'
+alias eixt="_show_and_run exit"
+alias amke="_show_and_run make"
+alias maek="_show_and_run make"
+alias mkae="_show_and_run make"
+alias amke="_show_and_run make"
+alias maek="_show_and_run make"
+alias ccc="_show_and_run clear"
+alias logout="_show_and_run gnome-session-quit"
+alias lock="_show_and_run gnome-screensaver-command -l"
+alias .b="_show_and_run source ~/.bashrc"
 
 # folder alias ----------------------------------------------
-alias cddj="cd "$djtools_path
+alias cddj="_show_and_run cd $djtools_path"

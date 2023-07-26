@@ -77,7 +77,7 @@ function _verify_block_device() {
 # use &> /dev/null to make it quiet
 function _prepare_sd_card_for_flash() {
     dev=$1
-    sudo umount ${dev}?* &>/dev/null
+    sudo umount -q ${dev}?* &>/dev/null
     # this only work for a particular filesystem type
     # printf "o\nn\np\n1\n\n\nw\n" | sudo fdisk "$dev"
     sudo dd if=/dev/zero of=$dev bs=4M count=1 conv=notrunc &>/dev/null

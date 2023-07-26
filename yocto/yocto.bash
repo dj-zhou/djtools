@@ -246,6 +246,10 @@ function yocto() {
             _yocto_help
             return
         fi
+        if [ $# -lt 3 ]; then
+            echo_warn "need more argument, exit!"
+            return
+        fi
         if [ $2 = 'distro-conf' ]; then
             _yocto_show_conf $3 "distro" $4 $5 $6 $7 $8 $9
             return
@@ -255,11 +259,11 @@ function yocto() {
             return
         fi
         if [ $2 = 'image-bb-inc' ]; then
-            _yocto_show_bb_file $3 "image" $4 $5 $6 $7 $8 $9
+            _yocto_show_bb_file $3 "image"
             return
         fi
         if [ $2 = 'recipe-bb-inc' ]; then
-            _yocto_show_bb_file $3 "recipe" -e vague
+            _yocto_show_bb_file $3 "recipe"
             return
         fi
         return
@@ -344,9 +348,6 @@ function _yocto() {
     for i in $show_list; do
         ACTIONS[$i]=" "
     done
-    ACTIONS[-e]="exact vague "
-    ACTIONS[exact]=" "
-    ACTIONS[vague]=" "
 
     # ------------------------------------------------------------------------
     local cur=${COMP_WORDS[COMP_CWORD]}

@@ -26,7 +26,7 @@ function _dj_setup_opencv_2_4_13() {
         -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON \
         WITH_OPENCL=ON WITH_GDAL=ON WITH_IPP=ON BUILD_JASPER=ON BUILD_JPEG=ON \
         BUILD_PNG=ON BUIILD_TIFF=ON WITH_OPENMP=ON ..
-    _show_and_run make -j$(nproc)
+    _show_and_run make -j$(($(nproc)/2))
     _show_and_run sudo make install
 
     _ask_to_remove_a_folder opencv-2.4.13
@@ -69,8 +69,7 @@ function _setup_opencv_dependencies() {
     # Optimization libraries for OpenCV
     packages+="libatlas-base-dev gfortran "
     # Optional libraries
-    packages+="libprotobuf-dev protobuf-compiler "
-    packages+="libgoogle-glog-dev libgflags-dev "
+    packages+="libprotobuf-dev protobuf-compiler libgflags-dev "
     packages+="libgphoto2-dev libeigen3-dev libhdf5-dev doxygen "
     # Install OpenCL SDK related things
     packages+="ocl-icd-opencl-dev "
@@ -144,7 +143,7 @@ function _dj_setup_opencv_3_4_13() {
         -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
         -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include ..
 
-    _show_and_run make -j$(nproc)
+    _show_and_run make -j$(($(nproc)/2))
     _show_and_run sudo make install
 
     cat <<eom
@@ -237,7 +236,7 @@ function _dj_setup_opencv_4_5_5() {
     # -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
     # -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include ..
 
-    _show_and_run make -j$(nproc)
+    _show_and_run make -j$(($(nproc)/2))
     _show_and_run sudo make install
 
     _show_and_run sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2

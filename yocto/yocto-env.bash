@@ -30,29 +30,35 @@ function _yocto_setup_dev_env()
     packages+="ca-certificates ccache chrpath coreutils cpio curl dblatex "
     packages+="debianutils desktop-file-utils diffstat docbook-utils dosfstools "
     packages+="dos2unix file fop gawk gcc gcc-multilib git gnupg groff g++ "
-    packages+="g++-multilib iputils-ping locales lib32ncurses5 lib32z1 libc6-dev "
+    packages+="g++-multilib iputils-ping locales  lib32z1 libc6-dev "
     packages+="libegl1-mesa libgl1-mesa-dev libglib2.0-dev libglu1-mesa-dev "
     packages+="liblz4-tool libsdl1.2-dev libtool libx11-dev libxml-parser-perl make "
-    packages+="mtools patch parted pv pylint3 python python-gtk2 python-pysqlite2 "
-    packages+="python3 python3-distutils python3-git python3-jinja2 python3-pexpect "
-    packages+="python3-pip screen sed ssh socat subversion texi2html texinfo "
-    packages+="unzip wget xmlto xsltproc xsltproc xterm xz-utils zstd "
+    packages+="mtools patch parted pv python3 python3-distutils python3-git "
+    packages+="python3-jinja2 python3-pexpect python3-pip screen sed ssh socat "
+    packages+="subversion texi2html texinfo unzip wget xmlto xsltproc xsltproc xterm xz-utils zstd "
     # dependencies needed for building documents
     packages+="fonts-liberation libfreetype6-dev libjpeg8-dev "
     packages+="python3-dev python3-sphinx texlive-fonts-recommended "
     packages+="texlive-latex-extra zlib1g-dev"
     for package in $packages ; do
-        _install_if_not_installed $package
+        _show_and_run _install_if_not_installed $package
     done
 
-    if [[ "${ubuntu_v}" != *'20.04'* ]] ; then
-        packages="libstdc++-5-dev python-git "
+    # should test in each platform
+    if [[ "${ubuntu_v}" != *'22.04'* ]] ; then
+        packages="lib32ncurses5 pylint3 python python-gtk2 python-pysqlite2 "
         for package in $packages ; do
-            _install_if_not_installed $package
+            _show_and_run _install_if_not_installed $package
+        done
+    fi
+    if [[ "${ubuntu_v}" == *'22.04'* ]] ; then
+        packages=" "
+        for package in $packages ; do
+            _show_and_run _install_if_not_installed $package
         done
     fi
 
-    sudo pip3 install reportlab sphinxcontrib-blockdiag &> /dev/null
+    _show_and_run pip3 install reportlab sphinxcontrib-blockdiag  
 
     echo "Yocto build environment dependencies are installed"
 }

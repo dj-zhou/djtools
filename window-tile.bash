@@ -47,7 +47,6 @@ _window_tile_embedded() {
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,3840,0,1800,2080
         wmctrl -r "Terminal" -e 0,2340,0,1500,2160
-        wmctrl -r "eclipse" -e 0,5370,0,2710,2150
         wmctrl -r "Sublime Text" -e 0,5660,0,1500,2150
         wmctrl -r ${vs_code_window} -e 0,5660,0,2000,2080
         return
@@ -56,9 +55,15 @@ _window_tile_embedded() {
         echo "window-tile embedded: single 3840x2160 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,1200,2030
-        wmctrl -r "eclipse" -e 0,1830,0,2000,2050
         wmctrl -r "Sublime Text" -e 0,1730,0,2000,2050
         wmctrl -r ${vs_code_window} -e 0,1730,0,2300,2030
+        return
+    fi
+    if [[ $SCREENSIZE = *"2560x1600"* ]]; then
+        echo "window-tile embedded: single 2560x1600 screen"
+        #                   none, x,     y,   width,   height
+        wmctrl -r "/bin/bash" -e 0,10,0,1000,1550
+        wmctrl -r ${vs_code_window} -e 0,1020,0,1540,1550
         return
     fi
     if [[ "$SCREENSIZE" = *"2560x1440"*"1920x1200"* ]]; then
@@ -71,7 +76,6 @@ _window_tile_embedded() {
         fi
         wmctrl -r "/bin/bash" -e 0,0,10,800,1120
         wmctrl -r "Terminal" -e 0,1200,0,710,1150
-        wmctrl -r "eclipse" -e 0,2720,0,1200,1150
         wmctrl -r "Sublime Text" -e 0,2830,0,1500,1100
         wmctrl -r ${vs_code_window} -e 0,800,0,1120,1150
         return
@@ -82,14 +86,12 @@ _window_tile_embedded() {
             #               none, x,     y,   width,   height
             wmctrl -r "/bin/bash" -e 0,1920,0,800,1170
             wmctrl -r "Terminal" -e 0,1200,0,710,1150
-            wmctrl -r "eclipse" -e 0,2720,0,1200,1150
             wmctrl -r "Sublime Text" -e 0,2830,0,1500,1100
             wmctrl -r ${vs_code_window} -e 0,2720,0,1120,1170
             return
         fi
         wmctrl -r "/bin/bash" -e 0,0,10,800,1120
         wmctrl -r "Terminal" -e 0,1200,0,710,1150
-        wmctrl -r "eclipse" -e 0,2720,0,1200,1150
         wmctrl -r "Sublime Text" -e 0,2830,0,1500,1100
         wmctrl -r ${vs_code_window} -e 0,800,0,1120,1150
         return
@@ -99,7 +101,6 @@ _window_tile_embedded() {
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,1930,0,800,1020
         wmctrl -r "Terminal" -e 0,1200,0,710,1050
-        wmctrl -r "eclipse" -e 0,2720,0,1200,1050
         wmctrl -r "Sublime Text" -e 0,2830,0,1500,1000
         wmctrl -r ${vs_code_window} -e 0,2720,0,1120,1050
         return
@@ -115,7 +116,6 @@ _window_tile_embedded() {
         echo "window-tile embedded: 2560x1440 + 1920x1080 screens"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,1000,1380
-        wmctrl -r "eclipse" -e 0,1530,0,1200,1380
         wmctrl -r "Sublime Text" -e 0,810,0,800,1380
         wmctrl -r ${vs_code_window} -e 0,1020,0,1530,1380
         return
@@ -124,7 +124,6 @@ _window_tile_embedded() {
         echo "window-tile embedded: a single 2560x1440 screens"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,1000,1380
-        wmctrl -r "eclipse" -e 0,1530,0,1200,1380
         wmctrl -r "Sublime Text" -e 0,810,0,800,1380
         wmctrl -r ${vs_code_window} -e 0,1020,0,1530,1380
         return
@@ -155,7 +154,6 @@ _window_tile_embedded() {
         echo "window-tile embedded: single 2560x1080 screen"
         #                   none, x,     y,   width,   height
         wmctrl -r "/bin/bash" -e 0,10,0,1000,1020
-        wmctrl -r "eclipse" -e 0,1530,0,1200,1060
         wmctrl -r "Sublime Text" -e 0,810,0,800,1040
         wmctrl -r ${vs_code_window} -e 0,1020,0,1530,1070
         return

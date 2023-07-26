@@ -276,49 +276,58 @@ function _find_ch_index_in_str_start_from() {
 }
 
 # =============================================================================
-function _size_human_readable() { # $fz_byte $output_control
-    fz_byte=$1
-    output_control=$2
-    if [[ $output_control = 'true' ]]; then
-        echo $fz_byte
-    elif [[ $output_control = 'false' ]]; then
-        fz_kbyte=$(awk "BEGIN {print $((fz_byte)) / 1024}" | awk '{printf("%d",$0);}')
-        fz_kbyte_int=${fz_kbyte%.*}
-        fz_mbyte=$(awk "BEGIN {print $((fz_kbyte_int)) / 1024}" | awk '{printf("%d",$0);}')
-        fz_mbyte_int=${fz_mbyte%.*}
-        fz_gbyte=$(awk "BEGIN {print $((fz_mbyte_int)) / 1024}" | awk '{printf("%d",$0);}')
-        fz_gbyte_int=${fz_gbyte%.*}
-        fz_tbyte=$(awk "BEGIN {print $((fz_gbyte_int)) / 1024}" | awk '{printf("%d",$0);}')
-        fz_tbyte_int=${fz_tbyte%.*}
-        if [[ $fz_kbyte_int = '0' ]]; then
-            echo "$fz_byte bytes"
-        elif [[ $fz_mbyte_int = '0' ]]; then
-            echo "$fz_kbyte KiB"
-        elif [[ $fz_gbyte_int = '0' ]]; then
-            echo "$fz_mbyte MiB"
-        elif [[ $fz_tbyte_int = '0' ]]; then
-            echo "$fz_gbyte GiB"
-        else
-            echo "$fz_tbyte TiB"
-        fi
-    fi
+function _size_human_readable() {
+    size=$1
+    units=("bytes" "KiB" "MiB" "GiB" "TiB")
+
+    unit_index=0
+    while ((size >= 1024 && unit_index < ${#units[@]})); do
+        size=$((size / 1024))
+        ((unit_index++))
+    done
+    highest_index=$unit_index
+
+    round_size=$size
+    base=1
+    while ((unit_index > 0)); do
+        round_size=$((round_size * 1024))
+        base=$((base * 1024))
+        ((unit_index--))
+    done
+    remain=$(( ($1 - $round_size) * 100))
+    percent=$(($remain / $base))
+    echo "${size}.${percent} ${units[highest_index]}"
 }
 
 # =============================================================================
 function _wget_if_not_exist() { # $filename $md5sum $url $option
     filename=$1
-    md5sum_passed_in=$2
+    checksum_passed_in=$2
     url=$3
     option=$4
-    unset md5checksum
+    local md5_checksum=""
     if [[ -f "$filename" ]]; then
-        md5checksum=$(md5sum "$filename")
+        md5_checksum=$(md5sum "$filename")
     else
-        md5checksum=" "
+        md5_checksum=" "
     fi
-    if [[ "$md5checksum" = *"$md5sum_passed_in"* ]]; then
-        echo "file exists, no need to wget again"
+    local sha256_checksum=""
+    if [[ -f "$filename" ]]; then
+        sha256_checksum=$(sha256sum "$filename")
     else
+        sha256_checksum=" "
+    fi
+    need_to_download=1
+    if [[ "$md5_checksum" = *"$checksum_passed_in"* ]]; then
+        echo "file exists, md5 checksum matches, no need to download again"
+        need_to_download=0
+    fi
+    if [[ "$sha256_checksum" = *"$checksum_passed_in"* ]]; then
+        echo "file exists, sha256 checksum matches, no need to download again"
+        need_to_download=0
+    fi
+    # finally, download it if necessary
+    if [[ "$need_to_download" = "1" ]]; then
         wget $option $filename "${url}"
     fi
 }
