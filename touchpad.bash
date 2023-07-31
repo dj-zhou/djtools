@@ -11,17 +11,26 @@ _touchpad_help() {
 
 # =============================================================================
 function _touchpad_thinkpad_control() {
+    if [[ ${ubuntu_v} = *'22.04'* ]]; then
+        touchpad=$(xinput list | grep Synaptics | cut -f 2 | cut -d= -f 2)
+        if [ $1 = '0' ]; then
+            _show_and_run xinput -disable $touchpad
+        elif [ $1 = '1' ]; then
+            _show_and_run xinput -enable $touchpad
+        fi
+        return
+    fi
     # xinput list | grep TouchPad
     touchpad=$(xinput list | grep TouchPad | tr -dc '0-9')
     # the number is not a constant number, for example it was 13, and it then 14 at some time
     touchpadID=${touchpad:1:2}
-    xinput set-prop $touchpadID "Device Enabled" $1
+    _show_and_run xinput set-prop $touchpadID "Device Enabled" $1
     # for my new P52 computer, it is "Touchpad" instead of "TouchPad"
     # xinput list | grep Touchpad
-    touchpad=$(xinput list | grep Touchpad | tr -dc '0-9')
+    touchpad=$(xinput list | grep TrackPoint | tr -dc '0-9')
     # the number is not a constant number, for example it was 13, and it then 14 at some time
     touchpadID=${touchpad:1:2}
-    xinput set-prop $touchpadID "Device Enabled" $1
+    _show_and_run xinput set-prop $touchpadID "Device Enabled" $1
 }
 
 # =============================================================================
@@ -72,7 +81,7 @@ function _touchpad_roc_control() {
     # echo "equal_pos = " $equal_pos
     touchpadID=${touchpad:$equal_pos:${first_space_after_equal}-${equal_pos}}
     # enable or disable the ROC touchpad
-    xinput set-prop $touchpadID "Device Enabled" $1
+    _show_and_run xinput set-prop $touchpadID "Device Enabled" $1
 }
 
 # =============================================================================
