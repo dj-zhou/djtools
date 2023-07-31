@@ -1828,10 +1828,10 @@ function _dj_setup_tldr() {
 # =============================================================================
 # why this does not work with python3.9?
 function _dj_setup_typora() {
-    wget -qO - https://typora.io/linux/public-key.asc | sudo apt-key add -
+    _show_and_run wget -qO - https://typoraio.cn/linux/public-key.asc | sudo tee /etc/apt/trusted.gpg.d/typora.asc
     # add Typora's repository
-    sudo add-apt-repository 'deb https://typora.io/linux ./'
-    sudo apt-get -y update
+    _show_and_run sudo add-apt-repository 'deb https://typora.io/linux ./'
+    _show_and_run sudo apt-get -y update
     # install typora
     _show_and_run sudo apt install -y typora
 }
