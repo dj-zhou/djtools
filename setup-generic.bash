@@ -515,10 +515,9 @@ function _dj_setup_foxit_reader() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-
     # no way to get the latest version?
-    file=FoxitReader.enu.setup.2.4.4.0911.x64.run
-    url="http://cdn01.foxitsoftware.com/pub/foxit/reader/desktop/"
+    file=FoxitReader.enu.setup.2.4.5.0727.x64.run
+    url="https://cdn78.foxitsoftware.com/pub/foxit/reader/desktop/"
     url=${url}linux/2.x/2.4/en_us/$file.tar.gz
     _show_and_run _wget_if_not_exist $file.tar.gz "22d2553945edc0af9dbd52dd4a2cee22" ${url}
     _show_and_run gzip -d $file.tar.gz
