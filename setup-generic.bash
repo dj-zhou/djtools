@@ -291,6 +291,16 @@ function _dj_setup_driver_wifi() {
             echo " $ sudo make install"
             return
         fi
+        # testing on Raspbian Pi Zero 2W board, kernel 6.1.21-v7+
+        if [[ "${ubuntu_v}" = *"Raspbian"* ]]; then
+            _show_and_run mkdir -p ~/soft
+            _show_and_run cd ~/soft
+            _show_and_run rm 8812au-20210629
+            _show_and_run git clone https://github.com/morrownr/8812au-20210629.git
+            _show_and_run cd 8812au-20210629
+            _show_and_run sudo ./install-driver.sh
+            return
+        fi
         echo -e "rtl8812au driver is only tested on Ubuntu 20.04 LTS (x86_64), exit"
         return
     fi
