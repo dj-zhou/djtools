@@ -966,9 +966,8 @@ function _dj_setup_libgpiod() {
         _show_and_run make -j$(nproc)
         _show_and_run sudo make install
 
-    elif [[ "${ubuntu_v}" = *'20.04'* ]]; then
+    elif [[ "${ubuntu_v}" = *'20.04'* || "${ubuntu_v}" = *'22.04'* ]]; then
         _show_and_run _install_if_not_installed autoconf-archive
-
         _show_and_run rm libgpiod -rf
         _show_and_run git clone git://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git
         _show_and_run cd libgpiod
@@ -1003,7 +1002,8 @@ function _dj_setup_libiio() {
     _show_and_run git clone https://github.com/analogdevicesinc/libiio.git
     _show_and_run cd libiio
     if [[ "${ubuntu_v}" = *'18.04'* ||
-        "${ubuntu_v}" = *'20.04'* ]]; then
+        "${ubuntu_v}" = *'20.04'* ||
+        "${ubuntu_v}" = *'22.04'* ]]; then
         _show_and_run git checkout $v
     else
         echo -e "\n${YLW} TO BE IMPLEMENTED${NOC}\n"
@@ -1016,12 +1016,11 @@ function _dj_setup_libiio() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    _verify_lib_installation /libiio.so /usr/lib/x86_64-linux-gnu/
+    _verify_lib_installation libiio.so /usr/lib/x86_64-linux-gnu/
     _verify_lib_installation iio_info /usr/bin/
     _verify_lib_installation iiod /usr/sbin/
     _verify_pkgconfig_file libiio.pc /usr/lib/x86_64-linux-gnu/pkgconfig/
-
-    echo "iio.h is installed to /usr/include/"
+    _verify_header_files iio.h /usr/include/
 
     _popd_quiet
 }

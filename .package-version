@@ -16,7 +16,7 @@ lcm 501bb446d42c9a57f9e5ddf3c41ba78f4735c9f2 # master on Dec. 1st, 2020
 libbpf v0.7.0 #Feb. 10th, 2022
 libev 4.33
 libiio 0.21
-libgpiod 1804:1.4 2004:v1.6.3
+libgpiod 1804:1.4 2004:v1.6.3 2204:v1.6.4
 libserialport 6f9b03e597ea7200eb616a4e410add3dd1690cb1 # Jun 11, 2021
 libsystemd v248
 nlohmann-json3 v3.11.1 # Aug 1st, 2022
