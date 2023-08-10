@@ -1732,7 +1732,7 @@ function _dj_setup_spdlog() { # static/shared
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm spdlog -rf
+    _show_and_run sudo rm spdlog -rf
 
     _show_and_run git clone https://github.com/gabime/spdlog.git
     _show_and_run cd spdlog
@@ -1743,9 +1743,9 @@ function _dj_setup_spdlog() { # static/shared
     # static build need to be specific
     # if no option found, "shared" is default
     if [ "$static_shared" = 'static' ]; then
-        _show_and_run cmake .. -DSPDLOG_BUILD_SHARED="off"
+        _show_and_run cmake -DSPDLOG_BUILD_SHARED=off -DSPDLOG_INSTALL=on -DSPDLOG_BUILD_EXAMPLES=off -DSPDLOG_BUILD_TESTS=off -DSPDLOG_BUILD_BENCH=off -DSPDLOG_FMT_EXTERNAL=off .. 
     else
-        _show_and_run cmake .. -DSPDLOG_BUILD_SHARED="on"
+        _show_and_run cmake  -DSPDLOG_BUILD_SHARED=on -DSPDLOG_FMT_EXTERNAL=off .. 
     fi
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
