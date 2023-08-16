@@ -109,23 +109,23 @@ function touchpad {
                 echo 'touchpad thinkpad: argument not supported.'
             fi
         fi
-        if [ $1 = 'roc' ] || [ $1 = 'precision' ]; then
+        if [ $1 = 'roc' ] || [ $1 = 'dell' ]; then
             if [ $2 = 'enable' ]; then
                 _touchpad_roc_control 1
                 if [ $1 = 'roc' ]; then
                     echo 'Touch Pad on ROC Zephyrus laptop is enabled '
-                elif [ $1 = 'precision' ]; then
-                    echo 'Touch Pad on Dell Precision laptop is enabled '
+                elif [ $1 = 'dell' ]; then
+                    echo 'Touch Pad on Dell dell laptop is enabled '
                 fi
             elif [ $2 = 'disable' ]; then
                 _touchpad_roc_control 0
                 if [ $1 = 'roc' ]; then
                     echo 'Touch Pad on ROC Zephyrus laptop is disabled '
-                elif [ $1 = 'precision' ]; then
-                    echo 'Touch Pad on Dell Precision laptop is disabled '
+                elif [ $1 = 'dell' ]; then
+                    echo 'Touch Pad on Dell dell laptop is disabled '
                 fi
             else
-                echo 'touchpad roc/precision: argument not supported.'
+                echo 'touchpad roc/dell: argument not supported.'
             fi
         fi
     fi
@@ -141,18 +141,18 @@ _touchpad() {
     local SERVICES=("
         thinkpad
         roc
-        precision
+        dell
     ")
 
     # declare an associative array for options
     declare -A ACTIONS
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------
-    ACTIONS[thinkpad]="enable disable "  # must have a space in " "
-    ACTIONS[roc]="enable disable "       # must have a space in " "
-    ACTIONS[precision]="enable disable " # must have a space in " "
-    ACTIONS[enable]=" "                  # must have a space in " "
-    ACTIONS[disable]=" "                 # must have a space in " "
+    ACTIONS[thinkpad]="enable disable " # must have a space in " "
+    ACTIONS[roc]="enable disable "      # must have a space in " "
+    ACTIONS[dell]="enable disable "     # must have a space in " "
+    ACTIONS[enable]=" "                 # must have a space in " "
+    ACTIONS[disable]=" "                # must have a space in " "
 
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------
