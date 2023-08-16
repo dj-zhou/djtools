@@ -1652,6 +1652,13 @@ function dj() {
     fi
 
     # ------------------------------
+    if [ $1 = 'systemd' ]; then
+        shift 1
+        _dj_systemd "$@"
+        return
+    fi
+
+    # ------------------------------
     if [ $1 = 'udev' ]; then
         # ------------------------------
         if [ $# -ge 2 ]; then
@@ -1708,6 +1715,7 @@ function _dj() {
         setup
         split
         ssh-general
+        systemd
         udev
         udevadm
         unpack
@@ -1833,6 +1841,14 @@ function _dj() {
     # --------------------------------------------------------
     ACTIONS["ssh-general"]="no-password "
     ACTIONS["no-password"]=" "
+
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    systemd_list="umount "
+    ACTIONS["systemd"]="$systemd_list  "
+    for i in $systemd_list; do
+        ACTIONS[$i]=" "
+    done
 
     # --------------------------------------------------------
     # --------------------------------------------------------

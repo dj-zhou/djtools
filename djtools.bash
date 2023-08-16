@@ -43,6 +43,7 @@ source $djtools_path/pack-unpack.bash
 source $djtools_path/rpi.bash
 source $djtools_path/split-merge.bash
 source $djtools_path/system.bash
+source $djtools_path/systemd.bash
 source $djtools_path/terminal-format.bash
 source $djtools_path/touchpad.bash
 source $djtools_path/version.bash
