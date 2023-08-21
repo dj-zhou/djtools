@@ -115,14 +115,14 @@ function touchpad {
                 if [ $1 = 'roc' ]; then
                     echo 'Touch Pad on ROC Zephyrus laptop is enabled '
                 elif [ $1 = 'dell' ]; then
-                    echo 'Touch Pad on Dell dell laptop is enabled '
+                    echo 'Touch Pad on Dell laptop is enabled '
                 fi
             elif [ $2 = 'disable' ]; then
                 _touchpad_roc_control 0
                 if [ $1 = 'roc' ]; then
                     echo 'Touch Pad on ROC Zephyrus laptop is disabled '
                 elif [ $1 = 'dell' ]; then
-                    echo 'Touch Pad on Dell dell laptop is disabled '
+                    echo 'Touch Pad on Dell laptop is disabled '
                 fi
             else
                 echo 'touchpad roc/dell: argument not supported.'
