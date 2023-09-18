@@ -1794,6 +1794,8 @@ function _dj_setup_texlive() {
 
 # =============================================================================
 function _dj_setup_thermal_printer() {
+    _pushd_quiet ${PWD}
+
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
