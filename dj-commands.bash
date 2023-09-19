@@ -346,7 +346,7 @@ function _dj_setup_container_docker() {
 
 # =============================================================================
 function _dj_setup_container_docker_compose() {
-    _show_and_run sudo apt install golang-go
+    _show_and_run _install_if_not_installed golang-go
 
     _show_and_run _pushd_quiet ${PWD}
     _show_and_run mkdir -p $soft_dir
