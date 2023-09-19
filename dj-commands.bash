@@ -306,8 +306,6 @@ function _dj_setup_devtools() {
 }
 
 # =============================================================================
-# https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04
-# this is only tested in Ubuntu 18.04
 function _dj_setup_container_docker() {
     _show_and_run _pushd_quiet ${PWD}
 
@@ -318,11 +316,12 @@ function _dj_setup_container_docker() {
     docker_url="https://download.docker.com/linux/ubuntu"
 
     # Add the GPG key for the official Docker repository
-    _show_and_run curl -fsSL $docker_url/gpg | sudo apt-key add -
+    _show_and_run curl -fsSL $docker_url/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    _show_and_run sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
     # Add the Docker repository to APT sources
     _show_and_run sudo add-apt-repository \
-        "deb [arch=amd64] $docker_url $(lsb_release -cs) stable"
+        "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] $docker_url $(lsb_release -cs) stable"
     _show_and_run sudo apt-get -y update
 
     # Install
