@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # =============================================================================
+# not used, but just keep it here
 function _dj_setup_ros_melodic() {
     _pushd_quiet ${PWD}
 
@@ -66,6 +67,7 @@ eom
 }
 
 # =============================================================================
+# not used, but just keep it here
 function _dj_setup_ros_noetic() {
     _pushd_quiet ${PWD}
 
@@ -81,8 +83,6 @@ function _dj_setup_ros_noetic() {
     fi
     # setup keys ---------------
     sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-    # or
-    # curl -sSL 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654' | sudo apt-key add -
 
     # installation ---------------
     sudo apt-get -y update || true
@@ -132,6 +132,7 @@ eom
 
 # =============================================================================
 # https://index.ros.org/doc/ros2/Installation/Foxy/Linux-Install-Debians/
+# todo: fix apt-key
 function _dj_setup_ros2_foxy_from_deb_package() {
     _pushd_quiet ${PWD}
 
@@ -201,13 +202,40 @@ eom
 }
 
 # =============================================================================
+function _dj_setup_ros2_foxy_from_source() {
+    echo "todo"
+}
+
+# =============================================================================
 function _dj_setup_ros2_foxy() {
-    if [[  $# = 0  || $1 = '--from-deb-package' ]]; then
+    if [[ $# = 0 || $1 = '--from-deb-package' ]]; then
         _dj_setup_ros2_foxy_from_deb_package
         return
     fi
     if [[ $1 = '--from-source' ]]; then
-        echo "from source: todo"
+        _dj_setup_ros2_foxy_from_source
+        return
+    fi
+}
+
+# =============================================================================
+function _dj_setup_ros2_humble_from_deb_package() {
+    echo "todo"
+}
+
+# =============================================================================
+function _dj_setup_ros2_humble_from_source() {
+    echo "todo"
+}
+
+# =============================================================================
+function _dj_setup_ros2_humble() {
+    if [[ $# = 0 || $1 = '--from-deb-package' ]]; then
+        _dj_setup_ros2_humble_from_deb_package
+        return
+    fi
+    if [[ $1 = '--from-source' ]]; then
+        _dj_setup_ros2_humble_from_source
         return
     fi
 }

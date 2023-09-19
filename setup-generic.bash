@@ -9,7 +9,7 @@ setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport 
 setup_list+="matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
 setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.5.5 pangolin perf "
 setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu qt-5.13.1 qt-5.14.2 "
-setup_list+="ros-melodic ros-noetic ros2-foxy rpi-pico rust saleae-logic serial-console spdlog slack "
+setup_list+="ros2-foxy ros2-humble rpi-pico rust saleae-logic serial-console spdlog slack "
 setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
 setup_list+="stm32-cube-programmer stm32-tools sublime texlive thermal-printer tldr typora vscode vtk-8.2.0 "
 setup_list+="windows-fonts wireshark wubi yaml-cpp "
@@ -19,7 +19,7 @@ function _dj_setup_help() {
     _dj_help
     cat <<eom
 ------------------------------- dj setup --------------------------------
-    setup common used software and packages, usually tested on Ubuntu 18.04/20.04
+    setup common used software and packages, usually tested on Ubuntu 20.04/22.04
 -------------------------------------------------------------------------
 eom
 }
@@ -1329,7 +1329,7 @@ function _dj_setup_mongodb() {
     echo "deb [ arch=amd64,arm64 signed-by=/etc/apt/keyrings/mongodb.asc] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/$v multiverse" |
         sudo tee /etc/apt/sources.list.d/mongodb-org.list
 
-    _show_and_run sudo apt update -y 
+    _show_and_run sudo apt update -y
     _show_and_run sudo apt install -y mongodb-org
     # Enable and start MongoDB Deamon program
     sudo systemctl enable --now mongod
@@ -2058,7 +2058,7 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'driver' ]; then
         shift 1
-        _dj_setup_driver $@
+        _dj_setup_driver "$@"
         return
     fi
     # --------------------------
@@ -2155,12 +2155,14 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'gtest' ]; then
-        _dj_setup_gtest $2 $3 $4
+        shift 1
+        _dj_setup_gtest "$@"
         return
     fi
     # --------------------------
     if [ $1 = 'glog' ]; then
-        _dj_setup_glog $2 $3 $4
+        shift 1
+        _dj_setup_glog "$@"
         return
     fi
     # --------------------------
@@ -2304,12 +2306,14 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'opencv-2.4.13' ]; then
-        _dj_setup_opencv_2_4_13 $2 $3 $4 $5
+        shift 1
+        _dj_setup_opencv_2_4_13 "$@"
         return
     fi
     # --------------------------
     if [ $1 = 'opencv-3.4.13' ]; then
-        _dj_setup_opencv_3_4_13 $2 $3 $4 $5
+        shift 1
+        _dj_setup_opencv_3_4_13 "$@"
         return
     fi
     # --------------------------
@@ -2365,7 +2369,8 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'qemu' ]; then
-        _dj_setup_qemu $2 $3 $4 $5
+        shift 1
+        _dj_setup_qemu "$@"
         return
     fi
     # --------------------------
@@ -2379,18 +2384,15 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'ros-melodic' ]; then
-        _dj_setup_ros_melodic $2 $3 $4
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'ros-noetic' ]; then
-        _dj_setup_ros_noetic $2 $3 $4
-        return
-    fi
-    # --------------------------
     if [ $1 = 'ros2-foxy' ]; then
-        _dj_setup_ros2_foxy $2 $3 $4
+        shift 1
+        _dj_setup_ros2_foxy "$@"
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'ros2-humble' ]; then
+        shift 1
+        _dj_setup_ros2_humble "$@"
         return
     fi
     # --------------------------
@@ -2400,8 +2402,8 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'rust' ]; then
-        shift
-        _dj_setup_rust $@
+        shift 1
+        _dj_setup_rust "$@"
         return
     fi
     # --------------------------
