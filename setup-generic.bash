@@ -1325,16 +1325,17 @@ function _dj_setup_mongodb() {
 
     v=$(_find_package_version mongodb)
     _echo_install mongodb $v
-    wget -qO - https://www.mongodb.org/static/pgp/server-$v.asc | sudo apt-key add -
-    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/$v multiverse" |
+    wget -qO - https://www.mongodb.org/static/pgp/server-$v.asc | sudo tee /etc/apt/trusted.gpg.d/mongodb.asc
+    echo "deb [ arch=amd64,arm64 signed-by=/etc/apt/keyrings/mongodb.asc] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/$v multiverse" |
         sudo tee /etc/apt/sources.list.d/mongodb-org.list
 
-    _show_and_run sudo apt update
+    _show_and_run sudo apt update -y 
     _show_and_run sudo apt install -y mongodb-org
     # Enable and start MongoDB Deamon program
     sudo systemctl enable --now mongod
 
     cat <<eom
+
 --------------------------------------------
 MongoDB install:
     mongodb-org-server - mongodb守护程序以及相应的初始化脚本和配置
@@ -1352,7 +1353,7 @@ Check if MongoDB is running:
 
 Check if MongoDB is installed:
     $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
-    or
+    or (for newer version)
     $ mongosh --eval 'db.runCommand({ connectionStatus: 1 })'
 --------------------------------------------
 eom
