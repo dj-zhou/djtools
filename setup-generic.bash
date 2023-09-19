@@ -1307,30 +1307,35 @@ function _dj_setup_meson_ninjia() {
 # =============================================================================
 # https://wiki.crowncloud.net/How_To_Install_Duf_On_Ubuntu_22_04?How_to_Install_Latest_MongoDB_on_Ubuntu_22_04
 function _dj_setup_mongodb() {
-    _show_and_run sudo apt-get update -y
     uname_a=$(uname -a)
     if [[ ! "${ubuntu_v}" = *'20.04'* && ! "${ubuntu_v}" = *'22.04'* && ! "${uname_a}" = *'x86_64'* ]]; then
         echo_warn "dj setup mongodb: only tested on x86_64 Ubuntu 20.04/22.04, exit!"
         return
     fi
 
+    _show_and_run sudo apt-get update -y
     _show_and_run _install_if_not_installed dirmngr gnupg apt-transport-https \
-        ca-certificates software-properties-common
+        ca-certificates software-properties-common libssl1.1
     # install libssl1.1 (https://askubuntu.com/a/1403683)
-    echo "deb http://security.ubuntu.com/ubuntu focal-security main" |
-        sudo tee /etc/apt/sources.list.d/focal-security.list
-
-    _show_and_run sudo apt-get update
-    _show_and_run _install_if_not_installed libssl1.1
 
     v=$(_find_package_version mongodb)
     _echo_install mongodb $v
-    wget -qO - https://www.mongodb.org/static/pgp/server-$v.asc | sudo tee /etc/apt/trusted.gpg.d/mongodb.asc
-    echo "deb [ arch=amd64,arm64 signed-by=/etc/apt/keyrings/mongodb.asc] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/$v multiverse" |
-        sudo tee /etc/apt/sources.list.d/mongodb-org.list
+    wget -qO - https://www.mongodb.org/static/pgp/server-$v.asc |
+        sudo gpg -o /usr/share/keyrings/mongodb-server-$v.gpg \
+            --dearmor
+
+    if [[ "${ubuntu_v}" = *'20.04'* ]]; then
+        codename="focal"
+    elif [[ "${ubuntu_v}" = *'22.04'* ]]; then
+        codename="jammy"
+    fi
+
+    echo "deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-$v.gpg] https://repo.mongodb.org/apt/ubuntu $codename/mongodb-org/$v multiverse" |
+        sudo tee /etc/apt/sources.list.d/mongodb-org-$v.list
 
     _show_and_run sudo apt update -y
     _show_and_run sudo apt install -y mongodb-org
+
     # Enable and start MongoDB Deamon program
     sudo systemctl enable --now mongod
 
