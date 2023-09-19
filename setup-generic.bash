@@ -1743,9 +1743,9 @@ function _dj_setup_spdlog() { # static/shared
     # static build need to be specific
     # if no option found, "shared" is default
     if [ "$static_shared" = 'static' ]; then
-        _show_and_run cmake -DSPDLOG_BUILD_SHARED=off -DSPDLOG_INSTALL=on -DSPDLOG_BUILD_EXAMPLES=off -DSPDLOG_BUILD_TESTS=off -DSPDLOG_BUILD_BENCH=off -DSPDLOG_FMT_EXTERNAL=off .. 
+        _show_and_run cmake -DSPDLOG_BUILD_SHARED=off -DSPDLOG_INSTALL=on -DSPDLOG_BUILD_EXAMPLES=off -DSPDLOG_BUILD_TESTS=off -DSPDLOG_BUILD_BENCH=off -DSPDLOG_FMT_EXTERNAL=off ..
     else
-        _show_and_run cmake  -DSPDLOG_BUILD_SHARED=on -DSPDLOG_FMT_EXTERNAL=off .. 
+        _show_and_run cmake -DSPDLOG_BUILD_SHARED=on -DSPDLOG_FMT_EXTERNAL=off ..
     fi
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
@@ -1767,16 +1767,15 @@ function _dj_setup_spdlog() { # static/shared
 function _dj_setup_sublime() {
     _pushd_quiet ${PWD}
 
-    sudo apt-get update
-    _show_and_run _install_if_not_installed apt-transport-https ca-certificates curl
-    _show_and_run _install_if_not_installed software-properties-common
+    _show_and_run sudo apt-get update -y
+    _show_and_run _install_if_not_installed apt-transport-https ca-certificates curl software-properties-common
 
-    curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
-    sudo add-apt-repository "deb https://download.sublimetext.com/ apt/stable/"
-
-    sudo apt-get update
-    _show_and_run _install_if_not_installed sublime-text
-
+    _show_and_run wget -nc https://download.sublimetext.com/sublimehq-pub.gpg
+    cat sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-pub.gpg >/dev/null
+    _show_and_run sudo add-apt-repository "deb https://download.sublimetext.com/ apt/stable/"
+    _show_and_run sudo apt-get update -y
+    _show_and_run sudo apt install sublime-text
+    rm sublimehq-pub.gpg
     _popd_quiet
 }
 
