@@ -1307,10 +1307,10 @@ function _dj_setup_meson_ninjia() {
 # =============================================================================
 # https://wiki.crowncloud.net/How_To_Install_Duf_On_Ubuntu_22_04?How_to_Install_Latest_MongoDB_on_Ubuntu_22_04
 function _dj_setup_mongodb() {
-    sudo apt-get update -y
+    _show_and_run sudo apt-get update -y
     uname_a=$(uname -a)
-    if [[ ! "${ubuntu_v}" = *'20.04'* || "${ubuntu_v}" = *'22.04'* || ! "${uname_a}" = *'x86_64'* ]]; then
-        echo_warn "only tested on x86_64 Ubuntu 20.04/22.04, exit"
+    if [[ ! "${ubuntu_v}" = *'20.04'* && ! "${ubuntu_v}" = *'22.04'* && ! "${uname_a}" = *'x86_64'* ]]; then
+        echo_warn "dj setup mongodb: only tested on x86_64 Ubuntu 20.04/22.04, exit!"
         return
     fi
 
