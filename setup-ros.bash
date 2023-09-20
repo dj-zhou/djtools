@@ -138,7 +138,7 @@ function _dj_setup_ros2_foxy_from_deb_package() {
 
     # only Uubntu 20.04 can install ros2 Foxy Fitzroy
     if [[ $ubuntu_v != *'Ubuntu 20.04'* ]]; then
-        echo -e "ROS2 Foxy Fitzroy can only be installed on Ubuntu 20.04"
+        echo_warn "ROS2 Foxy Fitzroy can only be installed on Ubuntu 20.04"
         return
     fi
 
@@ -170,7 +170,7 @@ function _dj_setup_ros2_foxy_from_deb_package() {
 
     installed=0
     while IFS='' read -r line || [[ -n "$line" ]]; do
-        if [[ $line == *"ource /opt/ros/foxy/setup.bash"* ]]; then
+        if [[ $line == *"source /opt/ros/foxy/setup.bash"* ]]; then
             installed=1
         fi
     done <~/.bashrc
@@ -219,8 +219,53 @@ function _dj_setup_ros2_foxy() {
 }
 
 # =============================================================================
+# https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html
 function _dj_setup_ros2_humble_from_deb_package() {
-    echo "todo"
+    # only Uubntu 22.04 can install ROS2 Humble Hawksbill
+    if [[ $ubuntu_v != *'Ubuntu 22.04'* ]]; then
+        echo_warn "ROS2 Humble Hawksbill can only be installed on Ubuntu 22.04"
+        return
+    fi
+
+    # install packages
+    _show_and_run sudo apt update -y
+    _show_and_run _install_if_not_installed locales software-properties-common curl
+
+    # Set locale
+    _show_and_run sudo locale-gen en_US en_US.UTF-8
+    _show_and_run sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+    _show_and_run export LANG=en_US.UTF-8
+
+    # Setup Sources
+    _show_and_run _install_if_not_installed
+    _show_and_run sudo add-apt-repository universe
+
+    # Now add the ROS 2 GPG key with apt
+    _show_and_run sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+
+    # add the repository to your sources list
+    _show_and_run echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list >/dev/null
+
+    # Install ROS 2 packages
+    _show_and_run sudo apt update -y
+    # Desktop Install: ROS, RViz, demos, tutorials.
+    _show_and_run sudo apt install ros-humble-desktop -y
+    _show_and_run sudo apt install ros-dev-tools -y
+
+    # Setup environment
+    installed=0
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"source /opt/ros/humble/setup.bash"* ]]; then
+            installed=1
+        fi
+    done <~/.bashrc
+
+    if [[ $installed = 0 ]]; then
+        echo -e '\n' >>~/.bashrc
+        echo '# ===========================================================' >>~/.bashrc
+        echo '# (djtools) ROS 2 Humble setup' >>~/.bashrc
+        echo -e "source /opt/ros/humble/setup.bash\n" >>~/.bashrc
+    fi
 }
 
 # =============================================================================
