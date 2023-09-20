@@ -969,7 +969,21 @@ function _dj_setup_go() {
     _show_and_run sudo rm -rf /usr/bin/go # installed by apt
     _show_and_run sudo mv go /usr/local
 
-    echo 'export PATH=$PATH:/usr/local/go/bin' >>~/.bashrc
+    installed=0
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"PATH:/usr/local/go/bin"* ]]; then
+            echo -e "PATH for go is setup correctly."
+            echo -e "you can still revise ~/.bashrc for manual setup."
+            installed=1
+        fi
+    done <~/.bashrc
+    if [[ $installed = '0' ]]; then
+        echo -e "setup the PATH for go (golong)."
+        echo -e '\n' >>~/.bashrc
+        echo '# ===========================================================' >>~/.bashrc
+        echo '# (djtools) go (golang) setup' >>~/.bashrc
+        echo -e 'export PATH=$PATH:/usr/local/go/bin\n' >>~/.bashrc
+    fi
 
     _popd_quiet
 }
