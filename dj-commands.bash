@@ -347,9 +347,9 @@ function _dj_setup_container_docker() {
     _show_and_run su - ${USER}
 
     # to solve a problem: dial unix /var/run/docker.sock: connect: permission denied
-    # (todo: why the below scripts seem not be ran?)
+    # (must run "exit" to exit the above entered session)
     _show_and_run sudo chmod 666 /var/run/docker.sock
-    echo -e "you need to reboot your computer so docker does not need sudo to run"
+    echo -e "you may need to reboot your computer so docker does not need sudo to run"
 
     _popd_quiet
 }
