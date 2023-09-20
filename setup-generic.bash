@@ -1667,13 +1667,17 @@ function _dj_setup_slack() {
     _show_and_run _pushd_quiet ${PWD}
 
     _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
+    _show_and_run _pushd_quiet $soft_dir
+    # just in case
+    _show_and_run rm -rf slack-desktop*.deb
 
     # the download page: https://slack.com/downloads/linux
     local v=$(_find_package_version slack)
     _show_and_run wget https://downloads.slack-edge.com/releases/linux/$v/prod/x64/slack-desktop-$v-amd64.deb
     _show_and_run sudo dpkg -i slack-desktop*.deb
+    _show_and_run rm slack-desktop*.deb
 
+    # is one popd enough?
     _popd_quiet
 }
 
