@@ -306,11 +306,12 @@ function _dj_setup_devtools() {
 }
 
 # =============================================================================
+# https://docs.docker.com/engine/install/ubuntu/
 function _dj_setup_container_docker() {
     _show_and_run _pushd_quiet ${PWD}
 
     # Install a few prerequisite packages
-    packages="apt-transport-https ca-certificates curl software-properties-common "
+    packages="apt-transport-https ca-certificates curl software-properties-common gnupg "
     _show_and_run _install_if_not_installed $packages
 
     docker_url="https://download.docker.com/linux/ubuntu"
@@ -320,12 +321,20 @@ function _dj_setup_container_docker() {
     _show_and_run sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
     # Add the Docker repository to APT sources
-    _show_and_run sudo add-apt-repository \
-        "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] $docker_url $(lsb_release -cs) stable"
+    # the install page uses VERSION_CODENAME or UBUNTU_CODENAME, but they are not defined
+    if [[ "${ubuntu_v}" = *'20.04'* ]]; then
+        codename="focal"
+    elif [[ "${ubuntu_v}" = *'22.04'* ]]; then
+        codename="jammy"
+    fi
+
+    _show_and_run echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] $docker_url   "$(. /etc/os-release && echo "$codename")" stable" |
+        sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+
     _show_and_run sudo apt-get -y update
 
     # Install
-    _show_and_run _install_if_not_installed docker-ce
+    _show_and_run sudo apt install docker-ce
 
     # check the status -- not sure if the "active status" need a system reboot
     _show_and_run sudo systemctl status docker
@@ -338,6 +347,7 @@ function _dj_setup_container_docker() {
     _show_and_run su - ${USER}
 
     # to solve a problem: dial unix /var/run/docker.sock: connect: permission denied
+    # (todo: why the below scripts seem not be ran?)
     _show_and_run sudo chmod 666 /var/run/docker.sock
     echo -e "you need to reboot your computer so docker does not need sudo to run"
 
