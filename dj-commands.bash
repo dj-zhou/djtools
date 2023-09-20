@@ -942,6 +942,39 @@ function _dj_setup_gnuplot() {
 }
 
 # =============================================================================
+function _dj_setup_go() {
+    _show_and_run _pushd_quiet ${PWD}
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    v=$(_find_package_version go)
+    echo "v=$v"
+    ARCH="amd64"
+    _show_and_run curl -O -L "https://golang.org/dl/go${v}.linux-${ARCH}.tar.gz"
+
+    local url="https://golang.org/dl/"
+    local file="go${v}.linux-${ARCH}.tar.gz"
+
+    local checksum_output=$(curl -sL "$url" | grep -A 5 -w "$file")
+    checksum_line=$(echo "$checksum_output" | tail -n 1)
+    checksum_calc=$(sha256sum $file | awk '{print $1}')
+    if [[ ! "$checksum_line"=*"$checksum_calc"* ]]; then
+        echo_error "dj setup go: checksum error, exit."
+        return
+    fi
+
+    _show_and_run tar -xf "$file"
+    _show_and_run sudo rm -rf /usr/local/go
+    _show_and_run sudo rm -rf /usr/bin/go # installed by apt
+    _show_and_run sudo mv go /usr/local
+
+    echo 'export PATH=$PATH:/usr/local/go/bin' >>~/.bashrc
+
+    _popd_quiet
+}
+
+# =============================================================================
 function _dj_setup_google_repo() {
     _show_and_run _pushd_quiet ${PWD}
 

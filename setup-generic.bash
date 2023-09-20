@@ -2158,6 +2158,11 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'go' ]; then
+        _dj_setup_go
+        return
+    fi
+    # --------------------------
     if [ $1 = 'google-repo' ]; then
         _dj_setup_google_repo
         return
