@@ -356,6 +356,7 @@ function _dj_setup_container_docker() {
 
 # =============================================================================
 function _dj_setup_container_docker_compose() {
+    # "dj setup go" installs specific version, and won't be overwritten by the below script:
     _show_and_run _install_if_not_installed golang-go
 
     _show_and_run _pushd_quiet ${PWD}
