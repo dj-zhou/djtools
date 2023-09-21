@@ -59,6 +59,10 @@ function _touchpad_roc_control() {
     # xinput list | grep TouchPad
     touchpad=$(xinput list | grep Touchpad)
     # echo "touchpad = " $touchpad
+    if [ -z $touchpad ]; then
+        echo_warn "cannot find touchpad, exit."
+        return
+    fi
     # to find the number of the id ---------------------------
     str_len=${#touchpad}
     # echo "str_len = " $str_len
