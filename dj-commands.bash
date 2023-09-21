@@ -402,6 +402,7 @@ function _dj_setup_container_lxd() {
     local v=$(_find_package_version lxd)
     _show_and_run sudo snap remove lxd
     _show_and_run sudo snap install lxd --channel=$v/stable
+    echo "check version: sudo lxd --version"
     echo 'next step: $ sudo lxd init'
 }
 
