@@ -396,10 +396,12 @@ function _dj_setup_container_dive() {
 }
 
 # =============================================================================
-function _dj_setup_container_lxd_4_0() {
+function _dj_setup_container_lxd() {
     _show_and_run _install_if_not_installed snapd
 
-    sudo snap install lxd --channel=4.0/stable
+    local v=$(_find_package_version lxd)
+    _show_and_run sudo snap remove lxd
+    _show_and_run sudo snap install lxd --channel=$v/stable
     echo 'next step: $ sudo lxd init'
 }
 
@@ -1796,7 +1798,7 @@ function _dj() {
         ACTIONS[$i]=" "
     done
     # special ones -----------------
-    ACTIONS[container]="dive docker docker-compose lxd-4.0 "
+    ACTIONS[container]="dive docker docker-compose lxd "
     cli11_version="1.9.0 2.1.1 "
     ACTIONS[cli11]="$cli11_version"
     for i in $cli11_version; do

@@ -20,6 +20,7 @@ libiio 0.21
 libgpiod 1804:1.4 2004:v1.6.3 2204:v1.6.4
 libserialport 6f9b03e597ea7200eb616a4e410add3dd1690cb1 # Jun 11, 2021
 libsystemd v248
+lxd 5.17
 nlohmann-json3 v3.11.1 # Aug 1st, 2022
 nodejs 16.14.0 # Feb 1, 2022, (includes npm 8.3.1??)
 nvm v0.39.1 # Nov 17, 2021

@@ -2042,8 +2042,8 @@ function _dj_setup() {
             _dj_setup_container_docker_compose
             return
         fi
-        if [ $2 = 'lxd-4.0' ]; then
-            _dj_setup_container_lxd_4_0
+        if [ $2 = 'lxd' ]; then
+            _dj_setup_container_lxd
             return
         fi
         return
