@@ -11,17 +11,26 @@ _touchpad_help() {
 
 # =============================================================================
 function _touchpad_thinkpad_control() {
+    if [[ ${ubuntu_v} = *'22.04'* ]]; then
+        touchpad=$(xinput list | grep Synaptics | cut -f 2 | cut -d= -f 2)
+        if [ $1 = '0' ]; then
+            _show_and_run xinput -disable $touchpad
+        elif [ $1 = '1' ]; then
+            _show_and_run xinput -enable $touchpad
+        fi
+        return
+    fi
     # xinput list | grep TouchPad
     touchpad=$(xinput list | grep TouchPad | tr -dc '0-9')
     # the number is not a constant number, for example it was 13, and it then 14 at some time
     touchpadID=${touchpad:1:2}
-    xinput set-prop $touchpadID "Device Enabled" $1
+    _show_and_run xinput set-prop $touchpadID "Device Enabled" $1
     # for my new P52 computer, it is "Touchpad" instead of "TouchPad"
     # xinput list | grep Touchpad
-    touchpad=$(xinput list | grep Touchpad | tr -dc '0-9')
+    touchpad=$(xinput list | grep TrackPoint | tr -dc '0-9')
     # the number is not a constant number, for example it was 13, and it then 14 at some time
     touchpadID=${touchpad:1:2}
-    xinput set-prop $touchpadID "Device Enabled" $1
+    _show_and_run xinput set-prop $touchpadID "Device Enabled" $1
 }
 
 # =============================================================================
@@ -50,6 +59,10 @@ function _touchpad_roc_control() {
     # xinput list | grep TouchPad
     touchpad=$(xinput list | grep Touchpad)
     # echo "touchpad = " $touchpad
+    if [ -z $touchpad ]; then
+        echo_warn "cannot find touchpad, exit."
+        return
+    fi
     # to find the number of the id ---------------------------
     str_len=${#touchpad}
     # echo "str_len = " $str_len
@@ -72,7 +85,7 @@ function _touchpad_roc_control() {
     # echo "equal_pos = " $equal_pos
     touchpadID=${touchpad:$equal_pos:${first_space_after_equal}-${equal_pos}}
     # enable or disable the ROC touchpad
-    xinput set-prop $touchpadID "Device Enabled" $1
+    _show_and_run xinput set-prop $touchpadID "Device Enabled" $1
 }
 
 # =============================================================================
@@ -100,23 +113,23 @@ function touchpad {
                 echo 'touchpad thinkpad: argument not supported.'
             fi
         fi
-        if [ $1 = 'roc' ] || [ $1 = 'precision' ]; then
+        if [ $1 = 'roc' ] || [ $1 = 'dell' ]; then
             if [ $2 = 'enable' ]; then
                 _touchpad_roc_control 1
                 if [ $1 = 'roc' ]; then
                     echo 'Touch Pad on ROC Zephyrus laptop is enabled '
-                elif [ $1 = 'precision' ]; then
-                    echo 'Touch Pad on Dell Precision laptop is enabled '
+                elif [ $1 = 'dell' ]; then
+                    echo 'Touch Pad on Dell laptop is enabled '
                 fi
             elif [ $2 = 'disable' ]; then
                 _touchpad_roc_control 0
                 if [ $1 = 'roc' ]; then
                     echo 'Touch Pad on ROC Zephyrus laptop is disabled '
-                elif [ $1 = 'precision' ]; then
-                    echo 'Touch Pad on Dell Precision laptop is disabled '
+                elif [ $1 = 'dell' ]; then
+                    echo 'Touch Pad on Dell laptop is disabled '
                 fi
             else
-                echo 'touchpad roc/precision: argument not supported.'
+                echo 'touchpad roc/dell: argument not supported.'
             fi
         fi
     fi
@@ -132,18 +145,18 @@ _touchpad() {
     local SERVICES=("
         thinkpad
         roc
-        precision
+        dell
     ")
 
     # declare an associative array for options
     declare -A ACTIONS
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------
-    ACTIONS[thinkpad]="enable disable "  # must have a space in " "
-    ACTIONS[roc]="enable disable "       # must have a space in " "
-    ACTIONS[precision]="enable disable " # must have a space in " "
-    ACTIONS[enable]=" "                  # must have a space in " "
-    ACTIONS[disable]=" "                 # must have a space in " "
+    ACTIONS[thinkpad]="enable disable " # must have a space in " "
+    ACTIONS[roc]="enable disable "      # must have a space in " "
+    ACTIONS[dell]="enable disable "     # must have a space in " "
+    ACTIONS[enable]=" "                 # must have a space in " "
+    ACTIONS[disable]=" "                # must have a space in " "
 
     # -------------------------------------------------------------------------
     # -------------------------------------------------------------------------

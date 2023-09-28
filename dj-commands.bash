@@ -306,27 +306,35 @@ function _dj_setup_devtools() {
 }
 
 # =============================================================================
-# https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04
-# this is only tested in Ubuntu 18.04
+# https://docs.docker.com/engine/install/ubuntu/
 function _dj_setup_container_docker() {
     _show_and_run _pushd_quiet ${PWD}
 
     # Install a few prerequisite packages
-    packages="apt-transport-https ca-certificates curl software-properties-common "
+    packages="apt-transport-https ca-certificates curl software-properties-common gnupg "
     _show_and_run _install_if_not_installed $packages
 
     docker_url="https://download.docker.com/linux/ubuntu"
 
     # Add the GPG key for the official Docker repository
-    _show_and_run curl -fsSL $docker_url/gpg | sudo apt-key add -
+    _show_and_run curl -fsSL $docker_url/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    _show_and_run sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
     # Add the Docker repository to APT sources
-    _show_and_run sudo add-apt-repository \
-        "deb [arch=amd64] $docker_url $(lsb_release -cs) stable"
+    # the install page uses VERSION_CODENAME or UBUNTU_CODENAME, but they are not defined
+    if [[ "${ubuntu_v}" = *'20.04'* ]]; then
+        codename="focal"
+    elif [[ "${ubuntu_v}" = *'22.04'* ]]; then
+        codename="jammy"
+    fi
+
+    _show_and_run echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] $docker_url   "$(. /etc/os-release && echo "$codename")" stable" |
+        sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+
     _show_and_run sudo apt-get -y update
 
     # Install
-    _show_and_run _install_if_not_installed docker-ce
+    _show_and_run sudo apt install docker-ce
 
     # check the status -- not sure if the "active status" need a system reboot
     _show_and_run sudo systemctl status docker
@@ -339,15 +347,17 @@ function _dj_setup_container_docker() {
     _show_and_run su - ${USER}
 
     # to solve a problem: dial unix /var/run/docker.sock: connect: permission denied
+    # (must run "exit" to exit the above entered session)
     _show_and_run sudo chmod 666 /var/run/docker.sock
-    echo -e "you need to reboot your computer so docker does not need sudo to run"
+    echo -e "you may need to reboot your computer so docker does not need sudo to run"
 
     _popd_quiet
 }
 
 # =============================================================================
 function _dj_setup_container_docker_compose() {
-    _show_and_run sudo apt install golang-go
+    # "dj setup go" installs specific version, and won't be overwritten by the below script:
+    _show_and_run _install_if_not_installed golang-go
 
     _show_and_run _pushd_quiet ${PWD}
     _show_and_run mkdir -p $soft_dir
@@ -386,10 +396,13 @@ function _dj_setup_container_dive() {
 }
 
 # =============================================================================
-function _dj_setup_container_lxd_4_0() {
+function _dj_setup_container_lxd() {
     _show_and_run _install_if_not_installed snapd
 
-    sudo snap install lxd --channel=4.0/stable
+    local v=$(_find_package_version lxd)
+    _show_and_run sudo snap remove lxd
+    _show_and_run sudo snap install lxd --channel=$v/stable
+    echo "check version: sudo lxd --version"
     echo 'next step: $ sudo lxd init'
 }
 
@@ -928,6 +941,53 @@ function _dj_setup_gnuplot() {
     _show_and_run ./configure
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install && sudo ldconfig
+
+    _popd_quiet
+}
+
+# =============================================================================
+function _dj_setup_go() {
+    _show_and_run _pushd_quiet ${PWD}
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    v=$(_find_package_version go)
+    echo "v=$v"
+    ARCH="amd64"
+    _show_and_run curl -O -L "https://golang.org/dl/go${v}.linux-${ARCH}.tar.gz"
+
+    local url="https://golang.org/dl/"
+    local file="go${v}.linux-${ARCH}.tar.gz"
+
+    local checksum_output=$(curl -sL "$url" | grep -A 5 -w "$file")
+    checksum_line=$(echo "$checksum_output" | tail -n 1)
+    checksum_calc=$(sha256sum $file | awk '{print $1}')
+    if [[ ! "$checksum_line"=*"$checksum_calc"* ]]; then
+        echo_error "dj setup go: checksum error, exit."
+        return
+    fi
+
+    _show_and_run tar -xf "$file"
+    _show_and_run sudo rm -rf /usr/local/go
+    _show_and_run sudo rm -rf /usr/bin/go # installed by apt
+    _show_and_run sudo mv go /usr/local
+
+    installed=0
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        if [[ $line == *"PATH:/usr/local/go/bin"* ]]; then
+            echo -e "PATH for go is setup correctly."
+            echo -e "you can still revise ~/.bashrc for manual setup."
+            installed=1
+        fi
+    done <~/.bashrc
+    if [[ $installed = '0' ]]; then
+        echo -e "setup the PATH for go (golong)."
+        echo -e '\n' >>~/.bashrc
+        echo '# ===========================================================' >>~/.bashrc
+        echo '# (djtools) go (golang) setup' >>~/.bashrc
+        echo -e 'export PATH=$PATH:/usr/local/go/bin\n' >>~/.bashrc
+    fi
 
     _popd_quiet
 }
@@ -1652,6 +1712,13 @@ function dj() {
     fi
 
     # ------------------------------
+    if [ $1 = 'systemd' ]; then
+        shift 1
+        _dj_systemd "$@"
+        return
+    fi
+
+    # ------------------------------
     if [ $1 = 'udev' ]; then
         # ------------------------------
         if [ $# -ge 2 ]; then
@@ -1708,6 +1775,7 @@ function _dj() {
         setup
         split
         ssh-general
+        systemd
         udev
         udevadm
         unpack
@@ -1731,7 +1799,7 @@ function _dj() {
         ACTIONS[$i]=" "
     done
     # special ones -----------------
-    ACTIONS[container]="dive docker docker-compose lxd-4.0 "
+    ACTIONS[container]="dive docker docker-compose lxd "
     cli11_version="1.9.0 2.1.1 "
     ACTIONS[cli11]="$cli11_version"
     for i in $cli11_version; do
@@ -1833,6 +1901,14 @@ function _dj() {
     # --------------------------------------------------------
     ACTIONS["ssh-general"]="no-password "
     ACTIONS["no-password"]=" "
+
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    systemd_list="umount "
+    ACTIONS["systemd"]="$systemd_list  "
+    for i in $systemd_list; do
+        ACTIONS[$i]=" "
+    done
 
     # --------------------------------------------------------
     # --------------------------------------------------------

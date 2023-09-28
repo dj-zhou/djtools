@@ -253,6 +253,17 @@ function _version_check_gnome() {
 }
 
 # =============================================================================
+function _version_check_go() {
+    v_str=$(go version)
+    if [[ "$v_str" =~ go([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+        go_version="${BASH_REMATCH[1]}"
+        echo "$go_version"
+    else
+        _echo_not_installed "golang-go"
+    fi
+}
+
+# =============================================================================
 function _version_check_magic_enum() {
     file="/usr/local/include/magic_enum.hpp"
     if [ ! -f $file ]; then
@@ -464,6 +475,16 @@ function version() {
             return
         fi
         # ------------------------------
+        if [ $2 = 'gnome' ]; then
+            _version_check_gnome
+            return
+        fi
+        # ------------------------------
+        if [ $2 = 'go' ]; then
+            _version_check_go
+            return
+        fi
+        # ------------------------------
         if [ $2 = 'grpc' ]; then
             _version_check_grpc
             return
@@ -476,11 +497,6 @@ function version() {
         # ------------------------------
         if [ $2 = 'g++' ]; then
             _version_check_gpp
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'gnome' ]; then
-            _version_check_gnome
             return
         fi
         # ------------------------------
@@ -611,7 +627,7 @@ function _version() {
     # ------------------------------------------------------------------------
     check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
     check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
-    check_list+="eigen3 fmt gcc glog grpc gtest g++ gnome libsystemd magic-enum "
+    check_list+="eigen3 fmt gcc glog gnome go grpc gtest g++ libsystemd magic-enum "
     check_list+="nlohmann-json3 node opencv opengl python3 spdlog ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do

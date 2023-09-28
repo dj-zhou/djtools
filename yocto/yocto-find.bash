@@ -2,19 +2,19 @@
 
 # =============================================================================
 function _yocto_check_is_a_build_directory() {
-    if [ ! -d "conf" ]; then
-        echo "false"
+    # a direct build directory
+    if [ -f "conf/local.conf" ] && [ -f "conf/bblayers.conf" ]; then
+        echo "true"
         return
     fi
-    if [ ! -f "conf/local.conf" ]; then
-        echo "false"
-        return
-    fi
-    if [ ! -f "conf/bblayers.conf" ]; then
-        echo "false"
-        return
-    fi
-    echo "true"
+    # a sub directory is a build directory
+    for sub_dir in ./*; do
+        if [ -f "$sub_dir/conf/local.conf" ] && [ -f "$sub_dir/conf/bblayers.conf" ]; then
+            echo "true"
+            return
+        fi
+    done
+    echo "false"
 }
 
 # =============================================================================
@@ -486,7 +486,7 @@ function _yocto_list_resources() {
             echo "branch: $branch_name"
             echo "  date: $(git log -1 --format=%cd)"
             echo "commit: $(git log -1 --format=%H)"
-        echo "$(git log -1 --format=%B)"
+            echo "$(git log -1 --format=%B)"
             # git log --decorate=short --pretty=oneline -n1
             cd $cur_dir
         fi

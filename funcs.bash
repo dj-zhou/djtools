@@ -294,7 +294,7 @@ function _size_human_readable() {
         base=$((base * 1024))
         ((unit_index--))
     done
-    remain=$(( ($1 - $round_size) * 100))
+    remain=$((($1 - $round_size) * 100))
     percent=$(($remain / $base))
     echo "${size}.${percent} ${units[highest_index]}"
 }
@@ -349,7 +349,7 @@ function _install_if_not_installed() {
     local cur_dir_install=$PWD
     for package in "$@"; do
         if [[ "no" = $(_check_if_package_installed $package) ]]; then
-            echo -e "${YLW}installing${NOC} $package"
+            echo -e "${CYN}installing${NOC} $package"
             # bug: /var/lib/dpkg/lock-frontend, etc, errors will not be seen
             sudo apt-get install -y $package &>/dev/null
         else
@@ -361,42 +361,51 @@ function _install_if_not_installed() {
 
 # =============================================================================
 function _verify_lib_installation() {
-    if [ ! -f "$2/$1" ]; then
-        echo -e "${RED}library $1 is not found in $2${NOC}"
+    dir="${2%/}"
+    if [[ $dir == "/usr/bin" || $dir == "/usr/sbin" ]]; then
+        str="executable"
     else
-        echo -e "     library file: ${GRN}$2/$1${NOC}"
+        str="   library"
+    fi
+    if [ ! -f "$dir/$1" ]; then
+        echo_error "library $1 is not found in $dir"
+    else
+        echo -e "  $str file: ${GRN}$dir/$1${NOC}"
     fi
 }
 
 # =============================================================================
 function _verify_header_files() {
+    dir="${2%/}"
     if [ $# != 2 ]; then
         echo "usage: _verify_header_files [header file] [path]"
         return
     fi
-    if [ ! -f "$2/$1" ]; then
-        echo -e "${RED}header file $1 is not found in $2${NOC}"
+    if [ ! -f "$dir/$1" ]; then
+        echo_error "header file $1 is not found in $dir"
     else
-        echo -e "      header file: ${GRN}$2/$1${NOC}"
+        echo -e "      header file: ${GRN}$dir/$1${NOC}"
     fi
     return
 }
 
 # =============================================================================
 function _verify_cmake_files() {
-    if [ ! -f "$2/$1" ]; then
-        echo -e "${RED}cmake file $1 is not found in $2${NOC}"
+    dir="${2%/}"
+    if [ ! -f "$dir/$1" ]; then
+        echo_error "cmake file $1 is not found in $dir"
     else
-        echo -e "       cmake file: ${GRN}$2/$1${NOC}"
+        echo -e "       cmake file: ${GRN}$dir/$1${NOC}"
     fi
 }
 
 # =============================================================================
 function _verify_pkgconfig_file() {
-    if [ ! -f "$2/$1" ]; then
-        echo -e "${RED}pkgconfig file $1 is not found in $2${NOC}"
+    dir="${2%/}"
+    if [ ! -f "$dir/$1" ]; then
+        echo_error "pkgconfig file $1 is not found in $dir"
     else
-        echo -e "   pkgconfig file:$ ${GRN}$2/$1${NOC}"
+        echo -e "   pkgconfig file: ${GRN}$dir/$1${NOC}"
     fi
 }
 
@@ -424,7 +433,11 @@ function _find_package_version() {
                 pos2=$(_find_ch_index_in_str_start_from "$line" " " $((pos1 + 4)))
                 echo ${line:$((pos1 + 5)):$((pos2 - pos1 - 5))}
                 return
-            # elif: other system: todo
+            elif [[ ${ubuntu_v} == *'22.04'* && $line == *'2204'* ]]; then
+                pos1=$(_find_substr_index_in_str "$line" "2204")
+                pos2=$(_find_ch_index_in_str_start_from "$line" " " $((pos1 + 4)))
+                echo ${line:$((pos1 + 5)):$((pos2 - pos1 - 5))}
+                return
             else
                 version=$(echo $line | awk '{ print $2 }')
                 echo $version

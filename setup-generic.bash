@@ -4,12 +4,12 @@ setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-ide baidu-netdi
 setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cuda cutecom devtools "
 setup_list+="driver dropbox eigen3 esp-idf fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
 setup_list+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-setup_list+="gitg-gitk glfw3 glog gnome gnuplot google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
+setup_list+="gitg-gitk glfw3 glog gnome gnuplot go google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd mathpix "
 setup_list+="matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
 setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.5.5 pangolin perf "
 setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu qt-5.13.1 qt-5.14.2 "
-setup_list+="ros-melodic ros-noetic ros2-foxy rpi-pico rust saleae-logic serial-console spdlog slack "
+setup_list+="ros2-foxy ros2-humble rpi-pico rust saleae-logic serial-console spdlog slack "
 setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
 setup_list+="stm32-cube-programmer stm32-tools sublime texlive thermal-printer tldr typora vscode vtk-8.2.0 "
 setup_list+="windows-fonts wireshark wubi yaml-cpp "
@@ -19,7 +19,7 @@ function _dj_setup_help() {
     _dj_help
     cat <<eom
 ------------------------------- dj setup --------------------------------
-    setup common used software and packages, usually tested on Ubuntu 18.04/20.04
+    setup common used software and packages, usually tested on Ubuntu 20.04/22.04
 -------------------------------------------------------------------------
 eom
 }
@@ -291,6 +291,16 @@ function _dj_setup_driver_wifi() {
             echo " $ sudo make install"
             return
         fi
+        # testing on Raspbian Pi Zero 2W board, kernel 6.1.21-v7+
+        if [[ "${ubuntu_v}" = *"Raspbian"* ]]; then
+            _show_and_run mkdir -p ~/soft
+            _show_and_run cd ~/soft
+            _show_and_run rm 8812au-20210629
+            _show_and_run git clone https://github.com/morrownr/8812au-20210629.git
+            _show_and_run cd 8812au-20210629
+            _show_and_run sudo ./install-driver.sh
+            return
+        fi
         echo -e "rtl8812au driver is only tested on Ubuntu 20.04 LTS (x86_64), exit"
         return
     fi
@@ -515,10 +525,9 @@ function _dj_setup_foxit_reader() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-
     # no way to get the latest version?
-    file=FoxitReader.enu.setup.2.4.4.0911.x64.run
-    url="http://cdn01.foxitsoftware.com/pub/foxit/reader/desktop/"
+    file=FoxitReader.enu.setup.2.4.5.0727.x64.run
+    url="https://cdn78.foxitsoftware.com/pub/foxit/reader/desktop/"
     url=${url}linux/2.x/2.4/en_us/$file.tar.gz
     _show_and_run _wget_if_not_exist $file.tar.gz "22d2553945edc0af9dbd52dd4a2cee22" ${url}
     _show_and_run gzip -d $file.tar.gz
@@ -957,9 +966,8 @@ function _dj_setup_libgpiod() {
         _show_and_run make -j$(nproc)
         _show_and_run sudo make install
 
-    elif [[ "${ubuntu_v}" = *'20.04'* ]]; then
+    elif [[ "${ubuntu_v}" = *'20.04'* || "${ubuntu_v}" = *'22.04'* ]]; then
         _show_and_run _install_if_not_installed autoconf-archive
-
         _show_and_run rm libgpiod -rf
         _show_and_run git clone git://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git
         _show_and_run cd libgpiod
@@ -994,7 +1002,8 @@ function _dj_setup_libiio() {
     _show_and_run git clone https://github.com/analogdevicesinc/libiio.git
     _show_and_run cd libiio
     if [[ "${ubuntu_v}" = *'18.04'* ||
-        "${ubuntu_v}" = *'20.04'* ]]; then
+        "${ubuntu_v}" = *'20.04'* ||
+        "${ubuntu_v}" = *'22.04'* ]]; then
         _show_and_run git checkout $v
     else
         echo -e "\n${YLW} TO BE IMPLEMENTED${NOC}\n"
@@ -1007,12 +1016,11 @@ function _dj_setup_libiio() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    _verify_lib_installation /libiio.so /usr/lib/x86_64-linux-gnu/
+    _verify_lib_installation libiio.so /usr/lib/x86_64-linux-gnu/
     _verify_lib_installation iio_info /usr/bin/
     _verify_lib_installation iiod /usr/sbin/
     _verify_pkgconfig_file libiio.pc /usr/lib/x86_64-linux-gnu/pkgconfig/
-
-    echo "iio.h is installed to /usr/include/"
+    _verify_header_files iio.h /usr/include/
 
     _popd_quiet
 }
@@ -1299,34 +1307,40 @@ function _dj_setup_meson_ninjia() {
 # =============================================================================
 # https://wiki.crowncloud.net/How_To_Install_Duf_On_Ubuntu_22_04?How_to_Install_Latest_MongoDB_on_Ubuntu_22_04
 function _dj_setup_mongodb() {
-    sudo apt-get update -y
     uname_a=$(uname -a)
-    if [[ ! "${ubuntu_v}" = *'20.04'* || "${ubuntu_v}" = *'22.04'* || ! "${uname_a}" = *'x86_64'* ]]; then
-        echo_warn "only tested on x86_64 Ubuntu 20.04/22.04, exit"
+    if [[ ! "${ubuntu_v}" = *'20.04'* && ! "${ubuntu_v}" = *'22.04'* && ! "${uname_a}" = *'x86_64'* ]]; then
+        echo_warn "dj setup mongodb: only tested on x86_64 Ubuntu 20.04/22.04, exit!"
         return
     fi
 
+    _show_and_run sudo apt-get update -y
     _show_and_run _install_if_not_installed dirmngr gnupg apt-transport-https \
-        ca-certificates software-properties-common
+        ca-certificates software-properties-common libssl1.1
     # install libssl1.1 (https://askubuntu.com/a/1403683)
-    echo "deb http://security.ubuntu.com/ubuntu focal-security main" |
-        sudo tee /etc/apt/sources.list.d/focal-security.list
-
-    _show_and_run sudo apt-get update
-    _show_and_run _install_if_not_installed libssl1.1
 
     v=$(_find_package_version mongodb)
     _echo_install mongodb $v
-    wget -qO - https://www.mongodb.org/static/pgp/server-$v.asc | sudo apt-key add -
-    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/$v multiverse" |
-        sudo tee /etc/apt/sources.list.d/mongodb-org.list
+    wget -qO - https://www.mongodb.org/static/pgp/server-$v.asc |
+        sudo gpg -o /usr/share/keyrings/mongodb-server-$v.gpg \
+            --dearmor
 
-    _show_and_run sudo apt update
+    if [[ "${ubuntu_v}" = *'20.04'* ]]; then
+        codename="focal"
+    elif [[ "${ubuntu_v}" = *'22.04'* ]]; then
+        codename="jammy"
+    fi
+
+    echo "deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-$v.gpg] https://repo.mongodb.org/apt/ubuntu $codename/mongodb-org/$v multiverse" |
+        sudo tee /etc/apt/sources.list.d/mongodb-org-$v.list
+
+    _show_and_run sudo apt update -y
     _show_and_run sudo apt install -y mongodb-org
+
     # Enable and start MongoDB Deamon program
     sudo systemctl enable --now mongod
 
     cat <<eom
+
 --------------------------------------------
 MongoDB install:
     mongodb-org-server - mongodb守护程序以及相应的初始化脚本和配置
@@ -1344,7 +1358,7 @@ Check if MongoDB is running:
 
 Check if MongoDB is installed:
     $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
-    or
+    or (for newer version)
     $ mongosh --eval 'db.runCommand({ connectionStatus: 1 })'
 --------------------------------------------
 eom
@@ -1653,13 +1667,17 @@ function _dj_setup_slack() {
     _show_and_run _pushd_quiet ${PWD}
 
     _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
+    _show_and_run _pushd_quiet $soft_dir
+    # just in case
+    _show_and_run rm -rf slack-desktop*.deb
 
     # the download page: https://slack.com/downloads/linux
     local v=$(_find_package_version slack)
     _show_and_run wget https://downloads.slack-edge.com/releases/linux/$v/prod/x64/slack-desktop-$v-amd64.deb
     _show_and_run sudo dpkg -i slack-desktop*.deb
+    _show_and_run rm slack-desktop*.deb
 
+    # is one popd enough?
     _popd_quiet
 }
 
@@ -1724,7 +1742,7 @@ function _dj_setup_spdlog() { # static/shared
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm spdlog -rf
+    _show_and_run sudo rm spdlog -rf
 
     _show_and_run git clone https://github.com/gabime/spdlog.git
     _show_and_run cd spdlog
@@ -1735,9 +1753,9 @@ function _dj_setup_spdlog() { # static/shared
     # static build need to be specific
     # if no option found, "shared" is default
     if [ "$static_shared" = 'static' ]; then
-        _show_and_run cmake .. -DSPDLOG_BUILD_SHARED="off"
+        _show_and_run cmake -DSPDLOG_BUILD_SHARED=off -DSPDLOG_INSTALL=on -DSPDLOG_BUILD_EXAMPLES=off -DSPDLOG_BUILD_TESTS=off -DSPDLOG_BUILD_BENCH=off -DSPDLOG_FMT_EXTERNAL=off ..
     else
-        _show_and_run cmake .. -DSPDLOG_BUILD_SHARED="on"
+        _show_and_run cmake -DSPDLOG_BUILD_SHARED=on -DSPDLOG_FMT_EXTERNAL=off ..
     fi
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
@@ -1759,16 +1777,15 @@ function _dj_setup_spdlog() { # static/shared
 function _dj_setup_sublime() {
     _pushd_quiet ${PWD}
 
-    sudo apt-get update
-    _show_and_run _install_if_not_installed apt-transport-https ca-certificates curl
-    _show_and_run _install_if_not_installed software-properties-common
+    _show_and_run sudo apt-get update -y
+    _show_and_run _install_if_not_installed apt-transport-https ca-certificates curl software-properties-common
 
-    curl -fsSL https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
-    sudo add-apt-repository "deb https://download.sublimetext.com/ apt/stable/"
-
-    sudo apt-get update
-    _show_and_run _install_if_not_installed sublime-text
-
+    _show_and_run wget -nc https://download.sublimetext.com/sublimehq-pub.gpg
+    cat sublimehq-pub.gpg | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/sublimehq-pub.gpg >/dev/null
+    _show_and_run sudo add-apt-repository "deb https://download.sublimetext.com/ apt/stable/"
+    _show_and_run sudo apt-get update -y
+    _show_and_run sudo apt install sublime-text
+    rm sublimehq-pub.gpg
     _popd_quiet
 }
 
@@ -1786,6 +1803,8 @@ function _dj_setup_texlive() {
 
 # =============================================================================
 function _dj_setup_thermal_printer() {
+    _pushd_quiet ${PWD}
+
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
@@ -1828,10 +1847,10 @@ function _dj_setup_tldr() {
 # =============================================================================
 # why this does not work with python3.9?
 function _dj_setup_typora() {
-    wget -qO - https://typora.io/linux/public-key.asc | sudo apt-key add -
+    _show_and_run wget -qO - https://typoraio.cn/linux/public-key.asc | sudo tee /etc/apt/trusted.gpg.d/typora.asc
     # add Typora's repository
-    sudo add-apt-repository 'deb https://typora.io/linux ./'
-    sudo apt-get -y update
+    _show_and_run sudo add-apt-repository 'deb https://typora.io/linux ./'
+    _show_and_run sudo apt-get -y update
     # install typora
     _show_and_run sudo apt install -y typora
 }
@@ -2023,8 +2042,8 @@ function _dj_setup() {
             _dj_setup_container_docker_compose
             return
         fi
-        if [ $2 = 'lxd-4.0' ]; then
-            _dj_setup_container_lxd_4_0
+        if [ $2 = 'lxd' ]; then
+            _dj_setup_container_lxd
             return
         fi
         return
@@ -2048,7 +2067,7 @@ function _dj_setup() {
     # --------------------------
     if [ $1 = 'driver' ]; then
         shift 1
-        _dj_setup_driver $@
+        _dj_setup_driver "$@"
         return
     fi
     # --------------------------
@@ -2139,18 +2158,25 @@ function _dj_setup() {
         return
     fi
     # --------------------------
+    if [ $1 = 'go' ]; then
+        _dj_setup_go
+        return
+    fi
+    # --------------------------
     if [ $1 = 'google-repo' ]; then
         _dj_setup_google_repo
         return
     fi
     # --------------------------
     if [ $1 = 'gtest' ]; then
-        _dj_setup_gtest $2 $3 $4
+        shift 1
+        _dj_setup_gtest "$@"
         return
     fi
     # --------------------------
     if [ $1 = 'glog' ]; then
-        _dj_setup_glog $2 $3 $4
+        shift 1
+        _dj_setup_glog "$@"
         return
     fi
     # --------------------------
@@ -2294,12 +2320,14 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'opencv-2.4.13' ]; then
-        _dj_setup_opencv_2_4_13 $2 $3 $4 $5
+        shift 1
+        _dj_setup_opencv_2_4_13 "$@"
         return
     fi
     # --------------------------
     if [ $1 = 'opencv-3.4.13' ]; then
-        _dj_setup_opencv_3_4_13 $2 $3 $4 $5
+        shift 1
+        _dj_setup_opencv_3_4_13 "$@"
         return
     fi
     # --------------------------
@@ -2355,7 +2383,8 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'qemu' ]; then
-        _dj_setup_qemu $2 $3 $4 $5
+        shift 1
+        _dj_setup_qemu "$@"
         return
     fi
     # --------------------------
@@ -2369,18 +2398,15 @@ function _dj_setup() {
         return
     fi
     # --------------------------
-    if [ $1 = 'ros-melodic' ]; then
-        _dj_setup_ros_melodic $2 $3 $4
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'ros-noetic' ]; then
-        _dj_setup_ros_noetic $2 $3 $4
-        return
-    fi
-    # --------------------------
     if [ $1 = 'ros2-foxy' ]; then
-        _dj_setup_ros2_foxy $2 $3 $4
+        shift 1
+        _dj_setup_ros2_foxy "$@"
+        return
+    fi
+    # --------------------------
+    if [ $1 = 'ros2-humble' ]; then
+        shift 1
+        _dj_setup_ros2_humble "$@"
         return
     fi
     # --------------------------
@@ -2390,8 +2416,8 @@ function _dj_setup() {
     fi
     # --------------------------
     if [ $1 = 'rust' ]; then
-        shift
-        _dj_setup_rust $@
+        shift 1
+        _dj_setup_rust "$@"
         return
     fi
     # --------------------------
