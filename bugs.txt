@@ -1,0 +1,11 @@
+robot@robo-nas:~$ .b
+run: 'source' '/var/services/homes/robot/.bashrc'
+-sh: lsb_release: command not found
+-sh: `tic-toc': not a valid identifier
+-sh: `_mark-down_help': not a valid identifier
+-sh: `mark-down': not a valid identifier
+-sh: `_mark-down': not a valid identifier
+-sh: /var/services/homes/robot/workspace/djtools/mirror.bash: line 212: syntax error near unexpected token `>'
+-sh: /var/services/homes/robot/workspace/djtools/mirror.bash: line 212: `        exec 1> >(stdbuf -i0 -o0 -e0 tee -a "$LOGFILE" >&1)'
+-sh: `window-tile': not a valid identifier
+
