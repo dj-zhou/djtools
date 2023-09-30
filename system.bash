@@ -154,9 +154,15 @@ function _system_wallpaper_random() {
 
     cd $wallpaper_folder
     set -- *
-    random_num=$((($RANDOM % ($length)) + 1))
-    # it only works for gnome
-    _show_and_run gsettings set org.gnome.desktop.background picture-uri "file://$wallpaper_folder/${!random_num}"
+
+    # fixed by ChatGPT
+    # Store the file paths in an array
+    mapfile -t wallpapers < <(find "$wallpaper_folder" -type f)
+    length=${#wallpapers[@]}
+    random_num=$((RANDOM % length))
+    selected_wallpaper="${wallpapers[$random_num]}"
+    gsettings set org.gnome.desktop.background picture-uri "file://$selected_wallpaper"
+
     _popd_quiet
 }
 
