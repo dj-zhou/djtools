@@ -293,6 +293,7 @@ function _dj_setup_driver_wifi() {
         fi
         # testing on Raspbian Pi Zero 2W board, kernel 6.1.21-v7+
         if [[ "${ubuntu_v}" = *"Raspbian"* ]]; then
+            _show_and_run _install_if_not_installed iw
             _show_and_run mkdir -p ~/soft
             _show_and_run cd ~/soft
             _show_and_run rm 8812au-20210629
