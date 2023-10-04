@@ -62,8 +62,8 @@ _window_tile_embedded() {
     if [[ $SCREENSIZE = *"2560x1600"*"2560x1440"* ]]; then
         echo "window-tile embedded: single 2560x1600 + single 2560x1440"
         #                   none, x,     y,   width,   height
-        wmctrl -r "/bin/bash" -e 0,2570,0,1000,1550
-        wmctrl -r ${vs_code_window} -e 0,3590,0,1540,1550
+        wmctrl -r "/bin/bash" -e 0,2570,0,1000,1370
+        wmctrl -r ${vs_code_window} -e 0,3590,0,1540,1430
         return
     fi
     if [[ $SCREENSIZE = *"2560x1600"* ]]; then
