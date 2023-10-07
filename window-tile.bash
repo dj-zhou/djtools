@@ -66,6 +66,13 @@ _window_tile_embedded() {
         wmctrl -r ${vs_code_window} -e 0,3590,0,1540,1430
         return
     fi
+    if [[ $SCREENSIZE = *"1920x1200"*"1920x1200"*"1920x1200"* ]]; then
+        echo "window-tile embedded: three 1920x1200 screens"
+        #                   none, x,     y,   width,   height
+        wmctrl -r "/bin/bash" -e 0,2850,0,1000,1160
+        wmctrl -r ${vs_code_window} -e 0,3200,0,1300,1160
+        return
+    fi
     if [[ $SCREENSIZE = *"2560x1600"* ]]; then
         echo "window-tile embedded: single 2560x1600 screen"
         #                   none, x,     y,   width,   height
