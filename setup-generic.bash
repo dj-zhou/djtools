@@ -31,7 +31,7 @@ function _dj_setup_abseil_cpp() {
     _show_and_run cd $soft_dir
 
     abseil_v=$(_find_package_version abseil-cpp)
-    _show_and_run rm abseil-cpp -rf
+    _show_and_run rm -rf abseil-cpp
     _show_and_run git clone git@github.com:abseil/abseil-cpp.git
     _show_and_run cd abseil-cpp
     _show_and_run git checkout $abseil_v
@@ -171,7 +171,7 @@ function _dj_setup_arduino() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm arduino* -rf
+    _show_and_run rm -rf arduino*
 
     v=$(_find_package_version arduino)
     ide_name="arduino-ide_${v}_Linux_64bit"
@@ -969,7 +969,7 @@ function _dj_setup_libgpiod() {
 
     elif [[ "${ubuntu_v}" = *'20.04'* || "${ubuntu_v}" = *'22.04'* ]]; then
         _show_and_run _install_if_not_installed autoconf-archive
-        _show_and_run rm libgpiod -rf
+        _show_and_run rm -rf libgpiod
         _show_and_run git clone git://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git
         _show_and_run cd libgpiod
         _show_and_run git checkout $libgpiod_v
@@ -1165,7 +1165,7 @@ function _dj_setup_magic_enum() {
     _show_and_run git clone https://github.com/Neargye/magic_enum.git
     _show_and_run cd magic_enum
     _show_and_run git checkout v$ver
-    _show_and_run rm build -rf
+    _show_and_run rm -rf build
     _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
@@ -1202,7 +1202,7 @@ eom
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm mbed-cli -rf
+    _show_and_run rm -rf mbed-cli
     git clone https://github.com/ARMmbed/mbed-cli
     _show_and_run cd mbed-cli/tools/bash_completion
     _show_and_run sudo cp mbed /usr/share/bash-completion/completions/
@@ -1410,11 +1410,11 @@ function _dj_setup_nlohmann_json3_dev() {
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
-    _show_and_run rm json -rf
+    _show_and_run rm -rf json
     _show_and_run git clone https://github.com/nlohmann/json.git
     _show_and_run cd json
     _show_and_run git checkout $v
-    _show_and_run rm build -rf
+    _show_and_run rm -rf build
     _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
@@ -1507,7 +1507,7 @@ function _dj_setup_nvtop() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm nvtop -rf
+    _show_and_run rm -rf nvtop
     _show_and_run git clone https://github.com/Syllo/nvtop.git
     _show_and_run cd nvtop
     _show_and_run mkdir -p build
@@ -1743,7 +1743,7 @@ function _dj_setup_spdlog() { # static/shared
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run sudo rm spdlog -rf
+    _show_and_run sudo rm -rf spdlog
 
     _show_and_run git clone https://github.com/gabime/spdlog.git
     _show_and_run cd spdlog

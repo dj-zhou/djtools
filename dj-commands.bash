@@ -108,7 +108,7 @@ function _dj_setup_can_analyzer() {
     _show_and_run _pushd_quiet ${PWD}
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm can-analyzer -rf
+    _show_and_run rm -rf can-analyzer
     _show_and_run git clone https://github.com/dj-zhou/can-analyzer.git
     _show_and_run chmod +x can-analyzer/CANAnalysis
     _popd_quiet
@@ -287,7 +287,7 @@ function _dj_setup_gadgets() {
 
     # dj-file installation
     _show_and_run cd ../dj-file/
-    _show_and_run rm build -rf
+    _show_and_run rm -rf build
     _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
@@ -363,7 +363,7 @@ function _dj_setup_container_docker_compose() {
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
-    _show_and_run rm compose -rf
+    _show_and_run rm -rf compose
     _show_and_run git clone https://github.com/docker/compose.git
     _show_and_run cd compose
     local v=$(_find_package_version docker-compose)
@@ -861,7 +861,7 @@ function _dj_setup_stm32_tools() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm stlink -rf
+    _show_and_run rm -rf stlink
     _show_and_run git clone https://github.com/stlink-org/stlink
 
     _show_and_run cd stlink
@@ -883,7 +883,7 @@ function _dj_setup_stm32_tools() {
     _echo_install "stm32flash"
     _press_enter_or_wait_s_continue 5
     _show_and_run cd $soft_dir
-    _show_and_run rm stm32-tools -rf
+    _show_and_run rm -rf stm32-tools
     _show_and_run git clone https://github.com/dj-zhou/stm32-tools.git
     _show_and_run cd stm32-tools/stm32flash
     _show_and_run make clean
@@ -1031,7 +1031,7 @@ function _dj_setup_gtest() {
     _show_and_run git clone https://github.com/google/googletest.git
     _show_and_run cd googletest
     _show_and_run git checkout release-$v
-    _show_and_run rm build -rf
+    _show_and_run rm -rf build
     _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
@@ -1061,7 +1061,7 @@ function _dj_setup_glog() {
     _show_and_run git clone https://github.com/google/glog.git
     _show_and_run cd glog
     _show_and_run git checkout $v
-    _show_and_run rm build -rf
+    _show_and_run rm -rf build
     _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
