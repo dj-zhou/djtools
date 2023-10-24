@@ -1,5 +1,14 @@
 #!/bin/bash
 
+system=$(uname -s)
+if [ $system = 'Darwin' ]; then
+    rc_file="$HOME/.zshrc"
+elif [ $system = 'Linux' ]; then
+    rc_file="$HOME/.bashrc"
+    # add some global variables -- only tested on Ubuntu
+    ubuntu_v=$(lsb_release -a)
+fi
+
 # =============================================================================
 NOC='\033[0m'
 GRY='\033[0;30m'
@@ -21,9 +30,21 @@ HWHT='\033[1;37m'
 
 # =============================================================================
 # by doing so, the system can find the whole tooklit
-djtools_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-# add some global variables
-ubuntu_v=$(lsb_release -a)
+# djtools_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+# get_script_path() {
+#     local SOURCE="${BASH_SOURCE[0]}"
+#     while [ -h "$SOURCE" ]; do # If $SOURCE is a symlink, resolve it
+#         local DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+#         SOURCE="$(readlink "$SOURCE")"
+#         # If $SOURCE is a relative symlink (so no "/" as prefix, 
+#         # we need to resolve it relative to the symlink base directory
+#         [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+#     done
+#     cd -P "$( dirname "$SOURCE" )" && pwd
+# }
+
+# djtools_path="$(get_script_path)"
+
 soft_dir="$HOME/soft"
 
 # =============================================================================
@@ -67,7 +88,7 @@ alias maek="_show_and_run make"
 alias ccc="_show_and_run clear"
 alias logout="_show_and_run gnome-session-quit"
 alias lock="_show_and_run gnome-screensaver-command -l"
-alias .b="_show_and_run source ~/.bashrc"
+alias .b="_show_and_run source $rc_file"
 
 # folder alias ----------------------------------------------
 alias cddj="_show_and_run cd $djtools_path"

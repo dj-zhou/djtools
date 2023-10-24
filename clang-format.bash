@@ -217,9 +217,9 @@ function _dj_setup_clang_llvm() {
         echo "You can edit ~/.config/Code/User/settings.json manually."
     fi
 
-    echo '# ===========================================================' >>~/.bashrc
-    echo '# (djtools) clang-format LLVM setup' >>~/.bashrc
-    echo "clang_format_path=/opt/$target_dir/bin/clang-format" >>~/.bashrc
+    echo '# ===========================================================' >>$rc_file
+    echo '# (djtools) clang-format LLVM setup' >>$rc_file
+    echo "clang_format_path=/opt/$target_dir/bin/clang-format" >>$rc_file
 
     _popd_quiet
 }

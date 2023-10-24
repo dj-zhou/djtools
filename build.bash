@@ -243,7 +243,7 @@ function _build_cmake() {
     # ---------------------------------------------------
     if [[ "$target_tag" = "all" ]]; then
         if [ ! -d "$build_dir" ]; then
-            _show_and_run mkdir "$build_dir"
+            _show_and_run mkdir -p "$build_dir"
             _show_and_run _pushd_quiet "$build_dir"
             _show_and_run cmake ..
         else
@@ -262,7 +262,7 @@ function _build_cmake() {
     # ---------------------------------------------------
     if [ "$target_tag" = "install" ]; then
         if [ ! -d "$build_dir" ]; then
-            _show_and_run mkdir "$build_dir"
+            _show_and_run mkdir -p "$build_dir"
             _show_and_run _pushd_quiet "$build_dir"
             _show_and_run cmake ..
             _show_and_run make -j$(nproc)

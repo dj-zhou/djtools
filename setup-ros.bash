@@ -35,28 +35,28 @@ function _dj_setup_ros_melodic() {
         if [[ $line == *"source /opt/ros/melodic/setup.bash"* ]]; then
             installed=1
         fi
-    done <~/.bashrc
+    done <$rc_file
 
     if [ $installed = 0 ]; then
-        echo -e "source /opt/ros/melodic/setup.bash\n" >>~/.bashrc
+        echo -e "source /opt/ros/melodic/setup.bash\n" >>$rc_file
     fi
 
     _install_if_not_installed python-roslaunch
     _install_if_not_installed python3-roslaunch
 
-    echo -e '\n' >>~/.bashrc
-    echo '# ===========================================================' >>~/.bashrc
-    echo '# ROS (1) setup' >>~/.bashrc
-    # echo 'export HOSTNAME:' >> ~/.bashrc
-    echo 'export ROS_MASTER_URI=http://localhost:11311' >>~/.bashrc
-    echo 'export ROS_IP=localhost' >>~/.bashrc
-    echo -e "ROS (1) settings are in ~/.bashrc."
+    echo -e '\n' >>$rc_file
+    echo '# ===========================================================' >>$rc_file
+    echo '# ROS (1) setup' >>$rc_file
+    # echo 'export HOSTNAME:' >> $rc_file
+    echo 'export ROS_MASTER_URI=http://localhost:11311' >>$rc_file
+    echo 'export ROS_IP=localhost' >>$rc_file
+    echo -e "ROS (1) settings are in $rc_file."
 
     # setup workspace ---------------
     cat <<eom
 ---------------------------------------------
 You can run those now:
-  $ source ~/.bashrc
+  $ source $rc_file
   $ mkdir -p ~/catkin_ws/src
   $ cd ~/catkin_ws
   $ catkin_make
@@ -102,25 +102,25 @@ function _dj_setup_ros_noetic() {
         if [[ $line == *"source /opt/ros/noetic/setup.bash"* ]]; then
             installed=1
         fi
-    done <~/.bashrc
+    done <$rc_file
 
     if [ $installed = 0 ]; then
-        echo -e "source /opt/ros/noetic/setup.bash\n" >>~/.bashrc
+        echo -e "source /opt/ros/noetic/setup.bash\n" >>$rc_file
     fi
 
-    echo -e '\n' >>~/.bashrc
-    echo '# ===========================================================' >>~/.bashrc
-    echo '# ROS (1) setup' >>~/.bashrc
-    # echo 'export HOSTNAME:' >> ~/.bashrc
-    echo 'export ROS_MASTER_URI=http://localhost:11311' >>~/.bashrc
-    echo 'export ROS_IP=localhost' >>~/.bashrc
-    echo -e "ROS (1) settings are in ~/.bashrc"
+    echo -e '\n' >>$rc_file
+    echo '# ===========================================================' >>$rc_file
+    echo '# ROS (1) setup' >>$rc_file
+    # echo 'export HOSTNAME:' >>$rc_file
+    echo 'export ROS_MASTER_URI=http://localhost:11311' >>$rc_file
+    echo 'export ROS_IP=localhost' >>$rc_file
+    echo -e "ROS (1) settings are in $rc_file"
 
     # setup workspace ---------------
     cat <<eom
 ---------------------------------------------
 You can run those now:
-  $ source ~/.bashrc
+  $ source $rc_file
   $ mkdir -p ~/catkin_ws/src
   $ cd ~/catkin_ws
   $ catkin_make
@@ -173,13 +173,13 @@ function _dj_setup_ros2_foxy_from_deb_package() {
         if [[ $line == *"source /opt/ros/foxy/setup.bash"* ]]; then
             installed=1
         fi
-    done <~/.bashrc
+    done <$rc_file
 
     if [[ $installed = 0 ]]; then
-        echo -e '\n' >>~/.bashrc
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) ROS 2 setup' >>~/.bashrc
-        echo -e "source /opt/ros/foxy/setup.bash\n" >>~/.bashrc
+        echo -e '\n' >>$rc_file
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) ROS 2 setup' >>$rc_file
+        echo -e "source /opt/ros/foxy/setup.bash\n" >>$rc_file
     fi
 
     cat <<eom
@@ -258,13 +258,13 @@ function _dj_setup_ros2_humble_from_deb_package() {
         if [[ $line == *"source /opt/ros/humble/setup.bash"* ]]; then
             installed=1
         fi
-    done <~/.bashrc
+    done <$rc_file
 
     if [[ $installed = 0 ]]; then
-        echo -e '\n' >>~/.bashrc
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) ROS 2 Humble setup' >>~/.bashrc
-        echo -e "source /opt/ros/humble/setup.bash\n" >>~/.bashrc
+        echo -e '\n' >>$rc_file
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) ROS 2 Humble setup' >>$rc_file
+        echo -e "source /opt/ros/humble/setup.bash\n" >>$rc_file
     fi
 }
 

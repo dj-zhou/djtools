@@ -35,7 +35,7 @@ function _dj_setup_abseil_cpp() {
     _show_and_run git clone git@github.com:abseil/abseil-cpp.git
     _show_and_run cd abseil-cpp
     _show_and_run git checkout $abseil_v
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -356,7 +356,7 @@ function _dj_setup_eigen3() {
     _show_and_run tar -xvf eigen-$eigen3_v.tar.gz
 
     _show_and_run cd eigen-$eigen3_v
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -413,9 +413,9 @@ function _dj_setup_esp_idf() {
     # ./install.sh esp32,esp32s2
 
     # setup env, this is not a good idea! We should only source it when develop ESP32 chips
-    # _show_and_run write_in_file "source $soft_dir/esp-idf/export.sh" ${HOME}/.bashrc
+    # _show_and_run write_in_file "source $soft_dir/esp-idf/export.sh" $rc_file
     # this is better:
-    _show_and_run write_in_file "alias get_esp_idf='source $soft_dir/esp-idf/export.sh'" ${HOME}/.bashrc
+    _show_and_run write_in_file "alias get_esp_idf='source $soft_dir/esp-idf/export.sh'" $rc_file
     _popd_quiet
 }
 
@@ -499,7 +499,7 @@ function _dj_setup_fmt() {
     _show_and_run cd fmt
     _show_and_run git checkout ${fmt_v}
     _show_and_run rm -rf build
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake .. -DBUILD_SHARED_LIBS=TRUE -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
     _show_and_run make -j$(nproc)
@@ -823,7 +823,7 @@ function _dj_setup_lcm() {
     _show_and_run git clone https://github.com/lcm-proj/lcm.git
     _show_and_run cd lcm
     _show_and_run git checkout $v
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -856,7 +856,7 @@ function _dj_setup_libbpf() {
 
     _show_and_run cd src
     _show_and_run make -j$(nproc)
-    _show_and_run mkdir build root
+    _show_and_run mkdir -p build root
     BUILD_STATIC_ONLY=y OBJDIR=build DESTDIR=root make install
 
     _show_and_run cd root/usr/
@@ -930,7 +930,7 @@ function _dj_setup_libev() {
     if [[ "$result" = *"/usr/local/lib"* ]]; then
         echo "LD_LIBRARY_PATH is already set, no need to set it again"
     else
-        _show_and_run echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >>~/.bashrc
+        _show_and_run echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >>$rc_file
     fi
 
     echo -e "\n${GRN}libev $v${NOC} is installed."
@@ -1011,7 +1011,7 @@ function _dj_setup_libiio() {
         return
     fi
 
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -1123,7 +1123,7 @@ function _dj_setup_matplot_xx() {
     _show_and_run git checkout $v
 
     # compile and install ------
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     if [ "$static_shared" = 'static' ]; then
         _show_and_run cmake .. -DBUILD_SHARED_LIBS=OFF
@@ -1166,7 +1166,7 @@ function _dj_setup_magic_enum() {
     _show_and_run cd magic_enum
     _show_and_run git checkout v$ver
     _show_and_run rm build -rf
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -1271,14 +1271,14 @@ function _dj_setup_meson_ninjia() {
     # make sure ~/.local/bin is in the PATH variable
     # but not sure if it is in it for new installed Ubuntu ... will check
 
-    meson_path=$(grep "PATH:~/.local/bin" ~/.bashrc)
+    meson_path=$(grep "PATH:~/.local/bin" $rc_file)
     if [ ! -z "$meson_path" ]; then
-        echo -e "${GRN}meson ${NOC}path was set in ~/.bashrc"
+        echo -e "${GRN}meson ${NOC}path was set in $rc_file"
     else
-        echo -e '\n' >>~/.bashrc
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) meson path setup' >>~/.bashrc
-        echo -e 'export PATH=$PATH:~/.local/bin\n' >>~/.bashrc
+        echo -e '\n' >>$rc_file
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) meson path setup' >>$rc_file
+        echo -e 'export PATH=$PATH:~/.local/bin\n' >>$rc_file
     fi
     echo -e "${GRN}meson${NOC} is installed to ${GRN}${HOME}/.local/bin${NOC}"
 
@@ -1294,7 +1294,7 @@ function _dj_setup_meson_ninjia() {
     _show_and_run rm -rf ninja
     _show_and_run git clone https://github.com/ninja-build/ninja.git && cd ninja
     _show_and_run git checkout v$ninja_v
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -1415,7 +1415,7 @@ function _dj_setup_nlohmann_json3_dev() {
     _show_and_run cd json
     _show_and_run git checkout $v
     _show_and_run rm build -rf
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -1510,7 +1510,7 @@ function _dj_setup_nvtop() {
     _show_and_run rm nvtop -rf
     _show_and_run git clone https://github.com/Syllo/nvtop.git
     _show_and_run cd nvtop
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake .. -DNVML_RETRIEVE_HEADER_ONLINE=True
     _show_and_run make -j$(nproc)
@@ -1542,13 +1542,13 @@ function _dj_setup_qt_5_13_1() {
 
     ./$filename
 
-    # setup the PATH and LD_LIBRARY_PATH into ~/.bashrc
-    echo -e '\n' >>~/.bashrc
-    echo '# ===========================================================' >>~/.bashrc
-    echo '# Qt5.13.1 setup (djtools)' >>~/.bashrc
-    echo 'export PATH=~/Qt5.13.1/5.13.1/gcc_64/bin:$PATH' >>~/.bashrc
-    echo 'export LD_LIBRARY_PATH=~/Qt5.13.1/5.13.1/gcc_64/lib:$LD_LIBRARY_PATH' >>~/.bashrc
-    echo -e "PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
+    # setup the PATH and LD_LIBRARY_PATH into $rc_file
+    echo -e '\n' >>$rc_file
+    echo '# ===========================================================' >>$rc_file
+    echo '# Qt5.13.1 setup (djtools)' >>$rc_file
+    echo 'export PATH=~/Qt5.13.1/5.13.1/gcc_64/bin:$PATH' >>$rc_file
+    echo 'export LD_LIBRARY_PATH=~/Qt5.13.1/5.13.1/gcc_64/lib:$LD_LIBRARY_PATH' >>$rc_file
+    echo -e "PATH and LD_LIBRARY_PATH are set in $rc_file.\n"
 
     _popd_quiet
 }
@@ -1577,13 +1577,13 @@ function _dj_setup_qt_5_14_2() {
 
     _show_and_run ./$filename
 
-    # setup the PATH and LD_LIBRARY_PATH into ~/.bashrc
-    echo -e '\n' >>~/.bashrc
-    echo '# ===========================================================' >>~/.bashrc
-    echo '# Qt5.14.2 setup (djtools)' >>~/.bashrc
-    echo 'export PATH=~/Qt5.14.2/5.14.2/gcc_64/bin:$PATH' >>~/.bashrc
-    echo 'export LD_LIBRARY_PATH=~/Qt5.14.2/5.14.2/gcc_64/lib:$LD_LIBRARY_PATH' >>~/.bashrc
-    echo -e "PATH and LD_LIBRARY_PATH are set in ~/.bashrc.\n"
+    # setup the PATH and LD_LIBRARY_PATH into $rc_file
+    echo -e '\n' >>$rc_file
+    echo '# ===========================================================' >>$rc_file
+    echo '# Qt5.14.2 setup (djtools)' >>$rc_file
+    echo 'export PATH=~/Qt5.14.2/5.14.2/gcc_64/bin:$PATH' >>$rc_file
+    echo 'export LD_LIBRARY_PATH=~/Qt5.14.2/5.14.2/gcc_64/lib:$LD_LIBRARY_PATH' >>$rc_file
+    echo -e "PATH and LD_LIBRARY_PATH are set in $rc_file.\n"
 
     _popd_quiet
 }
@@ -1627,19 +1627,19 @@ function _dj_setup_rpi_pico() {
     while IFS='' read -r line || [[ -n "$line" ]]; do
         if [[ $line == *"export PICO_SDK_PATH"* ]]; then
             echo -e "pico-sdk has already been setup, exit."
-            echo -e "you can still revise ~/.bashrc for manual setup."
+            echo -e "you can still revise $rc_file for manual setup."
             installed=1
         fi
-    done <~/.bashrc
+    done <$rc_file
     if [[ $installed = '0' ]]; then
-        echo -e '\n' >>~/.bashrc
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) pico-sdk setup' >>~/.bashrc
-        echo "export PICO_SDK_PATH=$HOME/rpi-pico/pico-sdk" >>~/.bashrc
+        echo -e '\n' >>$rc_file
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) pico-sdk setup' >>$rc_file
+        echo "export PICO_SDK_PATH=$HOME/rpi-pico/pico-sdk" >>$rc_file
     fi
     # build pico-examples
     export PICO_SDK_PATH=$HOME/rpi-pico/pico-sdk
-    mkdir build && cd build && cmake ..
+    mkdir -p build && cd build && cmake ..
     make -j$(nproc)
 
     _popd_quiet
@@ -1748,7 +1748,7 @@ function _dj_setup_spdlog() { # static/shared
     _show_and_run git clone https://github.com/gabime/spdlog.git
     _show_and_run cd spdlog
     _show_and_run git checkout v$v
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
 
     # static build need to be specific
@@ -1937,7 +1937,7 @@ function _dj_setup_yaml_cpp() {
     _show_and_run cd yaml-cpp
     _show_and_run git checkout yaml-cpp-$yaml_v
     _show_and_run rm -rf build/
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
 
     _show_and_run cmake ..

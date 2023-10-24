@@ -149,7 +149,7 @@ function _dj_setup_cli11() {
     _show_and_run git checkout v$v
     # gtest is a submodule of it
     _show_and_run git submodule update --init
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -269,7 +269,7 @@ function _dj_setup_gadgets() {
     _show_and_run git clone https://github.com/dj-zhou/dj-gadgets.git
     _show_and_run cd dj-gadgets
     _show_and_run sudo rm -rf build
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -288,7 +288,7 @@ function _dj_setup_gadgets() {
     # dj-file installation
     _show_and_run cd ../dj-file/
     _show_and_run rm build -rf
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make
@@ -426,7 +426,7 @@ function _dj_setup_pangolin() {
     _show_and_run git checkout v$v
     _show_and_run ./scripts/install_prerequisites.sh
     _show_and_run rm -rf build/
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -503,7 +503,7 @@ function _dj_setup_plotjuggler() {
     _show_and_run git clone https://github.com/facontidavide/PlotJuggler.git
     _show_and_run cd PlotJuggler
     _show_and_run git checkout $v
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -626,7 +626,7 @@ function _dj_setup_qemu() {
         _show_and_run git clone git://git.qemu-project.org/qemu.git
         _show_and_run cd qemu
         _show_and_run git checkout stable-4.2
-        _show_and_run mkdir build
+        _show_and_run mkdir -p build
         _show_and_run cd build
         # is this only for ARM? will fix it later if needed
         _show_and_run ../configure --target-list=arm-softmmu --audio-drv-list=
@@ -918,7 +918,7 @@ function _dj_setup_glfw3() {
     _show_and_run rm -rf glfw3/
     _show_and_run git clone https://github.com/dj-zhou/glfw3.git
     _show_and_run cd glfw3/
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build/
     _show_and_run cmake .. -DBUILD_SHARED_LIBS=ON
     _show_and_run make -j$(nproc)
@@ -977,16 +977,16 @@ function _dj_setup_go() {
     while IFS='' read -r line || [[ -n "$line" ]]; do
         if [[ $line == *"PATH:/usr/local/go/bin"* ]]; then
             echo -e "PATH for go is setup correctly."
-            echo -e "you can still revise ~/.bashrc for manual setup."
+            echo -e "you can still revise $rc_file for manual setup."
             installed=1
         fi
-    done <~/.bashrc
+    done <$rc_file
     if [[ $installed = '0' ]]; then
         echo -e "setup the PATH for go (golong)."
-        echo -e '\n' >>~/.bashrc
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) go (golang) setup' >>~/.bashrc
-        echo -e 'export PATH=$PATH:/usr/local/go/bin\n' >>~/.bashrc
+        echo -e '\n' >>$rc_file
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) go (golang) setup' >>$rc_file
+        echo -e 'export PATH=$PATH:/usr/local/go/bin\n' >>$rc_file
     fi
 
     _popd_quiet
@@ -1032,7 +1032,7 @@ function _dj_setup_gtest() {
     _show_and_run cd googletest
     _show_and_run git checkout release-$v
     _show_and_run rm build -rf
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -1062,7 +1062,7 @@ function _dj_setup_glog() {
     _show_and_run cd glog
     _show_and_run git checkout $v
     _show_and_run rm build -rf
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -1099,7 +1099,7 @@ function _dj_setup_grpc() {
     _show_and_run git clone https://github.com/grpc/grpc.git --recurse-submodules \
         --shallow-submodules --depth 1 --branch v${grpc_v}
     _show_and_run cd grpc
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake .. -GNinja
     _show_and_run cmake --build .
@@ -1198,8 +1198,8 @@ function _dj_setup_gpp_11() {
 function _dj_setup_rust() {
     echo -e "install ${GRN}rust${NOC}"
     _show_and_run curl https://sh.rustup.rs -sSf | sh
-    echo 'export PATH="$HOME/.cargo/bin:$PATH"' >>~/.bashrc
-    echo -e "You need to run ${GRN}\"source ~/.bashrc\"${NOC} manually."
+    echo 'export PATH="$HOME/.cargo/bin:$PATH"' >>$rc_file
+    echo -e "You need to run ${GRN}\"source $rc_file\"${NOC} manually."
     echo -e "update rust by ${GRN}rustup update${NOC}"
     echo -e "check rust version by ${GRN}rustc --version${NOC}"
     echo -e "check cargo version by ${GRN}cargo --version${NOC}"

@@ -20,7 +20,7 @@ function _dj_setup_opencv_2_4_13() {
     _show_and_run mv 2.4.13.6 opencv-2.4.13.6.zip
     _show_and_run unzip opencv-2.4.13.6.zip
     _show_and_run cd opencv-2.4.13.6
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
         -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON \
@@ -114,7 +114,7 @@ function _dj_setup_opencv_3_4_13() {
     _show_and_run mkvirtualenv cv -p python3
 
     _show_and_run cd opencv-3.4.13
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake -D CMAKE_BUILD_TYPE=RELEASE \
         -D CMAKE_C_COMPILER=/usr/bin/gcc-9 \
@@ -204,7 +204,7 @@ function _dj_setup_opencv_4_5_5() {
     mkvirtualenv cv -p python3
 
     _show_and_run cd opencv-$file
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake -D CMAKE_BUILD_TYPE=RELEASE \
         -D CMAKE_INSTALL_PREFIX=/usr/local \
