@@ -88,8 +88,8 @@ function _dj_python3() {
             _dj_python3_venv_numpy_pandas
             return
         fi
-        echo "dj python3 virtual-env: argument $2 is not supported, exit."
+        echo -e "dj python3 virtual-env: argument $YLW$2$NOC is not supported, exit."
         return
     fi
-    echo "dj python3: argument $1 is not supported, exit."s
+    echo -e "dj python3: argument $YLW$1$NOC is not supported, exit."
 }
