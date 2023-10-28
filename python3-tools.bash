@@ -73,7 +73,7 @@ EOF
     _show_and_run jupyter nbextension install \
         https://github.com/drillan/jupyter-black/archive/master.zip --user
     _show_and_run jupyter nbextension enable jupyter-black-master/jupyter-black
-    _show_and_run jupyter-lab
+    _show_and_run jupyter-lab --port 1688
 }
 
 # =============================================================================
