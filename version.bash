@@ -611,6 +611,7 @@ function version() {
     _version_help
 }
 
+if [ $system = 'Linux' ]; then
 # =============================================================================
 function _version() {
     COMPREPLY=()
@@ -651,3 +652,50 @@ function _version() {
 
 # =============================================================================
 complete -F _version version
+elif [ $system = 'Darwin' ]; then
+    # Array of options for the custom command
+    custom_options=("check" "swap")
+    
+    check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
+    check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
+    check_list+="eigen3 fmt gcc glog gnome go grpc gtest g++ libsystemd magic-enum "
+    check_list+="nlohmann-json3 node opencv opengl python3 spdlog ubuntu yaml-cpp "
+    read -r -A check_options <<< "$check_list"
+
+    swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
+    swap_list+="aarch64-linux-gnu-gcc gcc g++ gxx python3 "
+    read -r -A swap_options <<< "$swap_list"
+
+    # Function to provide custom completions
+    function _version() {
+    # Getting the current word and previous word in the command-line
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    # Defining states for the completion
+    _arguments -C \
+        '1: :->first' \
+        '2: :->second' \
+        '3: :->third' && return 0
+
+    case $state in
+    (first)
+        _wanted first_level_options expl 'main option' compadd -a custom_options
+        ;;
+    (second)
+        case $words[2] in
+        (check)
+            _wanted check_second_level_options expl 'subcommand for check' compadd -a check_options
+            ;;
+        (swap)
+            _wanted swap_second_level_options expl 'subcommand for swap' compadd -a swap_options
+            ;;
+        # You can add more cases here for other options if they have subcommands
+        esac
+        ;;
+    esac
+    }
+
+    # Associate our completion function with our custom command
+    compdef _version version
+fi
