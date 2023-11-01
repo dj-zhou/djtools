@@ -255,7 +255,7 @@ function system() {
 }
 
 # =============================================================================
-function _system() {
+function _system_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -299,4 +299,8 @@ function _system() {
 }
 
 # =============================================================================
-complete -F _system system
+if [ $system = 'Linux' ]; then
+    complete -F _system_linux system
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

@@ -138,7 +138,7 @@ function touchpad {
 # =============================================================================
 # auto completion reference:
 # https://blog.bouzekri.net/2017-01-28-custom-bash-autocomplete-script.html
-_touchpad() {
+function _touchpad_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -169,4 +169,8 @@ _touchpad() {
 }
 
 # =============================================================================
-complete -F _touchpad touchpad
+if [ $system = 'Linux' ]; then
+    complete -F _touchpad_linux touchpad
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

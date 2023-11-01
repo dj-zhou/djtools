@@ -133,7 +133,7 @@ function terminal {
 # =============================================================================
 # auto completion reference:
 # https://blog.bouzekri.net/2017-01-28-custom-bash-autocomplete-script.html
-_terminal() {
+function _terminal_linux() {
 
     COMPREPLY=()
 
@@ -164,4 +164,8 @@ _terminal() {
 }
 
 # =============================================================================
-complete -F _terminal terminal
+if [ $system = 'Linux' ]; then
+    complete -F _terminal_linux terminal
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

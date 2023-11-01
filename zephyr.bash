@@ -426,7 +426,7 @@ function zephyr() {
 }
 
 # =============================================================================
-function _zephyr() {
+function _zephyr_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -466,4 +466,8 @@ function _zephyr() {
 }
 
 # =============================================================================
-complete -F _zephyr zephyr
+if [ $system = 'Linux' ]; then
+    complete -F _zephyr_linux  zephyr
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

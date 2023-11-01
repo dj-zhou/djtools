@@ -50,7 +50,7 @@ function djfile() {
 }
 
 # =============================================================================
-function _djfile() {
+function _djfile_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -89,4 +89,8 @@ function _djfile() {
 }
 
 # =============================================================================
-complete -F _djfile djfile
+if [ $system = 'Linux' ]; then
+    complete -F _djfile_linux djfile
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

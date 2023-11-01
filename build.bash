@@ -438,7 +438,7 @@ function _meson_build_test_exists() {
 }
 
 # =============================================================================
-function _build() {
+function _build_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -518,4 +518,8 @@ function _build() {
 }
 
 # =============================================================================
-complete -F _build build
+if [ $system = 'Linux' ]; then
+    complete -F _build_linux build
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

@@ -181,7 +181,7 @@ function kernel {
 # =============================================================================
 # auto completion reference:
 # https://blog.bouzekri.net/2017-01-28-custom-bash-autocomplete-script.html
-_kernel() {
+function _kernel_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -204,4 +204,9 @@ _kernel() {
     fi
 }
 
-complete -F _kernel kernel
+# =============================================================================
+if [ $system = 'Linux' ]; then
+    complete -F _kernel_linux kernel
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

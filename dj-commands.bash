@@ -1756,7 +1756,7 @@ function dj() {
 }
 
 # =============================================================================
-function _dj() {
+function _dj_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -2026,4 +2026,8 @@ function _dj() {
 }
 
 # =============================================================================
-complete -F _dj dj
+if [ $system = 'Linux' ]; then
+    complete -F _dj_linux dj
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

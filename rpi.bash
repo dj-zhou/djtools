@@ -76,7 +76,7 @@ function rpi() {
 }
 
 # =============================================================================
-function _rpi() {
+function _rpi_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -123,4 +123,8 @@ function _rpi() {
 }
 
 # =============================================================================
-complete -F _rpi rpi
+if [ $system = 'Linux' ]; then
+    complete -F _rpi_linux rpi
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi
