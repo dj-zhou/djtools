@@ -611,9 +611,17 @@ function version() {
     _version_help
 }
 
-if [ $system = 'Linux' ]; then
+
+check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
+check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
+check_list+="eigen3 fmt gcc glog gnome go grpc gtest g++ libsystemd magic-enum "
+check_list+="nlohmann-json3 node opencv opengl python3 spdlog ubuntu yaml-cpp "
+
+swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
+swap_list+="aarch64-linux-gnu-gcc gcc g++ gxx python3 "
+
 # =============================================================================
-function _version() {
+function _version_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -626,16 +634,10 @@ function _version() {
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
-    check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
-    check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
-    check_list+="eigen3 fmt gcc glog gnome go grpc gtest g++ libsystemd magic-enum "
-    check_list+="nlohmann-json3 node opencv opengl python3 spdlog ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do
         ACTIONS[$i]=" "
     done
-    swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
-    swap_list+="aarch64-linux-gnu-gcc gcc g++ gxx python3 "
     ACTIONS[swap]="$swap_list "
     for i in $swap_list; do
         ACTIONS[$i]=" "
@@ -651,32 +653,21 @@ function _version() {
 }
 
 # =============================================================================
-complete -F _version version
-elif [ $system = 'Darwin' ]; then
-    # Array of options for the custom command
-    custom_options=("check" "swap")
-    
-    check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
-    check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
-    check_list+="eigen3 fmt gcc glog gnome go grpc gtest g++ libsystemd magic-enum "
-    check_list+="nlohmann-json3 node opencv opengl python3 spdlog ubuntu yaml-cpp "
-    read -r -A check_options <<< "$check_list"
-
-    swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
-    swap_list+="aarch64-linux-gnu-gcc gcc g++ gxx python3 "
-    read -r -A swap_options <<< "$swap_list"
-
-    # Function to provide custom completions
-    function _version() {
+# Function to provide custom completions
+function _version_darwin() {
     # Getting the current word and previous word in the command-line
     local curcontext="$curcontext" state line
     typeset -A opt_args
 
+     # Array of options for the custom command
+    custom_options=("check" "swap")
+    read -r -A check_options <<< "$check_list"
+    read -r -A swap_options <<< "$swap_list"
+
     # Defining states for the completion
     _arguments -C \
         '1: :->first' \
-        '2: :->second' \
-        '3: :->third' && return 0
+        '2: :->second' && return 0
 
     case $state in
     (first)
@@ -694,8 +685,11 @@ elif [ $system = 'Darwin' ]; then
         esac
         ;;
     esac
-    }
+}
 
-    # Associate our completion function with our custom command
-    compdef _version version
+# =============================================================================
+if [ $system = 'Linux' ]; then
+    complete -F _version_linux version
+elif [ $system = 'Darwin' ]; then
+    compdef _version_darwin version
 fi
