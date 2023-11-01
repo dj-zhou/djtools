@@ -28,50 +28,25 @@ HPRP='\033[1;35m'
 HCYN='\033[1;36m'
 HWHT='\033[1;37m'
 
-# =============================================================================
-# by doing so, the system can find the whole tooklit
-# djtools_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-# get_script_path() {
-#     local SOURCE="${BASH_SOURCE[0]}"
-#     while [ -h "$SOURCE" ]; do # If $SOURCE is a symlink, resolve it
-#         local DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-#         SOURCE="$(readlink "$SOURCE")"
-#         # If $SOURCE is a relative symlink (so no "/" as prefix, 
-#         # we need to resolve it relative to the symlink base directory
-#         [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
-#     done
-#     cd -P "$( dirname "$SOURCE" )" && pwd
-# }
 
-# djtools_path="$(get_script_path)"
+# =============================================================================
+function _show() {
+    printf >&2 "run:"
+    local arg
+    for arg in "$@"; do
+        arg="${arg%\'/\'\\\'\'}"
+        printf >&2 " $GRN'%s'$NOC" "$arg"
+    done
+    printf >&2 "\n"
+}
+
+# =============================================================================
+function _show_and_run() {
+    _show "$@"
+    "$@"
+}
 
 soft_dir="$HOME/soft"
-
-# =============================================================================
-source $djtools_path/block-device.bash
-source $djtools_path/build.bash
-source $djtools_path/djfile.bash
-source $djtools_path/dj-commands.bash
-source $djtools_path/esp32.bash
-source $djtools_path/funcs.bash
-source $djtools_path/git.bash
-source $djtools_path/keyremap.bash
-source $djtools_path/kernel.bash
-source $djtools_path/mark-down.bash
-source $djtools_path/m.bash
-source $djtools_path/mirror.bash
-source $djtools_path/pack-unpack.bash
-source $djtools_path/rpi.bash
-source $djtools_path/split-merge.bash
-source $djtools_path/system.bash
-source $djtools_path/systemd.bash
-source $djtools_path/terminal-format.bash
-source $djtools_path/touchpad.bash
-source $djtools_path/version.bash
-source $djtools_path/window-tile.bash
-source $djtools_path/work-check.bash
-source $djtools_path/yocto/yocto.bash
-source $djtools_path/zephyr.bash
 
 # =============================================================================
 # alias ----------------------------------------------
@@ -88,7 +63,31 @@ alias maek="_show_and_run make"
 alias ccc="_show_and_run clear"
 alias logout="_show_and_run gnome-session-quit"
 alias lock="_show_and_run gnome-screensaver-command -l"
+alias cddj="_show_and_run cd $djtools_path"
 alias .b="_show_and_run source $rc_file"
 
-# folder alias ----------------------------------------------
-alias cddj="_show_and_run cd $djtools_path"
+# =============================================================================
+# source $djtools_path/block-device.bash
+# source $djtools_path/build.bash
+# source $djtools_path/djfile.bash
+# source $djtools_path/dj-commands.bash
+# source $djtools_path/esp32.bash
+# source $djtools_path/funcs.bash
+# source $djtools_path/git.bash
+# source $djtools_path/keyremap.bash
+# source $djtools_path/kernel.bash
+# source $djtools_path/mark-down.bash
+# source $djtools_path/m.bash
+# source $djtools_path/mirror.bash
+# source $djtools_path/pack-unpack.bash
+# source $djtools_path/rpi.bash
+# source $djtools_path/split-merge.bash
+# source $djtools_path/system.bash
+# source $djtools_path/systemd.bash
+# source $djtools_path/terminal-format.bash
+# source $djtools_path/touchpad.bash
+source $djtools_path/version.bash
+# source $djtools_path/window-tile.bash
+# source $djtools_path/work-check.bash
+# source $djtools_path/yocto/yocto.bash
+# source $djtools_path/zephyr.bash
