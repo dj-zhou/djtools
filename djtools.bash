@@ -89,5 +89,5 @@ source $djtools_path/touchpad.bash
 source $djtools_path/version.bash
 source $djtools_path/window-tile.bash
 source $djtools_path/work-check.bash
-# source $djtools_path/yocto/yocto.bash
-# source $djtools_path/zephyr.bash
+source $djtools_path/yocto/yocto.bash
+source $djtools_path/zephyr.bash

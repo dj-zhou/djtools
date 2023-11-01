@@ -278,7 +278,7 @@ function yocto() {
 }
 
 # =============================================================================
-function _yocto() {
+function _yocto_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -359,4 +359,8 @@ function _yocto() {
 }
 
 # =============================================================================
-complete -F _yocto yocto
+if [ $system = 'Linux' ]; then
+    complete -F _yocto_linux yocto
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi
