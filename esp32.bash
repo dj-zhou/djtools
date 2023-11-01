@@ -90,7 +90,7 @@ function esp32() {
 }
 
 # =============================================================================
-function _esp32() {
+function _esp32_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -135,4 +135,8 @@ function _esp32() {
 }
 
 # =============================================================================
-complete -F _esp32 esp32
+if [ $system = 'Linux' ]; then
+    complete -F _esp32_linux esp32
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

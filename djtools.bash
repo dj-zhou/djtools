@@ -71,7 +71,7 @@ source $djtools_path/block-device.bash
 source $djtools_path/build.bash
 source $djtools_path/djfile.bash
 source $djtools_path/dj-commands.bash
-# source $djtools_path/esp32.bash
+source $djtools_path/esp32.bash
 source $djtools_path/funcs.bash
 source $djtools_path/git.bash
 source $djtools_path/keyremap.bash
