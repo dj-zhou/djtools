@@ -297,26 +297,15 @@ function _version_check_nlohmann_json3() {
 
 # =============================================================================
 function _version_check_node() {
-    # nvm_v=$(version check nvm)
-    # if [[ ! $nvm_v = "none" ]]; then
-    #     nodejs_v=$(node -v)
-    #     nodejs_v=$(echo $nodejs_v | sed 's/v//g')
-    #     echo $nodejs_v
-    #     return
-    # fi
     v=$(node -v)
     v=$(echo $v | sed 's/v//g')
     echo $v
 }
 
 # =============================================================================
-# function _version_check_nvm() {
-#     if [ -d "${HOME}/.nvm" ]; then
-#         echo $(nvm --version)
-#         return
-#     fi
-#     echo "none"
-# }
+function _version_check_npm() {
+    npm --version
+}
 
 # =============================================================================
 function _version_check_opencv() {
@@ -515,10 +504,10 @@ function version() {
             return
         fi
         # ------------------------------
-        # if [ $2 = 'nvm' ]; then
-        #     _version_check_nvm
-        #     return
-        # fi
+        if [ $2 = 'npm' ]; then
+            _version_check_npm
+            return
+        fi
         # ------------------------------
         if [ $2 = 'opencv' ]; then
             _version_check_opencv
@@ -611,11 +600,10 @@ function version() {
     _version_help
 }
 
-
 check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
 check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
 check_list+="eigen3 fmt gcc glog gnome go grpc gtest g++ libsystemd magic-enum "
-check_list+="nlohmann-json3 node opencv opengl python3 spdlog ubuntu yaml-cpp "
+check_list+="nlohmann-json3 node npm opencv opengl python3 spdlog ubuntu yaml-cpp "
 
 swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
 swap_list+="aarch64-linux-gnu-gcc gcc g++ gxx python3 "
@@ -659,10 +647,10 @@ function _version_darwin() {
     local curcontext="$curcontext" state line
     typeset -A opt_args
 
-     # Array of options for the custom command
+    # Array of options for the custom command
     custom_options=("check" "swap")
-    read -r -A check_options <<< "$check_list"
-    read -r -A swap_options <<< "$swap_list"
+    read -r -A check_options <<<"$check_list"
+    read -r -A swap_options <<<"$swap_list"
 
     # Defining states for the completion
     _arguments -C \
@@ -670,15 +658,15 @@ function _version_darwin() {
         '2: :->second' && return 0
 
     case $state in
-    (first)
+    first)
         _wanted first_level_options expl 'main option' compadd -a custom_options
         ;;
-    (second)
+    second)
         case $words[2] in
-        (check)
+        check)
             _wanted check_second_level_options expl 'subcommand for check' compadd -a check_options
             ;;
-        (swap)
+        swap)
             _wanted swap_second_level_options expl 'subcommand for swap' compadd -a swap_options
             ;;
         # You can add more cases here for other options if they have subcommands
