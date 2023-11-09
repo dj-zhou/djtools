@@ -1433,12 +1433,10 @@ function _dj_setup_nlohmann_json3_dev() {
 # use nvm (node version management) to install nodejs
 # https://github.com/nvm-sh/nvm#installing-and-updating
 function _dj_setup_nodejs() {
-
     # https://stackoverflow.com/a/36401038
-    if [[ "${ubuntu_v}" = *'18.04'* &&
-        "${ubuntu_v}" = *'20.04'* &&
-        "${ubuntu_v}" = *'22.04'* ]]; then
-        echo_warn "dj setup nodejs: not tested system, exit."
+    if [[ "${ubuntu_v}" != *'20.04'* &&
+        "${ubuntu_v}" != *'22.04'* ]]; then
+        echo_error "dj setup nodejs: not tested platform, exit."
         return
     fi
 
@@ -1499,7 +1497,7 @@ function _dj_setup_nvtop() {
     if [[ "${ubuntu_v}" != *'18.04'* &&
         "${ubuntu_v}" != *'20.04'* &&
         "${ubuntu_v}" != *'22.04'* ]]; then
-        echo_error "not tested platform, exit"
+        echo_error "dj setup nvtop: not tested platform, exit."
         return
     fi
 
