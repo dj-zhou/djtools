@@ -213,14 +213,14 @@ function _dj_setup_kdiff3_meld() {
 
     all_config=$(git config --list)
     if [[ "$all_config" = *"merge.tool"* ]]; then
-        git config --global --replace-all merge.tool kdiff3
+       _show_and_run git config --global --replace-all merge.tool kdiff3
     else
-        git config --global --add merge.tool kdiff3
+       _show_and_run git config --global --add merge.tool kdiff3
     fi
     if [[ "$all_config" = *"diff.guitool"* ]]; then
-        git config --global --replace-all diff.guitool meld
+        _show_and_run git config --global --replace-all diff.guitool meld
     else
-        git config --global --add diff.guitool meld
+        _show_and_run git config --global --add diff.guitool meld
     fi
 }
 
