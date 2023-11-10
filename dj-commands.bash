@@ -520,27 +520,33 @@ function _dj_setup_protobuf() {
 
     _show_and_run sudo rm -rf /usr/local/lib/libproto*
 
-    _show_and_run rm -rf protobuf
-    _show_and_run git clone https://github.com/google/protobuf
-    _show_and_run cd protobuf
+    # install bazel by $ dj2 setup bazel (now it is v6.4.0)
+    if [ ! -d protobuf ]; then
+        _show_and_run git clone https://github.com/google/protobuf
+        _show_and_run cd protobuf
+    else
+        _show_and_run cd protobuf
+        _show_and_run git checkout main
+        _show_and_run git fetch -p
+        _show_and_run git pull
+    fi
+    _show_and_run git submoudle update --init --recursive
     v=$(_find_package_version protobuf)
     _show_and_run git checkout v$v
-    _show_and_run ./autogen.sh
-    _show_and_run ./configure
-    _show_and_run make -j$(nproc)
-    _show_and_run make check
-    _show_and_run sudo make install
-    _show_and_run sudo ldconfig
 
-    _verify_lib_installation libprotobuf.a /usr/local/lib
-    _verify_lib_installation libprotobuf.la /usr/local/lib
-    _verify_lib_installation libprotobuf.so /usr/local/lib
-    _verify_lib_installation libprotobuf-lite.a /usr/local/lib
-    _verify_lib_installation libprotobuf-lite.la /usr/local/lib
-    _verify_lib_installation libprotobuf-lite.so /usr/local/lib
-    _verify_lib_installation libprotoc.a /usr/local/lib
-    _verify_lib_installation libprotoc.la /usr/local/lib
-    _verify_lib_installation libprotoc.so /usr/local/lib
+    _show_and_run bazel build :protoc :protobuf
+    _show_and_run sudo cp bazel-bin/protoc /usr/local/bin
+
+    # seems not needed?
+    # _verify_lib_installation libprotobuf.a /usr/local/lib
+    # _verify_lib_installation libprotobuf.la /usr/local/lib
+    # _verify_lib_installation libprotobuf.so /usr/local/lib
+    # _verify_lib_installation libprotobuf-lite.a /usr/local/lib
+    # _verify_lib_installation libprotobuf-lite.la /usr/local/lib
+    # _verify_lib_installation libprotobuf-lite.so /usr/local/lib
+    # _verify_lib_installation libprotoc.a /usr/local/lib
+    # _verify_lib_installation libprotoc.la /usr/local/lib
+    # _verify_lib_installation libprotoc.so /usr/local/lib
 
     _popd_quiet
 
