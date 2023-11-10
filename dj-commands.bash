@@ -1101,15 +1101,24 @@ function _dj_setup_gnome() {
 # =============================================================================
 # ninja is used to compile
 function _dj_setup_grpc() {
-    _show_and_run _pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
-    grpc_v=$(_find_package_version grpc)
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm -rf grpc
-    _show_and_run git clone https://github.com/grpc/grpc.git --recurse-submodules \
-        --shallow-submodules --depth 1 --branch v${grpc_v}
-    _show_and_run cd grpc
+
+    grpc_v=$(_find_package_version grpc)
+    if [ ! -d grpc ]; then
+        _show_and_run git clone https://github.com/grpc/grpc.git --recurse-submodules \
+            --shallow-submodules --depth 1
+        _show_and_run cd grpc
+    else
+        _show_and_run cd grpc
+        _show_and_run git checkout master
+        _show_and_run git fetch -p
+        _show_and_run git pull
+        _show_and_run git submodule update --init --recursive
+        _show_and_run rm -r build
+    fi
     _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake .. -GNinja
