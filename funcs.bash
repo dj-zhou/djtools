@@ -365,7 +365,7 @@ function _install_if_not_installed() {
             echo -e "${CYN}installing${NOC} $package"
             # bug: /var/lib/dpkg/lock-frontend, etc, errors will not be seen
             if [ $system = 'Linux' ]; then
-            sudo apt-get install -y $package &>/dev/null
+                sudo apt-get install -y $package &>/dev/null
             elif [ $system = 'Darwin' ]; then
                 brew install $package
             fi
@@ -375,6 +375,23 @@ function _install_if_not_installed() {
     done
     cd $cur_dir_install
 }
+
+# =============================================================================
+if [ $system = 'Darwin' ]; then
+# should find a better way to install
+function _cask_install_if_not_installed() {
+    local cur_dir_install=$PWD
+    for package in "$@"; do
+        if [[ "no" = $(_check_if_package_installed $package) ]]; then
+            echo -e "${CYN}installing${NOC} $package"
+            brew install --cask $package
+        else
+            echo -e "$package ${CYN}is already installed${NOC}"
+        fi
+    done
+    cd $cur_dir_install
+}
+fi
 
 # =============================================================================
 function _verify_lib_installation() {
