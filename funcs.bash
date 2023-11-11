@@ -335,11 +335,24 @@ function _wget_if_not_exist() { # $filename $md5sum $url $option
 # =============================================================================
 # https://stackoverflow.com/questions/1298066/check-if-an-apt-get-package-is-installed-and-then-install-it-if-its-not-on-linu
 function _check_if_package_installed() {
-    PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $1 2>/dev/null | grep "install ok installed")
-    if [ "" = "$PKG_OK" ]; then
-        echo "no"
-    else
-        echo "yes"
+    
+    if [ $system = 'Linux' ]; then
+        rc_file="$HOME/.bashrc"
+        # add some global variables -- only tested on Ubuntu
+        ubuntu_v=$(lsb_release -a)
+        PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $1 2>/dev/null | grep "install ok installed")
+        if [ "" = "$PKG_OK" ]; then
+            echo "no"
+        else
+            echo "yes"
+        fi
+    elif [ $system = 'Darwin' ]; then
+        find_package=$(brew list |grep $1)
+        if [ -z "$find_package" ]; then
+            echo "no"
+        else
+            echo "yes"
+        fi
     fi
 }
 
@@ -351,7 +364,11 @@ function _install_if_not_installed() {
         if [[ "no" = $(_check_if_package_installed $package) ]]; then
             echo -e "${CYN}installing${NOC} $package"
             # bug: /var/lib/dpkg/lock-frontend, etc, errors will not be seen
+            if [ $system = 'Linux' ]; then
             sudo apt-get install -y $package &>/dev/null
+            elif [ $system = 'Darwin' ]; then
+                brew install $package
+            fi
         else
             echo -e "$package ${CYN}is already installed${NOC}"
         fi
