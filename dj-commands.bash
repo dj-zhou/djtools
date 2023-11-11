@@ -1117,10 +1117,10 @@ function _dj_setup_grpc() {
         _show_and_run git fetch -p
         _show_and_run git pull
         _show_and_run git submodule update --init --recursive
-        _show_and_run rm -r build
+        _show_and_run rm -r build_dir
     fi
-    _show_and_run mkdir -p build
-    _show_and_run cd build
+    _show_and_run mkdir -p build_dir
+    _show_and_run cd build_dir
     _show_and_run cmake .. -GNinja
     _show_and_run cmake --build .
     _show_and_run sudo cmake --build . -- install
