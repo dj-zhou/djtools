@@ -335,11 +335,7 @@ function _wget_if_not_exist() { # $filename $md5sum $url $option
 # =============================================================================
 # https://stackoverflow.com/questions/1298066/check-if-an-apt-get-package-is-installed-and-then-install-it-if-its-not-on-linu
 function _check_if_package_installed() {
-    
     if [ $system = 'Linux' ]; then
-        rc_file="$HOME/.bashrc"
-        # add some global variables -- only tested on Ubuntu
-        ubuntu_v=$(lsb_release -a)
         PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $1 2>/dev/null | grep "install ok installed")
         if [ "" = "$PKG_OK" ]; then
             echo "no"
@@ -359,7 +355,6 @@ function _check_if_package_installed() {
 # =============================================================================
 # should find a better way to install
 function _install_if_not_installed() {
-    local cur_dir_install=$PWD
     for package in "$@"; do
         if [[ "no" = $(_check_if_package_installed $package) ]]; then
             echo -e "${CYN}installing${NOC} $package"
@@ -373,14 +368,12 @@ function _install_if_not_installed() {
             echo -e "$package ${CYN}is already installed${NOC}"
         fi
     done
-    cd $cur_dir_install
 }
 
 # =============================================================================
 if [ $system = 'Darwin' ]; then
 # should find a better way to install
 function _cask_install_if_not_installed() {
-    local cur_dir_install=$PWD
     for package in "$@"; do
         if [[ "no" = $(_check_if_package_installed $package) ]]; then
             echo -e "${CYN}installing${NOC} $package"
@@ -389,7 +382,6 @@ function _cask_install_if_not_installed() {
             echo -e "$package ${CYN}is already installed${NOC}"
         fi
     done
-    cd $cur_dir_install
 }
 fi
 
