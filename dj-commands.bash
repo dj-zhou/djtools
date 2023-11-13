@@ -513,6 +513,10 @@ function _dj_setup_plotjuggler() {
 }
 
 # =============================================================================
+# v3.25.0 uses bazel to compile, so I installed bazel v6.4.0 by command:
+# $ dj2 setup bazel
+# however, the compile of protobuf is unachievable due to abseil link issue
+# so I roll back to v3.21.12 version
 function _dj_setup_protobuf() {
     _show_and_run _pushd_quiet ${PWD}
     _show_and_run mkdir -p $soft_dir
@@ -521,17 +525,12 @@ function _dj_setup_protobuf() {
     _show_and_run sudo rm -rf /usr/local/lib/libproto*
     _show_and_run sudo rm -rf /usr/bin/protoc
 
-    # install bazel by $ dj2 setup bazel (now it is v6.4.0)
-    if [ ! -d protobuf ]; then
-        _show_and_run git clone https://github.com/google/protobuf
-        _show_and_run cd protobuf
-    else
-        _show_and_run cd protobuf
-        _show_and_run git checkout main
-        _show_and_run git fetch -p
-        _show_and_run git pull
-    fi
-    v=$(_find_package_version protobuf)
+    local v=$(_find_package_version protobuf)
+
+    # just do NOT enter into protobuf/ directory to pull
+    _show_and_run rm -rf protobuf
+    _show_and_run git clone https://github.com/google/protobuf
+    _show_and_run cd protobuf
     _show_and_run git checkout v$v
 
     _show_and_run git submodule update --init --recursive
