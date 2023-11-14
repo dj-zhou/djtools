@@ -9,7 +9,7 @@
 
 # build directories
 # Makefile           bin/
-# CMakeList.txt     _bnative.cmake/
+# CMakeLists.txt    _bnative.cmake/
 # meson.build       _bnative.meson/, or _bcross.[sdk name]/
 # make.sh            no default build directory, it all depends on how make.sh is written
 
@@ -22,7 +22,7 @@ function compile_make_build_etc() {
     [ -f "meson.build" ] && options+=("meson.build")
     [ -f "make.sh" ] && options+=("make.sh")
     choose=""
-    if [ ${#options[@]}==1 ]; then
+    if [ ${#options[@]} -eq 1 ]; then
         choose=${options[0]}
     elif [ ${#options[@]} -ge 2 ]; then
         echo "Please choose a build file to continue:"
@@ -50,6 +50,7 @@ function compile_make_build_etc() {
     else
         echo "No known build files found."
     fi
+    echo "choose=$choose"
     # ------------------------------
     if [ $choose = "Makefile" ]; then
         _build_makefile "$target"
