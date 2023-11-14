@@ -50,7 +50,6 @@ function compile_make_build_etc() {
     else
         echo "No known build files found."
     fi
-    echo "choose=$choose"
     # ------------------------------
     if [ $choose = "Makefile" ]; then
         _build_makefile "$target"
