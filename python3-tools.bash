@@ -28,7 +28,10 @@ function _dj_python3_venv_numpy_pandas() {
     python3_v=$(version check python3)
     _show_and_run echo "Python3: $python3_v"
     if [[ $python3_v = *"3.8"* ]]; then
-        _show_and_run _install_if_not_installed python3.8-venv
+        _show_and_run sudo apt install -y python3.8-venv
+    fi
+    if [[ $python3_v = *"3.10"* ]]; then
+        _show_and_run sudo apt install -y python3.10-venv
     fi
 
     VENV_DIR=".venv"
