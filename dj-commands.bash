@@ -108,7 +108,7 @@ function _dj_setup_can_analyzer() {
     _show_and_run _pushd_quiet ${PWD}
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm can-analyzer -rf
+    _show_and_run rm -rf can-analyzer
     _show_and_run git clone https://github.com/dj-zhou/can-analyzer.git
     _show_and_run chmod +x can-analyzer/CANAnalysis
     _popd_quiet
@@ -149,7 +149,7 @@ function _dj_setup_cli11() {
     _show_and_run git checkout v$v
     # gtest is a submodule of it
     _show_and_run git submodule update --init
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -213,14 +213,14 @@ function _dj_setup_kdiff3_meld() {
 
     all_config=$(git config --list)
     if [[ "$all_config" = *"merge.tool"* ]]; then
-        git config --global --replace-all merge.tool kdiff3
+        _show_and_run git config --global --replace-all merge.tool kdiff3
     else
-        git config --global --add merge.tool kdiff3
+        _show_and_run git config --global --add merge.tool kdiff3
     fi
     if [[ "$all_config" = *"diff.guitool"* ]]; then
-        git config --global --replace-all diff.guitool meld
+        _show_and_run git config --global --replace-all diff.guitool meld
     else
-        git config --global --add diff.guitool meld
+        _show_and_run git config --global --add diff.guitool meld
     fi
 }
 
@@ -269,7 +269,7 @@ function _dj_setup_gadgets() {
     _show_and_run git clone https://github.com/dj-zhou/dj-gadgets.git
     _show_and_run cd dj-gadgets
     _show_and_run sudo rm -rf build
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -287,8 +287,8 @@ function _dj_setup_gadgets() {
 
     # dj-file installation
     _show_and_run cd ../dj-file/
-    _show_and_run rm build -rf
-    _show_and_run mkdir build
+    _show_and_run rm -rf build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make
@@ -363,7 +363,7 @@ function _dj_setup_container_docker_compose() {
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
-    _show_and_run rm compose -rf
+    _show_and_run rm -rf compose
     _show_and_run git clone https://github.com/docker/compose.git
     _show_and_run cd compose
     local v=$(_find_package_version docker-compose)
@@ -426,7 +426,7 @@ function _dj_setup_pangolin() {
     _show_and_run git checkout v$v
     _show_and_run ./scripts/install_prerequisites.sh
     _show_and_run rm -rf build/
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -503,7 +503,7 @@ function _dj_setup_plotjuggler() {
     _show_and_run git clone https://github.com/facontidavide/PlotJuggler.git
     _show_and_run cd PlotJuggler
     _show_and_run git checkout $v
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -513,34 +513,45 @@ function _dj_setup_plotjuggler() {
 }
 
 # =============================================================================
+# v3.25.0 uses bazel to compile, so I installed bazel v6.4.0 by command:
+# $ dj2 setup bazel
+# however, the compile of protobuf is unachievable due to abseil link issue
+# so I roll back to v3.21.12 version
 function _dj_setup_protobuf() {
     _show_and_run _pushd_quiet ${PWD}
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
     _show_and_run sudo rm -rf /usr/local/lib/libproto*
+    _show_and_run sudo rm -rf /usr/bin/protoc
+    _show_and_run sudo rm -rf /usr/local/bin/protoc
 
+    local v=$(_find_package_version protobuf)
+
+    # just do NOT enter into protobuf/ directory to pull
     _show_and_run rm -rf protobuf
     _show_and_run git clone https://github.com/google/protobuf
     _show_and_run cd protobuf
-    v=$(_find_package_version protobuf)
     _show_and_run git checkout v$v
-    _show_and_run ./autogen.sh
-    _show_and_run ./configure
-    _show_and_run make -j$(nproc)
-    _show_and_run make check
-    _show_and_run sudo make install
-    _show_and_run sudo ldconfig
 
+    _show_and_run git submodule update --init --recursive
+
+    _show_and_run mkdir build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
+
+    # seems not needed?
     _verify_lib_installation libprotobuf.a /usr/local/lib
-    _verify_lib_installation libprotobuf.la /usr/local/lib
-    _verify_lib_installation libprotobuf.so /usr/local/lib
+    # _verify_lib_installation libprotobuf.la /usr/local/lib
+    # _verify_lib_installation libprotobuf.so /usr/local/lib
     _verify_lib_installation libprotobuf-lite.a /usr/local/lib
-    _verify_lib_installation libprotobuf-lite.la /usr/local/lib
-    _verify_lib_installation libprotobuf-lite.so /usr/local/lib
+    # _verify_lib_installation libprotobuf-lite.la /usr/local/lib
+    # _verify_lib_installation libprotobuf-lite.so /usr/local/lib
     _verify_lib_installation libprotoc.a /usr/local/lib
-    _verify_lib_installation libprotoc.la /usr/local/lib
-    _verify_lib_installation libprotoc.so /usr/local/lib
+    # _verify_lib_installation libprotoc.la /usr/local/lib
+    # _verify_lib_installation libprotoc.so /usr/local/lib
 
     _popd_quiet
 
@@ -626,7 +637,7 @@ function _dj_setup_qemu() {
         _show_and_run git clone git://git.qemu-project.org/qemu.git
         _show_and_run cd qemu
         _show_and_run git checkout stable-4.2
-        _show_and_run mkdir build
+        _show_and_run mkdir -p build
         _show_and_run cd build
         # is this only for ARM? will fix it later if needed
         _show_and_run ../configure --target-list=arm-softmmu --audio-drv-list=
@@ -861,7 +872,7 @@ function _dj_setup_stm32_tools() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm stlink -rf
+    _show_and_run rm -rf stlink
     _show_and_run git clone https://github.com/stlink-org/stlink
 
     _show_and_run cd stlink
@@ -883,7 +894,7 @@ function _dj_setup_stm32_tools() {
     _echo_install "stm32flash"
     _press_enter_or_wait_s_continue 5
     _show_and_run cd $soft_dir
-    _show_and_run rm stm32-tools -rf
+    _show_and_run rm -rf stm32-tools
     _show_and_run git clone https://github.com/dj-zhou/stm32-tools.git
     _show_and_run cd stm32-tools/stm32flash
     _show_and_run make clean
@@ -918,7 +929,7 @@ function _dj_setup_glfw3() {
     _show_and_run rm -rf glfw3/
     _show_and_run git clone https://github.com/dj-zhou/glfw3.git
     _show_and_run cd glfw3/
-    _show_and_run mkdir build
+    _show_and_run mkdir -p build
     _show_and_run cd build/
     _show_and_run cmake .. -DBUILD_SHARED_LIBS=ON
     _show_and_run make -j$(nproc)
@@ -977,16 +988,16 @@ function _dj_setup_go() {
     while IFS='' read -r line || [[ -n "$line" ]]; do
         if [[ $line == *"PATH:/usr/local/go/bin"* ]]; then
             echo -e "PATH for go is setup correctly."
-            echo -e "you can still revise ~/.bashrc for manual setup."
+            echo -e "you can still revise $rc_file for manual setup."
             installed=1
         fi
-    done <~/.bashrc
+    done <$rc_file
     if [[ $installed = '0' ]]; then
         echo -e "setup the PATH for go (golong)."
-        echo -e '\n' >>~/.bashrc
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) go (golang) setup' >>~/.bashrc
-        echo -e 'export PATH=$PATH:/usr/local/go/bin\n' >>~/.bashrc
+        echo -e '\n' >>$rc_file
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) go (golang) setup' >>$rc_file
+        echo -e 'export PATH=$PATH:/usr/local/go/bin\n' >>$rc_file
     fi
 
     _popd_quiet
@@ -1031,8 +1042,8 @@ function _dj_setup_gtest() {
     _show_and_run git clone https://github.com/google/googletest.git
     _show_and_run cd googletest
     _show_and_run git checkout release-$v
-    _show_and_run rm build -rf
-    _show_and_run mkdir build
+    _show_and_run rm -rf build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -1061,8 +1072,8 @@ function _dj_setup_glog() {
     _show_and_run git clone https://github.com/google/glog.git
     _show_and_run cd glog
     _show_and_run git checkout $v
-    _show_and_run rm build -rf
-    _show_and_run mkdir build
+    _show_and_run rm -rf build
+    _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
     _show_and_run make -j$(nproc)
@@ -1090,18 +1101,27 @@ function _dj_setup_gnome() {
 # =============================================================================
 # ninja is used to compile
 function _dj_setup_grpc() {
-    _show_and_run _pushd_quiet ${PWD}
+    _pushd_quiet ${PWD}
 
-    grpc_v=$(_find_package_version grpc)
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm -rf grpc
-    _show_and_run git clone https://github.com/grpc/grpc.git --recurse-submodules \
-        --shallow-submodules --depth 1 --branch v${grpc_v}
-    _show_and_run cd grpc
-    _show_and_run mkdir build
-    _show_and_run cd build
-    _show_and_run cmake .. -GNinja
+
+    grpc_v=$(_find_package_version grpc)
+    if [ ! -d grpc ]; then
+        _show_and_run git clone https://github.com/grpc/grpc.git --recurse-submodules
+        _show_and_run cd grpc
+    else
+        _show_and_run cd grpc
+        _show_and_run git checkout master
+        _show_and_run git fetch -p
+        _show_and_run git pull
+    fi
+    _show_and_run git checkout v$grpc_v
+    _show_and_run git submodule update --init --recursive
+    _show_and_run rm -r build_dir
+    _show_and_run mkdir -p build_dir
+    _show_and_run cd build_dir
+    _show_and_run cmake -DgRPC_INSTALL=ON -DgRPC_BUILD_TESTS=OFF .. -GNinja
     _show_and_run cmake --build .
     _show_and_run sudo cmake --build . -- install
 
@@ -1198,8 +1218,8 @@ function _dj_setup_gpp_11() {
 function _dj_setup_rust() {
     echo -e "install ${GRN}rust${NOC}"
     _show_and_run curl https://sh.rustup.rs -sSf | sh
-    echo 'export PATH="$HOME/.cargo/bin:$PATH"' >>~/.bashrc
-    echo -e "You need to run ${GRN}\"source ~/.bashrc\"${NOC} manually."
+    echo 'export PATH="$HOME/.cargo/bin:$PATH"' >>$rc_file
+    echo -e "You need to run ${GRN}\"source $rc_file\"${NOC} manually."
     echo -e "update rust by ${GRN}rustup update${NOC}"
     echo -e "check rust version by ${GRN}rustc --version${NOC}"
     echo -e "check cargo version by ${GRN}cargo --version${NOC}"
@@ -1756,7 +1776,7 @@ function dj() {
 }
 
 # =============================================================================
-function _dj() {
+function _dj_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -2026,4 +2046,8 @@ function _dj() {
 }
 
 # =============================================================================
-complete -F _dj dj
+if [ $system = 'Linux' ]; then
+    complete -F _dj_linux dj
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

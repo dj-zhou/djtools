@@ -139,15 +139,15 @@ function _system_wallpaper_random() {
         if [[ $line == *"wallpaper_folder="* ]]; then
             wallpaper_folder_is_set=1
         fi
-    done <~/.bashrc
+    done <$rc_file
 
     if [ $wallpaper_folder_is_set = 0 ]; then
         echo -e "variable ${GRN}wallpaper_folder${NOC} is NOT set, please enter a path of the wallpapers: "
         read answer
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) wallpaper setup' >>~/.bashrc
-        echo 'wallpaper_folder='$answer >>~/.bashrc
-        echo -e '\n' >>~/.bashrc
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) wallpaper setup' >>$rc_file
+        echo 'wallpaper_folder='$answer >>$rc_file
+        echo -e '\n' >>$rc_file
     fi
     # _random_wallpaper # from funcs.bash
     _pushd_quiet ${PWD}
@@ -255,7 +255,7 @@ function system() {
 }
 
 # =============================================================================
-function _system() {
+function _system_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -299,4 +299,8 @@ function _system() {
 }
 
 # =============================================================================
-complete -F _system system
+if [ $system = 'Linux' ]; then
+    complete -F _system_linux system
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

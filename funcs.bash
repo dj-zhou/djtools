@@ -335,29 +335,55 @@ function _wget_if_not_exist() { # $filename $md5sum $url $option
 # =============================================================================
 # https://stackoverflow.com/questions/1298066/check-if-an-apt-get-package-is-installed-and-then-install-it-if-its-not-on-linu
 function _check_if_package_installed() {
-    PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $1 2>/dev/null | grep "install ok installed")
-    if [ "" = "$PKG_OK" ]; then
-        echo "no"
-    else
-        echo "yes"
+    if [ $system = 'Linux' ]; then
+        PKG_OK=$(dpkg-query -W --showformat='${Status}\n' $1 2>/dev/null | grep "install ok installed")
+        if [ "" = "$PKG_OK" ]; then
+            echo "no"
+        else
+            echo "yes"
+        fi
+    elif [ $system = 'Darwin' ]; then
+        find_package=$(brew list |grep $1)
+        if [ -z "$find_package" ]; then
+            echo "no"
+        else
+            echo "yes"
+        fi
     fi
 }
 
 # =============================================================================
 # should find a better way to install
 function _install_if_not_installed() {
-    local cur_dir_install=$PWD
     for package in "$@"; do
         if [[ "no" = $(_check_if_package_installed $package) ]]; then
             echo -e "${CYN}installing${NOC} $package"
             # bug: /var/lib/dpkg/lock-frontend, etc, errors will not be seen
-            sudo apt-get install -y $package &>/dev/null
+            if [ $system = 'Linux' ]; then
+                sudo apt-get install -y $package &>/dev/null
+            elif [ $system = 'Darwin' ]; then
+                brew install $package
+            fi
         else
             echo -e "$package ${CYN}is already installed${NOC}"
         fi
     done
-    cd $cur_dir_install
 }
+
+# =============================================================================
+if [ $system = 'Darwin' ]; then
+# should find a better way to install
+function _cask_install_if_not_installed() {
+    for package in "$@"; do
+        if [[ "no" = $(_check_if_package_installed $package) ]]; then
+            echo -e "${CYN}installing${NOC} $package"
+            brew install --cask $package
+        else
+            echo -e "$package ${CYN}is already installed${NOC}"
+        fi
+    done
+}
+fi
 
 # =============================================================================
 function _verify_lib_installation() {
@@ -480,23 +506,6 @@ function _pushd_quiet() { # directory
 # =============================================================================
 function _popd_quiet() {
     popd &>/dev/null
-}
-
-# =============================================================================
-function _show() {
-    printf >&2 "run:"
-    local arg
-    for arg in "$@"; do
-        arg="${arg%\'/\'\\\'\'}"
-        printf >&2 " $GRN'%s'$NOC" "$arg"
-    done
-    printf >&2 "\n"
-}
-
-# =============================================================================
-function _show_and_run() {
-    _show "$@"
-    "$@"
 }
 
 # =============================================================================

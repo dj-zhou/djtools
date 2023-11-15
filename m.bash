@@ -9,23 +9,59 @@
 
 # build directories
 # Makefile           bin/
-# CMakeList.txt     _bnative.cmake/
+# CMakeLists.txt    _bnative.cmake/
 # meson.build       _bnative.meson/, or _bcross.[sdk name]/
 # make.sh            no default build directory, it all depends on how make.sh is written
 
 function compile_make_build_etc() {
     target="$1"
+    options=()
+    # let's choose --------------
+    [ -f "Makefile" ] && options+=("Makefile")
+    [ -f "CMakeLists.txt" ] && options+=("CMakeLists.txt")
+    [ -f "meson.build" ] && options+=("meson.build")
+    [ -f "make.sh" ] && options+=("make.sh")
+    choose=""
+    if [ ${#options[@]} -eq 1 ]; then
+        choose=${options[0]}
+    elif [ ${#options[@]} -ge 2 ]; then
+        echo "Please choose a build file to continue:"
+        select opt in "${options[@]}"; do
+            case $opt in
+            "CMakeLists.txt")
+                choose="CMakeLists.txt"
+                break
+                ;;
+            "Makefile")
+                choose="Makefile"
+                break
+                ;;
+            "meson.build")
+                choose="meson.build"
+                break
+                ;;
+            "make.sh")
+                choose="make.sh"
+                break
+                ;;
+            *) echo "Invalid option $REPLY" ;;
+            esac
+        done
+    else
+        echo "No known build files found."
+    fi
     # ------------------------------
-    if [ -f "Makefile" ]; then
+    if [ $choose = "Makefile" ]; then
         _build_makefile "$target"
         return
     fi
     # ------------------------------
     # CMake and Meson are of the same importance
-    if [[ $(_build_cmakelists_exists) = 'yes' || $(_build_main_meson_exists) = 'yes' ]]; then
-        if [ -f "CMakeLists.txt" ]; then
-            _build_cmake "$target"
-        fi
+    if [ $choose = "CMakeLists.txt" ]; then
+        _build_cmake "$target"
+        return
+    fi
+    if [ $choose = "meson.build" ]; then
         if [ $(_build_main_meson_exists) = 'yes' ]; then
             _build_meson_native "$target"
             # this is a hack
@@ -35,8 +71,9 @@ function compile_make_build_etc() {
         fi
         return
     fi
+
     # ------------------------------
-    if [ -f "make.sh" ]; then
+    if [ $choose = "make.sh" ]; then
         echo -e "use customized ${CYN}make.sh${NOC} file"
         chmod +x make.sh
         ./make.sh "$target"

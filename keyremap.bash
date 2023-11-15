@@ -43,7 +43,7 @@ function keyremap {
 # =============================================================================
 # auto completion reference:
 # https://blog.bouzekri.net/2017-01-28-custom-bash-autocomplete-script.html
-_keyremap() {
+function _keyremap_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -70,4 +70,9 @@ _keyremap() {
     fi
 }
 
-complete -F _keyremap keyremap
+# =============================================================================
+if [ $system = 'Linux' ]; then
+    complete -F _keyremap_linux keyremap
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

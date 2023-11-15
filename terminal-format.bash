@@ -65,75 +65,75 @@ function terminal {
     if [ $# -eq 0 ]; then
         _terminal_help
     else
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) terminal format setup' >>~/.bashrc
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) terminal format setup' >>$rc_file
         if [ ${1} = 'user@host' ]; then
             if [ $# = 1 ]; then
                 _terminal_format_user_host_short_path
-                echo '_terminal_format_user_host_short_path' >>~/.bashrc
+                echo '_terminal_format_user_host_short_path' >>$rc_file
             elif [ $2 = 'full-path' ]; then
                 _terminal_format_user_host_full_path
-                echo '_terminal_format_user_host_full_path' >>~/.bashrc
+                echo '_terminal_format_user_host_full_path' >>$rc_file
                 if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_user_host_full_path_no_space
-                    echo '_terminal_format_user_host_full_path_no_space' >>~/.bashrc
+                    echo '_terminal_format_user_host_full_path_no_space' >>$rc_file
                 fi
             elif [ $2 = 'short-path' ]; then
                 _terminal_format_user_host_short_path
-                echo '_terminal_format_user_host_short_path' >>~/.bashrc
+                echo '_terminal_format_user_host_short_path' >>$rc_file
                 if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_user_host_short_path_no_space
-                    echo '_terminal_format_user_host_short_path_no_space' >>~/.bashrc
+                    echo '_terminal_format_user_host_short_path_no_space' >>$rc_file
                 fi
             fi
         elif [ ${1} = 'host' ]; then
             if [ $# = 1 ]; then
                 _terminal_format_host_short_path
-                echo '_terminal_format_host_short_path' >>~/.bashrc
+                echo '_terminal_format_host_short_path' >>$rc_file
             elif [ $2 = 'full-path' ]; then
                 _terminal_format_host_full_path
-                echo '_terminal_format_host_full_path' >>~/.bashrc
+                echo '_terminal_format_host_full_path' >>$rc_file
                 if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_host_full_path_no_space
-                    echo '_terminal_format_host_full_path_no_space' >>~/.bashrc
+                    echo '_terminal_format_host_full_path_no_space' >>$rc_file
                 fi
             elif [ $2 = 'short-path' ]; then
                 _terminal_format_host_short_path
-                echo '_terminal_format_host_short_path' >>~/.bashrc
+                echo '_terminal_format_host_short_path' >>$rc_file
                 if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_host_short_path_no_space
-                    echo '_terminal_format_host_short_path_no_space' >>~/.bashrc
+                    echo '_terminal_format_host_short_path_no_space' >>$rc_file
                 fi
             fi
         elif [ ${1} = 'user' ]; then
             if [ $# = 1 ]; then
                 _terminal_format_user_short_path
-                echo '_terminal_format_user_short_path' >>~/.bashrc
+                echo '_terminal_format_user_short_path' >>$rc_file
             elif [ $2 = 'full-path' ]; then
                 _terminal_format_user_full_path
                 if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_user_full_path_no_space
-                    echo '_terminal_format_user_full_path_no_space' >>~/.bashrc
+                    echo '_terminal_format_user_full_path_no_space' >>$rc_file
                 fi
             elif [ $2 = 'short-path' ]; then
                 _terminal_format_user_short_path
-                echo '_terminal_format_user_short_path' >>~/.bashrc
+                echo '_terminal_format_user_short_path' >>$rc_file
                 if [ $# = 3 ] && [ $3 = 'no-space' ]; then
                     _terminal_format_user_short_path_no_space
-                    echo '_terminal_format_user_short_path_no_space' >>~/.bashrc
+                    echo '_terminal_format_user_short_path_no_space' >>$rc_file
                 fi
             fi
         else
             echo 'terminal: argument not supported.'
         fi
-        echo -e '\n' >>~/.bashrc
+        echo -e '\n' >>$rc_file
     fi
 }
 
 # =============================================================================
 # auto completion reference:
 # https://blog.bouzekri.net/2017-01-28-custom-bash-autocomplete-script.html
-_terminal() {
+function _terminal_linux() {
 
     COMPREPLY=()
 
@@ -164,4 +164,8 @@ _terminal() {
 }
 
 # =============================================================================
-complete -F _terminal terminal
+if [ $system = 'Linux' ]; then
+    complete -F _terminal_linux terminal
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

@@ -243,7 +243,7 @@ function _build_cmake() {
     # ---------------------------------------------------
     if [[ "$target_tag" = "all" ]]; then
         if [ ! -d "$build_dir" ]; then
-            _show_and_run mkdir "$build_dir"
+            _show_and_run mkdir -p "$build_dir"
             _show_and_run _pushd_quiet "$build_dir"
             _show_and_run cmake ..
         else
@@ -262,7 +262,7 @@ function _build_cmake() {
     # ---------------------------------------------------
     if [ "$target_tag" = "install" ]; then
         if [ ! -d "$build_dir" ]; then
-            _show_and_run mkdir "$build_dir"
+            _show_and_run mkdir -p "$build_dir"
             _show_and_run _pushd_quiet "$build_dir"
             _show_and_run cmake ..
             _show_and_run make -j$(nproc)
@@ -438,7 +438,7 @@ function _meson_build_test_exists() {
 }
 
 # =============================================================================
-function _build() {
+function _build_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -518,4 +518,8 @@ function _build() {
 }
 
 # =============================================================================
-complete -F _build build
+if [ $system = 'Linux' ]; then
+    complete -F _build_linux build
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

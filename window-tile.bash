@@ -360,7 +360,7 @@ function tilefigs() {
 
 # =============================================================================
 # auto tab completion
-function _window_tiled() {
+function _window_tile_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -391,4 +391,8 @@ function _window_tiled() {
 }
 
 # =============================================================================
-complete -F _window_tiled window-tile
+if [ $system = 'Linux' ]; then
+    complete -F _window_tile_linux  window-tile
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

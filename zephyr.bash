@@ -53,23 +53,23 @@ function _zephyr_setup_sdk_0_11_4() {
     # the west installation can fail! any solution??
     pip3 install --user -U west
 
-    # setup west path in ~/.bashrc ---------------------
-    grep_west_path=$(grep "PATH:~/.local/bin" ~/.bashrc)
+    # setup west path in $rc_file ---------------------
+    grep_west_path=$(grep "PATH:~/.local/bin" $rc_file)
     if [ ! -z "$grep_west_path" ]; then
-        echo -e "${YLW}west${GRN} path was set in ~/.bashrc${NOC}"
+        echo -e "${YLW}west${GRN} path was set in $rc_file${NOC}"
     else
-        echo -e '\n' >>~/.bashrc
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) zephyr setup: west' >>~/.bashrc
-        echo 'export PATH=$PATH:~/.local/bin' >>~/.bashrc
+        echo -e '\n' >>$rc_file
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) zephyr setup: west' >>$rc_file
+        echo 'export PATH=$PATH:~/.local/bin' >>$rc_file
     fi
 
-    # find the Zephyr project path setting in ~/.bashrc ---------------------
-    echo -e "${GRN}find the Zephyr project path setting in ~/.bashrc ${NOC}"
+    # find the Zephyr project path setting in $rc_file ---------------------
+    echo -e "${GRN}find the Zephyr project path setting in $rc_file ${NOC}"
     _press_enter_or_wait_s_continue 5
-    zephyr_proj_path_set_str=$(grep "export ZEPHYR_PROJECT_PATH" ~/.bashrc)
+    zephyr_proj_path_set_str=$(grep "export ZEPHYR_PROJECT_PATH" $rc_file)
     if [ ! -z "$zephyr_proj_path_set_str" ]; then
-        echo -e "${GRN}ZEPHYR_PROJECT_PATH was set in ~/.bashrc${NOC}"
+        echo -e "${GRN}ZEPHYR_PROJECT_PATH was set in $rc_file${NOC}"
         # find the original path ---------------------
         pos=$(_find_a_char_in_str "$zephyr_proj_path_set_str" "=" 1)
         original_path=${zephyr_proj_path_set_str:$((pos + 1)):${#zephyr_proj_path_set_str}}
@@ -77,14 +77,14 @@ function _zephyr_setup_sdk_0_11_4() {
         if [ "$original_path" != "$zephyr_proj_folder" ]; then
             echo -e "${RED}the original ZEPHYR_PROJECT_PATH is not${NOC} $zephyr_proj_folder"
             echo -e " ${RED}revise it, and delete${NOC} $original_path"
-            sed -i "s|$original_path|$zephyr_proj_folder|g" ~/.bashrc
+            sed -i "s|$original_path|$zephyr_proj_folder|g" $rc_file
             rm -rf $original_path
         fi
     else
-        echo -e '\n' >>~/.bashrc
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) Zephyr Project path:' >>~/.bashrc
-        echo 'export ZEPHYR_PROJECT_PATH='$zephyr_proj_folder >>~/.bashrc
+        echo -e '\n' >>$rc_file
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) Zephyr Project path:' >>$rc_file
+        echo 'export ZEPHYR_PROJECT_PATH='$zephyr_proj_folder >>$rc_file
     fi
 
     # delete zephyr project folder and start from scratch, or ---------------------
@@ -205,21 +205,21 @@ function _zephyr_setup_sdk_0_11_4() {
     sudo cp "${zephyr_sdk_folder}/$udev_rule_path/60-openocd.rules" /etc/udev/rules.d
     sudo udevadm control --reload
 
-    echo -e "${GRN}reset ZEPHYR_SDK_PATH in ~/.bashrc${NOC}"
+    echo -e "${GRN}reset ZEPHYR_SDK_PATH in $rc_file${NOC}"
     _press_enter_or_wait_s_continue 10
-    zephyr_sdk_path_set_str=$(grep "export ZEPHYR_SDK_PATH" ~/.bashrc)
+    zephyr_sdk_path_set_str=$(grep "export ZEPHYR_SDK_PATH" $rc_file)
     if [ ! -z "$zephyr_sdk_path_set_str" ]; then
         pos=$(_find_a_char_in_str "$zephyr_sdk_path_set_str" "=" 1)
         original_path=${zephyr_sdk_path_set_str:$((pos + 1)):${#zephyr_sdk_path_set_str}}
         if [ "$original_path" != "$zephyr_sdk_folder" ]; then
             sudo rm -rf $original_path
-            sed -i "s|$original_path|$zephyr_sdk_folder|g" ~/.bashrc
+            sed -i "s|$original_path|$zephyr_sdk_folder|g" $rc_file
         fi
     else
-        echo -e '\n' >>~/.bashrc
-        echo '# ===========================================================' >>~/.bashrc
-        echo '# (djtools) Zephyr SDK path:' >>~/.bashrc
-        echo 'export ZEPHYR_SDK_PATH='$zephyr_sdk_folder >>~/.bashrc
+        echo -e '\n' >>$rc_file
+        echo '# ===========================================================' >>$rc_file
+        echo '# (djtools) Zephyr SDK path:' >>$rc_file
+        echo 'export ZEPHYR_SDK_PATH='$zephyr_sdk_folder >>$rc_file
     fi
 
     echo -e "${GRN}try the following commands to verify installation${NOC}"
@@ -426,7 +426,7 @@ function zephyr() {
 }
 
 # =============================================================================
-function _zephyr() {
+function _zephyr_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -466,4 +466,8 @@ function _zephyr() {
 }
 
 # =============================================================================
-complete -F _zephyr zephyr
+if [ $system = 'Linux' ]; then
+    complete -F _zephyr_linux  zephyr
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

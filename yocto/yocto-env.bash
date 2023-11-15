@@ -82,7 +82,7 @@ function _env_blacklisted()
 # =============================================================================
 function _yocto_reset_env_variables()
 {
-    source ~/.bashrc
+    source $rc_file
     unset ARCH
     unset GDB
     unset OPENSSL_CONF

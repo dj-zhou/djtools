@@ -1,5 +1,14 @@
 #!/bin/bash
 
+system=$(uname -s)
+if [ $system = 'Darwin' ]; then
+    rc_file="$HOME/.zshrc"
+elif [ $system = 'Linux' ]; then
+    rc_file="$HOME/.bashrc"
+    # add some global variables -- only tested on Ubuntu
+    ubuntu_v=$(lsb_release -a)
+fi
+
 # =============================================================================
 NOC='\033[0m'
 GRY='\033[0;30m'
@@ -19,12 +28,43 @@ HPRP='\033[1;35m'
 HCYN='\033[1;36m'
 HWHT='\033[1;37m'
 
+
 # =============================================================================
-# by doing so, the system can find the whole tooklit
-djtools_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
-# add some global variables
-ubuntu_v=$(lsb_release -a)
+function _show() {
+    printf >&2 "run:"
+    local arg
+    for arg in "$@"; do
+        arg="${arg%\'/\'\\\'\'}"
+        printf >&2 " $GRN'%s'$NOC" "$arg"
+    done
+    printf >&2 "\n"
+}
+
+# =============================================================================
+function _show_and_run() {
+    _show "$@"
+    "$@"
+}
+
 soft_dir="$HOME/soft"
+
+# =============================================================================
+# alias ----------------------------------------------
+alias lc="_show_and_run ls -lh --color=always"
+alias ll='_show_and_run ls -alF'
+alias la='_show_and_run ls -A'
+alias l='_show_and_run ls -CF'
+alias eixt="_show_and_run exit"
+alias amke="_show_and_run make"
+alias maek="_show_and_run make"
+alias mkae="_show_and_run make"
+alias amke="_show_and_run make"
+alias maek="_show_and_run make"
+alias ccc="_show_and_run clear"
+alias logout="_show_and_run gnome-session-quit"
+alias lock="_show_and_run gnome-screensaver-command -l"
+alias cddj="_show_and_run cd $djtools_path"
+alias .b="_show_and_run source $rc_file"
 
 # =============================================================================
 source $djtools_path/block-device.bash
@@ -51,23 +91,3 @@ source $djtools_path/window-tile.bash
 source $djtools_path/work-check.bash
 source $djtools_path/yocto/yocto.bash
 source $djtools_path/zephyr.bash
-
-# =============================================================================
-# alias ----------------------------------------------
-alias lc="_show_and_run ls -lh --color=always"
-alias ll='_show_and_run ls -alF'
-alias la='_show_and_run ls -A'
-alias l='_show_and_run ls -CF'
-alias eixt="_show_and_run exit"
-alias amke="_show_and_run make"
-alias maek="_show_and_run make"
-alias mkae="_show_and_run make"
-alias amke="_show_and_run make"
-alias maek="_show_and_run make"
-alias ccc="_show_and_run clear"
-alias logout="_show_and_run gnome-session-quit"
-alias lock="_show_and_run gnome-screensaver-command -l"
-alias .b="_show_and_run source ~/.bashrc"
-
-# folder alias ----------------------------------------------
-alias cddj="_show_and_run cd $djtools_path"

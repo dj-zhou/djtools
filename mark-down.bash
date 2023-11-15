@@ -77,7 +77,7 @@ function mark-down() {
 }
 
 # =============================================================================
-function _mark-down() {
+function _mark-down_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -105,4 +105,8 @@ function _mark-down() {
 }
 
 # =============================================================================
-complete -F _mark-down mark-down
+if [ $system = 'Linux' ]; then
+    complete -F _mark-down_linux mark-down
+# elif [ $system = 'Darwin' ]; then
+#     echo "todo"
+fi

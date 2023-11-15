@@ -297,26 +297,15 @@ function _version_check_nlohmann_json3() {
 
 # =============================================================================
 function _version_check_node() {
-    # nvm_v=$(version check nvm)
-    # if [[ ! $nvm_v = "none" ]]; then
-    #     nodejs_v=$(node -v)
-    #     nodejs_v=$(echo $nodejs_v | sed 's/v//g')
-    #     echo $nodejs_v
-    #     return
-    # fi
     v=$(node -v)
     v=$(echo $v | sed 's/v//g')
     echo $v
 }
 
 # =============================================================================
-# function _version_check_nvm() {
-#     if [ -d "${HOME}/.nvm" ]; then
-#         echo $(nvm --version)
-#         return
-#     fi
-#     echo "none"
-# }
+function _version_check_npm() {
+    npm --version
+}
 
 # =============================================================================
 function _version_check_opencv() {
@@ -405,214 +394,88 @@ function _version_check_yaml_cpp() {
 }
 
 # =============================================================================
-function version() {
-    # ------------------------------
+function _version_check {
+    case $1 in
+    arm-linux-gnueabi-gcc) _version_check_arm_linux_gnueabi_gcc ;;
+    arm-linux-gnueabihf-gcc) _version_check_arm_linux_gnueabihf_gcc ;;
+    arm-linux-gnueabihf-g++) _version_check_arm_linux_gnueabihf_gpp ;;
+    aarch64-linux-gnu-gcc) _version_check_aarch64_linux_gnu_gcc ;;
+    boost) _version_check_boost ;;
+    cli11) _version_check_cli11 ;;
+    cmake) _version_check_cmake ;;
+    eigen3) _version_check_eigen3 ;;
+    fmt) _version_check_fmt ;;
+    gcc) _version_check_gcc ;;
+    glog) _version_check_glog ;;
+    gnome) _version_check_gnome ;;
+    go) _version_check_go ;;
+    grpc) _version_check_grpc ;;
+    gtest) _version_check_gtest ;;
+    g++) _version_check_gpp ;;
+    magic-enum) _version_check_magic_enum ;;
+    nlohmann-json3) _version_check_nlohmann_json3 ;;
+    node) _version_check_node ;;
+    npm) _version_check_npm ;;
+    opencv) _version_check_opencv ;;
+    opengl) _version_check_opengl ;;
+    python3) _version_check_python3 ;;
+    spdlog) _version_check_spdlog ;;
+    libsystemd) _version_check_libsystemd ;;
+    ubuntu) _version_check_ubuntu ;;
+    yaml-cpp) _version_check_yaml_cpp ;;
+    *) echo -e "version check: $1: argument not supported" ;;
+    esac
+}
+
+function _version_swap {
+    case $1 in
+    gcc | g++ | gxx | arm-linux-gnueabi-gxx | arm-linux-gnueabihf-gxx | aarch64-linux-gnu-gcc | python3)
+        sudo update-alternatives --config $1
+        ;;
+    *) echo -e "version swap: $1: argument not supported" ;;
+    esac
+}
+
+# =============================================================================
+function version {
     if [ $# -eq 0 ]; then
         _version_help
         return
     fi
 
-    # ------------------------------
-    if [ $1 = 'check' ]; then
-        # ------------------------------
-        if [ $# = 1 ]; then
+    case $1 in
+    check)
+        if [ $# -lt 2 ]; then
             _version_help
-            return
+        else
+            _version_check "$2"
         fi
-        # ------------------------------
-        if [ $2 = 'arm-linux-gnueabi-gcc' ]; then
-            _version_check_arm_linux_gnueabi_gcc
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'arm-linux-gnueabihf-gcc' ]; then
-            _version_check_arm_linux_gnueabihf_gcc
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'arm-linux-gnueabihf-g++' ]; then
-            _version_check_arm_linux_gnueabihf_gpp
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'aarch64-linux-gnu-gcc' ]; then
-            _version_check_aarch64_linux_gnu_gcc
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'boost' ]; then
-            _version_check_boost
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'cli11' ]; then
-            _version_check_cli11
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'cmake' ]; then
-            _version_check_cmake
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'eigen3' ]; then
-            _version_check_eigen3
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'fmt' ]; then
-            _version_check_fmt
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'gcc' ]; then
-            _version_check_gcc
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'glog' ]; then
-            _version_check_glog
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'gnome' ]; then
-            _version_check_gnome
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'go' ]; then
-            _version_check_go
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'grpc' ]; then
-            _version_check_grpc
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'gtest' ]; then
-            _version_check_gtest
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'g++' ]; then
-            _version_check_gpp
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'magic-enum' ]; then
-            _version_check_magic_enum
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'nlohmann-json3' ]; then
-            _version_check_nlohmann_json3
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'node' ]; then
-            _version_check_node
-            return
-        fi
-        # ------------------------------
-        # if [ $2 = 'nvm' ]; then
-        #     _version_check_nvm
-        #     return
-        # fi
-        # ------------------------------
-        if [ $2 = 'opencv' ]; then
-            _version_check_opencv
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'opengl' ]; then
-            _version_check_opengl
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'python3' ]; then
-            _version_check_python3
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'spdlog' ]; then
-            _version_check_spdlog
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'libsystemd' ]; then
-            _version_check_libsystemd
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'ubuntu' ]; then
-            _version_check_ubuntu
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'yaml-cpp' ]; then
-            _version_check_yaml_cpp
-            return
-        fi
-        # ------------------------------
-        echo -e " version check: $2: argument not supported"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'swap' ]; then
-        # ------------------------------
-        if [ $# = 1 ]; then
+        ;;
+    swap)
+        if [ $# -lt 2 ]; then
             _version_help
-            return
+        else
+            _version_swap "$2"
         fi
-        # ------------------------------
-        if [ $2 = 'gcc' ]; then
-            sudo update-alternatives --config gcc
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'g++' ]; then
-            sudo update-alternatives --config g++
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'gxx' ]; then
-            sudo update-alternatives --config gcc
-            sudo update-alternatives --config g++
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'arm-linux-gnueabi-gxx' ]; then
-            sudo update-alternatives --config arm-linux-gnueabi-gcc
-            sudo update-alternatives --config arm-linux-gnueabi-g++
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'arm-linux-gnueabihf-gxx' ]; then
-            sudo update-alternatives --config arm-linux-gnueabihf-gcc
-            sudo update-alternatives --config arm-linux-gnueabihf-g++
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'python3' ]; then
-            # this does not work due to anaconda setup! be careful
-            sudo update-alternatives --config python3
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'aarch64-linux-gnu-gcc' ]; then
-            sudo update-alternatives --config aarch64-linux-gnu-gcc
-            return
-        fi
-        echo -e "version swap: $2: argument not supported"
-        return
-    fi
-    echo -e 'version : "'$1 '"command not supported'
-    _version_help
+        ;;
+    *)
+        echo -e 'version: "'$1'" command not supported'
+        _version_help
+        ;;
+    esac
 }
 
 # =============================================================================
-function _version() {
+check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
+check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
+check_list+="eigen3 fmt gcc glog gnome go grpc gtest g++ libsystemd magic-enum "
+check_list+="nlohmann-json3 node npm opencv opengl python3 spdlog ubuntu yaml-cpp "
+
+swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
+swap_list+="aarch64-linux-gnu-gcc gcc g++ gxx python3 "
+
+# =============================================================================
+function _version_linux() {
     COMPREPLY=()
 
     # All possible first values in command line
@@ -625,16 +488,10 @@ function _version() {
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
-    check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
-    check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
-    check_list+="eigen3 fmt gcc glog gnome go grpc gtest g++ libsystemd magic-enum "
-    check_list+="nlohmann-json3 node opencv opengl python3 spdlog ubuntu yaml-cpp "
     ACTIONS[check]="$check_list "
     for i in $check_list; do
         ACTIONS[$i]=" "
     done
-    swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
-    swap_list+="aarch64-linux-gnu-gcc gcc g++ gxx python3 "
     ACTIONS[swap]="$swap_list "
     for i in $swap_list; do
         ACTIONS[$i]=" "
@@ -650,4 +507,43 @@ function _version() {
 }
 
 # =============================================================================
-complete -F _version version
+# Function to provide custom completions
+function _version_darwin() {
+    # Getting the current word and previous word in the command-line
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    # Array of options for the custom command
+    custom_options=("check" "swap")
+    read -r -A check_options <<<"$check_list"
+    read -r -A swap_options <<<"$swap_list"
+
+    # Defining states for the completion
+    _arguments -C \
+        '1: :->first' \
+        '2: :->second' && return 0
+
+    case $state in
+    first)
+        _wanted first_level_options expl 'main option' compadd -a custom_options
+        ;;
+    second)
+        case $words[2] in
+        check)
+            _wanted check_second_level_options expl 'subcommand for check' compadd -a check_options
+            ;;
+        swap)
+            _wanted swap_second_level_options expl 'subcommand for swap' compadd -a swap_options
+            ;;
+        # You can add more cases here for other options if they have subcommands
+        esac
+        ;;
+    esac
+}
+
+# =============================================================================
+if [ $system = 'Linux' ]; then
+    complete -F _version_linux version
+elif [ $system = 'Darwin' ]; then
+    compdef _version_darwin version
+fi

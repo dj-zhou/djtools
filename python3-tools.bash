@@ -73,7 +73,7 @@ EOF
     _show_and_run jupyter nbextension install \
         https://github.com/drillan/jupyter-black/archive/master.zip --user
     _show_and_run jupyter nbextension enable jupyter-black-master/jupyter-black
-    _show_and_run jupyter-lab
+    _show_and_run jupyter-lab --port 1688
 }
 
 # =============================================================================
@@ -88,5 +88,8 @@ function _dj_python3() {
             _dj_python3_venv_numpy_pandas
             return
         fi
+        echo -e "dj python3 virtual-env: argument $YLW$2$NOC is not supported, exit."
+        return
     fi
+    echo -e "dj python3: argument $YLW$1$NOC is not supported, exit."
 }
