@@ -524,6 +524,7 @@ function _dj_setup_protobuf() {
 
     _show_and_run sudo rm -rf /usr/local/lib/libproto*
     _show_and_run sudo rm -rf /usr/bin/protoc
+    _show_and_run sudo rm -rf /usr/local/bin/protoc
 
     local v=$(_find_package_version protobuf)
 
@@ -1107,20 +1108,20 @@ function _dj_setup_grpc() {
 
     grpc_v=$(_find_package_version grpc)
     if [ ! -d grpc ]; then
-        _show_and_run git clone https://github.com/grpc/grpc.git --recurse-submodules \
-            --shallow-submodules --depth 1
+        _show_and_run git clone https://github.com/grpc/grpc.git --recurse-submodules
         _show_and_run cd grpc
     else
         _show_and_run cd grpc
         _show_and_run git checkout master
         _show_and_run git fetch -p
         _show_and_run git pull
-        _show_and_run git submodule update --init --recursive
-        _show_and_run rm -r build_dir
     fi
+    _show_and_run git checkout v$grpc_v
+    _show_and_run git submodule update --init --recursive
+    _show_and_run rm -r build_dir
     _show_and_run mkdir -p build_dir
     _show_and_run cd build_dir
-    _show_and_run cmake .. -GNinja
+    _show_and_run cmake -DgRPC_INSTALL=ON -DgRPC_BUILD_TESTS=OFF .. -GNinja
     _show_and_run cmake --build .
     _show_and_run sudo cmake --build . -- install
 
