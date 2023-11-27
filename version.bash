@@ -453,7 +453,7 @@ function _version_check {
     libsystemd) _version_check_libsystemd ;;
     ubuntu) _version_check_ubuntu ;;
     yaml-cpp) _version_check_yaml_cpp ;;
-    *) echo -e "version check: $1: argument not supported" ;;
+    *) echo -e "version check: argument \"$1\" is not supported" ;;
     esac
 }
 
@@ -462,7 +462,7 @@ function _version_swap {
     gcc | g++ | gxx | arm-linux-gnueabi-gxx | arm-linux-gnueabihf-gxx | aarch64-linux-gnu-gcc | python3)
         sudo update-alternatives --config $1
         ;;
-    *) echo -e "version swap: $1: argument not supported" ;;
+    *) echo -e "version swap: argument \"$1\" is not supported" ;;
     esac
 }
 
