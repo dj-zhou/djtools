@@ -1455,6 +1455,16 @@ function _dj_ssh_general_no_password() {
 }
 
 # =============================================================================
+function _dj_ssh_general() {
+    # ------------------------------
+    if [ $1 = 'no-password' ]; then
+        shift 1
+        _dj_ssh_general_no_password "$@"
+        return
+    fi
+}
+
+# =============================================================================
 # reference: https://gist.github.com/jexchan/2351996
 # I don't know why ~/.ssh/config is not needed
 # make sure the content in ~/.ssh/id_rsa-github-<account>.pub is pasted to the GitHub account
@@ -1553,226 +1563,59 @@ function _dj_flame_grapah() {
 }
 
 # =============================================================================
+function _dj_grep() {
+    # ------------------------------
+    if [ $1 = '-package' ]; then
+        # ------------------------------
+        if [[ $# -ge 2 ]]; then
+            shift 1
+            _dj_grep_package "$@"
+            return
+        fi
+    fi
+    # ------------------------------
+    if [ $1 = '-string' ]; then
+        # ------------------------------
+        if [[ $# -ge 2 ]]; then
+            shift 1
+            _dj_grep_string "$@"
+            return
+        fi
+    fi
+    echo "dj grep: wrong argument, exit."
+    return
+}
+
+# =============================================================================
 function dj() {
     # ------------------------------
     if [ $# -eq 0 ]; then
         _dj_help
         return
     fi
-    # ------------------------------
-    if [ $1 = 'flame-graph' ]; then
-        shift 1
-        _dj_flame_grapah "$@"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'format' ]; then
-        # ------------------------------
-        if [[ $# -ge 2 ]]; then
-            shift 1
-            _dj_format "$@"
-            return
-        fi
-        echo "dj format: argument not supported, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'grep' ]; then
-        # ------------------------------
-        if [ $2 = '-package' ]; then
-            # ------------------------------
-            if [[ $# -ge 3 ]]; then
-                shift 2
-                _dj_grep_package "$@"
-                return
-            fi
-        fi
-        # ------------------------------
-        if [ $2 = '-string' ]; then
-            # ------------------------------
-            if [[ $# -ge 3 ]]; then
-                shift 2
-                _dj_grep_string "$@"
-                return
-            fi
-        fi
-        echo "dj grep: wrong argument, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'help' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ]; then
-            _dj_help_skill $2
-            return
-        fi
-        echo 'dj help: argument not supported, exit.'
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'get' ]; then
-        shift 1
-        _dj_get "$@"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'git' ]; then
-        if [ $2 = 'config' ]; then
-            shift 2
-            _dj_git_config "$@"
-            return
-        fi
-        if [ $2 = 'search' ]; then
-            shift 2
-            _dj_git_search "$@"
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'ssh-account' ]; then
-            if [ $3 = '--activate' ]; then
-                shift 3
-                _dj_git_ssh_account_activate "$@"
-                return
-            fi
-            if [ $3 = '--show-all' ]; then
-                _dj_git_ssh_account_show_all
-                return
-            fi
-            if [ $3 = '--show-current' ]; then
-                _dj_git_ssh_account_show_current
-                return
-            fi
-        fi
-        # ------------------------------
-        if [ $2 = 'ssh-clone' ]; then
-            # --------------------------
-            if [[ "$3" = 'bitbucket' ||
-                "$3" = 'github' ]]; then
-                shift 2
-                _dj_git_ssh_clone_from "$@"
-                return
-            fi
-            _dj_ssh_clone_help
-            return
-        fi
-        echo 'dj git: argument not supported, exit.'
-        return
-    fi
+    case $1 in
+    'flame-graph') shift && _dj_flame_grapah "$@" ;;
+    'format') shift && _dj_format "$@" ;;
+    'grep') shift && _dj_grep "$@" ;;
+    'get') shift && _dj_get "$@" ;;
+    'git') shift && _dj_git "$@" ;;
+    'help') shift && _dj_help_skill "$@" ;;
+    'merge') shift && _dj_merge "$@" ;;
+    'open') shift && _dj_open_file "$@" ;;
+    'pack') shift && _dj_pack "$@" ;;
+    'python3') shift && _dj_python3 "$@" ;;
+    'replace') shift && _dj_replace "$@" ;;
+    'setup') shift && _dj_setup "$@" ;;
+    'split') shift && _dj_split "$@" ;;
+    'ssh-general') shift && _dj_ssh_general "$@" ;;
+    'systemd') shift && _dj_systemd "$@" ;;
+    'udev') shift && _dj_udev "$@" ;;
+    'udevadm') shift && _dj_udevadm "$@" ;;
+    'unpack') shift && _dj_unpack "$@" ;;
+    'work-check') shift && _dj_work_check "$@" ;;
 
-    # ------------------------------
-    if [ $1 = 'merge' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ]; then
-            shift 1
-            _dj_merge "$@"
-            return
-        fi
-        echo "dj merge: argument not supported, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'open' ]; then
-        _dj_open_file $2 $3 $4
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'pack' ]; then
-        shift 1
-        _dj_pack "$@"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'python3' ]; then
-        shift 1
-        _dj_python3 "$@"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'replace' ]; then
-        # ------------------------------
-        if [[ $# -ge 2 ]]; then
-            shift 1
-            _dj_replace "$@"
-            return
-        fi
-        echo "dj replace: argument not supported, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'setup' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ]; then
-            shift 1
-            _dj_setup "$@"
-            return
-        fi
-        echo "dj setup: argument not supported, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'split' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ]; then
-            shift 1
-            _dj_split "$@"
-            return
-        fi
-        echo "dj split: argument not supported, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'ssh-general' ]; then
-        # ------------------------------
-        if [ $2 = 'no-password' ]; then
-            shift 2
-            _dj_ssh_general_no_password "$@"
-            return
-        fi
-        return
-    fi
-
-    # ------------------------------
-    if [ $1 = 'systemd' ]; then
-        shift 1
-        _dj_systemd "$@"
-        return
-    fi
-
-    # ------------------------------
-    if [ $1 = 'udev' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ]; then
-            shift 1
-            _dj_udev "$@"
-            return
-        fi
-        _dj_udev_help
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'udevadm' ]; then
-        if [ $# -ge 2 ]; then
-            shift 1
-            _dj_udevadm "$@"
-            return
-        fi
-        _dj_udevadm_help $2 $3
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'unpack' ]; then
-        shift 1
-        _dj_unpack "$@"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'work-check' ]; then
-        shift 1
-        _dj_work_check "$@"
-        return
-    fi
-    _dj_help
-    # ------------------------------
+    *) echo "Invalid option: $1" && _dj_help ;;
+    esac
 }
 
 # =============================================================================

@@ -83,3 +83,47 @@ function _dj_git_search() {
     fi
     echo "dj grep search: argument not supported, exit!"
 }
+
+# =============================================================================
+function _dj_git() {
+    if [ $1 = 'config' ]; then
+        shift 1
+        _dj_git_config "$@"
+        return
+    fi
+    if [ $1 = 'search' ]; then
+        shift 1
+        _dj_git_search "$@"
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'ssh-account' ]; then
+        if [ $2 = '--activate' ]; then
+            shift 1
+            _dj_git_ssh_account_activate "$@"
+            return
+        fi
+        if [ $2 = '--show-all' ]; then
+            _dj_git_ssh_account_show_all
+            return
+        fi
+        if [ $2 = '--show-current' ]; then
+            _dj_git_ssh_account_show_current
+            return
+        fi
+    fi
+    # ------------------------------
+    if [ $1 = 'ssh-clone' ]; then
+        # --------------------------
+        if [[ "$2" = 'bitbucket' ||
+            "$2" = 'github' ]]; then
+            shift 1
+            _dj_git_ssh_clone_from "$@"
+            return
+        fi
+        _dj_ssh_clone_help
+        return
+    fi
+    echo 'dj git: argument not supported, exit.'
+    return
+}
