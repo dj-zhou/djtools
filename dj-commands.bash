@@ -19,7 +19,7 @@ function _dj_help() {
     echo " Create Date : Mar. 1st, 2020"
     echo "-----------------------------------------------------"
     echo -e "\nFirst level commands:"
-    echo "   git        - git related features: cofnig. search, ssh-account, ssh clone"
+    echo "   git        - git related features: config. search, ssh-account, ssh clone"
     echo "   merge      - merge splited files into a single file (reversion operation: split)"
     echo "   split      - split a single file into small files (reversion operation: merge)"
     echo "   setup      - to install some software"
@@ -1618,20 +1618,6 @@ function dj() {
     esac
 }
 
-setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-ide baidu-netdisk boost can-analyzer "
-setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cuda cutecom devtools "
-setup_list+="driver dropbox eigen3 esp-idf fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
-setup_list+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-setup_list+="gitg-gitk glfw3 glog gnome gnuplot go google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
-setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd mathpix "
-setup_list+="matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
-setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.5.5 pangolin perf "
-setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu qt-5.13.1 qt-5.14.2 "
-setup_list+="ros2-foxy ros2-humble rpi-pico rust saleae-logic serial-console spdlog slack "
-setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
-setup_list+="stm32-cube-programmer stm32-tools sublime texlive thermal-printer tldr typora vscode vtk-8.2.0 "
-setup_list+="windows-fonts wireshark wubi yaml-cpp "
-
 # =============================================================================
 function _dj_linux() {
     COMPREPLY=()
@@ -1823,14 +1809,14 @@ function _dj_linux() {
     for i in $git_list; do
         ACTIONS[$i]=" "
     done
-    ACTIONS[search]="$search_list "
-    for i in $search_list; do
+    ACTIONS[search]="$git_search_list "
+    for i in $git_search_list; do
         ACTIONS[$i]=" "
     done
 
     # --------------------------------------------------------
-    ACTIONS["ssh-account"]="$ssh_account_list "
-    for i in $ssh_account_list; do
+    ACTIONS["ssh-account"]="$git_ssh_account_list "
+    for i in $git_ssh_account_list; do
         ACTIONS[$i]=" "
     done
     ACTIONS["--activate"]="$all_accounts"
@@ -1914,13 +1900,17 @@ function _dj_darwin() {
         git
         setup
     )
+    read -r -A git_options <<<"$git_list"
+    read -r -A git_search_options <<<"$git_search_list"
+    read -r -A git_ssh_account_options <<<"$git_ssh_account_list"
+    # ------------
     read -r -A setup_options <<<"$setup_list"
-    git_options=" "
 
     # Defining states for the completion
     _arguments -C \
         '1: :->first' \
-        '2: :->second' && return 0
+        '2: :->second' \
+        '3: :->third' && return 0
 
     case $state in
     first)
@@ -1935,6 +1925,14 @@ function _dj_darwin() {
             _wanted setup_sl_options expl 'subcommand for setup' compadd -a setup_options
             ;;
         esac
+        ;;
+    third)
+        if [[ $words[2] == 'git' ]] && [[ $words[3] == 'search' ]]; then
+            _wanted git_tl_options expl 'subcommands for git search' compadd -a git_search_options
+        elif [[ $words[2] == 'git' ]] && [[ $words[3] == 'ssh-account' ]]; then
+            _wanted git_tl_options expl 'subcommands for git ssh-account' compadd -a git_ssh_account_options
+        fi
+        # Add more cases here for other third-level subcommands
         ;;
     esac
 }

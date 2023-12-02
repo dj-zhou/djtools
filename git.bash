@@ -1,8 +1,14 @@
 #!/bin/bash
 
-git_list="config search ssh-account ssh-clone "
-search_list="-name -email -commit "
-ssh_account_list="--activate --show-all --show-current "
+git_list="search ssh-account "
+if [ $system = 'Linux' ]; then
+    git_list+="ssh-clone "
+    # elif [ $system = 'Darwin' ]; then
+    # do nothing here
+fi
+
+git_search_list="-name -email -commit "
+git_ssh_account_list="--activate --show-all --show-current "
 
 # =============================================================================
 function _dj_git_ssh_account_show_all() {
@@ -15,19 +21,6 @@ function _dj_git_ssh_account_show_all() {
 }
 
 all_accounts="$(_dj_git_ssh_account_show_all) "
-# =============================================================================
-function _dj_git_config() { # name, email
-    if [ $# -eq 0 ]; then
-        echo "usage: dj git config \"<name>\" <email>"
-        return
-    fi
-    name="$1"
-    email="$2"
-    echo "git config --local user.name \"$name\""
-    git config --local user.name "$name"
-    echo "git config --local user.email \"$email\""
-    git config --local user.email "$email"
-}
 
 # =============================================================================
 function _dj_git_search_show_result() {
