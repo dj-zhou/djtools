@@ -92,7 +92,7 @@ function _dj_git() {
     # ------------------------------
     if [ $1 = 'ssh-account' ]; then
         if [ $2 = '--activate' ]; then
-            shift 1
+            shift 2
             _dj_git_ssh_account_activate "$@"
             return
         fi

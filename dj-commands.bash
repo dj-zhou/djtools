@@ -1470,8 +1470,9 @@ function _dj_ssh_general() {
 # make sure the content in ~/.ssh/id_rsa-github-<account>.pub is pasted to the GitHub account
 # install ssh-askpass to avoid some error, however, it will have an popup window to press
 function _dj_git_ssh_account_activate() {
-
-    _show_and_run _install_if_not_installed ssh-askpass
+    if [ $system = 'Linux' ]; then
+        _show_and_run _install_if_not_installed ssh-askpass
+    fi
 
     github_username=$1
     key_file=${HOME}/.ssh/id_rsa-github-$github_username
