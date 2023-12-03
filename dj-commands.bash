@@ -1330,7 +1330,7 @@ function _dj_grep_string() {
     fi
     if [ "$1" = "-in-ccode" ]; then
         echo -e "grep in ${GRN}*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt${NOC} files"
-        grep "$2" -rIn \
+        grep "$2" -rn \
             --include={*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt} \
             --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
             --exclude='*.lst' \
@@ -1618,6 +1618,16 @@ function dj() {
     esac
 }
 
+grep_list="-string "
+if [ $system = 'Linux' ]; then
+    grep_list+="-package "
+    # elif [ $system = 'Darwin' ]; then
+    # do nothing here
+fi
+
+grep_string_list="-in-bash -in-config -in-meson -in-python -in-ccode "
+grep_string_list+="-in-rust -in-yaml -in-yocto-recipe "
+
 # =============================================================================
 function _dj_linux() {
     COMPREPLY=()
@@ -1790,15 +1800,13 @@ function _dj_linux() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    grep_list="-package -string "
     ACTIONS[grep]="$grep_list "
     for i in $grep_list; do
         ACTIONS[$i]=" "
     done
-    string_list="-in-bash -in-config -in-meson -in-python -in-ccode "
-    string_list+="-in-rust -in-yaml -in-yocto-recipe "
-    ACTIONS["-string"]="$string_list "
-    for i in $string_list; do
+
+    ACTIONS["-string"]="$grep_string_list "
+    for i in $grep_string_list; do
         ACTIONS[$i]=" "
     done
 
@@ -1898,11 +1906,16 @@ function _dj_darwin() {
     # Array of options for the custom command
     custom_options=(
         git
+        grep
         setup
     )
+    # ------------
     read -r -A git_options <<<"$git_list"
     read -r -A git_search_options <<<"$git_search_list"
     read -r -A git_ssh_account_options <<<"$git_ssh_account_list"
+    # ------------
+    read -r -A grep_options <<<"$grep_list"
+    read -r -A grep_string_options <<<"$grep_string_list"
     # ------------
     read -r -A setup_options <<<"$setup_list"
 
@@ -1921,18 +1934,34 @@ function _dj_darwin() {
         git)
             _wanted git_sl_options expl 'subcommand for git' compadd -a git_options
             ;;
+        grep)
+            _wanted grep_sl_options expl 'subcommand for grep' compadd -a grep_options
+            ;;
         setup)
             _wanted setup_sl_options expl 'subcommand for setup' compadd -a setup_options
             ;;
         esac
         ;;
     third)
-        if [[ $words[2] == 'git' ]] && [[ $words[3] == 'search' ]]; then
-            _wanted git_tl_options expl 'subcommands for git search' compadd -a git_search_options
-        elif [[ $words[2] == 'git' ]] && [[ $words[3] == 'ssh-account' ]]; then
-            _wanted git_tl_options expl 'subcommands for git ssh-account' compadd -a git_ssh_account_options
-        fi
-        # Add more cases here for other third-level subcommands
+        case $words[2] in
+        git)
+            case $words[3] in
+            search)
+                _wanted git_tl_options expl 'subcommands for git search' compadd -a git_search_options
+                ;;
+            ssh-account)
+                _wanted git_tl_options expl 'subcommands for git ssh-account' compadd -a git_ssh_account_options
+                ;;
+            esac
+            ;;
+        grep)
+            case $words[3] in
+            -string)
+                _wanted grep_tl_options expl 'subcommands for grep -string' compadd -a grep_string_options
+                ;;
+            esac
+            ;;
+        esac
         ;;
     esac
 }
