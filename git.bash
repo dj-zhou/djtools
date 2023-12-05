@@ -1,8 +1,14 @@
 #!/bin/bash
 
-git_list="config search ssh-account ssh-clone "
-search_list="-name -email -commit "
-ssh_account_list="--activate --show-all --show-current "
+git_list="search ssh-account "
+if [ $system = 'Linux' ]; then
+    git_list+="ssh-clone "
+    # elif [ $system = 'Darwin' ]; then
+    # do nothing here
+fi
+
+git_search_list="-name -email -commit "
+git_ssh_account_list="--activate --show-all --show-current "
 
 # =============================================================================
 function _dj_git_ssh_account_show_all() {
@@ -15,19 +21,6 @@ function _dj_git_ssh_account_show_all() {
 }
 
 all_accounts="$(_dj_git_ssh_account_show_all) "
-# =============================================================================
-function _dj_git_config() { # name, email
-    if [ $# -eq 0 ]; then
-        echo "usage: dj git config \"<name>\" <email>"
-        return
-    fi
-    name="$1"
-    email="$2"
-    echo "git config --local user.name \"$name\""
-    git config --local user.name "$name"
-    echo "git config --local user.email \"$email\""
-    git config --local user.email "$email"
-}
 
 # =============================================================================
 function _dj_git_search_show_result() {
@@ -82,4 +75,48 @@ function _dj_git_search() {
         return
     fi
     echo "dj grep search: argument not supported, exit!"
+}
+
+# =============================================================================
+function _dj_git() {
+    if [ $1 = 'config' ]; then
+        shift 1
+        _dj_git_config "$@"
+        return
+    fi
+    if [ $1 = 'search' ]; then
+        shift 1
+        _dj_git_search "$@"
+        return
+    fi
+    # ------------------------------
+    if [ $1 = 'ssh-account' ]; then
+        if [ $2 = '--activate' ]; then
+            shift 2
+            _dj_git_ssh_account_activate "$@"
+            return
+        fi
+        if [ $2 = '--show-all' ]; then
+            _dj_git_ssh_account_show_all
+            return
+        fi
+        if [ $2 = '--show-current' ]; then
+            _dj_git_ssh_account_show_current
+            return
+        fi
+    fi
+    # ------------------------------
+    if [ $1 = 'ssh-clone' ]; then
+        # --------------------------
+        if [[ "$2" = 'bitbucket' ||
+            "$2" = 'github' ]]; then
+            shift 1
+            _dj_git_ssh_clone_from "$@"
+            return
+        fi
+        _dj_ssh_clone_help
+        return
+    fi
+    echo 'dj git: argument not supported, exit.'
+    return
 }

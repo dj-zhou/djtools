@@ -19,7 +19,7 @@ function _dj_help() {
     echo " Create Date : Mar. 1st, 2020"
     echo "-----------------------------------------------------"
     echo -e "\nFirst level commands:"
-    echo "   git        - git related features: cofnig. search, ssh-account, ssh clone"
+    echo "   git        - git related features: config. search, ssh-account, ssh clone"
     echo "   merge      - merge splited files into a single file (reversion operation: split)"
     echo "   split      - split a single file into small files (reversion operation: merge)"
     echo "   setup      - to install some software"
@@ -1321,27 +1321,27 @@ function _dj_grep_string() {
     if [ "$1" = "-in-bash" ]; then
         echo -e "grep in ${GRN}*.bash, *.sh${NOC} files"
         # how to search in the files without extension??
-        _show_and_run grep "$2" -rIn \
-            --include={*.bash,*.sh} \
-            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+        grep "$2" -rIn \
+            --include={"*.bash","*.sh"} \
+            --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
             --exclude='*.lst' \
             .
         return
     fi
     if [ "$1" = "-in-ccode" ]; then
         echo -e "grep in ${GRN}*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt${NOC} files"
-        _show_and_run grep "$2" -rIn \
-            --include={*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt} \
-            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+        grep "$2" -rn \
+            --include={"*.c","*.cpp","*.h","*.hpp","Makefile*","CMakeLists.txt"} \
+            --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
             --exclude='*.lst' \
             .
         return
     fi
     if [ "$1" = "-in-config" ]; then
         echo -e "grep in ${GRN}*.json,Dockerfile,*.xml${NOC} files"
-        _show_and_run grep "$2" -rIn \
-            --include={*.json,Dockerfile,*.xml} \
-            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+        grep "$2" -rIn \
+            --include={"*.json","Dockerfile","*.xml"} \
+            --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
             --exclude='*.lst' \
             .
         return
@@ -1353,37 +1353,37 @@ function _dj_grep_string() {
     fi
     if [ "$1" = "-in-python" ]; then
         echo -e "grep in ${GRN}*.py,*.ipynb${NOC} files"
-        _show_and_run grep "$2" -rIn \
-            --include={*.py,*.ipynb} \
-            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
-            --exclude='*.lst' \
+        grep "$2" -rIn \
+            --include={"*.py","*.ipynb"} \
+            --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
+            --exclude={'*.lst','*.pyc'} \
             .
         return
     fi
     if [ "$1" = "-in-rust" ]; then # seems not working for *.rs files
         echo -e "grep in ${GRN}*.rs,Cargo.toml,Cargo.lock${NOC} files"
         # not a bug, a single "*.rs" does not work here, don't know why
-        _show_and_run grep "$2" -rIn \
-            --include={*.rs,*.rs,Cargo.toml,Cargo.lock} \
-            --exclude-dir={.venv,build,subprojects,_b*,builddir,.git,.cache} \
+        grep "$2" -rIn \
+            --include={"*.rs","*.rs","Cargo.toml","Cargo.lock"} \
+            --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
             --exclude='*.lst' \
             .
         return
     fi
     if [ "$1" = "-in-yaml" ]; then
         echo -e "grep in ${GRN}*.yml,*.yaml${NOC} files"
-        _show_and_run grep "$2" -rIn \
-            --include={*.yml,*.yaml} \
-            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+        grep "$2" -rIn \
+            --include={"*.yml","*.yaml"} \
+            --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
             --exclude='*.lst' \
             .
         return
     fi
     if [ "$1" = "-in-yocto-recipe" ]; then
         echo -e "grep in ${GRN}*.bb,*.conf,*.inc,*.sample,*.bbappend${NOC} files"
-        _show_and_run grep "$2" -rIn \
-            --include={*.bb,*.conf,*.inc,*.sample,*.bbappend} \
-            --exclude-dir={.venv,build,subprojects,bin,_b*,builddir,.git,.cache} \
+        grep "$2" -rIn \
+            --include={"*.bb","*.conf","*.inc","*.sample","*.bbappend"} \
+            --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
             --exclude='*.lst' \
             .
         return
@@ -1455,13 +1455,24 @@ function _dj_ssh_general_no_password() {
 }
 
 # =============================================================================
+function _dj_ssh_general() {
+    # ------------------------------
+    if [ $1 = 'no-password' ]; then
+        shift 1
+        _dj_ssh_general_no_password "$@"
+        return
+    fi
+}
+
+# =============================================================================
 # reference: https://gist.github.com/jexchan/2351996
 # I don't know why ~/.ssh/config is not needed
 # make sure the content in ~/.ssh/id_rsa-github-<account>.pub is pasted to the GitHub account
 # install ssh-askpass to avoid some error, however, it will have an popup window to press
 function _dj_git_ssh_account_activate() {
-
-    _show_and_run _install_if_not_installed ssh-askpass
+    if [ $system = 'Linux' ]; then
+        _show_and_run _install_if_not_installed ssh-askpass
+    fi
 
     github_username=$1
     key_file=${HOME}/.ssh/id_rsa-github-$github_username
@@ -1553,227 +1564,70 @@ function _dj_flame_grapah() {
 }
 
 # =============================================================================
+function _dj_grep() {
+    # ------------------------------
+    if [ $1 = '-package' ]; then
+        # ------------------------------
+        if [[ $# -ge 2 ]]; then
+            shift 1
+            _dj_grep_package "$@"
+            return
+        fi
+    fi
+    # ------------------------------
+    if [ $1 = '-string' ]; then
+        # ------------------------------
+        if [[ $# -ge 2 ]]; then
+            shift 1
+            _dj_grep_string "$@"
+            return
+        fi
+    fi
+    echo "dj grep: wrong argument, exit."
+    return
+}
+
+# =============================================================================
 function dj() {
     # ------------------------------
     if [ $# -eq 0 ]; then
         _dj_help
         return
     fi
-    # ------------------------------
-    if [ $1 = 'flame-graph' ]; then
-        shift 1
-        _dj_flame_grapah "$@"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'format' ]; then
-        # ------------------------------
-        if [[ $# -ge 2 ]]; then
-            shift 1
-            _dj_format "$@"
-            return
-        fi
-        echo "dj format: argument not supported, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'grep' ]; then
-        # ------------------------------
-        if [ $2 = '-package' ]; then
-            # ------------------------------
-            if [[ $# -ge 3 ]]; then
-                shift 2
-                _dj_grep_package "$@"
-                return
-            fi
-        fi
-        # ------------------------------
-        if [ $2 = '-string' ]; then
-            # ------------------------------
-            if [[ $# -ge 3 ]]; then
-                shift 2
-                _dj_grep_string "$@"
-                return
-            fi
-        fi
-        echo "dj grep: wrong argument, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'help' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ]; then
-            _dj_help_skill $2
-            return
-        fi
-        echo 'dj help: argument not supported, exit.'
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'get' ]; then
-        shift 1
-        _dj_get "$@"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'git' ]; then
-        if [ $2 = 'config' ]; then
-            shift 2
-            _dj_git_config "$@"
-            return
-        fi
-        if [ $2 = 'search' ]; then
-            shift 2
-            _dj_git_search "$@"
-            return
-        fi
-        # ------------------------------
-        if [ $2 = 'ssh-account' ]; then
-            if [ $3 = '--activate' ]; then
-                shift 3
-                _dj_git_ssh_account_activate "$@"
-                return
-            fi
-            if [ $3 = '--show-all' ]; then
-                _dj_git_ssh_account_show_all
-                return
-            fi
-            if [ $3 = '--show-current' ]; then
-                _dj_git_ssh_account_show_current
-                return
-            fi
-        fi
-        # ------------------------------
-        if [ $2 = 'ssh-clone' ]; then
-            # --------------------------
-            if [[ "$3" = 'bitbucket' ||
-                "$3" = 'github' ]]; then
-                shift 2
-                _dj_git_ssh_clone_from "$@"
-                return
-            fi
-            _dj_ssh_clone_help
-            return
-        fi
-        echo 'dj git: argument not supported, exit.'
-        return
-    fi
+    case $1 in
+    'flame-graph') shift && _dj_flame_grapah "$@" ;;
+    'format') shift && _dj_format "$@" ;;
+    'grep') shift && _dj_grep "$@" ;;
+    'get') shift && _dj_get "$@" ;;
+    'git') shift && _dj_git "$@" ;;
+    'help') shift && _dj_help_skill "$@" ;;
+    'merge') shift && _dj_merge "$@" ;;
+    'open') shift && _dj_open_file "$@" ;;
+    'pack') shift && _dj_pack "$@" ;;
+    'python3') shift && _dj_python3 "$@" ;;
+    'replace') shift && _dj_replace "$@" ;;
+    'setup') shift && _dj_setup "$@" ;;
+    'split') shift && _dj_split "$@" ;;
+    'ssh-general') shift && _dj_ssh_general "$@" ;;
+    'systemd') shift && _dj_systemd "$@" ;;
+    'udev') shift && _dj_udev "$@" ;;
+    'udevadm') shift && _dj_udevadm "$@" ;;
+    'unpack') shift && _dj_unpack "$@" ;;
+    'work-check') shift && _dj_work_check "$@" ;;
 
-    # ------------------------------
-    if [ $1 = 'merge' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ]; then
-            shift 1
-            _dj_merge "$@"
-            return
-        fi
-        echo "dj merge: argument not supported, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'open' ]; then
-        _dj_open_file $2 $3 $4
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'pack' ]; then
-        shift 1
-        _dj_pack "$@"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'python3' ]; then
-        shift 1
-        _dj_python3 "$@"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'replace' ]; then
-        # ------------------------------
-        if [[ $# -ge 2 ]]; then
-            shift 1
-            _dj_replace "$@"
-            return
-        fi
-        echo "dj replace: argument not supported, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'setup' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ]; then
-            shift 1
-            _dj_setup "$@"
-            return
-        fi
-        echo "dj setup: argument not supported, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'split' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ]; then
-            shift 1
-            _dj_split "$@"
-            return
-        fi
-        echo "dj split: argument not supported, exit."
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'ssh-general' ]; then
-        # ------------------------------
-        if [ $2 = 'no-password' ]; then
-            shift 2
-            _dj_ssh_general_no_password "$@"
-            return
-        fi
-        return
-    fi
-
-    # ------------------------------
-    if [ $1 = 'systemd' ]; then
-        shift 1
-        _dj_systemd "$@"
-        return
-    fi
-
-    # ------------------------------
-    if [ $1 = 'udev' ]; then
-        # ------------------------------
-        if [ $# -ge 2 ]; then
-            shift 1
-            _dj_udev "$@"
-            return
-        fi
-        _dj_udev_help
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'udevadm' ]; then
-        if [ $# -ge 2 ]; then
-            shift 1
-            _dj_udevadm "$@"
-            return
-        fi
-        _dj_udevadm_help $2 $3
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'unpack' ]; then
-        shift 1
-        _dj_unpack "$@"
-        return
-    fi
-    # ------------------------------
-    if [ $1 = 'work-check' ]; then
-        shift 1
-        _dj_work_check "$@"
-        return
-    fi
-    _dj_help
-    # ------------------------------
+    *) echo "Invalid option: $1" && _dj_help ;;
+    esac
 }
+
+grep_list="-string "
+if [ $system = 'Linux' ]; then
+    grep_list+="-package "
+    # elif [ $system = 'Darwin' ]; then
+    # do nothing here
+fi
+
+grep_string_list="-in-bash -in-config -in-meson -in-python -in-ccode "
+grep_string_list+="-in-rust -in-yaml -in-yocto-recipe "
 
 # =============================================================================
 function _dj_linux() {
@@ -1947,15 +1801,13 @@ function _dj_linux() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    grep_list="-package -string "
     ACTIONS[grep]="$grep_list "
     for i in $grep_list; do
         ACTIONS[$i]=" "
     done
-    string_list="-in-bash -in-config -in-meson -in-python -in-ccode "
-    string_list+="-in-rust -in-yaml -in-yocto-recipe "
-    ACTIONS["-string"]="$string_list "
-    for i in $string_list; do
+
+    ACTIONS["-string"]="$grep_string_list "
+    for i in $grep_string_list; do
         ACTIONS[$i]=" "
     done
 
@@ -1966,14 +1818,14 @@ function _dj_linux() {
     for i in $git_list; do
         ACTIONS[$i]=" "
     done
-    ACTIONS[search]="$search_list "
-    for i in $search_list; do
+    ACTIONS[search]="$git_search_list "
+    for i in $git_search_list; do
         ACTIONS[$i]=" "
     done
 
     # --------------------------------------------------------
-    ACTIONS["ssh-account"]="$ssh_account_list "
-    for i in $ssh_account_list; do
+    ACTIONS["ssh-account"]="$git_ssh_account_list "
+    for i in $git_ssh_account_list; do
         ACTIONS[$i]=" "
     done
     ACTIONS["--activate"]="$all_accounts"
@@ -2046,8 +1898,78 @@ function _dj_linux() {
 }
 
 # =============================================================================
+# Function to provide custom completions
+function _dj_darwin() {
+    # Getting the current word and previous word in the command-line
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    # Array of options for the custom command
+    custom_options=(
+        git
+        grep
+        setup
+    )
+    # ------------
+    read -r -A git_options <<<"$git_list"
+    read -r -A git_search_options <<<"$git_search_list"
+    read -r -A git_ssh_account_options <<<"$git_ssh_account_list"
+    # ------------
+    read -r -A grep_options <<<"$grep_list"
+    read -r -A grep_string_options <<<"$grep_string_list"
+    # ------------
+    read -r -A setup_options <<<"$setup_list"
+
+    # Defining states for the completion
+    _arguments -C \
+        '1: :->first' \
+        '2: :->second' \
+        '3: :->third' && return 0
+
+    case $state in
+    first)
+        _wanted fl_options expl 'main option' compadd -a custom_options
+        ;;
+    second)
+        case $words[2] in
+        git)
+            _wanted git_sl_options expl 'subcommand for git' compadd -a git_options
+            ;;
+        grep)
+            _wanted grep_sl_options expl 'subcommand for grep' compadd -a grep_options
+            ;;
+        setup)
+            _wanted setup_sl_options expl 'subcommand for setup' compadd -a setup_options
+            ;;
+        esac
+        ;;
+    third)
+        case $words[2] in
+        git)
+            case $words[3] in
+            search)
+                _wanted git_tl_options expl 'subcommands for git search' compadd -a git_search_options
+                ;;
+            ssh-account)
+                _wanted git_tl_options expl 'subcommands for git ssh-account' compadd -a git_ssh_account_options
+                ;;
+            esac
+            ;;
+        grep)
+            case $words[3] in
+            -string)
+                _wanted grep_tl_options expl 'subcommands for grep -string' compadd -a grep_string_options
+                ;;
+            esac
+            ;;
+        esac
+        ;;
+    esac
+}
+
+# =============================================================================
 if [ $system = 'Linux' ]; then
     complete -F _dj_linux dj
-# elif [ $system = 'Darwin' ]; then
-#     echo "todo"
+elif [ $system = 'Darwin' ]; then
+    compdef _dj_darwin dj
 fi

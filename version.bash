@@ -77,6 +77,16 @@ function _echo_not_installed() {
 }
 
 # =============================================================================
+function _version_check_abseil() {
+    file="/usr/local/lib/pkgconfig/absl_base.pc"
+    if [ ! -f $file ]; then
+        _echo_not_installed "abseil"
+        return
+    fi
+    _find_version_from_pkgconfig_file $file
+}
+
+# =============================================================================
 function _version_check_arm_linux_gnueabi_gcc() {
     v=$(arm-linux-gnueabi-gcc --version | awk '{ print $4 }')
     vv=$(echo $v | awk '{ print $1 }')
@@ -347,6 +357,13 @@ function _version_check_opengl() {
 }
 
 # =============================================================================
+function _version_check_protobuf() {
+    # check protoc, what if it is not installed?
+    v=$(protoc --version | awk '{ print $2 }')
+    echo $v
+}
+
+# =============================================================================
 function _version_check_python3() {
     anw=$(_check_if_package_installed python3)
     if [[ "$anw" = "no" ]]; then
@@ -354,6 +371,16 @@ function _version_check_python3() {
         return
     fi
     echo $(python3 --version | awk '{ print $2 }')
+}
+
+# =============================================================================
+function _version_check_ros() {
+    _install_if_not_installed python3-rospkg &>/dev/null
+    local v=$(rosversion -d)
+    if [[ -z "$v" ]]; then
+        v=$(echo $ROS_DISTRO)
+    fi
+    echo $v
 }
 
 # =============================================================================
@@ -396,6 +423,7 @@ function _version_check_yaml_cpp() {
 # =============================================================================
 function _version_check {
     case $1 in
+    abseil) _version_check_abseil ;;
     arm-linux-gnueabi-gcc) _version_check_arm_linux_gnueabi_gcc ;;
     arm-linux-gnueabihf-gcc) _version_check_arm_linux_gnueabihf_gcc ;;
     arm-linux-gnueabihf-g++) _version_check_arm_linux_gnueabihf_gpp ;;
@@ -418,12 +446,14 @@ function _version_check {
     npm) _version_check_npm ;;
     opencv) _version_check_opencv ;;
     opengl) _version_check_opengl ;;
+    protobuf) _version_check_protobuf ;;
     python3) _version_check_python3 ;;
+    ros) _version_check_ros ;;
     spdlog) _version_check_spdlog ;;
     libsystemd) _version_check_libsystemd ;;
     ubuntu) _version_check_ubuntu ;;
     yaml-cpp) _version_check_yaml_cpp ;;
-    *) echo -e "version check: $1: argument not supported" ;;
+    *) echo -e "version check: argument \"$1\" is not supported" ;;
     esac
 }
 
@@ -432,7 +462,7 @@ function _version_swap {
     gcc | g++ | gxx | arm-linux-gnueabi-gxx | arm-linux-gnueabihf-gxx | aarch64-linux-gnu-gcc | python3)
         sudo update-alternatives --config $1
         ;;
-    *) echo -e "version swap: $1: argument not supported" ;;
+    *) echo -e "version swap: argument \"$1\" is not supported" ;;
     esac
 }
 
@@ -466,10 +496,11 @@ function version {
 }
 
 # =============================================================================
-check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
+check_list+="abseil arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
 check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
 check_list+="eigen3 fmt gcc glog gnome go grpc gtest g++ libsystemd magic-enum "
-check_list+="nlohmann-json3 node npm opencv opengl python3 spdlog ubuntu yaml-cpp "
+check_list+="nlohmann-json3 node npm opencv opengl protobuf python3 ros spdlog "
+check_list+="ubuntu yaml-cpp "
 
 swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
 swap_list+="aarch64-linux-gnu-gcc gcc g++ gxx python3 "

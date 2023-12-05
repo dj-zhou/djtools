@@ -127,6 +127,10 @@ function _system_check_process() {
 
 # =============================================================================
 function _system_check_threads() {
+    if [ $# -eq 0 ]; then
+        echo "usage: system check threads [keyword]"
+        return
+    fi
     echo -e "run ${PRP}ps -eLf | grep $1${NOC}"
     ps -eLf | grep $1
 }
