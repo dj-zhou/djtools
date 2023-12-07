@@ -4,15 +4,21 @@ setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-ide baidu-netdi
 setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cuda cutecom devtools "
 setup_list+="driver dropbox eigen3 esp-idf fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
 setup_list+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-setup_list+="gitg-gitk glfw3 glog gnome gnuplot go google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
-setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd mathpix "
+setup_list+="gitg-gitk  glog gnuplot go google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
+setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
 setup_list+="matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
 setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.5.5 pangolin perf "
 setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu qt-5.13.1 qt-5.14.2 "
 setup_list+="ros2-foxy ros2-humble rpi-pico rust saleae-logic serial-console spdlog slack "
 setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
-setup_list+="stm32-cube-programmer stm32-tools sublime texlive thermal-printer tldr typora vscode vtk-8.2.0 "
+setup_list+="stm32-cube-programmer stm32-tools sublime texlive thermal-printer typora vscode "
 setup_list+="windows-fonts wireshark wubi yaml-cpp "
+
+if [ $system = 'Linux' ]; then
+    setup_list+="glfw3 gnome "
+    # elif [ $system = 'Darwin' ]; then
+    # do nothing at this point
+fi
 
 # =============================================================================
 function _dj_setup_help() {
@@ -365,7 +371,7 @@ function _dj_setup_eigen3() {
     # just to prevent compiling error in the future
     _show_and_run sudo ln -s /usr/local/include/eigen3 /usr/include/eigen3
 
-    echo -e "\n${GRN}eigen3 $eigen3_v${NOC} is installed."
+    echo -e "\n${INFO}eigen3 $eigen3_v${NOC} is installed."
     _verify_header_files Eigen /usr/local/include/eigen3/Eigen
     _verify_header_files Eigen /usr/include/eigen3/Eigen
 
@@ -505,7 +511,7 @@ function _dj_setup_fmt() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    echo -e "\n${GRN}fmt $fmt_v${NOC} is installed."
+    echo -e "\n${INFO}fmt $fmt_v${NOC} is installed."
 
     # _verify_lib_installation libfmt.a /usr/local/lib
     _verify_lib_installation libfmt.so /usr/local/lib
@@ -603,7 +609,7 @@ function _dj_setup_gcc_aarch64_linux() {
 function _dj_setup_gcc_arm_stm32() {
     _show_and_run _pushd_quiet ${PWD}
 
-    echo -e "remove ${RED}gcc-arm-none-eabi${NOC}, and install ${GRN}gcc-arm-embedded${NOC} ...\n"
+    echo -e "remove ${RED}gcc-arm-none-eabi${NOC}, and install ${INFO}gcc-arm-embedded${NOC} ...\n"
     _press_enter_or_wait_s_continue 5
 
     _show_and_run mkdir -p $soft_dir
@@ -830,7 +836,7 @@ function _dj_setup_lcm() {
     _show_and_run sudo make install
     _show_and_run sudo ldconfig
 
-    echo -e "${GRN}lcm $v${NOC} is installed."
+    echo -e "${INFO}lcm $v${NOC} is installed."
     _verify_lib_installation liblcm.so /usr/local/lib
     _verify_header_files lcm.h /usr/local/include/lcm/
     _verify_pkgconfig_file lcm-java.pc /usr/local/lib/pkgconfig
@@ -933,7 +939,7 @@ function _dj_setup_libev() {
         _show_and_run echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >>$rc_file
     fi
 
-    echo -e "\n${GRN}libev $v${NOC} is installed."
+    echo -e "\n${INFO}libev $v${NOC} is installed."
     _verify_lib_installation libev.so /usr/local/lib/
     _verify_lib_installation libev.a /usr/local/lib/
 
@@ -1067,7 +1073,7 @@ function _dj_setup_libsystemd() {
         echo "just do not install it, it will break your system!"
         return
     fi
-    echo -e "install ${GRN}libsystemd $systemd_v${NOC}"
+    echo -e "install ${INFO}libsystemd $systemd_v${NOC}"
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd ~/ $soft_dir
@@ -1085,12 +1091,6 @@ function _dj_setup_libsystemd() {
     _verify_pkgconfig_file libsystemd.pc /usr/lib/x86_64-linux-gnu/pkgconfig
 
     _popd_quiet
-}
-
-# =============================================================================
-function _dj_setup_mathpix() {
-    _show_and_run _install_if_not_installed snapd
-    _show_and_run sudo snap install mathpix-snipping-tool
 }
 
 # =============================================================================
@@ -1172,7 +1172,7 @@ function _dj_setup_magic_enum() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    echo -e "${GRN}magic_enum $ver${NOC} is installed:"
+    echo -e "${INFO}magic_enum $ver${NOC} is installed:"
     _verify_header_files magic_enum.hpp /usr/local/include
     _verify_cmake_files magic_enumConfig.cmake /usr/local/lib/cmake/magic_enum
     _verify_cmake_files magic_enumConfigVersion.cmake /usr/local/lib/cmake/magic_enum
@@ -1273,14 +1273,14 @@ function _dj_setup_meson_ninjia() {
 
     meson_path=$(grep "PATH:~/.local/bin" $rc_file)
     if [ ! -z "$meson_path" ]; then
-        echo -e "${GRN}meson ${NOC}path was set in $rc_file"
+        echo -e "${INFO}meson ${NOC}path was set in $rc_file"
     else
         echo -e '\n' >>$rc_file
         echo '# ===========================================================' >>$rc_file
         echo '# (djtools) meson path setup' >>$rc_file
         echo -e 'export PATH=$PATH:~/.local/bin\n' >>$rc_file
     fi
-    echo -e "${GRN}meson${NOC} is installed to ${GRN}${HOME}/.local/bin${NOC}"
+    echo -e "${INFO}meson${NOC} is installed to ${INFO}${HOME}/.local/bin${NOC}"
 
     # ---------------------------------------------
     _echo_install ninja $ninja_v
@@ -1368,10 +1368,10 @@ eom
 
 # =============================================================================
 function _dj_stup_network_tools() {
-    echo -e "install ${GRN}nethogs${NOC}, ${GRN}iptraf${NOC}"
+    echo -e "install ${INFO}nethogs${NOC}, ${INFO}iptraf${NOC}"
     _show_and_run _install_if_not_installed nethogs iptraf
 
-    echo -e "install ${GRN}mNet-Assist${NOC}"
+    echo -e "install ${INFO}mNet-Assist${NOC}"
     _show_and_run _pushd_quiet ${PWD}
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
@@ -1423,7 +1423,7 @@ function _dj_setup_nlohmann_json3_dev() {
 
     _popd_quiet
 
-    echo -e "${GRN}nlohmann-json3 $v${NOC} is installed:"
+    echo -e "${INFO}nlohmann-json3 $v${NOC} is installed:"
     _verify_header_files json.hpp /usr/local/include/nlohmann
     _verify_cmake_files nlohmann_jsonConfig.cmake /usr/local/share/cmake/nlohmann_json
     _verify_pkgconfig_file nlohmann_json.pc /usr/local/share/pkgconfig
@@ -1759,7 +1759,7 @@ function _dj_setup_spdlog() { # static/shared
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    echo -e "\n${GRN}spdlog v$v${NOC} is installed."
+    echo -e "\n${INFO}spdlog v$v${NOC} is installed."
     if [ "$static_shared" = 'static' ]; then
         _verify_lib_installation libspdlog.a /usr/local/lib
     else
@@ -1835,12 +1835,6 @@ function _dj_setup_thermal_printer() {
     _show_and_run sudo /etc/init.d/cups restart
 
     _popd_quiet
-}
-
-# =============================================================================
-function _dj_setup_tldr() {
-    _show_and_run _install_if_not_installed tldr
-    echo "example: $ tldr tar"
 }
 
 # =============================================================================
@@ -1943,7 +1937,7 @@ function _dj_setup_yaml_cpp() {
     _show_and_run make -j4 # just do not use all CPU threads
     _show_and_run sudo make install
 
-    echo -e "\n${GRN}yaml-cpp $yaml_v${NOC} is installed."
+    echo -e "\n${INFO}yaml-cpp $yaml_v${NOC} is installed."
     _verify_lib_installation libyaml-cpp.a /usr/local/lib
     _verify_header_files yaml.h /usr/local/include/yaml-cpp
     _verify_pkgconfig_file yaml-cpp.pc /usr/local/lib/pkgconfig
@@ -1952,581 +1946,125 @@ function _dj_setup_yaml_cpp() {
 }
 
 # =============================================================================
+function _dj_setup_container() {
+    if [ $# -lt 1 ]; then
+        echo "dj setup container: need argument"
+        return
+    fi
+    case $1 in
+    "dive") _dj_setup_container_dive ;;
+    "docker") _dj_setup_container_docker ;;
+    "docker-compose") _dj_setup_container_docker_compose ;;
+    "lxd") _dj_setup_container_lxd ;;
+    esac
+}
+
+# =============================================================================
 function _dj_setup() {
-    # --------------------------
-    if [ $1 = 'abseil-cpp' ]; then
-        _dj_setup_abseil_cpp
-        return
-    fi
-    if [ $1 = 'adobe-pdf-reader' ]; then
-        _dj_setup_adobe_pdf_reader
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'anaconda' ]; then
-        _dj_setup_anaconda
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'ansible' ]; then
-        _dj_setup_ansible
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'arduino-ide' ]; then
-        _dj_setup_arduino
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'baidu-netdisk' ]; then
-        _dj_setup_baidu_netdisk
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'boost' ]; then
-        _dj_setup_boost
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'can-analyzer' ]; then
-        _dj_setup_can_analyzer
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'can-dev-tools' ]; then
-        _dj_setup_can_dev_tools
-        return
-    fi
-
-    # --------------------------
-    if [ $1 = 'clang-format' ]; then
-        _dj_setup_clang_format
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'clang-llvm' ]; then
-        _dj_setup_clang_llvm
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'cli11' ]; then
-        _dj_setup_cli11 $2
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'cmake' ]; then
-        _dj_setup_cmake
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'computer' ]; then
-        _dj_setup_computer
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'container' ]; then
-        if [ $# -lt 2 ]; then
-            echo "dj setup container: need argument"
-            return
-        fi
-        if [ $2 = 'dive' ]; then
-            _dj_setup_container_dive
-            return
-        fi
-        if [ $2 = 'docker' ]; then
-            _dj_setup_container_docker
-            return
-        fi
-        if [ $2 = 'docker-compose' ]; then
-            _dj_setup_container_docker_compose
-            return
-        fi
-        if [ $2 = 'lxd' ]; then
-            _dj_setup_container_lxd
-            return
-        fi
-        return
-    fi
-
-    # --------------------------
-    if [ $1 = 'cuda' ]; then
-        _dj_setup_cuda
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'cutecom' ]; then
-        _dj_setup_cutecom
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'devtools' ]; then
-        _dj_setup_devtools
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'driver' ]; then
-        shift 1
-        _dj_setup_driver "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'dropbox' ]; then
-        _dj_setup_dropbox
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'eigen3' ]; then
-        _dj_setup_eigen3
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'esp-idf' ]; then
-        _dj_setup_esp_idf
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'fast-github' ]; then
-        _dj_setup_fast_github
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'flamegraph' ]; then
-        _dj_setup_flamegraph
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'fmt' ]; then
-        _dj_setup_fmt $2
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'foxit-pdf-reader' ]; then
-        _dj_setup_foxit_reader
-        return
-    fi
-
-    # --------------------------
-    if [ $1 = 'fsm-pro' ]; then
-        _dj_setup_fsm_pro
-        return
-    fi
-
-    # --------------------------
-    if [ $1 = 'gadgets' ]; then
-        _dj_setup_gadgets
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'gcc-arm-stm32' ]; then
-        _dj_setup_gcc_arm_stm32
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'gcc-arm-linux-gnueabi' ]; then
-        _dj_setup_gcc_arm_linux_gnueabi
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'gcc-arm-linux-gnueabihf' ]; then
-        _dj_setup_gcc_arm_linux_gnueabihf
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'gcc-aarch64-linux-gnu' ]; then
-        _dj_setup_gcc_aarch64_linux
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'git-lfs' ]; then
-        _dj_setup_git_lfs
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'gitg-gitk' ]; then
-        _dj_setup_gitg_gitk
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'glfw3' ]; then
-        _dj_setup_glfw3
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'gnuplot' ]; then
-        _dj_setup_gnuplot
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'go' ]; then
-        _dj_setup_go
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'google-repo' ]; then
-        _dj_setup_google_repo
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'gtest' ]; then
-        shift 1
-        _dj_setup_gtest "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'glog' ]; then
-        shift 1
-        _dj_setup_glog "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'gnome' ]; then
-        _dj_setup_gnome
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'grpc' ]; then
-        _dj_setup_grpc
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'g++-10' ]; then
-        _dj_setup_gpp_10
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'g++-11' ]; then
-        _dj_setup_gpp_11
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'htop' ]; then
-        _dj_setup_htop
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'i219-v' ]; then
-        _dj_setup_i219_v $2
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'kdiff3-meld' ]; then
-        _dj_setup_kdiff3_meld
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'kermit' ]; then
-        _dj_setup_kermit
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'lcm' ]; then
-        _dj_setup_lcm
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'libbpf' ]; then
-        _dj_setup_libbpf
-        return
-    fi
-    if [ $1 = 'libcsv-3.0.2' ]; then
-        _dj_setup_libcsv_3_0_2
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'libev' ]; then
-        _dj_setup_libev
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'libgpiod' ]; then
-        _dj_setup_libgpiod
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'libiio' ]; then
-        _dj_setup_libiio
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'libserialport' ]; then
-        _dj_setup_libserialport
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'libsystemd' ]; then
-        _dj_setup_libsystemd
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'yaml-cpp' ]; then
-        _dj_setup_yaml_cpp $2
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'mathpix' ]; then
-        _dj_setup_mathpix
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'matplot++' ]; then
-        _dj_setup_matplot_xx
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'magic-enum' ]; then
-        _dj_setup_magic_enum
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'mbed' ]; then
-        _dj_setup_mbed
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'meson-ninja' ]; then
-        _dj_setup_meson_ninjia
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'mongodb' ]; then
-        _dj_setup_mongodb
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'network-tools' ]; then
-        _dj_stup_network_tools
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'nlohmann-json3-dev' ]; then
-        _dj_setup_nlohmann_json3_dev
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'nodejs' ]; then
-        _dj_setup_nodejs
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'nvidia' ]; then
-        _dj_setup_nvidia
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'nvtop' ]; then
-        _dj_setup_nvtop
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'opencv-2.4.13' ]; then
-        shift 1
-        _dj_setup_opencv_2_4_13 "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'opencv-3.4.13' ]; then
-        shift 1
-        _dj_setup_opencv_3_4_13 "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'opencv-4.5.5' ]; then
-        shift 1
-        _dj_setup_opencv_4_5_5 "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'pangolin' ]; then
-        _dj_setup_pangolin
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'perf' ]; then
-        _dj_setup_perf
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'picocom' ]; then
-        _dj_setup_picocom
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'pip' ]; then
-        _dj_setup_pip
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'plotjuggler' ]; then
-        _dj_setup_plotjuggler
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'protobuf' ]; then
-        _dj_setup_protobuf
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'pycharm' ]; then
-        _dj_setup_pycharm
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'python3.9' ]; then
-        _dj_setup_python_3_9
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'python3.10' ]; then
-        _dj_setup_python_3_10
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'qemu' ]; then
-        shift 1
-        _dj_setup_qemu "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'qt-5.13.1' ]; then
-        _dj_setup_qt_5_13_1
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'qt-5.14.2' ]; then
-        _dj_setup_qt_5_14_2
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'ros2-foxy' ]; then
-        shift 1
-        _dj_setup_ros2_foxy "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'ros2-humble' ]; then
-        shift 1
-        _dj_setup_ros2_humble "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'rpi-pico' ]; then
-        _dj_setup_rpi_pico
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'rust' ]; then
-        shift 1
-        _dj_setup_rust "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'saleae-logic' ]; then
-        _dj_setup_saleae_logic
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'serial-console' ]; then
-        _dj_setup_serial_console
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'slack' ]; then
-        _dj_setup_slack
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'spdlog' ]; then
-        _dj_setup_spdlog $2
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'stm32-cube-ide' ]; then
-        shift 1
-        _dj_setup_stm32_cube_ide "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'stm32-cube-ide-desktop-item' ]; then
-        shift 1
-        _dj_setup_stm32_cube_ide_desktop_item "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'stm32-cube-mx' ]; then
-        shift 1
-        _dj_setup_stm32_cube_mx "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'stm32-cube-mx-desktop-item' ]; then
-        shift 1
-        _dj_setup_stm32_cube_mx_desktop_item "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'stm32-cube-programmer' ]; then
-        shift 1
-        _dj_setup_stm32_cube_programmer "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'stm32-tools' ]; then
-        shift 1
-        _dj_setup_stm32_tools "$@"
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'sublime' ]; then
-        _dj_setup_sublime
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'texlive' ]; then
-        _dj_setup_texlive
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'thermal-printer' ]; then
-        _dj_setup_thermal_printer
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'tldr' ]; then
-        _dj_setup_tldr
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'typora' ]; then
-        _dj_setup_typora
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'vscode' ]; then
-        _dj_setup_vscode
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'vtk-8.2.0' ]; then
-        _dj_setup_vtk_8_2_0
-        return
-    fi
-
-    # --------------------------
-    if [ $1 = 'windows-fonts' ]; then
-        _dj_setup_windows_fonts
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'wireshark' ]; then
-        _dj_setup_wireshark
-        return
-    fi
-    # --------------------------
-    if [ $1 = 'wubi' ]; then
-        _dj_setup_wubi
-        return
-    fi
-    # --------------------------
-    _dj_setup_help
-    return
+    case $1 in
+    "abseil-cpp") _dj_setup_abseil_cpp ;;
+    "adobe-pdf-reader") _dj_setup_adobe_pdf_reader ;;
+    "anaconda") _dj_setup_anaconda ;;
+    "ansible") _dj_setup_ansible ;;
+    "arduino-ide") _dj_setup_arduino ;;
+    "baidu-netdisk") _dj_setup_baidu_netdisk ;;
+    "boost") _dj_setup_boost ;;
+    "can-analyzer") _dj_setup_can_analyzer ;;
+    "can-dev-tools") _dj_setup_can_dev_tools ;;
+    "clang-format") _dj_setup_clang_format ;;
+    "clang-llvm") _dj_setup_clang_llvm ;;
+    "cli11") _dj_setup_cli11 ;;
+    "cmake") _dj_setup_cmake ;;
+    "computer") _dj_setup_computer ;;
+    "container") _dj_setup_container ;;
+    "cuda") _dj_setup_cuda ;;
+    "cutecom") _dj_setup_cutecom ;;
+    "devtools") _dj_setup_devtools ;;
+    "driver") shift 1 && _dj_setup_driver "$@" ;;
+    "dropbox") _dj_setup_dropbox ;;
+    "eigen3") _dj_setup_eigen3 ;;
+    "esp-idf") _dj_setup_esp_idf ;;
+    "fast-github") _dj_setup_fast_github ;;
+    "flamegraph") _dj_setup_flamegraph ;;
+    "fmt") _dj_setup_fmt $2 ;;
+    "foxit-pdf-reader") _dj_setup_foxit_reader ;;
+    "fsm-pro") _dj_setup_fsm_pro ;;
+    "gadgets") _dj_setup_gadgets ;;
+    "gcc-arm-stm32") _dj_setup_gcc_arm_stm32 ;;
+    "gcc-arm-linux-gnueabi") _dj_setup_gcc_arm_linux_gnueabi ;;
+    "gcc-arm-linux-gnueabihf") _dj_setup_gcc_arm_linux_gnueabihf ;;
+    "gcc-aarch64-linux-gnu") _dj_setup_gcc_aarch64_linux ;;
+    "git-lfs") _dj_setup_git_lfs ;;
+    "gitg-gitk") _dj_setup_gitg_gitk ;;
+    "glfw3") _dj_setup_glfw3 ;;
+    "gnuplot") _dj_setup_gnuplot ;;
+    "go") _dj_setup_go ;;
+    "google-repo") _dj_setup_google_repo ;;
+    "gtest") _dj_setup_gtest ;;
+    "glog") _dj_setup_glog ;;
+    "gnome") _dj_setup_gnome ;;
+    "grpc") _dj_setup_grpc ;;
+    "g++-10") _dj_setup_gpp_10 ;;
+    "g++-11") _dj_setup_gpp_11 ;;
+    "htop") _dj_setup_htop ;;
+    "i219-v") _dj_setup_i219_v $2 ;;
+    "kdiff3-meld") _dj_setup_kdiff3_meld ;;
+    "kermit") _dj_setup_kermit ;;
+    "lcm") _dj_setup_lcm ;;
+    "libbpf") _dj_setup_libbpf ;;
+    "libcsv-3.0.2") _dj_setup_libcsv_3_0_2 ;;
+    "libev") _dj_setup_libev ;;
+    "libgpiod") _dj_setup_libgpiod ;;
+    "libiio") _dj_setup_libiio ;;
+    "libserialport") _dj_setup_libserialport ;;
+    "libsystemd") _dj_setup_libsystemd ;;
+    "yaml-cpp") _dj_setup_yaml_cpp ;;
+    "matplot++") _dj_setup_matplot_xx ;;
+    "magic-enum") _dj_setup_magic_enum ;;
+    "mbed") _dj_setup_mbed ;;
+    "meson-ninja") _dj_setup_meson_ninjia ;;
+    "mongodb") _dj_setup_mongodb ;;
+    "network-tools") _dj_stup_network_tools ;;
+    "nlohmann-json3-dev") _dj_setup_nlohmann_json3_dev ;;
+    "nodejs") _dj_setup_nodejs ;;
+    "nvidia") _dj_setup_nvidia ;;
+    "nvtop") _dj_setup_nvtop ;;
+    "opencv-2.4.13") _dj_setup_opencv_2_4_13 ;;
+    "opencv-3.4.13") _dj_setup_opencv_3_4_13 ;;
+    "opencv-4.5.5") _dj_setup_opencv_4_5_5 ;;
+    "pangolin") _dj_setup_pangolin ;;
+    "perf") _dj_setup_perf ;;
+    "picocom") _dj_setup_picocom ;;
+    "pip") _dj_setup_pip ;;
+    "plotjuggler") _dj_setup_plotjuggler ;;
+    "protobuf") _dj_setup_protobuf ;;
+    "pycharm") _dj_setup_pycharm ;;
+    "python3.9") _dj_setup_python_3_9 ;;
+    "python3.10") _dj_setup_python_3_10 ;;
+    "qemu") shift 1 && _dj_setup_qemu "$@" ;;
+    "qt-5.13.1") _dj_setup_qt_5_13_1 ;;
+    "qt-5.14.2") _dj_setup_qt_5_14_2 ;;
+    "ros2-foxy") shift 1 && _dj_setup_ros2_foxy "$@" ;;
+    "ros2-humble") shift 1 && _dj_setup_ros2_humble "$@" ;;
+    "rpi-pico") _dj_setup_rpi_pico ;;
+    "rust") shift 1 && _dj_setup_rust "$@" ;;
+    "saleae-logic") _dj_setup_saleae_logic ;;
+    "serial-console") _dj_setup_serial_console ;;
+    "slack") _dj_setup_slack ;;
+    "spdlog") _dj_setup_spdlog ;;
+    "stm32-cube-ide") _dj_setup_stm32_cube_ide ;;
+    "stm32-cube-ide-desktop-item") shift 1 && _dj_setup_stm32_cube_ide_desktop_item "$@" ;;
+    "stm32-cube-mx") shift 1 && _dj_setup_stm32_cube_mx "$@" ;;
+    "stm32-cube-mx-desktop-item") shift 1 && _dj_setup_stm32_cube_mx_desktop_item "$@" ;;
+    "stm32-cube-programmer") shift 1 && _dj_setup_stm32_cube_programmer "$@" ;;
+    "stm32-tools") shift 1 && _dj_setup_stm32_tools "$@" ;;
+    "sublime") _dj_setup_sublime ;;
+    "texlive") _dj_setup_texlive ;;
+    "thermal-printer") _dj_setup_thermal_printer ;;
+    "typora") _dj_setup_typora ;;
+    "vscode") _dj_setup_vscode ;;
+    "windows-fonts") _dj_setup_windows_fonts ;;
+    "wireshark") _dj_setup_wireshark ;;
+    "wubi") _dj_setup_wubi ;;
+    esac
 }

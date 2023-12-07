@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function echo_info() { echo -e "${CYN}$@${NOC}" 1>&2; }
-function echo_cmd() { echo -e "$ ${GRN}$@${NOC}" 1>&2; }
+function echo_cmd() { echo -e "$ ${INFO}$@${NOC}" 1>&2; }
 function echo_highlight() { echo -e "${HGRN}$@${NOC}" 1>&2; }
 function echo_warn() { echo -e "${YLW}$@${NOC}" 1>&2; }
 function echo_error() { echo -e "${RED}$@${NOC}" 1>&2; }
@@ -396,7 +396,7 @@ function _verify_lib_installation() {
     if [ ! -f "$dir/$1" ]; then
         echo_error "library $1 is not found in $dir"
     else
-        echo -e "  $str file: ${GRN}$dir/$1${NOC}"
+        echo -e "  $str file: ${INFO}$dir/$1${NOC}"
     fi
 }
 
@@ -410,7 +410,7 @@ function _verify_header_files() {
     if [ ! -f "$dir/$1" ]; then
         echo_error "header file $1 is not found in $dir"
     else
-        echo -e "      header file: ${GRN}$dir/$1${NOC}"
+        echo -e "      header file: ${INFO}$dir/$1${NOC}"
     fi
     return
 }
@@ -421,7 +421,7 @@ function _verify_cmake_files() {
     if [ ! -f "$dir/$1" ]; then
         echo_error "cmake file $1 is not found in $dir"
     else
-        echo -e "       cmake file: ${GRN}$dir/$1${NOC}"
+        echo -e "       cmake file: ${INFO}$dir/$1${NOC}"
     fi
 }
 
@@ -431,7 +431,7 @@ function _verify_pkgconfig_file() {
     if [ ! -f "$dir/$1" ]; then
         echo_error "pkgconfig file $1 is not found in $dir"
     else
-        echo -e "   pkgconfig file: ${GRN}$dir/$1${NOC}"
+        echo -e "   pkgconfig file: ${INFO}$dir/$1${NOC}"
     fi
 }
 
@@ -481,7 +481,7 @@ function _find_package_version() {
 
 # =============================================================================
 function _echo_install() { # package # version
-    echo -e "install ${GRN}$1 $2${NOC}"
+    echo -e "install ${INFO}$1 $2${NOC}"
 }
 
 # =============================================================================

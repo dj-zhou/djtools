@@ -453,7 +453,7 @@ function _mirror_backup() {
     fi
     blk=$1
     file=$2
-    _show_and_run echo -e " backing up $GRN$blk$NOC to $GRN$file$NOC"
+    _show_and_run echo -e " backing up $INFO$blk$NOC to $INFO$file$NOC"
     _show_and_run sudo dd bs=4M if="$blk" of="$file" status=progress
     _show_and_run sudo chown $USER "$file"
     echo -e " you can run $PRP mirror shrink $file$NOC to make the file smaller"

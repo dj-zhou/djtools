@@ -42,7 +42,7 @@ function _dj_udev_dialout() {
     sudo usermod -a -G dialout $USER
 
     rule_file=udev-dialout.rules
-    echo -e "write udev rule file ${GRN}\"$rule_file\"${NOC} to ${GRN}/etc/udev/rule.d/${NOC}"
+    echo -e "write udev rule file ${INFO}\"$rule_file\"${NOC} to ${INFO}/etc/udev/rule.d/${NOC}"
 
     sudo rm -f /etc/udev/rules.d/$rule_file
     echo 'KERNEL=="ttyUSB*",MODE="0666"' |
@@ -68,7 +68,7 @@ function _dj_udev_show() {
 function _dj_udev_uvc_video_capture() {
     rule_file=uvc-video-capture.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "write udev rule file ${GRN}\"$rule_file\"${NOC} to ${GRN}/etc/udev/rule.d/${NOC}"
+    echo -e "write udev rule file ${INFO}\"$rule_file\"${NOC} to ${INFO}/etc/udev/rule.d/${NOC}"
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
@@ -89,7 +89,7 @@ function _dj_udev_uvc_video_capture() {
 function _dj_udev_logitech_f710() {
     rule_file=logitech-f710-x.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "write udev rule file ${GRN}\"$rule_file\"${NOC} to ${GRN}/etc/udev/rule.d/${NOC}"
+    echo -e "write udev rule file ${INFO}\"$rule_file\"${NOC} to ${INFO}/etc/udev/rule.d/${NOC}"
 
     string="SUBSYSTEMS==\"usb\", "
     string="${string}KERNEL==\"js*\", "
@@ -107,7 +107,7 @@ function _dj_udev_logitech_f710() {
     # the joystick can change its property -----------------------
     rule_file=logitech-f710-d.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "write udev rule file ${GRN}\"$rule_file\"${NOC} to ${GRN}/etc/udev/rule.d/${NOC}"
+    echo -e "write udev rule file ${INFO}\"$rule_file\"${NOC} to ${INFO}/etc/udev/rule.d/${NOC}"
 
     string="SUBSYSTEMS==\"usb\", "
     string="${string}KERNEL==\"js*\", "
@@ -140,7 +140,7 @@ function _udev_screen_tab_completion() {
 function _dj_udev_one_third_console() {
     rule_file=one-third-console.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "write udev rule file ${GRN}\"$rule_file\"${NOC} to ${GRN}/etc/udev/rule.d/${NOC}"
+    echo -e "write udev rule file ${INFO}\"$rule_file\"${NOC} to ${INFO}/etc/udev/rule.d/${NOC}"
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "
@@ -168,7 +168,7 @@ function _dj_udev_one_third_console() {
 function _dj_udev_ft4232h() {
     rule_file=ft4232h-serial.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "write udev rule file ${GRN}\"$rule_file\"${NOC} to ${GRN}/etc/udev/rule.d/${NOC}"
+    echo -e "write udev rule file ${INFO}\"$rule_file\"${NOC} to ${INFO}/etc/udev/rule.d/${NOC}"
 
     string="SUBSYSTEMS==\"usb\", ENV{.LOCAL_serial}=\"\$attr{serial}\"\n"
     string="${string}SUBSYSTEMS==\"usb\", ENV{.LOCAL_ifNum}=\"\$attr{bInterfaceNumber}\"\n"
@@ -195,7 +195,7 @@ function _dj_udev_ft4232h() {
 function _dj_udev_stlink_v2_1() {
     rule_file=st-link-v2-1.rules
     sudo rm -f /etc/udev/rules.d/$rule_file
-    echo -e "write udev rule file ${GRN}\"$rule_file\"${NOC} to ${GRN}/etc/udev/rule.d/${NOC}"
+    echo -e "write udev rule file ${INFO}\"$rule_file\"${NOC} to ${INFO}/etc/udev/rule.d/${NOC}"
 
     # finally ----------------
     string="SUBSYSTEMS==\"usb\", "

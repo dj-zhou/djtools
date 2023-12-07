@@ -118,7 +118,7 @@ function _dj_setup_can_analyzer() {
 # =============================================================================
 function _dj_setup_can_dev_tools() {
     sudo apt update &>/dev/null
-    echo -e "going to install ${GRN}can-utils${NOC}"
+    echo -e "going to install ${INFO}can-utils${NOC}"
     _show_and_run _install_if_not_installed can-utils
 }
 
@@ -155,7 +155,7 @@ function _dj_setup_cli11() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    echo -e "\n${GRN}CLI11 $v${NOC} is installed."
+    echo -e "\n${INFO}CLI11 $v${NOC} is installed."
     anw=$(_version_if_ge_than $v "1.9.0")
     if [ "$anw" = "no" ]; then
         _verify_header_files CLI.hpp /usr/local/include/CLI
@@ -202,7 +202,7 @@ function _dj_setup_cmake() {
     _show_and_run ./bootstrap --prefix=/usr/local --parallel=$(nproc)
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
-    echo -e "${GRN}cmake${NOC} is installed to ${GRN}/usr/local/bin${NOC}"
+    echo -e "${INFO}cmake${NOC} is installed to ${INFO}/usr/local/bin${NOC}"
 
     _popd_quiet
 }
@@ -410,31 +410,47 @@ function _dj_setup_container_lxd() {
 function _dj_setup_pangolin() {
     _show_and_run _pushd_quiet ${PWD}
 
-    # dependency installation
-    packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
-    _show_and_run _install_if_not_installed $packages
-    _show_and_run dj setup glfw3
+    if [ $system = 'Linux' ]; then
+        # dependency installation
+        packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
+        _show_and_run _install_if_not_installed $packages
+        _show_and_run dj setup glfw3
+    fi
     local v=$(_find_package_version pangolin)
 
     # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run sudo rm -rf Pangolin/ # somehow it generate build/CMakeFiles/Progress/ as root
+    _show_and_run sudo rm -rf Pangolin/
     _show_and_run git clone --recursive https://github.com/stevenlovegrove/Pangolin.git
     _show_and_run cd Pangolin
     _show_and_run git checkout v$v
-    _show_and_run ./scripts/install_prerequisites.sh
+    if [ $system = 'Darwin' ]; then
+        _show_and_run ./scripts/install_prerequisites.sh -m brew all
+    elif [ $system = 'Linux' ]; then
+        _show_and_run ./scripts/install_prerequisites.sh
+    fi
     _show_and_run rm -rf build/
     _show_and_run mkdir -p build
     _show_and_run cd build
-    _show_and_run cmake ..
+    if [ $system = 'Darwin' ]; then
+        # without using pyhton3.10, I have lots of errors when build
+        _show_and_run cmake .. -DPython_EXECUTABLE=/usr/local/bin/python3.10
+    elif [ $system = 'Linux' ]; then
+        _show_and_run cmake ..
+    fi
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
     _show_and_run sudo cp libpango_* /usr/local/lib
 
-    _verify_lib_installation libpango_core.so /usr/local/lib
-    _verify_lib_installation libpango_geometry.so /usr/local/lib
+    if [ $system = 'Darwin' ]; then
+        _verify_lib_installation libpango_core.dylib /usr/local/lib
+        _verify_lib_installation libpango_geometry.dylib /usr/local/lib
+    elif [ $system = 'Linux' ]; then
+        _verify_lib_installation libpango_core.so /usr/local/lib
+        _verify_lib_installation libpango_geometry.so /usr/local/lib
+    fi
     _verify_header_files pangolin.h /usr/local/include/pangolin
 
     _popd_quiet
@@ -843,7 +859,7 @@ function _dj_setup_stm32_cube_programmer() {
 function _dj_setup_stm32_tools() {
     _pushd_quiet ${PWD}
 
-    echo -e "install ${GRN}st-link v2${NOC} and ${GRN}stm32flash${NOC} tools"
+    echo -e "install ${INFO}st-link v2${NOC} and ${INFO}stm32flash${NOC} tools"
     _press_enter_or_wait_s_continue 5
 
     # remove a package that makes problem!
@@ -923,10 +939,14 @@ function _dj_setup_glfw3() {
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
-    # glfw3
-    packages="build-essential cmake git xorg-dev libglu1-mesa-dev "
-    _show_and_run _install_if_not_installed $packages
-    _show_and_run rm -rf glfw3/
+    if [ $system = 'Darwin' ]; then
+        _show_and_run _cask_install_if_not_installed cmake xorg-server
+    elif [ $system = 'Linux' ]; then
+        packages="build-essential cmake xorg-dev libglu1-mesa-dev "
+        _show_and_run _install_if_not_installed $packages
+    fi
+
+    _show_and_run rm -rf glfw3
     _show_and_run git clone https://github.com/dj-zhou/glfw3.git
     _show_and_run cd glfw3/
     _show_and_run mkdir -p build
@@ -1049,7 +1069,7 @@ function _dj_setup_gtest() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    echo -e "\n${GRN}googletest $v${NOC} is installed:"
+    echo -e "\n${INFO}googletest $v${NOC} is installed:"
     _verify_lib_installation libgtest.a /usr/local/lib
     _verify_lib_installation libgtest_main.a /usr/local/lib
     _verify_header_files gtest.h /usr/local/include/gtest
@@ -1079,7 +1099,7 @@ function _dj_setup_glog() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    echo -e "\n${GRN}glog $v${NOC} is installed:"
+    echo -e "\n${INFO}glog $v${NOC} is installed:"
     _verify_lib_installation libglog.a /usr/local/lib
     _verify_lib_installation libglog.so /usr/local/lib
     _verify_header_files logging.h /usr/local/include/glog
@@ -1136,7 +1156,7 @@ function _dj_setup_grpc() {
 # make this function to install g++-9 on Ubuntu 18.04 as well!
 function _dj_setup_gpp_10() {
     # install g++10/gcc-10
-    echo -e "install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC}"
+    echo -e "install ${INFO}gcc-10${NOC}, ${INFO}g++-10${NOC}"
     _press_enter_or_wait_s_continue 5
 
     if ! compgen -G "/etc/apt/sources.list.d/ubuntu-toolchain-r*.list" >/dev/null; then
@@ -1149,7 +1169,7 @@ function _dj_setup_gpp_10() {
 
     # install g++9/gcc-9
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
-        echo -e "install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} "
+        echo -e "install ${INFO}gcc-9${NOC}, ${INFO}g++-9${NOC} "
         _press_enter_or_wait_s_continue 5
         _show_and_run _install_if_not_installed gcc-9 g++-9
     fi
@@ -1173,7 +1193,7 @@ function _dj_setup_gpp_10() {
 # =============================================================================
 function _dj_setup_gpp_11() {
     # install g++11/gcc-11
-    echo -e "install ${GRN}gcc-11${NOC}, ${GRN}g++-11${NOC}"
+    echo -e "install ${INFO}gcc-11${NOC}, ${INFO}g++-11${NOC}"
     _press_enter_or_wait_s_continue 5
 
     if ! compgen -G "/etc/apt/sources.list.d/ubuntu-toolchain-r*.list" >/dev/null; then
@@ -1186,14 +1206,14 @@ function _dj_setup_gpp_11() {
 
     # install g++10/gcc-10
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
-        echo -e "install ${GRN}gcc-10${NOC}, ${GRN}g++-10${NOC} "
+        echo -e "install ${INFO}gcc-10${NOC}, ${INFO}g++-10${NOC} "
         _press_enter_or_wait_s_continue 5
         _show_and_run _install_if_not_installed gcc-10 g++-10
     fi
 
     # install g++9/gcc-9
     if [[ ${ubuntu_v} = *'18.04'* ]]; then
-        echo -e "install ${GRN}gcc-9${NOC}, ${GRN}g++-9${NOC} "
+        echo -e "install ${INFO}gcc-9${NOC}, ${INFO}g++-9${NOC} "
         _press_enter_or_wait_s_continue 5
         _show_and_run _install_if_not_installed gcc-9 g++-9
     fi
@@ -1216,15 +1236,15 @@ function _dj_setup_gpp_11() {
 
 # =============================================================================
 function _dj_setup_rust() {
-    echo -e "install ${GRN}rust${NOC}"
+    echo -e "install ${INFO}rust${NOC}"
     _show_and_run curl https://sh.rustup.rs -sSf | sh
     echo 'export PATH="$HOME/.cargo/bin:$PATH"' >>$rc_file
-    echo -e "You need to run ${GRN}\"source $rc_file\"${NOC} manually."
-    echo -e "update rust by ${GRN}rustup update${NOC}"
-    echo -e "check rust version by ${GRN}rustc --version${NOC}"
-    echo -e "check cargo version by ${GRN}cargo --version${NOC}"
-    echo -e "uninstall rust by ${GRN}rustup self uninstall${NOC}"
-    echo -e "compile a rust program by (example) ${GRN}rustc main.rs${NOC}"
+    echo -e "You need to run ${INFO}\"source $rc_file\"${NOC} manually."
+    echo -e "update rust by ${INFO}rustup update${NOC}"
+    echo -e "check rust version by ${INFO}rustc --version${NOC}"
+    echo -e "check cargo version by ${INFO}cargo --version${NOC}"
+    echo -e "uninstall rust by ${INFO}rustup self uninstall${NOC}"
+    echo -e "compile a rust program by (example) ${INFO}rustc main.rs${NOC}"
 }
 
 # =============================================================================
@@ -1257,38 +1277,6 @@ eom
 }
 
 # =============================================================================
-function _dj_setup_vtk_8_2_0() {
-    echo "vtk 8.2.0 installation"
-
-    _show_and_run _pushd_quiet ${PWD}
-
-    # vtk 8 ----------------
-    # reference: https://kezunlin.me/post/b901735e/
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-
-    _show_and_run _install_if_not_installed cmake-qt-gui
-
-    _show_and_run git clone https://gitee.com/dj-zhou/vtk-8.2.0.git
-
-    _show_and_run cd vtk-8.2.0
-    _show_and_run sudo rm -rf build/
-    _show_and_run mkdir -p build
-    _show_and_run cd build
-    _show_and_run cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/usr/local -DVTK_RENDERING_BACKEND=OpenGL2 \
-        -DQT5_DIR=$HOME/Qt5.14.2/5.14.2/gcc_64/lib/cmake/Qt5 \
-        -DVTK_QT_VERSION=5 -DVTK_Group_Qt=ON ..
-    _show_and_run make -j$(nproc)
-    _show_and_run sudo make install
-
-    echo "the installed library seems to be in /usr/local/lib folder"
-    echo "the installed header files seem to be in /usr/local/include/vtk-8.2/ folder"
-
-    _popd_quiet
-}
-
-# =============================================================================
 # call function in workspace-check.bash
 function _dj_work_check() {
     _work_check "$@"
@@ -1301,7 +1289,7 @@ function _dj_grep_package() {
     _show_and_run _pushd_quiet ${PWD}
 
     lib_to_find=$1
-    echo -e "run: ${GRN}ldconfig -p | grep $lib_to_find${NOC}:"
+    echo -e "run: ${INFO}ldconfig -p | grep $lib_to_find${NOC}:"
 
     ldconfig -p | grep $lib_to_find
 
@@ -1319,7 +1307,7 @@ function _dj_grep_package() {
 # todo: combine exclude-dir and excludes
 function _dj_grep_string() {
     if [ "$1" = "-in-bash" ]; then
-        echo -e "grep in ${GRN}*.bash, *.sh${NOC} files"
+        echo -e "grep in ${INFO}*.bash, *.sh${NOC} files"
         # how to search in the files without extension??
         grep "$2" -rIn \
             --include={"*.bash","*.sh"} \
@@ -1329,7 +1317,7 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-ccode" ]; then
-        echo -e "grep in ${GRN}*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt${NOC} files"
+        echo -e "grep in ${INFO}*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt${NOC} files"
         grep "$2" -rn \
             --include={"*.c","*.cpp","*.h","*.hpp","Makefile*","CMakeLists.txt"} \
             --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
@@ -1338,7 +1326,7 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-config" ]; then
-        echo -e "grep in ${GRN}*.json,Dockerfile,*.xml${NOC} files"
+        echo -e "grep in ${INFO}*.json,Dockerfile,*.xml${NOC} files"
         grep "$2" -rIn \
             --include={"*.json","Dockerfile","*.xml"} \
             --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
@@ -1347,12 +1335,12 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-meson" ]; then
-        echo -e "grep in ${GRN}meson.build${NOC} files"
+        echo -e "grep in ${INFO}meson.build${NOC} files"
         _dj_grep_string_in_meson "$2"
         return
     fi
     if [ "$1" = "-in-python" ]; then
-        echo -e "grep in ${GRN}*.py,*.ipynb${NOC} files"
+        echo -e "grep in ${INFO}*.py,*.ipynb${NOC} files"
         grep "$2" -rIn \
             --include={"*.py","*.ipynb"} \
             --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
@@ -1361,7 +1349,7 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-rust" ]; then # seems not working for *.rs files
-        echo -e "grep in ${GRN}*.rs,Cargo.toml,Cargo.lock${NOC} files"
+        echo -e "grep in ${INFO}*.rs,Cargo.toml,Cargo.lock${NOC} files"
         # not a bug, a single "*.rs" does not work here, don't know why
         grep "$2" -rIn \
             --include={"*.rs","*.rs","Cargo.toml","Cargo.lock"} \
@@ -1371,7 +1359,7 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-yaml" ]; then
-        echo -e "grep in ${GRN}*.yml,*.yaml${NOC} files"
+        echo -e "grep in ${INFO}*.yml,*.yaml${NOC} files"
         grep "$2" -rIn \
             --include={"*.yml","*.yaml"} \
             --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
@@ -1380,7 +1368,7 @@ function _dj_grep_string() {
         return
     fi
     if [ "$1" = "-in-yocto-recipe" ]; then
-        echo -e "grep in ${GRN}*.bb,*.conf,*.inc,*.sample,*.bbappend${NOC} files"
+        echo -e "grep in ${INFO}*.bb,*.conf,*.inc,*.sample,*.bbappend${NOC} files"
         grep "$2" -rIn \
             --include={"*.bb","*.conf","*.inc","*.sample","*.bbappend"} \
             --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
@@ -1408,7 +1396,7 @@ function _dj_grep_string_in_meson() { # term
     for file in $all_meson_build; do
         find_term=$(grep -rn "$term" "$file")
         if [ ! -z "$find_term" ]; then
-            echo -e "\n${GRN} ---------------------------------------"
+            echo -e "\n${INFO} ---------------------------------------"
             echo -e "$file${NOC}"
             echo "$find_term"
         fi
@@ -1487,11 +1475,11 @@ function _dj_git_ssh_account_activate() {
         elif [[ ($asw = 'y') || ($asw = 'Y') || ($asw = 'YES') || (
             $asw = 'Yes') || ($asw = 'yes') ]]; then
             # proceed -------------
-            echo -e "SSH key file ${GRN}${key_file}${NOC} not found, generate one automatically:"
+            echo -e "SSH key file ${INFO}${key_file}${NOC} not found, generate one automatically:"
             echo -e "${YLW}Press [OK] on the popup window${NOC}"
             _show_and_run printf "${key_file}\n\n\n\n" | ssh-keygen
             echo -e "copy the following content into a new GitHub SSH Key (https://github.com/settings/keys, need login):"
-            echo -e "${GRN}"
+            echo -e "${INFO}"
             cat ${key_file}.pub
             echo -e "${NOC}"
         else
@@ -1510,7 +1498,7 @@ function _dj_git_ssh_account_activate() {
 # =============================================================================
 function _dj_git_ssh_account_show_current() {
     if [ ! -f ~/.ssh/.github-activated-account ]; then
-        echo -e "you need to run ${GRN}dj ssh-github activate <github username>${NOC} to activate one"
+        echo -e "you need to run ${INFO}dj ssh-github activate <github username>${NOC} to activate one"
         return
     fi
     _show_and_run cat ~/.ssh/.github-activated-account
@@ -1545,8 +1533,8 @@ function _dj_flame_grapah() {
     fi
     if [ ! -f "${perf_data_file}" ]; then
         echo "${perf_data_file} not found, exit."
-        echo -e "use command ${GRN}perf record -e cpu-clock -g <executable>${NOC}"
-        echo -e "or ${GRN}perf record --call-graph dwarf <executable>${NOC}"
+        echo -e "use command ${INFO}perf record -e cpu-clock -g <executable>${NOC}"
+        echo -e "or ${INFO}perf record --call-graph dwarf <executable>${NOC}"
         echo -e "to generate perf.data."
         return 1
     fi

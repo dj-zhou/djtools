@@ -153,7 +153,7 @@ function _dj_setup_clang_format() {
 function _dj_setup_clang_llvm() {
     _show_and_run _pushd_quiet ${PWD}
 
-    echo -e "Install LLVM clang (clang+llvm) on Ubuntu ${GRN}$(version check ubuntu)${NOC}"
+    echo -e "Install LLVM clang (clang+llvm) on Ubuntu ${INFO}$(version check ubuntu)${NOC}"
 
     _press_enter_or_wait_s_continue 5
 

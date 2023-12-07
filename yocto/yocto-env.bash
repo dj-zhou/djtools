@@ -195,11 +195,11 @@ function _yocto_setup_plain_sdk() #image-name
         distro_v=$answer
     fi
     sdk_folder=$HOME/.$image_name-oesdk/$machine/$distro-$distro_v
-    echo -e "    image name: $GRN"$image_name$NOC >&2
-    echo -e "       machine: $GRN"$machine$NOC >&2
-    echo -e "        distro: $GRN"$distro$NOC >&2
-    echo -e "distro version: $GRN"$distro_v$NOC >&2
-    echo -e " sdk directory: $GRN"$sdk_folder$NOC  >&2
+    echo -e "    image name: $INFO"$image_name$NOC >&2
+    echo -e "       machine: $INFO"$machine$NOC >&2
+    echo -e "        distro: $INFO"$distro$NOC >&2
+    echo -e "distro version: $INFO"$distro_v$NOC >&2
+    echo -e " sdk directory: $INFO"$sdk_folder$NOC  >&2
 
     # return
     # remove the existing sdk folder ---------

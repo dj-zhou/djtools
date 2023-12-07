@@ -5,7 +5,7 @@ function _dj_unpack_tar_xz() {
     tar_xz_file=$1
     folder=${tar_xz_file%".tar.xz"*}
     _show_and_run rm $folder -rf
-    echo -e "unpack ${GRN}$tar_xz_file${NOC} to directory ${GRN}${folder}/${NOC}\n"
+    echo -e "unpack ${INFO}$tar_xz_file${NOC} to directory ${INFO}${folder}/${NOC}\n"
 
     _press_enter_or_wait_s_continue 10
     _show_and_run tar -xvf $tar_xz_file
@@ -17,7 +17,7 @@ function _dj_unpack_tar_gz() {
     folder=${tar_gz_file%".tar.gz"*}
     _show_and_run rm $folder -rf
     _show_and_run mkdir -p $folder
-    echo -e "unpack ${GRN}$tar_gz_file${NOC} to directory ${GRN}${folder}/${NOC}"
+    echo -e "unpack ${INFO}$tar_gz_file${NOC} to directory ${INFO}${folder}/${NOC}"
 
     _press_enter_or_wait_s_continue 10
     _show_and_run tar -xvf $tar_gz_file -C ./$folder

@@ -455,7 +455,7 @@ function _yocto_list_things() {
 function _yocto_list_resources() {
     # current folder -------------
     if [ -d .git ]; then
-        echo -e "\n${GRN}----------------------------------------------${NOC}"
+        echo -e "\n${INFO}----------------------------------------------${NOC}"
         folder_name=$(basename $PWD)
         echo -e "${HGRN}$folder_name${NOC} (root)"
         branch_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')

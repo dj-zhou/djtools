@@ -2,7 +2,7 @@
 
 # =============================================================================
 djtools_path=$PWD
-echo -e "${GRN}djtools${NOC} current path is: $djtools_path"
+echo -e "${INFO}djtools${NOC} current path is: $djtools_path"
 
 echo -e "djtools installation ..."
 
@@ -77,7 +77,7 @@ mkdir -p ~/.ssh
 #     local arg
 #     for arg in "$@"; do
 #         arg="${arg%\'/\'\\\'\'}"
-#         printf >&2 " $GRN'%s'$NOC" "$arg"
+#         printf >&2 " $INFO'%s'$NOC" "$arg"
 #     done
 #     printf >&2 "\n"
 # }

@@ -106,7 +106,7 @@ function _system_check_temperature() {
         done
         # calcuate the average and show in C
         echo -e "average temperature: $(($sum_temp / 14))°C"
-        echo -e "you can install ${GRN}lm-sensors${NOC} to have a better view"
+        echo -e "you can install ${INFO}lm-sensors${NOC} to have a better view"
         return
     fi
 }
@@ -146,7 +146,7 @@ function _system_wallpaper_random() {
     done <$rc_file
 
     if [ $wallpaper_folder_is_set = 0 ]; then
-        echo -e "variable ${GRN}wallpaper_folder${NOC} is NOT set, please enter a path of the wallpapers: "
+        echo -e "variable ${INFO}wallpaper_folder${NOC} is NOT set, please enter a path of the wallpapers: "
         read answer
         echo '# ===========================================================' >>$rc_file
         echo '# (djtools) wallpaper setup' >>$rc_file

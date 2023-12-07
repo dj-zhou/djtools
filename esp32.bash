@@ -85,7 +85,7 @@ function esp32() {
         return
     fi
 
-    echo -e "${GRN}esp32${NOC}: argument ${RED}$1${NOC} not supported."
+    echo -e "${INFO}esp32${NOC}: argument ${RED}$1${NOC} not supported."
     return
 }
 

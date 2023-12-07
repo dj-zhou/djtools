@@ -73,7 +73,7 @@ function _yocto_flash() { # block-device # image-file # "--skip"
         echo -e "you can use command \"lsblk\" to find it."
         return
     fi
-    echo -e "          SD card: ${GRN}$dev${NOC}"
+    echo -e "          SD card: ${INFO}$dev${NOC}"
     card_size_byte=$(_disk_size $dev)
     if [ $card_size_byte -gt 137438953472 ]; then # max size: 128G
         echo -e "${YLW}card too large, a wrong card? Max size supported: 128G${NOC}"
@@ -84,7 +84,7 @@ function _yocto_flash() { # block-device # image-file # "--skip"
         echo -e "${RED}card size not obtained, abort \"yocto flash\" command ${NOC}"
         return
     fi
-    echo -e "             size: ${GRN}${card_size}${NOC}"
+    echo -e "             size: ${INFO}${card_size}${NOC}"
     source ../poky/oe-init-build-env . &>/dev/null
 
     # if -f option is used, image_file should be that after -f option
@@ -102,7 +102,7 @@ function _yocto_flash() { # block-device # image-file # "--skip"
             echo -e "${RED}MACHINE not found, exit!!${NOC}"
             return
         fi
-        echo -e "          machine: ${GRN}$machine${NOC}"
+        echo -e "          machine: ${INFO}$machine${NOC}"
         # find tmp/ folder ---------------
         tmp_dir=$(_yocto_find_TMPDIR)
         if [ -z $tmp_dir ]; then
@@ -116,23 +116,23 @@ function _yocto_flash() { # block-device # image-file # "--skip"
             echo -e "${RED}image file not found, exit!!${NOC}"
             return
         fi
-        echo -e "       image name: ${GRN}$2${NOC}"
-        echo -e "    file location: ${GRN}$tmp_dir/deploy/images/$machine/${NOC}"
+        echo -e "       image name: ${INFO}$2${NOC}"
+        echo -e "    file location: ${INFO}$tmp_dir/deploy/images/$machine/${NOC}"
         # if it is a symbolic file ----------
         if [ -L "$image_file" ]; then
             image_file=$(readlink -f $image_file)
         fi
     else
-        echo -e "       image file: ${GRN}$image_file${NOC}"
-        echo -e "    file location: ${GRN}./${NOC}"
+        echo -e "       image file: ${INFO}$image_file${NOC}"
+        echo -e "    file location: ${INFO}./${NOC}"
     fi
     # show its file size --------------
     image_size=$(stat -c %s $image_file)
-    echo -e "  image file size: ${GRN}$(_size_human_readable $image_size false)${NOC}"
+    echo -e "  image file size: ${INFO}$(_size_human_readable $image_size false)${NOC}"
 
     # shows its creation time --------------
     creation_time=$(stat -c %y $image_file)
-    echo -e "image create time: ${GRN}$creation_time${NOC}"
+    echo -e "image create time: ${INFO}$creation_time${NOC}"
 
     # wic image should have a bmap file --------------
     bmap_file=$(_yocto_find_bmap_file $image_file)
@@ -149,7 +149,7 @@ function _yocto_flash() { # block-device # image-file # "--skip"
             echo -e "skip bitbake check, flash ..."
         else
             echo -e "-----------------------------\n"
-            echo -e "run ${GRN}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
+            echo -e "run ${INFO}bitbake bmap-tools-native -caddto_recipe_sysroot${NOC}"
             _press_enter_or_wait_s_continue 2
             bitbake bmap-tools-native -caddto_recipe_sysroot
         fi
@@ -157,7 +157,7 @@ function _yocto_flash() { # block-device # image-file # "--skip"
             # the following command need to use a *.wic.bmap file in the same path
             # of the wic.gz file
             echo -e "bmap file found, run command:"
-            echo -e "${GRN}oe-run-native bmap-tools-native bmaptool copy <image> $dev${NOC}"
+            echo -e "${INFO}oe-run-native bmap-tools-native bmaptool copy <image> $dev${NOC}"
             _press_enter_or_wait_s_continue 4
             oe-run-native bmap-tools-native bmaptool copy $image_file $dev
         else

@@ -134,7 +134,7 @@ function _build_meson_native() {
     if [[ -z "$target_tag" ]]; then
         target_tag="all"
     fi
-    echo -e "${CYN}meson.build (native)${NOC}: $GRN$target_tag$NOC ..."
+    echo -e "${CYN}meson.build (native)${NOC}: $INFO$target_tag$NOC ..."
     proj_dir="_bnative.meson"
 
     if [ "$target_tag" = "clean" ]; then
@@ -177,7 +177,7 @@ function _build_in_docker() {
         return
     fi
     if [[ "$target_tag" = "clean" ]]; then
-        echo -e "${GRN}rm -rf _bdocker*${NOC}"
+        echo -e "${INFO}rm -rf _bdocker*${NOC}"
         rm -rf _bdocker*
     fi
 }
@@ -201,7 +201,7 @@ function _build_makefile() {
     if [[ -z "$target_tag" ]]; then
         target_tag="all"
     fi
-    echo -e "${CYN}Makefile${NOC}: $GRN$target_tag$NOC ..."
+    echo -e "${CYN}Makefile${NOC}: $INFO$target_tag$NOC ..."
     if [ "$target_tag" = "clean" ]; then
         _show_and_run make clean
         return
@@ -238,7 +238,7 @@ function _build_cmake() {
     if [[ -z "$target_tag" ]]; then
         target_tag="all"
     fi
-    echo -e "${CYN}CMakeLists.txt${NOC}: $GRN$target_tag$NOC ..."
+    echo -e "${CYN}CMakeLists.txt${NOC}: $INFO$target_tag$NOC ..."
     build_dir="_bnative.cmake"
     # ---------------------------------------------------
     if [[ "$target_tag" = "all" ]]; then
@@ -344,7 +344,7 @@ function build() {
         compile_template "$@"
         return
     fi
-    echo -e "${GRN}build${NOC}: argument ${RED}$1${NOC} not supported."
+    echo -e "${INFO}build${NOC}: argument ${RED}$1${NOC} not supported."
     return
 }
 
