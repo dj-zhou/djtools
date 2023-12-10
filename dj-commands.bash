@@ -1439,7 +1439,8 @@ function _dj_ssh_general_no_password() {
     _show_and_run ssh -l $user $ip "mkdir -p ~/.ssh"
 
     # then run, copy the content of local id_rsa.pub to .ssh/autorized_keys in remote
-    _show_and_run cat "${key_file}.pub" | _show_and_run ssh $user_and_ip "cat >> .ssh/authorized_keys"
+    echo "${INFO}copy $key_file to the remote:${NOC}"
+    cat "${key_file}.pub" | ssh $user_and_ip "cat >> ~/.ssh/authorized_keys"
 }
 
 # =============================================================================
@@ -1897,6 +1898,7 @@ function _dj_darwin() {
         git
         grep
         setup
+        ssh-general
     )
     # ------------
     read -r -A git_options <<<"$git_list"
@@ -1907,6 +1909,9 @@ function _dj_darwin() {
     read -r -A grep_string_options <<<"$grep_string_list"
     # ------------
     read -r -A setup_options <<<"$setup_list"
+    # ------------
+    ssh_general_list="no-password "
+    read -r -A ssh_generals_options <<<"$ssh_general_list"
 
     # Defining states for the completion
     _arguments -C \
@@ -1928,6 +1933,9 @@ function _dj_darwin() {
             ;;
         setup)
             _wanted setup_sl_options expl 'subcommand for setup' compadd -a setup_options
+            ;;
+        ssh-general)
+            _wanted ssh_general_sl_options expl 'subcommand for ssh-general' compadd -a ssh_generals_options
             ;;
         esac
         ;;

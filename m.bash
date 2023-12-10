@@ -15,40 +15,46 @@
 
 function compile_make_build_etc() {
     target="$1"
-    options=()
-    # let's choose --------------
-    [ -f "Makefile" ] && options+=("Makefile")
-    [ -f "CMakeLists.txt" ] && options+=("CMakeLists.txt")
-    [ -f "meson.build" ] && options+=("meson.build")
-    [ -f "make.sh" ] && options+=("make.sh")
     choose=""
-    if [ ${#options[@]} -eq 1 ]; then
-        choose=${options[0]}
-    elif [ ${#options[@]} -ge 2 ]; then
-        echo "Please choose a build file to continue:"
-        select opt in "${options[@]}"; do
-            case $opt in
-            "CMakeLists.txt")
-                choose="CMakeLists.txt"
-                break
-                ;;
-            "Makefile")
-                choose="Makefile"
-                break
-                ;;
-            "meson.build")
-                choose="meson.build"
-                break
-                ;;
-            "make.sh")
-                choose="make.sh"
-                break
-                ;;
-            *) echo "Invalid option $REPLY" ;;
-            esac
-        done
-    else
-        echo "No known build files found."
+    typeset -a options
+    [[ -f "Makefile" ]] && options+=("Makefile")
+    [[ -f "CMakeLists.txt" ]] && options+=("CMakeLists.txt")
+    [[ -f "meson.build" ]] && options+=("meson.build")
+    [[ -f "make.sh" ]] && options+=("make.sh")
+    if [[ $system = "Darwin" ]]; then
+        # on Mac OS, I cannot choose the only option
+        if ((${#options[@]} > 0)); then
+            echo "Select a build file to start build:"
+            select file in "${options[@]}"; do
+                if [[ -n "$file" ]]; then
+                    choose="$file"
+                    break
+                else
+                    echo "Invalid selection, try again."
+                fi
+            done
+        else
+            echo "No build files found, exit."
+            return
+        fi
+    elif [[ $system = "Linux" ]]; then
+        if ((${#options[@]} == 1)); then
+            choose="${options[0]}"
+            echo -e "Using $INFO$choose$NOC to build."
+        elif ((${#options[@]} > 0)); then
+            echo "Select a build file to start build:"
+            select file in "${options[@]}"; do
+                if [[ -n "$file" ]]; then
+                    choose="$file"
+                    break
+                else
+                    echo "Invalid selection, try again."
+                fi
+            done
+        else
+            echo "No build files found, exit."
+            return
+        fi
     fi
     # ------------------------------
     if [ $choose = "Makefile" ]; then

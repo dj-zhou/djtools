@@ -3,6 +3,7 @@
 system=$(uname -s)
 if [ $system = 'Darwin' ]; then
     rc_file="$HOME/.zshrc"
+    alias nproc="sysctl -n hw.ncpu"
 elif [ $system = 'Linux' ]; then
     rc_file="$HOME/.bashrc"
     # add some global variables -- only tested on Ubuntu

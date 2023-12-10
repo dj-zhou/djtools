@@ -93,18 +93,35 @@ function _press_enter_to_continue() {
 # =============================================================================
 function _press_enter_or_wait_s_continue() {
     second=$1
-    while [ 0 -lt $second ]; do
-        if [ $second = '1' ]; then
-            echo -ne "\rPress [ENTER] or wait $second second to continue ...    "
-        else
-            echo -ne "\rPress [ENTER] or wait $second seconds to continue ...   "
-        fi
-        read -s -N 1 -t 1 key
-        if [ "$key" == $'\x0a' ]; then
-            break
-        fi
-        second=$((second - 1))
-    done
+    if [ $system = 'Linux' ]; then
+        while [ 0 -lt $second ]; do
+            if [ $second = '1' ]; then
+                echo -ne "\rPress [ENTER] or wait $second second to continue ...    "
+            else
+                echo -ne "\rPress [ENTER] or wait $second seconds to continue ...   "
+            fi
+            read -s -N 1 -t 1 key
+            if [ "$key" == $'\x0a' ]; then
+                break
+            fi
+            second=$((second - 1))
+        done
+    elif [ $system = 'Darwin' ]; then
+        while ((second > 0)); do
+            if ((second == 1)); then
+                echo -ne "\rPress [ENTER] or wait $second second to continue ...    "
+            else
+                echo -ne "\rPress [ENTER] or wait $second seconds to continue ...   "
+            fi
+
+            # Use read with a timeout
+            read -sk -t 1 key
+            if [[ -n $key ]]; then
+                break
+            fi
+            second=$((second - 1))
+        done
+    fi
     echo " "
 }
 
@@ -343,7 +360,7 @@ function _check_if_package_installed() {
             echo "yes"
         fi
     elif [ $system = 'Darwin' ]; then
-        find_package=$(brew list |grep $1)
+        find_package=$(brew list | grep $1)
         if [ -z "$find_package" ]; then
             echo "no"
         else
@@ -372,17 +389,17 @@ function _install_if_not_installed() {
 
 # =============================================================================
 if [ $system = 'Darwin' ]; then
-# should find a better way to install
-function _cask_install_if_not_installed() {
-    for package in "$@"; do
-        if [[ "no" = $(_check_if_package_installed $package) ]]; then
-            echo -e "${CYN}installing${NOC} $package"
-            brew install --cask $package
-        else
-            echo -e "$package ${CYN}is already installed${NOC}"
-        fi
-    done
-}
+    # should find a better way to install
+    function _cask_install_if_not_installed() {
+        for package in "$@"; do
+            if [[ "no" = $(_check_if_package_installed $package) ]]; then
+                echo -e "${CYN}installing${NOC} $package"
+                brew install --cask $package
+            else
+                echo -e "$package ${CYN}is already installed${NOC}"
+            fi
+        done
+    }
 fi
 
 # =============================================================================
