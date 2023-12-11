@@ -498,9 +498,13 @@ function version {
 # =============================================================================
 check_list+="abseil arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
 check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
-check_list+="eigen3 fmt gcc glog gnome go grpc gtest g++ libsystemd magic-enum "
+check_list+="eigen3 fmt gcc glog go grpc gtest g++ libsystemd magic-enum "
 check_list+="nlohmann-json3 node npm opencv opengl protobuf python3 ros spdlog "
-check_list+="ubuntu yaml-cpp "
+check_list+="yaml-cpp "
+
+if [ $system = 'Linux' ]; then
+    check_list+="gnome ubuntu "
+fi
 
 swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
 swap_list+="aarch64-linux-gnu-gcc gcc g++ gxx python3 "

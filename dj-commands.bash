@@ -208,8 +208,8 @@ function _dj_setup_cmake() {
 }
 
 # =============================================================================
-function _dj_setup_kdiff3_meld() {
-    _show_and_run _install_if_not_installed kdiff3 meld
+function _dj_setup_kdiff3() {
+    _show_and_run _cask_install_if_not_installed kdiff3
 
     all_config=$(git config --list)
     if [[ "$all_config" = *"merge.tool"* ]]; then
@@ -218,9 +218,9 @@ function _dj_setup_kdiff3_meld() {
         _show_and_run git config --global --add merge.tool kdiff3
     fi
     if [[ "$all_config" = *"diff.guitool"* ]]; then
-        _show_and_run git config --global --replace-all diff.guitool meld
+        _show_and_run git config --global --replace-all diff.guitool kdiff3
     else
-        _show_and_run git config --global --add diff.guitool meld
+        _show_and_run git config --global --add diff.guitool kdiff3
     fi
 }
 
@@ -415,6 +415,8 @@ function _dj_setup_pangolin() {
         packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
         _show_and_run _install_if_not_installed $packages
         _show_and_run dj setup glfw3
+    elif [ $system = 'Darwin' ]; then
+        _show_and_run _install_if_not_installed freeglut
     fi
     local v=$(_find_package_version pangolin)
 
@@ -1049,20 +1051,20 @@ eom
 }
 
 # =============================================================================
-function _dj_setup_gtest() {
+function _dj_setup_googletest() {
     _show_and_run _pushd_quiet ${PWD}
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
 
-    v=$(_find_package_version googletest)
+    local v=$(_find_package_version googletest)
     _echo_install googletest $v
     _press_enter_or_wait_s_continue 5
 
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-    _show_and_run rm -rf googletest
+    _show_and_run sudo rm -rf googletest
     _show_and_run git clone https://github.com/google/googletest.git
     _show_and_run cd googletest
     _show_and_run git checkout release-$v
-    _show_and_run rm -rf build
+    _show_and_run sudo rm -rf build
     _show_and_run mkdir -p build
     _show_and_run cd build
     _show_and_run cmake ..
@@ -1082,16 +1084,17 @@ function _dj_setup_gtest() {
 # =============================================================================
 function _dj_setup_glog() {
     _show_and_run _pushd_quiet ${PWD}
-
-    echo -e "install glog ..."
-
-    v=$(_find_package_version glog)
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm -rf glog
+
+    _show_and_run sudo rm -rf /usr/local/include/glog
+    _show_and_run sudo rm -rf /usr/local/lib/libglog.*
+    local v=$(_find_package_version glog)
+    _echo_install glog v$v
+    _show_and_run sudo rm -rf glog
     _show_and_run git clone https://github.com/google/glog.git
     _show_and_run cd glog
-    _show_and_run git checkout $v
+    _show_and_run git checkout v$v
     _show_and_run rm -rf build
     _show_and_run mkdir -p build
     _show_and_run cd build
@@ -1100,8 +1103,12 @@ function _dj_setup_glog() {
     _show_and_run sudo make install
 
     echo -e "\n${INFO}glog $v${NOC} is installed:"
-    _verify_lib_installation libglog.a /usr/local/lib
-    _verify_lib_installation libglog.so /usr/local/lib
+    if [ $system = 'Linux' ]; then
+        _verify_lib_installation libglog.a /usr/local/lib
+        _verify_lib_installation libglog.so /usr/local/lib
+    elif [ $system = 'Darwin' ]; then
+        _verify_lib_installation libglog.dylib /usr/local/lib
+    fi
     _verify_header_files logging.h /usr/local/include/glog
 
     _popd_quiet

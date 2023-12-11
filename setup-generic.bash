@@ -4,18 +4,18 @@ setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-ide baidu-netdi
 setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cuda cutecom devtools "
 setup_list+="driver dropbox eigen3 esp-idf fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
 setup_list+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-setup_list+="gitg-gitk  glog gnuplot go google-repo grpc gtest g++-10 g++-11 htop i219-v kdiff3-meld "
+setup_list+="gitg-gitk  glog gnuplot go googletest grpc gtest g++-10 g++-11 htop i219-v kdiff3 "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
-setup_list+="matplot++ magic-enum mbed meson-ninja mongodb network-tools nlohmann-json3-dev "
-setup_list+="nodejs nvidia nvtop opencv-2.4.13 opencv-3.4.13 opencv-4.5.5 pangolin perf "
+setup_list+="matplot++ magic-enum mbed meson-ninja mongodb nlohmann-json3-dev "
+setup_list+="nodejs nvidia nvtop opencv-3.4.13 opencv-4.5.5 pangolin perf "
 setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu qt-5.13.1 qt-5.14.2 "
-setup_list+="ros2-foxy ros2-humble rpi-pico rust saleae-logic serial-console spdlog slack "
+setup_list+="ros2-foxy ros2-humble rpi-pico rust saleae-logic serial-console spdlog "
 setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
-setup_list+="stm32-cube-programmer stm32-tools sublime texlive thermal-printer typora vscode "
-setup_list+="windows-fonts wireshark wubi yaml-cpp "
+setup_list+="stm32-cube-programmer stm32-tools sublime texlive "
+setup_list+="windows-fonts wireshark yaml-cpp "
 
 if [ $system = 'Linux' ]; then
-    setup_list+="glfw3 gnome "
+    setup_list+="glfw3 gnome google-repo network-tools slack thermal-printer typora vscode wubi "
     # elif [ $system = 'Darwin' ]; then
     # do nothing at this point
 fi
@@ -357,7 +357,9 @@ function _dj_setup_eigen3() {
 
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
-    _show_and_run rm -rf eigen*
+    if ls eigen* 1>/dev/null 2>&1; then
+        _show_and_run rm -rf eigen*
+    fi
     _show_and_run wget https://gitlab.com/libeigen/eigen/-/archive/$eigen3_v/eigen-$eigen3_v.tar.gz
     _show_and_run tar -xvf eigen-$eigen3_v.tar.gz
 
@@ -368,12 +370,13 @@ function _dj_setup_eigen3() {
     _show_and_run make -j$(nproc)
     _show_and_run sudo make install
 
-    # just to prevent compiling error in the future
-    _show_and_run sudo ln -s /usr/local/include/eigen3 /usr/include/eigen3
-
     echo -e "\n${INFO}eigen3 $eigen3_v${NOC} is installed."
     _verify_header_files Eigen /usr/local/include/eigen3/Eigen
-    _verify_header_files Eigen /usr/include/eigen3/Eigen
+    # just to prevent compiling error in the future
+    if [ $system = 'Linux' ]; then
+        _show_and_run sudo ln -s /usr/local/include/eigen3 /usr/include/eigen3
+        _verify_header_files Eigen /usr/include/eigen3/Eigen
+    fi
 
     _popd_quiet
 }
@@ -1363,7 +1366,6 @@ Check if MongoDB is installed:
     $ mongosh --eval 'db.runCommand({ connectionStatus: 1 })'
 --------------------------------------------
 eom
-
 }
 
 # =============================================================================
@@ -1763,7 +1765,11 @@ function _dj_setup_spdlog() { # static/shared
     if [ "$static_shared" = 'static' ]; then
         _verify_lib_installation libspdlog.a /usr/local/lib
     else
-        _verify_lib_installation libspdlog.so /usr/local/lib
+        if [ $system = 'Linux' ]; then
+            _verify_lib_installation libspdlog.so /usr/local/lib
+        elif [ $system = 'Darwin' ]; then
+            _verify_lib_installation libspdlog.dylib /usr/local/lib
+        fi
     fi
     _verify_header_files spdlog.h /usr/local/include/spdlog
     _verify_pkgconfig_file spdlog.pc /usr/local/lib/pkgconfig
@@ -1905,8 +1911,10 @@ function _dj_setup_yaml_cpp() {
     _show_and_run _pushd_quiet ${PWD}
 
     # dependencies to install --------------
-    _show_and_run sudo apt-get -y update
-    _show_and_run _install_if_not_installed build-essential
+    if [ $system = 'Linux' ]; then
+        _show_and_run sudo apt-get -y update
+        _show_and_run _install_if_not_installed build-essential
+    fi
 
     cmake_v=$(version check cmake)
 
@@ -1915,7 +1923,9 @@ function _dj_setup_yaml_cpp() {
         _show_and_run dj setup cmake
     fi
     # remove existing library, if there is
-    _show_and_run sudo rm -rf /usr/local/lib/libyaml-cpp*
+    # if ls /usr/local/lib/libyaml-cpp* 1>/dev/null 2>&1; then
+    _show_and_run rm -rf /usr/local/lib/libyaml-cpp*
+    # fi
 
     yaml_v=$(_find_package_version yaml-cpp)
     _echo_install yaml-cpp $yaml_v
@@ -1933,8 +1943,7 @@ function _dj_setup_yaml_cpp() {
     _show_and_run cd build
 
     _show_and_run cmake ..
-    _press_enter_or_wait_s_continue 5
-    _show_and_run make -j4 # just do not use all CPU threads
+    _show_and_run make -j${nproc}
     _show_and_run sudo make install
 
     echo -e "\n${INFO}yaml-cpp $yaml_v${NOC} is installed."
@@ -2000,7 +2009,8 @@ function _dj_setup() {
     "gnuplot") _dj_setup_gnuplot ;;
     "go") _dj_setup_go ;;
     "google-repo") _dj_setup_google_repo ;;
-    "gtest") _dj_setup_gtest ;;
+    "gtest") _dj_setup_googletest ;;
+    "googletest") _dj_setup_googletest ;;
     "glog") _dj_setup_glog ;;
     "gnome") _dj_setup_gnome ;;
     "grpc") _dj_setup_grpc ;;
@@ -2008,7 +2018,7 @@ function _dj_setup() {
     "g++-11") _dj_setup_gpp_11 ;;
     "htop") _dj_setup_htop ;;
     "i219-v") _dj_setup_i219_v $2 ;;
-    "kdiff3-meld") _dj_setup_kdiff3_meld ;;
+    "kdiff3") _dj_setup_kdiff3 ;;
     "kermit") _dj_setup_kermit ;;
     "lcm") _dj_setup_lcm ;;
     "libbpf") _dj_setup_libbpf ;;
@@ -2029,7 +2039,6 @@ function _dj_setup() {
     "nodejs") _dj_setup_nodejs ;;
     "nvidia") _dj_setup_nvidia ;;
     "nvtop") _dj_setup_nvtop ;;
-    "opencv-2.4.13") _dj_setup_opencv_2_4_13 ;;
     "opencv-3.4.13") _dj_setup_opencv_3_4_13 ;;
     "opencv-4.5.5") _dj_setup_opencv_4_5_5 ;;
     "pangolin") _dj_setup_pangolin ;;

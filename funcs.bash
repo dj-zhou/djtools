@@ -114,11 +114,8 @@ function _press_enter_or_wait_s_continue() {
                 echo -ne "\rPress [ENTER] or wait $second seconds to continue ...   "
             fi
 
-            # Use read with a timeout
-            read -sk -t 1 key
-            if [[ -n $key ]]; then
-                break
-            fi
+            # I cannot make the same action as in Linux
+            sleep 1
             second=$((second - 1))
         done
     fi
@@ -455,7 +452,6 @@ function _verify_pkgconfig_file() {
 # =============================================================================
 # find package version from the file .package-version
 function _find_package_version() {
-    set -eu
     file="$djtools_path/.package-version"
     package=$1
     if [ -z "$package" ]; then
@@ -465,6 +461,12 @@ function _find_package_version() {
     version=""
     while IFS='' read -r line || [[ -n "$line" ]]; do
         if [[ $line == "$package"* ]]; then
+            # on Mac OS, ubuntu_v is not set
+            if [ -z "${ubuntu_v}" ]; then
+                version=$(echo $line | awk '{ print $2 }')
+                echo $version
+                return
+            fi
             # echo $line
             if [[ ${ubuntu_v} == *'18.04'* && $line == *'1804'* ]]; then
                 pos1=$(_find_substr_index_in_str "$line" "1804")

@@ -1,44 +1,6 @@
 #!/bin/bash
 
 # =============================================================================
-# may not be a good way to install opencv
-# recommend to install opencv-4.1.1
-function _dj_setup_opencv_2_4_13() {
-    _show_and_run _pushd_quiet ${PWD}
-
-    echo -e "Have you installed Qt? The openCV installation may need Qt"
-    echo " use the following command to install Qt 5.11.2"
-    echo -e "     dj setup qt-5.11.2"
-    _press_enter_or_wait_s_continue 20
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-
-    sudo rm -rf opencv-4.1.1 # otherwise, it will not going to clone into this folder
-
-    _show_and_run wget https://codeload.github.com/opencv/opencv/zip/2.4.13.6
-    _show_and_run mv 2.4.13.6 opencv-2.4.13.6.zip
-    _show_and_run unzip opencv-2.4.13.6.zip
-    _show_and_run cd opencv-2.4.13.6
-    _show_and_run mkdir -p build
-    _show_and_run cd build
-    _show_and_run cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local \
-        -D WITH_TBB=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_OPENGL=ON \
-        WITH_OPENCL=ON WITH_GDAL=ON WITH_IPP=ON BUILD_JASPER=ON BUILD_JPEG=ON \
-        BUILD_PNG=ON BUIILD_TIFF=ON WITH_OPENMP=ON ..
-    _show_and_run make -j$(($(nproc)/2))
-    _show_and_run sudo make install
-
-    _ask_to_remove_a_folder opencv-2.4.13
-    _ask_to_remove_a_file opencv-2.4.13.zip
-
-    echo " lib files *.so are installed in /usr/local/lib/"
-    echo " header files are installded in /usr/local/include/opencv2/"
-
-    _popd_quiet
-}
-
-# =============================================================================
 function _setup_opencv_dependencies() {
     # Generic tools
     packages="build-essential cmake pkg-config unzip yasm git checkinstall "
@@ -143,7 +105,7 @@ function _dj_setup_opencv_3_4_13() {
         -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
         -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include ..
 
-    _show_and_run make -j$(($(nproc)/2))
+    _show_and_run make -j$(($(nproc) / 2))
     _show_and_run sudo make install
 
     cat <<eom
@@ -236,7 +198,7 @@ function _dj_setup_opencv_4_5_5() {
     # -D CUDNN_LIBRARY=/usr/local/cuda/lib64/libcudnn.so.7.6.5 \
     # -D CUDNN_INCLUDE_DIR=/usr/local/cuda/include ..
 
-    _show_and_run make -j$(($(nproc)/2))
+    _show_and_run make -j$(($(nproc) / 2))
     _show_and_run sudo make install
 
     _show_and_run sudo ln -sf /usr/local/include/opencv4/opencv2 /usr/local/include/opencv2
