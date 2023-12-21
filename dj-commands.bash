@@ -412,7 +412,7 @@ function _dj_setup_pangolin() {
 
     if [ $system = 'Linux' ]; then
         # dependency installation
-        packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev "
+        packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev freeglut3 freeglut3-dev "
         _show_and_run _install_if_not_installed $packages
         _show_and_run dj setup glfw3
     elif [ $system = 'Darwin' ]; then

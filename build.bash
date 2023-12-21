@@ -150,7 +150,7 @@ function _build_meson_native() {
     if [ ! -d "$proj_dir" ]; then
         _show_and_run meson setup "$proj_dir"
     elif [ ! -f "$proj_dir/build.ninja" ]; then
-        _show_and_run rm "$proj_dir" -rf
+        _show_and_run rm -rf "$proj_dir"
         _show_and_run meson setup "$proj_dir"
 
     fi

@@ -88,30 +88,46 @@ function _version_check_abseil() {
 
 # =============================================================================
 function _version_check_arm_linux_gnueabi_gcc() {
-    v=$(arm-linux-gnueabi-gcc --version | awk '{ print $4 }')
-    vv=$(echo $v | awk '{ print $1 }')
-    echo $vv
+    if command -v arm-linux-gnueabi-gcc >/dev/null 2>&1; then
+        v=$(arm-linux-gnueabi-gcc --version | awk '{ print $4 }')
+        vv=$(echo $v | awk '{ print $1 }')
+        echo $vv
+    else
+        _echo_not_installed arm-linux-gnueabi-gcc
+    fi
 }
 
 # =============================================================================
 function _version_check_arm_linux_gnueabihf_gcc() {
-    v=$(arm-linux-gnueabihf-gcc --version | awk '{ print $4 }')
-    vv=$(echo $v | awk '{ print $1 }')
-    echo $vv
+    if command -v arm-linux-gnueabihf-gcc >/dev/null 2>&1; then
+        v=$(arm-linux-gnueabihf-gcc --version | awk '{ print $4 }')
+        vv=$(echo $v | awk '{ print $1 }')
+        echo $vv
+    else
+        _echo_not_installed arm-linux-gnueabihf-gcc
+    fi
 }
 
 # =============================================================================
 function _version_check_arm_linux_gnueabihf_gpp() {
-    v=$(arm-linux-gnueabihf-g++ --version | awk '{ print $4 }')
-    vv=$(echo $v | awk '{ print $1 }')
-    echo $vv
+    if command -v arm-linux-gnueabihf-g++ >/dev/null 2>&1; then
+        v=$(arm-linux-gnueabihf-g++ --version | awk '{ print $4 }')
+        vv=$(echo $v | awk '{ print $1 }')
+        echo $vv
+    else
+        _echo_not_installed arm-linux-gnueabihf-g++
+    fi
 }
 
 # =============================================================================
 function _version_check_aarch64_linux_gnu_gcc() {
-    v=$(aarch64-linux-gnu-gcc --version | awk '{ print $4 }')
-    vv=$(echo $v | awk '{ print $1 }')
-    echo $vv
+    if command -v aarch64-linux-gnu-gcc >/dev/null 2>&1; then
+        v=$(aarch64-linux-gnu-gcc --version | awk '{ print $4 }')
+        vv=$(echo $v | awk '{ print $1 }')
+        echo $vv
+    else
+        _echo_not_installed aarch64-linux-gnu-gcc
+    fi
 }
 
 # =============================================================================
@@ -131,10 +147,10 @@ function _version_check_boost() {
 
 # =============================================================================
 function _version_check_cli11() {
-    files="/usr/local/lib/pkgconfig/CLI11.pc "
-    files+="/usr/local/share/pkgconfig/CLI11.pc "
+    files=("/usr/local/lib/pkgconfig/CLI11.pc"
+        "/usr/local/share/pkgconfig/CLI11.pc")
     file_is_found=0
-    for file in $files; do
+    for file in "${files[@]}"; do
         if [[ -f "$file" ]]; then
             while IFS='' read -r line || [[ -n "$line" ]]; do
                 if [[ $line == *"Version: "* ]]; then
@@ -153,22 +169,23 @@ function _version_check_cli11() {
 
 # =============================================================================
 function _version_check_cmake() {
-    v=$(cmake --version | grep -v kitware | awk '{ print $3 }')
-    # return the version value
-    echo $v
+    if command -v cmake >/dev/null 2>&1; then
+        v=$(cmake --version | grep -v kitware | awk '{ print $3 }')
+        # return the version value
+        echo $v
+    else
+        _echo_not_installed cmake
+    fi
 }
 
 # =============================================================================
 function _version_check_eigen3() {
-    # example:
-    # #define EIGEN_WORLD_VERSION 3
-    # #define EIGEN_MAJOR_VERSION 3
-    # #define EIGEN_MINOR_VERSION 4
+    # Array of file paths
+    files=("/usr/local/include/eigen3/Eigen/src/Core/util/Macros.h"
+        "/usr/include/eigen3/Eigen/src/Core/util/Macros.h")
 
-    files="/usr/local/include/eigen3/Eigen/src/Core/util/Macros.h "
-    files+="/usr/include/eigen3/Eigen/src/Core/util/Macros.h "
     file_is_found=0
-    for file in $files; do
+    for file in "${files[@]}"; do
         if [[ -f "$file" ]]; then
             file_is_found=1
             while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -181,12 +198,12 @@ function _version_check_eigen3() {
                 if [[ $line == *"define EIGEN_MINOR_VERSION"* ]]; then
                     minor_version=$(echo $line | awk '{ print $3 }')
                 fi
-            done <$file
+            done <"$file"
             echo $world_version.$major_version.$minor_version
             return
         fi
     done
-    if [ $file_is_found='0' ]; then
+    if [ $file_is_found = 0 ]; then
         _echo_not_installed "eigen3"
     fi
 }
@@ -204,9 +221,13 @@ function _version_check_fmt() {
 
 # =============================================================================
 function _version_check_gcc() {
-    v=$(gcc --version | awk '{ print $4 }')
-    vv=$(echo $v | awk '{ print $1 }')
-    echo $vv
+    if command -v gcc >/dev/null 2>&1; then
+        v=$(gcc --version | awk '{ print $4 }')
+        vv=$(echo $v | awk '{ print $1 }')
+        echo $vv
+    else
+        _echo_not_installed gcc
+    fi
 }
 
 # =============================================================================
@@ -250,9 +271,13 @@ function _version_check_gtest() {
 
 # =============================================================================
 function _version_check_gpp() {
-    v=$(g++ --version | awk '{ print $4 }')
-    vv=$(echo $v | awk '{ print $1 }')
-    echo $vv
+    if command -v g++ >/dev/null 2>&1; then
+        v=$(g++ --version | awk '{ print $4 }')
+        vv=$(echo $v | awk '{ print $1 }')
+        echo $vv
+    else
+        _echo_not_installed g++
+    fi
 }
 
 # =============================================================================
@@ -264,10 +289,12 @@ function _version_check_gnome() {
 
 # =============================================================================
 function _version_check_go() {
-    v_str=$(go version)
-    if [[ "$v_str" =~ go([0-9]+\.[0-9]+\.[0-9]+) ]]; then
-        go_version="${BASH_REMATCH[1]}"
-        echo "$go_version"
+    if command -v go >/dev/null 2>&1; then
+        v_str=$(go version)
+        if [[ "$v_str" =~ go([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+            go_version="${BASH_REMATCH[1]}"
+            echo "$go_version"
+        fi
     else
         _echo_not_installed "golang-go"
     fi
@@ -296,6 +323,25 @@ function _version_check_magic_enum() {
 }
 
 # =============================================================================
+function _version_check_meson() {
+    if command -v meson >/dev/null 2>&1; then
+        v=$(meson --version)
+        echo $v
+    else
+        _echo_not_installed meson
+    fi
+}
+
+function _version_check_ninja() {
+    if command -v ninja >/dev/null 2>&1; then
+        v=$(ninja --version)
+        echo $v
+    else
+        _echo_not_installed ninja
+    fi
+}
+
+# =============================================================================
 function _version_check_nlohmann_json3() {
     file="/usr/local/share/pkgconfig/nlohmann_json.pc"
     if [ ! -f $file ]; then
@@ -307,14 +353,22 @@ function _version_check_nlohmann_json3() {
 
 # =============================================================================
 function _version_check_node() {
-    v=$(node -v)
-    v=$(echo $v | sed 's/v//g')
-    echo $v
+    if command -v node >/dev/null 2>&1; then
+        v=$(node -v)
+        v=$(echo $v | sed 's/v//g')
+        echo $v
+    else
+        _echo_not_installed node
+    fi
 }
 
 # =============================================================================
 function _version_check_npm() {
-    npm --version
+    if command -v npm >/dev/null 2>&1; then
+        npm --version
+    else
+        _echo_not_installed npm
+    fi
 }
 
 # =============================================================================
@@ -323,11 +377,10 @@ function _version_check_opencv() {
     # #define CV_VERSION_MAJOR    3
     # #define CV_VERSION_MINOR    4
     # #define CV_VERSION_REVISION 13
-
-    files="/usr/local/include/opencv2/core/version.hpp "
-    files+="/usr/include/opencv4/opencv2/core/version.hpp"
+    files=("/usr/local/include/opencv2/core/version.hpp"
+        "/usr/include/opencv4/opencv2/core/version.hpp")
     file_is_found=0
-    for file in $files; do
+    for file in "${files[@]}"; do
         if [[ -f "$file" ]]; then
             file_is_found=1
             while IFS='' read -r line || [[ -n "$line" ]]; do
@@ -358,29 +411,35 @@ function _version_check_opengl() {
 
 # =============================================================================
 function _version_check_protobuf() {
-    # check protoc, what if it is not installed?
-    v=$(protoc --version | awk '{ print $2 }')
-    echo $v
+    if command -v protoc >/dev/null 2>&1; then
+        v=$(protoc --version | awk '{ print $2 }')
+        echo "$v"
+    else
+        _echo_not_installed "protobuf"
+    fi
 }
 
 # =============================================================================
 function _version_check_python3() {
-    anw=$(_check_if_package_installed python3)
-    if [[ "$anw" = "no" ]]; then
+    if command -v python3 >/dev/null 2>&1; then
+        v=$(python3 --version | awk '{ print $2 }')
+        echo "$v"
+    else
         _echo_not_installed "python3"
-        return
     fi
-    echo $(python3 --version | awk '{ print $2 }')
 }
 
 # =============================================================================
 function _version_check_ros() {
-    _install_if_not_installed python3-rospkg &>/dev/null
-    local v=$(rosversion -d)
-    if [[ -z "$v" ]]; then
+    if command -v python >/dev/null 2>&1; then
+        v=$(rosversion -d)
+        echo "$v"
+    else
         v=$(echo $ROS_DISTRO)
     fi
-    echo $v
+    if [ -z $v ]; then
+        _echo_not_installed "ROS"
+    fi
 }
 
 # =============================================================================
@@ -441,6 +500,8 @@ function _version_check {
     gtest) _version_check_gtest ;;
     g++) _version_check_gpp ;;
     magic-enum) _version_check_magic_enum ;;
+    meson) _version_check_meson ;;
+    ninja) _version_check_ninja ;;
     nlohmann-json3) _version_check_nlohmann_json3 ;;
     node) _version_check_node ;;
     npm) _version_check_npm ;;
@@ -457,7 +518,12 @@ function _version_check {
     esac
 }
 
+# =============================================================================
 function _version_swap {
+    if [ $system = 'Darwin']; then
+        echo "version swap: does not work on Mac OS yet."
+        return
+    fi
     case $1 in
     gcc | g++ | gxx | arm-linux-gnueabi-gxx | arm-linux-gnueabihf-gxx | aarch64-linux-gnu-gcc | python3)
         sudo update-alternatives --config $1
@@ -499,11 +565,11 @@ function version {
 check_list+="abseil arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
 check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
 check_list+="eigen3 fmt gcc glog go grpc gtest g++ libsystemd magic-enum "
-check_list+="nlohmann-json3 node npm opencv opengl protobuf python3 ros spdlog "
-check_list+="yaml-cpp "
+check_list+="meson ninja nlohmann-json3 node npm opencv protobuf python3 ros "
+check_list+="spdlog yaml-cpp "
 
 if [ $system = 'Linux' ]; then
-    check_list+="gnome ubuntu "
+    check_list+="gnome opengl ubuntu "
 fi
 
 swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "

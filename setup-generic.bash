@@ -8,14 +8,15 @@ setup_list+="gitg-gitk  glog gnuplot go googletest grpc gtest g++-10 g++-11 htop
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
 setup_list+="matplot++ magic-enum mbed meson-ninja mongodb nlohmann-json3-dev "
 setup_list+="nodejs nvidia nvtop opencv-3.4.13 opencv-4.5.5 pangolin perf "
-setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu qt-5.13.1 qt-5.14.2 "
+setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu "
 setup_list+="ros2-foxy ros2-humble rpi-pico rust saleae-logic serial-console spdlog "
 setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
 setup_list+="stm32-cube-programmer stm32-tools sublime texlive "
-setup_list+="windows-fonts wireshark yaml-cpp "
+setup_list+="wireshark yaml-cpp "
 
 if [ $system = 'Linux' ]; then
-    setup_list+="glfw3 gnome google-repo network-tools slack thermal-printer typora vscode wubi "
+    setup_list+="glfw3 gnome google-repo network-tools qt-5.13.1 qt-5.14.2 "
+    setup_list+="slack thermal-printer typora vscode windows-fonts wubi "
     # elif [ $system = 'Darwin' ]; then
     # do nothing at this point
 fi
@@ -1242,73 +1243,6 @@ eom
 }
 
 # =============================================================================
-# testing
-function _dj_setup_meson_ninjia() {
-    meson_v=$(_find_package_version meson)
-    ninja_v=$(_find_package_version ninja)
-    # sanity check
-    cmake_v=$(version check cmake)
-    anw=$(_version_if_ge_than "$cmake_v" "3.20")
-    if [ "$anw" = "no" ]; then
-        echo "cmake needs to be 3.20 or higher version, exit."
-        return
-    fi
-    # python3_v=$(version check python3)
-    # anw=$(_version_if_ge_than "$python3_v" "3.7")
-    # if [[ "$anw" = "yes" ]]; then
-    #     echo "I failed to use python3>3.6 to install meson v$meson_v."
-    #     return
-    # fi
-    _echo_install meson $meson_v
-    _press_enter_or_wait_s_continue 5
-    # remove /usr/bin/meson
-    _show_and_run sudo apt-get remove meson &>/dev/null
-
-    # install needed software
-    _show_and_run _install_if_not_installed python3
-    _show_and_run _install_if_not_installed python3-pip
-
-    # meson release: https://github.com/mesonbuild/meson/releases
-    _show_and_run python3 -m pip install meson==$meson_v
-
-    # make sure ~/.local/bin is in the PATH variable
-    # but not sure if it is in it for new installed Ubuntu ... will check
-
-    meson_path=$(grep "PATH:~/.local/bin" $rc_file)
-    if [ ! -z "$meson_path" ]; then
-        echo -e "${INFO}meson ${NOC}path was set in $rc_file"
-    else
-        echo -e '\n' >>$rc_file
-        echo '# ===========================================================' >>$rc_file
-        echo '# (djtools) meson path setup' >>$rc_file
-        echo -e 'export PATH=$PATH:~/.local/bin\n' >>$rc_file
-    fi
-    echo -e "${INFO}meson${NOC} is installed to ${INFO}${HOME}/.local/bin${NOC}"
-
-    # ---------------------------------------------
-    _echo_install ninja $ninja_v
-    _press_enter_or_wait_s_continue 5
-    # ninja is needed for meson, so install it as well
-
-    _show_and_run _pushd_quiet ${PWD}
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-    _show_and_run rm -rf ninja
-    _show_and_run git clone https://github.com/ninja-build/ninja.git && cd ninja
-    _show_and_run git checkout v$ninja_v
-    _show_and_run mkdir -p build
-    _show_and_run cd build
-    _show_and_run cmake ..
-    _show_and_run make -j$(nproc)
-    _show_and_run sudo make install
-
-    _show_and_run which meson
-    _show_and_run which ninja
-    _popd_quiet
-}
-
-# =============================================================================
 # https://wiki.crowncloud.net/How_To_Install_Duf_On_Ubuntu_22_04?How_to_Install_Latest_MongoDB_on_Ubuntu_22_04
 function _dj_setup_mongodb() {
     uname_a=$(uname -a)
@@ -2075,5 +2009,6 @@ function _dj_setup() {
     "windows-fonts") _dj_setup_windows_fonts ;;
     "wireshark") _dj_setup_wireshark ;;
     "wubi") _dj_setup_wubi ;;
+    *) echo -e "dj setup: argument \"$1\" is not supported." ;;
     esac
 }

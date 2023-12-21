@@ -67,6 +67,10 @@ alias lock="_show_and_run gnome-screensaver-command -l"
 alias cddj="_show_and_run cd $djtools_path"
 alias .b="_show_and_run source $rc_file"
 
+alias ..="_show_and_run cd .."
+alias ...="_show_and_run cd ../.."
+alias ....="_show_and_run cd ../../.."
+
 # =============================================================================
 source $djtools_path/block-device.bash
 source $djtools_path/build.bash
@@ -75,20 +79,23 @@ source $djtools_path/dj-commands.bash
 source $djtools_path/esp32.bash
 source $djtools_path/funcs.bash
 source $djtools_path/git.bash
-source $djtools_path/keyremap.bash
 source $djtools_path/kernel.bash
 source $djtools_path/mark-down.bash
 source $djtools_path/m.bash
 source $djtools_path/mirror.bash
 source $djtools_path/pack-unpack.bash
-source $djtools_path/rpi.bash
 source $djtools_path/split-merge.bash
 source $djtools_path/system.bash
-source $djtools_path/systemd.bash
-source $djtools_path/terminal-format.bash
 source $djtools_path/touchpad.bash
 source $djtools_path/version.bash
-source $djtools_path/window-tile.bash
 source $djtools_path/work-check.bash
-source $djtools_path/yocto/yocto.bash
-source $djtools_path/zephyr.bash
+
+if [ $system = 'Linux' ]; then
+    source $djtools_path/keyremap.bash
+    source $djtools_path/rpi.bash
+    source $djtools_path/systemd.bash
+    source $djtools_path/terminal-format.bash
+    source $djtools_path/window-tile.bash
+    source $djtools_path/yocto/yocto.bash
+    source $djtools_path/zephyr.bash
+fi
