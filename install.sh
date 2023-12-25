@@ -45,9 +45,9 @@ for rs in $repo_source; do
     fi
 done
 
-echo -e "\nIf "
+printf "If "
 for rs in $repo_source; do
-    echo "\"$rs\" "
+    printf "\"$rs\" "
 done
 echo -e "usernames set wrong, you can still edit them in $rc_file"
 echo "djtools_path=${PWD}" >>$rc_file
@@ -56,7 +56,6 @@ echo -e "djtools installation finished."
 echo -e "\n" >>$rc_file
 
 mkdir -p ~/.ssh
-
 
 # # ===========================================================
 
@@ -67,9 +66,6 @@ mkdir -p ~/.ssh
 # bitbucket_username=sky-Hawk
 # djtools_path=/Users/dingjiangzhou/workspace/djtools
 # source /Users/dingjiangzhou/workspace/djtools/djtools.bash
-
-
-
 
 # # =============================================================================
 # function _show() {
@@ -87,7 +83,6 @@ mkdir -p ~/.ssh
 #     _show "$@"
 #     "$@"
 # }
-
 
 # NOC='\033[0m'
 # GRY='\033[0;30m'

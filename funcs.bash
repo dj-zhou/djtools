@@ -385,7 +385,7 @@ function _install_if_not_installed() {
 }
 
 # =============================================================================
-if [ $system = 'Darwin' ]; then
+if [[ $system = 'Darwin' ]]; then
     # should find a better way to install
     function _cask_install_if_not_installed() {
         for package in "$@"; do
@@ -555,26 +555,28 @@ function _log_show_run() {
 
 # =============================================================================
 # to measure the time of running some commands
-function tic-toc() {
-    start_time=$(get-time-us)
-    _show_and_run "$@"
-    end_time=$(get-time-us)
-    elapsed_time=$((end_time - start_time))
-    printf "run time: $elapsed_time us"
-    seconds=$((elapsed_time / 1000000))
-    us=$((elapsed_time - seconds * 1000000))
-    # the length is 1 char more
-    len=$(echo $us | wc -c)
-    # must add leading zeros
-    leading_zeros=$((7 - len))
-    printf " (${seconds}."
-    if [ $leading_zeros -gt 1 ]; then
-        for i in {1..${leading_zeros}}; do
-            printf "0"
-        done
-    fi
-    echo "$us s)"
-}
+# error: what is the get-time-us command here?
+# t his function does not work!
+# function tic_toc() {
+#     start_time=$(get-time-us)
+#     _show_and_run "$@"
+#     end_time=$(get-time-us)
+#     elapsed_time=$((end_time - start_time))
+#     printf "run time: $elapsed_time us"
+#     seconds=$((elapsed_time / 1000000))
+#     us=$((elapsed_time - seconds * 1000000))
+#     # the length is 1 char more
+#     len=$(echo $us | wc -c)
+#     # must add leading zeros
+#     leading_zeros=$((7 - len))
+#     printf " (${seconds}."
+#     if [ $leading_zeros -gt 1 ]; then
+#         for i in {1..${leading_zeros}}; do
+#             printf "0"
+#         done
+#     fi
+#     echo "$us s)"
+# }
 
 # =============================================================================
 # write text $1 into file $2, if $1 does not exits in $2

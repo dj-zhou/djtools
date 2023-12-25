@@ -20,7 +20,9 @@ function compile_make_build_etc() {
     [[ -f "Makefile" ]] && options+=("Makefile")
     [[ -f "CMakeLists.txt" ]] && options+=("CMakeLists.txt")
     [[ -f "meson.build" ]] && options+=("meson.build")
-    [[ -f "make.sh" ]] && options+=("make.sh")
+    if [[ $system = "Linux" ]]; then
+        [[ -f "make.sh" ]] && options+=("make.sh")
+    fi
     if [[ $system = "Darwin" ]]; then
         # on Mac OS, I cannot choose the only option
         if ((${#options[@]} > 0)); then
