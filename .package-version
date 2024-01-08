@@ -37,4 +37,7 @@ plotjuggler 3.3.3 # October 30th, 2021
 protobuf 3.25.0
 slack 4.34.120
 spdlog 1.11.0 # Sat Jul 8 17:12:25 2023
+websocat 1.9.0
 yaml-cpp 0.6.3
+zephyr-project 3.2.0 # Sep. 30th, 2022
+zephyr-sdk 0.15.2 # Nov. 22nd, 2022

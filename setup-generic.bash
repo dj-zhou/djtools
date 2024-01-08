@@ -1,22 +1,24 @@
 #!/bin/bash
 
-setup_list="abseil-cpp adobe-pdf-reader anaconda ansible arduino-ide baidu-netdisk boost can-analyzer "
-setup_list+="can-dev-tools clang-format clang-llvm cli11 cmake computer container cuda cutecom devtools "
-setup_list+="driver dropbox eigen3 esp-idf fast-github flamegraph fmt foxit-pdf-reader fsm-pro gadgets "
-setup_list+="gcc-arm-stm32 gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu git-lfs "
-setup_list+="gitg-gitk  glog gnuplot go googletest grpc gtest g++-10 g++-11 htop i219-v kdiff3 "
+
+setup_list="abseil-cpp anaconda ansible arduino-ide boost cli11 cmake computer container  "
+setup_list+="eigen3 esp-idf fast-github flamegraph fmt gadgets git-lfs "
+setup_list+="gitg-gitk glog gnuplot go googletest grpc gtest g++-10 g++-11 htop kdiff3 "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
-setup_list+="matplot++ magic-enum mbed meson-ninja mongodb nlohmann-json3-dev "
-setup_list+="nodejs nvidia nvtop opencv-3.4.13 opencv-4.5.5 pangolin perf "
-setup_list+="picocom pip plotjuggler protobuf pycharm python3.9 python3.10 qemu "
-setup_list+="ros2-foxy ros2-humble rpi-pico rust saleae-logic serial-console spdlog "
-setup_list+="stm32-cube-ide stm32-cube-ide-desktop-item stm32-cube-mx stm32-cube-mx-desktop-item "
-setup_list+="stm32-cube-programmer stm32-tools sublime texlive "
-setup_list+="wireshark yaml-cpp "
+setup_list+="magic-enum  meson-ninja mongodb nlohmann-json3-dev nodejs opencv-3.4.13 "
+setup_list+="opencv-4.5.5 pangolin perf picocom pip plotjuggler protobuf pycharm python3.9 "
+setup_list+="python3.10 qemu ros2-foxy ros2-humble rpi-pico rust  spdlog "
+setup_list+="sublime texlive yaml-cpp "
 
 if [ $system = 'Linux' ]; then
-    setup_list+="glfw3 gnome google-repo network-tools qt-5.13.1 qt-5.14.2 "
-    setup_list+="slack thermal-printer typora vscode windows-fonts wubi "
+    setup_list+="adobe-pdf-reader baidu-netdisk can-analyzer can-dev-tools clang-format "
+    setup_list+="clang-llvm cuda cutecom devtools driver dtc device-tree-compilier "
+    setup_list+="foxit-pdf-reader fsm-pro gcc-arm-stm32 gcc-arm-linux-gnueabi "
+    setup_list+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu glfw3 gnome google-repo "
+    setup_list+="i219-v mbed network-tools nvidia nvtop qt-5.13.1 qt-5.14.2 saleae-logic "
+    setup_list+="serial-console slack stm32-cube-ide stm32-cube-ide-desktop-item "
+    setup_list+="stm32-cube-mx stm32-cube-mx-desktop-item stm32-cube-programmer "
+    setup_list+="stm32-tools thermal-printer typora vscode windows-fonts wireshark wubi "
     # elif [ $system = 'Darwin' ]; then
     # do nothing at this point
 fi
@@ -323,32 +325,17 @@ function _dj_setup_driver() {
 }
 
 # =============================================================================
-function _dj_setup_dropbox() {
-    _pushd_quiet ${PWD}
-
-    sudo apt-get --fix-broken install
-    _show_and_run _install_if_not_installed libpango1.0-0
-    _show_and_run _install_if_not_installed curl
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $ssoft_dir
-
-    _show_and_run curl -L \
-        https://linux.dropbox.com/packages/ubuntu/dropbox_2020.03.04_amd64.deb \
-        >dropbox.deb
-    _show_and_run sudo dpkg -i dropbox.deb
-
-    echo -e "You can run the following command to setup the Dropbox"
-    echo -e "   dropbox start -i\n"
-
-    _popd_quiet
-}
-
-# =============================================================================
 # Install a version from its source code
 function _dj_setup_eigen3() {
     _show_and_run _pushd_quiet ${PWD}
 
+    _show_and_run _install_if_not_installed wget
+
+    if command -v cmake >/dev/null 2>&1; then
+        echo "cmake is installed already"
+    else
+        dj setup cmake
+    fi
     eigen3_v=$(_find_package_version eigen3)
     _echo_install eigen3 $eigen3_v
     _press_enter_or_wait_s_continue 5
@@ -1098,59 +1085,6 @@ function _dj_setup_libsystemd() {
 }
 
 # =============================================================================
-# this might need a higher version of g++ to compile (>= 9.3?)
-function _dj_setup_matplot_xx() {
-    _show_and_run _pushd_quiet ${PWD}
-
-    static_shared=$1
-
-    v=$(_find_package_version matplotplusplus)
-    _echo_install matplot++ $v
-    _press_enter_or_wait_s_continue 5
-
-    # dependency ------
-    _show_and_run _install_if_not_installed gnuplot
-    _show_and_run _install_if_not_installed libfftw3-dev
-
-    # removed previously installed files ------
-    _show_and_run sudo rm -f /usr/local/lib/Matplot++/libnodesoup.a
-    _show_and_run sudo rm -f /usr/local/lib/libmatplot.a
-    _show_and_run sudo rm -f /usr/local/lib/libmatplot.so
-    _show_and_run sudo rm -rf /usr/local/include/matplot
-    _show_and_run sudo rm -rf /usr/local/lib/cmake/Matplot++
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-    _show_and_run rm -rf matplotplusplus
-    _show_and_run git clone https://github.com/alandefreitas/matplotplusplus.git
-    _show_and_run cd matplotplusplus
-    _show_and_run git checkout $v
-
-    # compile and install ------
-    _show_and_run mkdir -p build
-    _show_and_run cd build
-    if [ "$static_shared" = 'static' ]; then
-        _show_and_run cmake .. -DBUILD_SHARED_LIBS=OFF
-    else
-        _show_and_run cmake .. -DBUILD_SHARED_LIBS=ON
-    fi
-    _show_and_run make -j$(nproc)
-    _show_and_run sudo make install
-    sudo ldconfig
-    if [ "$static_shared" = 'static' ]; then
-        _verify_header_files matplot.h /usr/local/include/matplot
-        _verify_lib_installation libmatplot.a /usr/local/lib
-        _verify_lib_installation libnodesoup.a /usr/local/lib/Matplot++
-
-    else
-        _verify_header_files matplot.h /usr/local/include/matplot
-        _verify_lib_installation libmatplot.so /usr/local/lib
-    fi
-
-    _popd_quiet
-}
-
-# =============================================================================
 function _dj_setup_magic_enum() {
     _show_and_run _pushd_quiet ${PWD}
 
@@ -1660,59 +1594,6 @@ function _dj_setup_serial_console() {
 }
 
 # =============================================================================
-function _dj_setup_spdlog() { # static/shared
-    static_shared=$1          # if empty, treat as dynamic
-
-    v=$(_find_package_version spdlog)
-    _show_and_run _pushd_quiet ${PWD}
-
-    _show_and_run sudo rm -f /usr/local/lib/libspdlog.a
-    _show_and_run sudo rm -f /usr/local/lib/libspdlog.so*
-    _show_and_run sudo rm -rf /usr/local/include/spdlog/
-    _show_and_run sudo rm -f /usr/local/lib/pkgconfig/spdlog.pc
-    _show_and_run sudo rm -rf /usr/local/lib/cmake/spdlog/
-
-    _echo_install spdlog v$v
-    _press_enter_or_wait_s_continue 5
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-    _show_and_run sudo rm -rf spdlog
-
-    _show_and_run git clone https://github.com/gabime/spdlog.git
-    _show_and_run cd spdlog
-    _show_and_run git checkout v$v
-    _show_and_run mkdir -p build
-    _show_and_run cd build
-
-    # static build need to be specific
-    # if no option found, "shared" is default
-    if [ "$static_shared" = 'static' ]; then
-        _show_and_run cmake -DSPDLOG_BUILD_SHARED=off -DSPDLOG_INSTALL=on -DSPDLOG_BUILD_EXAMPLES=off -DSPDLOG_BUILD_TESTS=off -DSPDLOG_BUILD_BENCH=off -DSPDLOG_FMT_EXTERNAL=off ..
-    else
-        _show_and_run cmake -DSPDLOG_BUILD_SHARED=on -DSPDLOG_FMT_EXTERNAL=off ..
-    fi
-    _show_and_run make -j$(nproc)
-    _show_and_run sudo make install
-
-    echo -e "\n${INFO}spdlog v$v${NOC} is installed."
-    if [ "$static_shared" = 'static' ]; then
-        _verify_lib_installation libspdlog.a /usr/local/lib
-    else
-        if [ $system = 'Linux' ]; then
-            _verify_lib_installation libspdlog.so /usr/local/lib
-        elif [ $system = 'Darwin' ]; then
-            _verify_lib_installation libspdlog.dylib /usr/local/lib
-        fi
-    fi
-    _verify_header_files spdlog.h /usr/local/include/spdlog
-    _verify_pkgconfig_file spdlog.pc /usr/local/lib/pkgconfig
-    _verify_cmake_files spdlogConfig.cmake /usr/local/lib/cmake/spdlog
-
-    _popd_quiet
-}
-
-# =============================================================================
 function _dj_setup_sublime() {
     _pushd_quiet ${PWD}
 
@@ -1791,6 +1672,10 @@ function _dj_setup_typora() {
 # =============================================================================
 # tested: Ubuntu 18.04, Ubuntu 20.04
 function _dj_setup_vscode() {
+    if [ $system = 'Darwin' ]; then
+        _show_and_run brew install --cask visual-studio-code
+        return
+    fi
     _show_and_run _pushd_quiet ${PWD}
 
     _show_and_run mkdir -p $soft_dir
@@ -1834,61 +1719,6 @@ eom
 }
 
 # =============================================================================
-# make sure the related package is public available in dj-zhou's github
-# compile from the source code will install it to
-#   /usr/local/lib/libyaml-cpp.a
-# apt-get will install it to
-#  /usr/lib/x86_64-linux-gnu/
-# shared library build seems not working, error:
-# ./_bnative.cmake/yaml-demo: symbol lookup error: ./_bnative.cmake/yaml-demo: undefined symbol: _ZN4YAML6detail9node_data12empty_scalarB5cxx11Ev
-function _dj_setup_yaml_cpp() {
-    _show_and_run _pushd_quiet ${PWD}
-
-    # dependencies to install --------------
-    if [ $system = 'Linux' ]; then
-        _show_and_run sudo apt-get -y update
-        _show_and_run _install_if_not_installed build-essential
-    fi
-
-    cmake_v=$(version check cmake)
-
-    anw=$(_version_if_ge_than $cmake_v 3.20.5)
-    if [ "$anw" = 'no' ]; then
-        _show_and_run dj setup cmake
-    fi
-    # remove existing library, if there is
-    # if ls /usr/local/lib/libyaml-cpp* 1>/dev/null 2>&1; then
-    _show_and_run rm -rf /usr/local/lib/libyaml-cpp*
-    # fi
-
-    yaml_v=$(_find_package_version yaml-cpp)
-    _echo_install yaml-cpp $yaml_v
-    _press_enter_or_wait_s_continue 5
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-    _show_and_run rm -rf yaml-cpp
-
-    _show_and_run git clone https://github.com/jbeder/yaml-cpp.git
-    _show_and_run cd yaml-cpp
-    _show_and_run git checkout yaml-cpp-$yaml_v
-    _show_and_run rm -rf build/
-    _show_and_run mkdir -p build
-    _show_and_run cd build
-
-    _show_and_run cmake ..
-    _show_and_run make -j${nproc}
-    _show_and_run sudo make install
-
-    echo -e "\n${INFO}yaml-cpp $yaml_v${NOC} is installed."
-    _verify_lib_installation libyaml-cpp.a /usr/local/lib
-    _verify_header_files yaml.h /usr/local/include/yaml-cpp
-    _verify_pkgconfig_file yaml-cpp.pc /usr/local/lib/pkgconfig
-
-    _popd_quiet
-}
-
-# =============================================================================
 function _dj_setup_container() {
     if [ $# -lt 1 ]; then
         echo "dj setup container: need argument"
@@ -1924,7 +1754,7 @@ function _dj_setup() {
     "cutecom") _dj_setup_cutecom ;;
     "devtools") _dj_setup_devtools ;;
     "driver") shift 1 && _dj_setup_driver "$@" ;;
-    "dropbox") _dj_setup_dropbox ;;
+    "dtc" | "device-tree-compiler") _dj_setup_device_tree_compiler ;;
     "eigen3") _dj_setup_eigen3 ;;
     "esp-idf") _dj_setup_esp_idf ;;
     "fast-github") _dj_setup_fast_github ;;
@@ -1943,8 +1773,7 @@ function _dj_setup() {
     "gnuplot") _dj_setup_gnuplot ;;
     "go") _dj_setup_go ;;
     "google-repo") _dj_setup_google_repo ;;
-    "gtest") _dj_setup_googletest ;;
-    "googletest") _dj_setup_googletest ;;
+    "gtest" | "googletest") _dj_setup_googletest ;;
     "glog") _dj_setup_glog ;;
     "gnome") _dj_setup_gnome ;;
     "grpc") _dj_setup_grpc ;;
@@ -1963,7 +1792,6 @@ function _dj_setup() {
     "libserialport") _dj_setup_libserialport ;;
     "libsystemd") _dj_setup_libsystemd ;;
     "yaml-cpp") _dj_setup_yaml_cpp ;;
-    "matplot++") _dj_setup_matplot_xx ;;
     "magic-enum") _dj_setup_magic_enum ;;
     "mbed") _dj_setup_mbed ;;
     "meson-ninja") _dj_setup_meson_ninjia ;;

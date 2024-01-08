@@ -1082,39 +1082,6 @@ function _dj_setup_googletest() {
 }
 
 # =============================================================================
-function _dj_setup_glog() {
-    _show_and_run _pushd_quiet ${PWD}
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-
-    _show_and_run sudo rm -rf /usr/local/include/glog
-    _show_and_run sudo rm -rf /usr/local/lib/libglog.*
-    local v=$(_find_package_version glog)
-    _echo_install glog v$v
-    _show_and_run sudo rm -rf glog
-    _show_and_run git clone https://github.com/google/glog.git
-    _show_and_run cd glog
-    _show_and_run git checkout v$v
-    _show_and_run rm -rf build
-    _show_and_run mkdir -p build
-    _show_and_run cd build
-    _show_and_run cmake ..
-    _show_and_run make -j$(nproc)
-    _show_and_run sudo make install
-
-    echo -e "\n${INFO}glog $v${NOC} is installed:"
-    if [ $system = 'Linux' ]; then
-        _verify_lib_installation libglog.a /usr/local/lib
-        _verify_lib_installation libglog.so /usr/local/lib
-    elif [ $system = 'Darwin' ]; then
-        _verify_lib_installation libglog.dylib /usr/local/lib
-    fi
-    _verify_header_files logging.h /usr/local/include/glog
-
-    _popd_quiet
-}
-
-# =============================================================================
 # instlal gnome, need more test
 function _dj_setup_gnome() {
     echo -e "install gnome on Ubuntu"

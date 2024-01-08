@@ -179,6 +179,17 @@ function _version_check_cmake() {
 }
 
 # =============================================================================
+function _version_check_device_tree_compiler() {
+    if command -v dtc >/dev/null 2>&1; then
+        v=$(dtc --version | awk '{ print $3 }')
+        # return the version value
+        echo $v
+    else
+        _echo_not_installed device-tree-compiler
+    fi
+}
+
+# =============================================================================
 function _version_check_eigen3() {
     # Array of file paths
     files=("/usr/local/include/eigen3/Eigen/src/Core/util/Macros.h"
@@ -239,7 +250,7 @@ function _version_check_glog() {
     file="/usr/local/lib/pkgconfig/libglog.pc"
     if [ ! -f $file ]; then
         _echo_not_installed "glog"
-        echo "note: source code installation does not have a libglog.pc file"
+        echo "glog installed from source does not have a libglog.pc file"
         return
     fi
 
@@ -482,38 +493,39 @@ function _version_check_yaml_cpp() {
 # =============================================================================
 function _version_check {
     case $1 in
-    abseil) _version_check_abseil ;;
-    arm-linux-gnueabi-gcc) _version_check_arm_linux_gnueabi_gcc ;;
-    arm-linux-gnueabihf-gcc) _version_check_arm_linux_gnueabihf_gcc ;;
-    arm-linux-gnueabihf-g++) _version_check_arm_linux_gnueabihf_gpp ;;
-    aarch64-linux-gnu-gcc) _version_check_aarch64_linux_gnu_gcc ;;
-    boost) _version_check_boost ;;
-    cli11) _version_check_cli11 ;;
-    cmake) _version_check_cmake ;;
-    eigen3) _version_check_eigen3 ;;
-    fmt) _version_check_fmt ;;
-    gcc) _version_check_gcc ;;
-    glog) _version_check_glog ;;
-    gnome) _version_check_gnome ;;
-    go) _version_check_go ;;
-    grpc) _version_check_grpc ;;
-    gtest) _version_check_gtest ;;
-    g++) _version_check_gpp ;;
-    magic-enum) _version_check_magic_enum ;;
-    meson) _version_check_meson ;;
-    ninja) _version_check_ninja ;;
-    nlohmann-json3) _version_check_nlohmann_json3 ;;
-    node) _version_check_node ;;
-    npm) _version_check_npm ;;
-    opencv) _version_check_opencv ;;
-    opengl) _version_check_opengl ;;
-    protobuf) _version_check_protobuf ;;
-    python3) _version_check_python3 ;;
-    ros) _version_check_ros ;;
-    spdlog) _version_check_spdlog ;;
-    libsystemd) _version_check_libsystemd ;;
-    ubuntu) _version_check_ubuntu ;;
-    yaml-cpp) _version_check_yaml_cpp ;;
+    "abseil") _version_check_abseil ;;
+    "arm-linux-gnueabi-gcc") _version_check_arm_linux_gnueabi_gcc ;;
+    "arm-linux-gnueabihf-gcc") _version_check_arm_linux_gnueabihf_gcc ;;
+    "arm-linux-gnueabihf-g++") _version_check_arm_linux_gnueabihf_gpp ;;
+    "aarch64-linux-gnu-gcc") _version_check_aarch64_linux_gnu_gcc ;;
+    "boost") _version_check_boost ;;
+    "cli11") _version_check_cli11 ;;
+    "cmake") _version_check_cmake ;;
+    "dtc" | "device-tree-compiler") _version_check_device_tree_compiler ;;
+    "eigen3") _version_check_eigen3 ;;
+    "fmt") _version_check_fmt ;;
+    "gcc") _version_check_gcc ;;
+    "glog") _version_check_glog ;;
+    "gnome") _version_check_gnome ;;
+    "go") _version_check_go ;;
+    "grpc") _version_check_grpc ;;
+    "gtest") _version_check_gtest ;;
+    "g++") _version_check_gpp ;;
+    "magic-enum") _version_check_magic_enum ;;
+    "meson") _version_check_meson ;;
+    "ninja") _version_check_ninja ;;
+    "nlohmann-json3") _version_check_nlohmann_json3 ;;
+    "node") _version_check_node ;;
+    "npm") _version_check_npm ;;
+    "opencv") _version_check_opencv ;;
+    "opengl") _version_check_opengl ;;
+    "protobuf") _version_check_protobuf ;;
+    "python3") _version_check_python3 ;;
+    "ros") _version_check_ros ;;
+    "spdlog") _version_check_spdlog ;;
+    "libsystemd") _version_check_libsystemd ;;
+    "ubuntu") _version_check_ubuntu ;;
+    "yaml-cpp") _version_check_yaml_cpp ;;
     *) echo -e "version check: argument \"$1\" is not supported" ;;
     esac
 }
@@ -562,14 +574,14 @@ function version {
 }
 
 # =============================================================================
-check_list+="abseil arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
-check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ boost cli11 cmake "
-check_list+="eigen3 fmt gcc glog go grpc gtest g++ libsystemd magic-enum "
-check_list+="meson ninja nlohmann-json3 node npm opencv protobuf python3 ros "
-check_list+="spdlog yaml-cpp "
+check_list+="abseil boost cli11 cmake eigen3 fmt gcc glog go grpc gtest g++ "
+check_list+="magic-enum meson ninja nlohmann-json3 node npm opencv protobuf "
+check_list+="python3 ros spdlog yaml-cpp "
 
 if [ $system = 'Linux' ]; then
-    check_list+="gnome opengl ubuntu "
+    check_list+="arm-linux-gnueabi-gcc arm-linux-gnueabihf-gcc "
+    check_list+="aarch64-linux-gnu-gcc arm-linux-gnueabihf-g++ "
+    check_list+="dtc device-tree-compiler gnome libsystemd opengl ubuntu "
 fi
 
 swap_list+="arm-linux-gnueabi-gxx arm-linux-gnueabihf-gxx "
