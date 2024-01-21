@@ -78,7 +78,6 @@ source $djtools_path/djfile.bash
 source $djtools_path/dj-commands.bash
 source $djtools_path/esp32.bash
 source $djtools_path/funcs.bash
-source $djtools_path/git.bash
 source $djtools_path/kernel.bash
 source $djtools_path/mark-down.bash
 source $djtools_path/m.bash

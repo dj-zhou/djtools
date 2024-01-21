@@ -4,6 +4,7 @@ source $djtools_path/clang-format.bash
 source $djtools_path/clone.bash
 source $djtools_path/help.bash
 source $djtools_path/get.bash
+source $djtools_path/git.bash
 source $djtools_path/setup-dev.bash
 source $djtools_path/setup-generic.bash
 source $djtools_path/setup-opencv.bash
@@ -38,8 +39,12 @@ function _dj_setup_boost() {
     gpp_v=$(version check g++)
     anw=$(_version_if_ge_than $gpp_v "10.1.0")
     if [ "$anw" = "no" ]; then
-        echo "run \"version swap g++\" to use higher version of g++ (>=10.1.0)"
-        echo "run \"version swap gcc\" to use higher version of gcc (>=10.1.0)"
+        if [ "$system" = "Linux" ]; then
+            echo "run \"version swap g++\" to use higher version of g++ (>=10.1.0)"
+            echo "run \"version swap gcc\" to use higher version of gcc (>=10.1.0)"
+        elif [ "$system" = "Darwin" ]; then
+            echo "Need to upgrade gcc/g++ version, wip."
+        fi
         return
     fi
     v=$(_find_package_version boost)
@@ -48,9 +53,18 @@ function _dj_setup_boost() {
 
     # remove previously installed files
     _show_and_run sudo rm -rf /usr/local/include/boost
-    _show_and_run sudo rm -rf /usr/local/lib/libboost*
+    # remove those if previouly has installed another version
+    _show_and_run sudo find /usr/local/lib/cmake -name 'boost*' -exec rm -rf {} \; || true
+    _show_and_run sudo find /usr/local/lib/cmake -name 'Boost*' -exec rm -rf {} \; || true
+    _show_and_run sudo find /usr/local/lib/cmake -name 'BoostDetectToolset*' -exec rm -rf {} \; || true
+    _show_and_run sudo find /usr/local/lib -name 'libboost*' -exec rm -f {} \;
 
-    _show_and_run _install_if_not_installed python3-dev libxml2-dev
+    if [ "$system" = "Linux" ]; then
+        _show_and_run _install_if_not_installed python3-dev libxml2-dev
+    elif [ "$system" = "Darwin" ]; then
+        echo "May need to install some dependencies."
+    fi
+
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
     _show_and_run sudo rm -rf boost
@@ -65,8 +79,13 @@ function _dj_setup_boost() {
     _show_and_run sudo ./b2 install
 
     _verify_header_files version.hpp /usr/local/include/boost
-    _verify_lib_installation libboost_atomic.so /usr/local/lib
-    _verify_lib_installation libboost_timer.so /usr/local/lib
+    if [ $system = 'Linux' ]; then
+        _verify_lib_installation libboost_atomic.so /usr/local/lib
+        _verify_lib_installation libboost_timer.so /usr/local/lib
+    elif [ $system = 'Darwin' ]; then
+        _verify_lib_installation libboost_atomic.dylib /usr/local/lib
+        _verify_lib_installation libboost_timer.dylib /usr/local/lib
+    fi
 
     _popd_quiet
 }
@@ -173,43 +192,16 @@ function _dj_setup_cli11() {
 }
 
 # =============================================================================
-# setting a fixed version is not a good idea, but ...
-function _dj_setup_cmake() {
-    # install dependencies
-    _show_and_run _install_if_not_installed libssl-dev gcc g++
-    new_v=$(_find_package_version cmake)
-    v=v$new_v
-    _echo_install CMake $v
-
-    current_v=$(version check cmake)
-    anw=$(_version_if_ge_than $current_v $new_v)
-    if [ "$anw" = "yes" ]; then
-        echo "CMake is as new as $current_v, no need to install $new_v"
-        return
-    fi
-
-    _press_enter_or_wait_s_continue 5
-
-    _show_and_run _pushd_quiet ${PWD}
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-    _show_and_run rm -rf CMake
-    _show_and_run git clone https://github.com/Kitware/CMake.git
-    _show_and_run cd CMake
-    _show_and_run git checkout $v
-
-    _show_and_run ./bootstrap --prefix=/usr/local --parallel=$(nproc)
-    _show_and_run make -j$(nproc)
-    _show_and_run sudo make install
-    echo -e "${INFO}cmake${NOC} is installed to ${INFO}/usr/local/bin${NOC}"
-
-    _popd_quiet
-}
-
-# =============================================================================
 function _dj_setup_kdiff3() {
-    _show_and_run _cask_install_if_not_installed kdiff3
+    check_m=$(sysctl -a | grep machdep.cpu.brand_string)
+    if [[ "$check_m" = *"Apple M"* ]]; then
+        echo "This is an Apple M sillicon computer, need to run the following:"
+        _show_and_run softwareupdate --install-rosetta --agree-to-license
+        _show_and_run brew install kdiff3
+    fi
+    if [ "$system" = "Linux" ]; then
+        _show_and_run _cask_install_if_not_installed kdiff3
+    fi
 
     all_config=$(git config --list)
     if [[ "$all_config" = *"merge.tool"* ]]; then
@@ -307,7 +299,12 @@ function _dj_setup_devtools() {
 
 # =============================================================================
 # https://docs.docker.com/engine/install/ubuntu/
-function _dj_setup_container_docker() {
+function _dj_setup_docker() {
+    if [ "$system" = "Darwin" ]; then
+        echo "Follow instructions from https://docs.docker.com/desktop/install/mac-install/"
+        echo "then open \"docker\" from Applications to finish setup"
+        return
+    fi
     _show_and_run _pushd_quiet ${PWD}
 
     # Install a few prerequisite packages
@@ -355,7 +352,11 @@ function _dj_setup_container_docker() {
 }
 
 # =============================================================================
-function _dj_setup_container_docker_compose() {
+function _dj_setup_docker_compose() {
+    if [ "$system" = "Darwin" ]; then
+        echo "If Docker Desktop is installed, docker-compose should just have came with it."
+        return
+    fi
     # "dj setup go" installs specific version, and won't be overwritten by the below script:
     _show_and_run _install_if_not_installed golang-go
 
@@ -370,90 +371,6 @@ function _dj_setup_container_docker_compose() {
     _show_and_run git checkout v$v
     _show_and_run make -j$(nproc)
     _show_and_run sudo cp bin/build/docker-compose /usr/local/bin
-
-    _popd_quiet
-}
-
-# =============================================================================
-# https://github.com/wagoodman/dive
-# how to clone the repo and use its Makefile to install? -- don't know
-function _dj_setup_container_dive() {
-    _pushd_quiet ${PWD}
-
-    # ----------------------------------------------
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-    dive_version="0.9.2"
-    drive_url="https://github.com/wagoodman/dive/releases/download/v"
-    _show_and_run wget $drive_url$dive_version"/dive_"$dive_version"_linux_amd64.deb"
-    _show_and_run sudo dpkg -i dive_*.deb
-
-    echo "use the following command to check the docker image layouts"
-    echo "    \$ sudo dive <image-tag/hash>"
-    echo "you can find the image-tag/hash from command: sudo docker images -a"
-
-    _popd_quiet
-}
-
-# =============================================================================
-function _dj_setup_container_lxd() {
-    _show_and_run _install_if_not_installed snapd
-
-    local v=$(_find_package_version lxd)
-    _show_and_run sudo snap remove lxd
-    _show_and_run sudo snap install lxd --channel=$v/stable
-    echo "check version: sudo lxd --version"
-    echo 'next step: $ sudo lxd init'
-}
-
-# =============================================================================
-function _dj_setup_pangolin() {
-    _show_and_run _pushd_quiet ${PWD}
-
-    if [ $system = 'Linux' ]; then
-        # dependency installation
-        packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev freeglut3 freeglut3-dev "
-        _show_and_run _install_if_not_installed $packages
-        _show_and_run dj setup glfw3
-    elif [ $system = 'Darwin' ]; then
-        _show_and_run _install_if_not_installed freeglut
-    fi
-    local v=$(_find_package_version pangolin)
-
-    # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-    _show_and_run sudo rm -rf Pangolin/
-    _show_and_run git clone --recursive https://github.com/stevenlovegrove/Pangolin.git
-    _show_and_run cd Pangolin
-    _show_and_run git checkout v$v
-    if [ $system = 'Darwin' ]; then
-        _show_and_run ./scripts/install_prerequisites.sh -m brew all
-    elif [ $system = 'Linux' ]; then
-        _show_and_run ./scripts/install_prerequisites.sh
-    fi
-    _show_and_run rm -rf build/
-    _show_and_run mkdir -p build
-    _show_and_run cd build
-    if [ $system = 'Darwin' ]; then
-        # without using pyhton3.10, I have lots of errors when build
-        _show_and_run cmake .. -DPython_EXECUTABLE=/usr/local/bin/python3.10
-    elif [ $system = 'Linux' ]; then
-        _show_and_run cmake ..
-    fi
-    _show_and_run make -j$(nproc)
-    _show_and_run sudo make install
-    _show_and_run sudo cp libpango_* /usr/local/lib
-
-    if [ $system = 'Darwin' ]; then
-        _verify_lib_installation libpango_core.dylib /usr/local/lib
-        _verify_lib_installation libpango_geometry.dylib /usr/local/lib
-    elif [ $system = 'Linux' ]; then
-        _verify_lib_installation libpango_core.so /usr/local/lib
-        _verify_lib_installation libpango_geometry.so /usr/local/lib
-    fi
-    _verify_header_files pangolin.h /usr/local/include/pangolin
 
     _popd_quiet
 }
@@ -1280,7 +1197,7 @@ function _dj_grep_package() {
 # =============================================================================
 # todo: combine exclude-dir and excludes
 function _dj_grep_string() {
-    if [ "$1" = "-in-bash" ]; then
+    if [ "$1" = "--in-bash" ]; then
         echo -e "grep in ${INFO}*.bash, *.sh${NOC} files"
         # how to search in the files without extension??
         grep "$2" -rIn \
@@ -1290,7 +1207,7 @@ function _dj_grep_string() {
             .
         return
     fi
-    if [ "$1" = "-in-ccode" ]; then
+    if [ "$1" = "--in-ccode" ]; then
         echo -e "grep in ${INFO}*.c,*.cpp,*.h,*.hpp,Makefile*,CMakeLists.txt${NOC} files"
         grep "$2" -rn \
             --include={"*.c","*.cpp","*.h","*.hpp","Makefile*","CMakeLists.txt"} \
@@ -1299,7 +1216,7 @@ function _dj_grep_string() {
             .
         return
     fi
-    if [ "$1" = "-in-config" ]; then
+    if [ "$1" = "--in-config" ]; then
         echo -e "grep in ${INFO}*.json,Dockerfile,*.xml${NOC} files"
         grep "$2" -rIn \
             --include={"*.json","Dockerfile","*.xml"} \
@@ -1308,12 +1225,12 @@ function _dj_grep_string() {
             .
         return
     fi
-    if [ "$1" = "-in-meson" ]; then
+    if [ "$1" = "--in-meson" ]; then
         echo -e "grep in ${INFO}meson.build${NOC} files"
         _dj_grep_string_in_meson "$2"
         return
     fi
-    if [ "$1" = "-in-python" ]; then
+    if [ "$1" = "--in-python" ]; then
         echo -e "grep in ${INFO}*.py,*.ipynb${NOC} files"
         grep "$2" -rIn \
             --include={"*.py","*.ipynb"} \
@@ -1322,7 +1239,7 @@ function _dj_grep_string() {
             .
         return
     fi
-    if [ "$1" = "-in-rust" ]; then # seems not working for *.rs files
+    if [ "$1" = "--in-rust" ]; then # seems not working for *.rs files
         echo -e "grep in ${INFO}*.rs,Cargo.toml,Cargo.lock${NOC} files"
         # not a bug, a single "*.rs" does not work here, don't know why
         grep "$2" -rIn \
@@ -1332,7 +1249,7 @@ function _dj_grep_string() {
             .
         return
     fi
-    if [ "$1" = "-in-yaml" ]; then
+    if [ "$1" = "--in-yaml" ]; then
         echo -e "grep in ${INFO}*.yml,*.yaml${NOC} files"
         grep "$2" -rIn \
             --include={"*.yml","*.yaml"} \
@@ -1341,7 +1258,7 @@ function _dj_grep_string() {
             .
         return
     fi
-    if [ "$1" = "-in-yocto-recipe" ]; then
+    if [ "$1" = "--in-yocto-recipe" ]; then
         echo -e "grep in ${INFO}*.bb,*.conf,*.inc,*.sample,*.bbappend${NOC} files"
         grep "$2" -rIn \
             --include={"*.bb","*.conf","*.inc","*.sample","*.bbappend"} \
@@ -1589,8 +1506,8 @@ if [ $system = 'Linux' ]; then
     # do nothing here
 fi
 
-grep_string_list="-in-bash -in-config -in-meson -in-python -in-ccode "
-grep_string_list+="-in-rust -in-yaml -in-yocto-recipe "
+grep_string_list="--in-bash --in-config --in-meson --in-python --in-ccode "
+grep_string_list+="--in-rust --in-yaml --in-yocto-recipe "
 
 # =============================================================================
 function _dj_linux() {
@@ -1624,33 +1541,29 @@ function _dj_linux() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     # get.bash
-    ACTIONS[get]="$get_list "
+    ACTIONS["get"]="$get_list "
     for i in $get_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ACTIONS[setup]="$setup_list "
+    ACTIONS["setup"]="$setup_list "
     for i in $setup_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
     # special ones -----------------
-    ACTIONS[container]="dive docker docker-compose lxd "
     cli11_version="1.9.0 2.1.1 "
-    ACTIONS[cli11]="$cli11_version"
+    ACTIONS["cli11"]="$cli11_version"
     for i in $cli11_version; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
-    ACTIONS[docker]=" "
-    ACTIONS[dive]="  "
-    ACTIONS["lxd-4.0"]=" "
     # ---------------------
-    ACTIONS[driver]="wifi "
+    ACTIONS["driver"]="wifi "
     wifi_list="rtl8812au "
-    ACTIONS[wifi]="$wifi_list "
+    ACTIONS["wifi"]="$wifi_list "
     for i in $wifi_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
     # ---------------------
     ACTIONS["i219-v"]="e1000e-3.4.2.1 e1000e-3.4.2.4 "
@@ -1661,7 +1574,7 @@ function _dj_linux() {
     ACTIONS["with-contrib"]=" "
     ACTIONS["no-contrib"]=" "
     # ---------------------
-    ACTIONS[qemu]="2.11.1 4.2.0 "
+    ACTIONS["qemu"]="2.11.1 4.2.0 "
     ACTIONS[2.11.1]=" "
     ACTIONS[4.2.0]=" "
     # ---------------------
@@ -1671,47 +1584,46 @@ function _dj_linux() {
     ACTIONS["--from-deb-package"]=" "
     ACTIONS["--from-source"]=" "
     # ---------------------
-    ACTIONS[spdlog]="static shared "
-    ACTIONS[static]=" "
-    ACTIONS[shared]=" "
+    ACTIONS["spdlog"]="static shared "
+    ACTIONS["static"]=" "
+    ACTIONS["shared"]=" "
     ACTIONS[0.6.2]=" "
     ACTIONS[0.6.3]=" "
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ACTIONS[split]="$(ls)"
+    ACTIONS["split"]="$(ls)"
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ACTIONS[clone]="bitbucket github "
+    ACTIONS["clone"]="bitbucket github "
 
     # --------------------------------------------------------
     flame_list="generate clear help "
     ACTIONS["flame-graph"]="$flame_list "
     for i in $flame_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
     # --------------------------------------------------------
     format_list="brush show "
-    ACTIONS[format]="$format_list "
+    ACTIONS["format"]="$format_list "
     for i in $format_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
-    ACTIONS[format]+="implement "
     brush_list="google file "
-    ACTIONS[brush]="$brush_list"
+    ACTIONS["brush"]="$brush_list"
     for i in $brush_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
     implement_list="djz bg "
-    ACTIONS[implement]="$implement_list"
+    ACTIONS["implement"]="$implement_list"
     for i in $implement_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
     # -----------------
     show_list="camel "
-    ACTIONS[show]="$show_list "
+    ACTIONS["show"]="$show_list "
     for i in $show_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
 
     # --------------------------------------------------------
@@ -1777,78 +1689,80 @@ function _dj_linux() {
     # --------------------------------------------------------
     # --------------------------------------------------------
     # git.bash
-    ACTIONS[git]="$git_list "
+    ACTIONS["git"]="$git_list "
     for i in $git_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
-    ACTIONS[search]="$git_search_list "
+    ACTIONS["search"]="$git_search_list "
     for i in $git_search_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
 
     # --------------------------------------------------------
     ACTIONS["ssh-account"]="$git_ssh_account_list "
     for i in $git_ssh_account_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
-    ACTIONS["--activate"]="$all_accounts"
+
+    all_accounts="$(_dj_git_ssh_account_show_all) "
+    ACTIONS["--activate"]="$all_accounts "
     for i in $all_accounts; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
 
     # --------------------------------------------------------
     ACTIONS["ssh-clone"]="bitbucket github "
     # --------------------------------------------------------
     bitbucket_repos="$(_dj_clone_repo_list bitbucket) "
-    ACTIONS[bitbucket]+="$bitbucket_repos "
-    ACTIONS[bitbucket]+="--add "
+    ACTIONS["bitbucket"]+="$bitbucket_repos "
+    ACTIONS["bitbucket"]+="--add "
     for i in $bitbucket_repos; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
     # --------------------------------------------------------
     github_repos="$(_dj_clone_repo_list github) "
-    ACTIONS[github]+="$github_repos "
-    ACTIONS[github]+="--add "
+    ACTIONS["github"]+="$github_repos "
+    ACTIONS["github"]+="--add "
     for i in $github_repos; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
     ACTIONS[--add]=" "
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ACTIONS[help]="$_help_list "
+    ACTIONS["help"]="$_help_list "
     for i in $_help_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
 
     # --------------------------------------------------------
     # --------------------------------------------------------
     pack_list="-tar.gz "
-    ACTIONS[pack]="$pack_list "
+    ACTIONS["pack"]="$pack_list "
     for i in $pack_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
     # --------------------------------------------------------
     pack_tar_gz_list="$(ls .)"
     ACTIONS["-tar.gz"]="$pack_tar_gz_list "
     for i in $pack_tar_gz_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
     # --------------------------------------------------------
     # --------------------------------------------------------
     unpack_list="tar.xz tar.gz "
-    ACTIONS[unpack]="$unpack_list "
+    ACTIONS["unpack"]="$unpack_list "
     # --------------------------------------------------------
     unpack_tar_xz_list="$(ls . | grep tar.xz)"
-    ACTIONS[tar.xz]+="$unpack_tar_xz_list "
+    ACTIONS["tar.xz"]+="$unpack_tar_xz_list "
     for i in $unpack_tar_xz_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
     # --------------------------------------------------------
     unpack_tar_gz_list="$(ls . | grep tar.gz)"
-    ACTIONS[tar.gz]+="$unpack_tar_gz_list "
+    ACTIONS["tar.gz"]+="$unpack_tar_gz_list "
     for i in $unpack_tar_gz_list; do
-        ACTIONS[$i]=" "
+        ACTIONS["$i"]=" "
     done
 
     # --------------------------------------------------------

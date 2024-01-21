@@ -1,14 +1,13 @@
 #!/bin/bash
 
-
-setup_list="abseil-cpp anaconda ansible arduino-ide boost cli11 cmake computer container  "
+setup_list="abseil-cpp anaconda ansible arduino-ide boost cli11 cmake computer docker docker-compose  "
 setup_list+="eigen3 esp-idf fast-github flamegraph fmt gadgets git-lfs "
 setup_list+="gitg-gitk glog gnuplot go googletest grpc gtest g++-10 g++-11 htop kdiff3 "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
 setup_list+="magic-enum  meson-ninja mongodb nlohmann-json3-dev nodejs opencv-3.4.13 "
 setup_list+="opencv-4.5.5 pangolin perf picocom pip plotjuggler protobuf pycharm python3.9 "
 setup_list+="python3.10 qemu ros2-foxy ros2-humble rpi-pico rust  spdlog "
-setup_list+="sublime texlive yaml-cpp "
+setup_list+="sublime yaml-cpp "
 
 if [ $system = 'Linux' ]; then
     setup_list+="adobe-pdf-reader baidu-netdisk can-analyzer can-dev-tools clang-format "
@@ -18,7 +17,7 @@ if [ $system = 'Linux' ]; then
     setup_list+="i219-v mbed network-tools nvidia nvtop qt-5.13.1 qt-5.14.2 saleae-logic "
     setup_list+="serial-console slack stm32-cube-ide stm32-cube-ide-desktop-item "
     setup_list+="stm32-cube-mx stm32-cube-mx-desktop-item stm32-cube-programmer "
-    setup_list+="stm32-tools thermal-printer typora vscode windows-fonts wireshark wubi "
+    setup_list+="stm32-tools texlive thermal-printer typora vscode windows-fonts wireshark wubi "
     # elif [ $system = 'Darwin' ]; then
     # do nothing at this point
 fi
@@ -138,14 +137,6 @@ function _dj_setup_anaconda() {
     _create_anaconda_desktop_item
 
     _popd_quiet
-}
-
-# =============================================================================
-function _dj_setup_ansible() {
-    _show_and_run sudo apt update
-    _show_and_run sudo apt install software-properties-common
-    _show_and_run sudo add-apt-repository --yes --update ppa:ansible/ansible
-    _show_and_run sudo apt install ansible
 }
 
 # =============================================================================================
@@ -890,49 +881,6 @@ header file:
     /usr/local/include/csv.h
 --------------------------------------------
 eom
-
-    _popd_quiet
-}
-
-# =============================================================================
-# libev can also be installed by
-# $ _show_and_run _install_if_not_installed libev-dev
-# however, it is the v4.22 to be installed, and the installation location is
-#   /usr/lib/x86_64-linux-gnu/
-# install from the source, will have the libev installed into
-#  /usr/local/lib
-# this setup works only for the host computer, don't know how to do it for
-# cross compilers
-function _dj_setup_libev() {
-    _show_and_run _pushd_quiet ${PWD}
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-
-    v=$(_find_package_version libev)
-    _echo_install libev $v
-    _press_enter_or_wait_s_continue 5
-
-    file="libev-$v"
-    _show_and_run wget http://dist.schmorp.de/libev/$file.tar.gz
-    _show_and_run tar -zxf $file.tar.gz
-    _show_and_run cd $file
-    _show_and_run ./configure
-    _show_and_run make -j$(nproc)
-    _show_and_run sudo make install
-
-    # check for the LD_LIBRARY_PATH
-    # if it is not set for libev, then set it
-    result=$(echo $LD_LIBRARY_PATH)
-    if [[ "$result" = *"/usr/local/lib"* ]]; then
-        echo "LD_LIBRARY_PATH is already set, no need to set it again"
-    else
-        _show_and_run echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >>$rc_file
-    fi
-
-    echo -e "\n${INFO}libev $v${NOC} is installed."
-    _verify_lib_installation libev.so /usr/local/lib/
-    _verify_lib_installation libev.a /usr/local/lib/
 
     _popd_quiet
 }
@@ -1719,20 +1667,6 @@ eom
 }
 
 # =============================================================================
-function _dj_setup_container() {
-    if [ $# -lt 1 ]; then
-        echo "dj setup container: need argument"
-        return
-    fi
-    case $1 in
-    "dive") _dj_setup_container_dive ;;
-    "docker") _dj_setup_container_docker ;;
-    "docker-compose") _dj_setup_container_docker_compose ;;
-    "lxd") _dj_setup_container_lxd ;;
-    esac
-}
-
-# =============================================================================
 function _dj_setup() {
     case $1 in
     "abseil-cpp") _dj_setup_abseil_cpp ;;
@@ -1749,10 +1683,11 @@ function _dj_setup() {
     "cli11") _dj_setup_cli11 ;;
     "cmake") _dj_setup_cmake ;;
     "computer") _dj_setup_computer ;;
-    "container") _dj_setup_container ;;
     "cuda") _dj_setup_cuda ;;
     "cutecom") _dj_setup_cutecom ;;
     "devtools") _dj_setup_devtools ;;
+    "docker") _dj_setup_docker ;;
+    "docker-compose") _dj_setup_docker_compose ;;
     "driver") shift 1 && _dj_setup_driver "$@" ;;
     "dtc" | "device-tree-compiler") _dj_setup_device_tree_compiler ;;
     "eigen3") _dj_setup_eigen3 ;;

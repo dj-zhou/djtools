@@ -16,11 +16,9 @@ function _dj_git_ssh_account_show_all() {
     for i in $all_github_accounts; do
         username=${i%".pub"}
         username=$(echo "${username/"id_rsa-github-"/}")
-        echo $username
+        echo "$username"
     done
 }
-
-all_accounts="$(_dj_git_ssh_account_show_all) "
 
 # =============================================================================
 function _dj_git_search_show_result() {

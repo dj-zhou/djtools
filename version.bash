@@ -136,6 +136,7 @@ function _version_check_boost() {
 
     if [ ! -f $file ]; then
         _echo_not_installed "boost"
+        return
     fi
 
     boost_v=$(cat $file | grep "define BOOST_LIB_VERSION" | awk '{print $3}')
@@ -343,6 +344,7 @@ function _version_check_meson() {
     fi
 }
 
+# =============================================================================
 function _version_check_ninja() {
     if command -v ninja >/dev/null 2>&1; then
         v=$(ninja --version)

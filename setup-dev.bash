@@ -1,6 +1,57 @@
 #!/bin/bash
 
 # =============================================================================
+function _dj_setup_ansible() {
+    if [ "$system" = "Linux" ]; then
+        _show_and_run sudo apt update
+        _show_and_run sudo apt install software-properties-common
+        _show_and_run sudo add-apt-repository --yes --update ppa:ansible/ansible
+        _show_and_run sudo apt install ansible
+    elif [ "$system" = "Darwin" ]; then
+        _show_and_run brew install ansible
+    fi
+}
+
+# =============================================================================
+# setting a fixed version is not a good idea, but ...
+function _dj_setup_cmake() {
+    # install dependencies
+    _show_and_run _install_if_not_installed libssl-dev gcc
+    if [ "$system" = "Linux" ]; then
+        _show_and_run _install_if_not_installed g++
+    fi
+    g++
+    new_v=$(_find_package_version cmake)
+    v=v$new_v
+    _echo_install CMake $v
+
+    current_v=$(version check cmake)
+    anw=$(_version_if_ge_than $current_v $new_v)
+    if [ "$anw" = "yes" ]; then
+        echo "CMake is as new as $current_v, no need to install $new_v."
+        return
+    fi
+
+    _press_enter_or_wait_s_continue 5
+
+    _show_and_run _pushd_quiet ${PWD}
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm -rf CMake
+    _show_and_run git clone https://github.com/Kitware/CMake.git
+    _show_and_run cd CMake
+    _show_and_run git checkout $v
+
+    _show_and_run ./bootstrap --prefix=/usr/local --parallel=$(nproc)
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
+    echo -e "${INFO}cmake${NOC} is installed to ${INFO}/usr/local/bin${NOC}"
+
+    _popd_quiet
+}
+
+# =============================================================================
 function _dj_setup_cuda() {
     _show_and_run sudo apt install -y nvidia-cuda-toolkit
     cat <<eom
@@ -46,7 +97,6 @@ function _dj_setup_device_tree_compiler() {
     _show_and_run sudo apt install device-tree-compiler
 }
 
-
 # =============================================================================
 function _dj_setup_glog() {
     _show_and_run _pushd_quiet ${PWD}
@@ -54,8 +104,8 @@ function _dj_setup_glog() {
     _show_and_run cd $soft_dir
 
     _show_and_run sudo rm -rf /usr/local/include/glog
-     _show_and_run sudo find /usr/local/lib -name 'libglog*' -exec rm -f {} \;
-    
+    _show_and_run sudo find /usr/local/lib -name 'libglog*' -exec rm -f {} \;
+
     local v=$(_find_package_version glog)
     _echo_install glog v$v
     _show_and_run sudo rm -rf glog
@@ -77,6 +127,55 @@ function _dj_setup_glog() {
         _verify_lib_installation libglog.dylib /usr/local/lib
     fi
     _verify_header_files logging.h /usr/local/include/glog
+
+    _popd_quiet
+}
+
+# =============================================================================
+# libev can also be installed by
+# $ _show_and_run _install_if_not_installed libev-dev
+# however, it is the v4.22 to be installed, and the installation location is
+#   /usr/lib/x86_64-linux-gnu/
+# install from the source, will have the libev installed into
+#  /usr/local/lib
+# this setup works only for the host computer, don't know how to do it for
+# cross compilers
+function _dj_setup_libev() {
+    _show_and_run _pushd_quiet ${PWD}
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    v=$(_find_package_version libev)
+    _echo_install libev $v
+    _press_enter_or_wait_s_continue 5
+
+    file="libev-$v"
+    _show_and_run wget http://dist.schmorp.de/libev/$file.tar.gz
+    _show_and_run tar -zxf $file.tar.gz
+    _show_and_run cd $file
+    _show_and_run ./configure
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
+
+    # check for the LD_LIBRARY_PATH
+    # if it is not set for libev, then set it
+    result=$(echo $LD_LIBRARY_PATH)
+    if [[ "$result" = *"/usr/local/lib"* ]]; then
+        echo "LD_LIBRARY_PATH is already set, no need to set it again"
+    else
+        _show_and_run echo '# ===========================================================' >>$rc_file
+        _show_and_run echo '# (djtools) dj setup libev' >>$rc_file
+        _show_and_run echo 'export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH' >>$rc_file
+    fi
+
+    echo -e "\n${INFO}libev $v${NOC} is installed."
+    if [ "$system" = "Linux" ]; then
+        _verify_lib_installation libev.so /usr/local/lib/
+    elif [ "$system" = "Darwim" ]; then
+        _verify_lib_installation libev.dylib /usr/local/lib/
+    fi
+    _verify_lib_installation libev.a /usr/local/lib/
 
     _popd_quiet
 }
@@ -144,6 +243,58 @@ function _dj_setup_meson_ninjia() {
     _popd_quiet
 }
 
+# =============================================================================
+function _dj_setup_pangolin() {
+    _show_and_run _pushd_quiet ${PWD}
+
+    if [ $system = 'Linux' ]; then
+        # dependency installation
+        packages="libglew-dev mesa-utils libglm-dev libxkbcommon-x11-dev freeglut3 freeglut3-dev "
+        _show_and_run _install_if_not_installed $packages
+        _show_and_run dj setup glfw3
+    elif [ $system = 'Darwin' ]; then
+        _show_and_run _install_if_not_installed freeglut glew
+    fi
+
+    # on my m3max, I have to use the master, probably because of ffmpeg version (6.1.1)
+    local v=$(_find_package_version pangolin)
+
+    # use command 'glxinfo | grep "OpenGL version" ' to see opengl version in Ubuntu
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run sudo rm -rf Pangolin/
+    _show_and_run git clone --recursive https://github.com/stevenlovegrove/Pangolin.git
+    _show_and_run cd Pangolin
+    _show_and_run git checkout $v
+    if [ $system = 'Darwin' ]; then
+        _show_and_run ./scripts/install_prerequisites.sh -m brew all
+    elif [ $system = 'Linux' ]; then
+        _show_and_run ./scripts/install_prerequisites.sh
+    fi
+    _show_and_run rm -rf build/
+    _show_and_run mkdir -p build
+    _show_and_run cd build
+    _show_and_run cmake ..
+
+    # without using pyhton3.10, I have lots of errors when build
+    # on my m3max macbook, I don't have to do this and I don't have python3.10
+    # _show_and_run cmake .. -DPython_EXECUTABLE=/usr/local/bin/python3.10
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
+    _show_and_run sudo cp libpango_* /usr/local/lib
+
+    if [ $system = 'Darwin' ]; then
+        _verify_lib_installation libpango_core.dylib /usr/local/lib
+        _verify_lib_installation libpango_geometry.dylib /usr/local/lib
+    elif [ $system = 'Linux' ]; then
+        _verify_lib_installation libpango_core.so /usr/local/lib
+        _verify_lib_installation libpango_geometry.so /usr/local/lib
+    fi
+    _verify_header_files pangolin.h /usr/local/include/pangolin
+
+    _popd_quiet
+}
 
 # =============================================================================
 function _dj_setup_spdlog() { # static/shared
@@ -203,7 +354,6 @@ function _dj_setup_spdlog() { # static/shared
     _popd_quiet
 }
 
-
 # =============================================================================
 # make sure the related package is public available in dj-zhou's github
 # compile from the source code will install it to
@@ -227,7 +377,7 @@ function _dj_setup_yaml_cpp() {
     if [ "$anw" = 'no' ]; then
         _show_and_run dj setup cmake
     fi
-    
+
     # remove existing library, if there is any
     if [ $system = 'Linux' ]; then
         _show_and_run sudo find /usr/local/lib -name 'libyaml-cpp*' -exec rm -f {} \;
