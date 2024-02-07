@@ -13,7 +13,7 @@ go 1.21.1
 googletest 1.11.0 # June 11, 2021
 grpc 1.59.2  # Mon Oct 30 10:33:54 2023 -0700
 htop 3.0.1
-lcm 501bb446d42c9a57f9e5ddf3c41ba78f4735c9f2 # master on Dec. 1st, 2020
+lcm 1.5.0 # Apr 19, 2023
 libbpf v0.7.0 #Feb. 10th, 2022
 libev 4.33
 libiio 0.21

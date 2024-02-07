@@ -18,6 +18,7 @@ if [ $system = 'Linux' ]; then
     declare -A ZIP_PARALLEL_OPTIONS=([gzip]="-f9" [xz]="-T0") # options for zip tools in parallel mode
     declare -A ZIPEXTENSIONS=([gzip]="gz" [xz]="xz")          # extensions of zipped files
 fi
+
 # =============================================================================
 function _rpi_shrink_info() {
     echo "$SCRIPTNAME: $1 ..."
@@ -164,10 +165,10 @@ EOF1
 }
 
 # =============================================================================
-_rpi_shrink_help() {
+function _rpi_shrink_help() {
     local _rpi_shrink_help
     read -r -d '' _rpi_shrink_help <<eom
-Usage: $0 [-adhrspvzZ] imagefile.img [newimagefile.img]
+Usage: $0 [-adhrspvzZ] [image.img] [new-image.img]
 
   -s         Don't expand filesystem when image is booted the first time
   -v         Be verbose
@@ -179,7 +180,6 @@ Usage: $0 [-adhrspvzZ] imagefile.img [newimagefile.img]
   -d         Write debug messages in a debug log file
 eom
     echo "$_rpi_shrink_help"
-    exit 1
 }
 
 # =============================================================================
@@ -281,7 +281,6 @@ function _mirror_shrink() {
 
     # gather _rpi_shrink_info
     _rpi_shrink_info "Gathering data"
-    echo_error "hello world 11"
     beforesize="$(ls -lh "$img" | cut -d ' ' -f 5)"
     parted_output="$(parted -ms "$img" unit B print)"
     rc=$?
@@ -448,13 +447,15 @@ function _mirror_shrink() {
 # =============================================================================
 function _mirror_backup() {
     if [ $# -le 1 ]; then
-        echo " usage example: rpi backup /dev/sda image.img"
+        echo "Need more arguments: rpi backup [device] [image]"
+        echo " -- device: i.e., /dev/sda, /dev/sdb, etc."
+        echo " --  image: the image file to save."
         return
     fi
     blk=$1
     file=$2
-    _show_and_run echo -e " backing up $INFO$blk$NOC to $INFO$file$NOC"
+    echo -e "Backing up $INFO$blk$NOC to $INFO$file$NOC"
     _show_and_run sudo dd bs=4M if="$blk" of="$file" status=progress
     _show_and_run sudo chown $USER "$file"
-    echo -e " you can run $PRP mirror shrink $file$NOC to make the file smaller"
+    echo -e "Now you can run ${INFO}rpi shrink $file${NOC} to make the file smaller"
 }

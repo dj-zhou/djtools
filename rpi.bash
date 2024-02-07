@@ -53,6 +53,10 @@ function rpi() {
 
     # ------------------------------
     if [ $1 = 'setup' ]; then
+        if [ $# -eq 1 ]; then
+            echo "rpi setup: need argument, exit."
+            return
+        fi
         if [ $2 = 'waveshare-dsi-lcd' ]; then
             shift 1
             _rpi_setup_waveshare_dsi_lcd "$@"
@@ -63,12 +67,17 @@ function rpi() {
     fi
     # ------------------------------
     if [ $1 = 'shrink' ]; then
+        if [ $# -eq 1 ]; then
+            echo "need argument, example: $ rpi shrink image.img"
+            return
+        fi
         _mirror_shrink $2
         return
     fi
     # ------------------------------
     if [ $1 = 'backup' ]; then
-        _mirror_backup $2 $3 $4
+        shift
+        _mirror_backup "$@"
         return
     fi
     echo 'rpi : "'$1 '"command not supported'

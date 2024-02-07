@@ -313,6 +313,16 @@ function _version_check_go() {
 }
 
 # =============================================================================
+function _version_check_lcm() {
+    file="/usr/local/lib/pkgconfig/lcm.pc"
+    if [ ! -f $file ]; then
+        _echo_not_installed "lcm"
+        return
+    fi
+    _find_version_from_pkgconfig_file $file
+}
+
+# =============================================================================
 function _version_check_magic_enum() {
     file="/usr/local/include/magic_enum.hpp"
     if [ ! -f $file ]; then
@@ -376,11 +386,22 @@ function _version_check_node() {
 }
 
 # =============================================================================
+# pretty sure that npm is installed along with nodejs
 function _version_check_npm() {
     if command -v npm >/dev/null 2>&1; then
         npm --version
     else
         _echo_not_installed npm
+    fi
+}
+
+# =============================================================================
+# npx seems to be installed along with nodejs
+function _version_check_npx() {
+    if command -v npx >/dev/null 2>&1; then
+        npx --version
+    else
+        _echo_not_installed npx
     fi
 }
 
@@ -513,12 +534,14 @@ function _version_check {
     "grpc") _version_check_grpc ;;
     "gtest") _version_check_gtest ;;
     "g++") _version_check_gpp ;;
+    "lcm") _version_check_lcm ;;
     "magic-enum") _version_check_magic_enum ;;
     "meson") _version_check_meson ;;
     "ninja") _version_check_ninja ;;
     "nlohmann-json3") _version_check_nlohmann_json3 ;;
     "node") _version_check_node ;;
     "npm") _version_check_npm ;;
+    "npx") _version_check_npx ;;
     "opencv") _version_check_opencv ;;
     "opengl") _version_check_opengl ;;
     "protobuf") _version_check_protobuf ;;
@@ -534,7 +557,7 @@ function _version_check {
 
 # =============================================================================
 function _version_swap {
-    if [ $system = 'Darwin']; then
+    if [[ $system = 'Darwin' ]]; then
         echo "version swap: does not work on Mac OS yet."
         return
     fi
@@ -577,7 +600,7 @@ function version {
 
 # =============================================================================
 check_list+="abseil boost cli11 cmake eigen3 fmt gcc glog go grpc gtest g++ "
-check_list+="magic-enum meson ninja nlohmann-json3 node npm opencv protobuf "
+check_list+="lcm magic-enum meson ninja nlohmann-json3 node npm npx opencv protobuf "
 check_list+="python3 ros spdlog yaml-cpp "
 
 if [ $system = 'Linux' ]; then

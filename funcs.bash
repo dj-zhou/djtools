@@ -499,6 +499,25 @@ function _find_package_version() {
 }
 
 # =============================================================================
+# this does not work because of the wildcard:
+# if [[ ! -f /etc/apt/sources.list.d/deadsnake*.list ]]; then
+function _check_file_existence() { # substring_of_file, path
+    found=0
+    for file in $2/${1}*; do
+        if [[ -f $file ]]; then
+            found=1
+            break
+        fi
+    done
+
+    if [[ $found -eq 0 ]]; then
+        echo "no"
+    else
+        echo "yes"
+    fi
+}
+
+# =============================================================================
 function _echo_install() { # package # version
     echo -e "install ${INFO}$1 $2${NOC}"
 }

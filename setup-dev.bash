@@ -132,6 +132,44 @@ function _dj_setup_glog() {
 }
 
 # =============================================================================
+function _dj_setup_lcm() {
+    _pushd_quiet ${PWD}
+
+    if [[ ! "${ubuntu_v}" = *'20.04'* ]] && [[ ! "${ubuntu_v}" = *'22.04'* ]]; then
+        echo "lcm installation is only tested on Ubuntu 20.04/22.04."
+        return
+    fi
+
+    _show_and_run _install_if_not_installed default-jdk build-essential libglib2.0-dev
+    _show_and_run _install_if_not_installed doxygen liblua5.3-dev lua5.3
+    _show_and_run _install_if_not_installed python3-dev
+
+    v=$(_find_package_version lcm)
+    _echo_install lcm v$v
+
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    _show_and_run rm -rf lcm
+    _show_and_run git clone https://github.com/lcm-proj/lcm.git
+    _show_and_run cd lcm
+    _show_and_run git checkout v$v
+    _show_and_run mkdir -p build
+    _show_and_run cd build
+    _show_and_run cmake ..
+    _show_and_run make -j$(nproc)
+    _show_and_run sudo make install
+    _show_and_run sudo ldconfig
+
+    echo -e "${INFO}lcm $v${NOC} is installed."
+    _verify_lib_installation liblcm.so /usr/local/lib
+    _verify_header_files lcm.h /usr/local/include/lcm/
+    _verify_pkgconfig_file lcm.pc /usr/local/lib/pkgconfig
+    _verify_pkgconfig_file lcm-java.pc /usr/local/lib/pkgconfig
+
+    _popd_quiet
+}
+
+# =============================================================================
 # libev can also be installed by
 # $ _show_and_run _install_if_not_installed libev-dev
 # however, it is the v4.22 to be installed, and the installation location is

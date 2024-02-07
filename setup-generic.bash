@@ -5,8 +5,8 @@ setup_list+="eigen3 esp-idf fast-github flamegraph fmt gadgets git-lfs "
 setup_list+="gitg-gitk glog gnuplot go googletest grpc gtest g++-10 g++-11 htop kdiff3 "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
 setup_list+="magic-enum  meson-ninja mongodb nlohmann-json3-dev nodejs opencv-3.4.13 "
-setup_list+="opencv-4.5.5 pangolin perf picocom pip plotjuggler protobuf pycharm python3.9 "
-setup_list+="python3.10 qemu ros2-foxy ros2-humble rpi-pico rust  spdlog "
+setup_list+="opencv-4.5.5 pangolin perf picocom pip plotjuggler protobuf pycharm "
+setup_list+="python3.10 python3.11 qemu ros2-foxy ros2-humble rpi-pico rust  spdlog "
 setup_list+="sublime yaml-cpp "
 
 if [ $system = 'Linux' ]; then
@@ -792,41 +792,6 @@ function _dj_setup_i219_v() {
 }
 
 # =============================================================================
-function _dj_setup_lcm() {
-    _pushd_quiet ${PWD}
-
-    if [[ ! "${ubuntu_v}" = *'20.04'* ]] && [[ ! "${ubuntu_v}" = *'18.04'* ]]; then
-        echo "lcm installation is only tested within Ubuntu 20.04/18.04"
-        return
-    fi
-
-    _show_and_run _install_if_not_installed default-jdk
-
-    v=$(_find_package_version lcm)
-    _echo_install lcm $v
-
-    _show_and_run mkdir -p $soft_dir
-    _show_and_run cd $soft_dir
-    _show_and_run rm -rf lcm
-    _show_and_run git clone https://github.com/lcm-proj/lcm.git
-    _show_and_run cd lcm
-    _show_and_run git checkout $v
-    _show_and_run mkdir -p build
-    _show_and_run cd build
-    _show_and_run cmake ..
-    _show_and_run make -j$(nproc)
-    _show_and_run sudo make install
-    _show_and_run sudo ldconfig
-
-    echo -e "${INFO}lcm $v${NOC} is installed."
-    _verify_lib_installation liblcm.so /usr/local/lib
-    _verify_header_files lcm.h /usr/local/include/lcm/
-    _verify_pkgconfig_file lcm-java.pc /usr/local/lib/pkgconfig
-
-    _popd_quiet
-}
-
-# =============================================================================
 function _dj_setup_libbpf() {
     _pushd_quiet ${PWD}
 
@@ -1250,15 +1215,12 @@ function _dj_setup_nlohmann_json3_dev() {
 # =============================================================================
 # use nvm (node version management) to install nodejs
 # https://github.com/nvm-sh/nvm#installing-and-updating
+# https://stackoverflow.com/a/36401038
 function _dj_setup_nodejs() {
-    # https://stackoverflow.com/a/36401038
-    if [[ "${ubuntu_v}" != *'20.04'* &&
-        "${ubuntu_v}" != *'22.04'* ]]; then
-        echo_error "dj setup nodejs: not tested platform, exit."
-        return
-    fi
 
-    _show_and_run _install_if_not_installed git-core curl build-essential openssl libssl-dev
+    if [ $system = 'Linux' ]; then
+        _show_and_run _install_if_not_installed git-core curl build-essential openssl libssl-dev
+    fi
     _show_and_run _pushd_quiet ${PWD}
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
@@ -1745,8 +1707,8 @@ function _dj_setup() {
     "plotjuggler") _dj_setup_plotjuggler ;;
     "protobuf") _dj_setup_protobuf ;;
     "pycharm") _dj_setup_pycharm ;;
-    "python3.9") _dj_setup_python_3_9 ;;
     "python3.10") _dj_setup_python_3_10 ;;
+    "python3.11") _dj_setup_python_3_11 ;;
     "qemu") shift 1 && _dj_setup_qemu "$@" ;;
     "qt-5.13.1") _dj_setup_qt_5_13_1 ;;
     "qt-5.14.2") _dj_setup_qt_5_14_2 ;;
