@@ -96,7 +96,7 @@ function _work_check() {
             branch_commit_value=${branch_commit:0:10}"     "
             date_time=$(git log -1 --format=%ai)
             printf " | ${date_time:0:19}"
-            date_time="${date_time:0:19}     "
+            date_time="${date_time:0:19}"
             # --------------------------------------------------------
             commit_str=${branch_commit:41:$branch_commit_len-41}
             # if too long, make it shorter
@@ -158,6 +158,7 @@ function _work_check() {
         echo_info "work-check result is stored in file $OUTPUT_FILE"
         return
     fi
+    echo -ne "\n\n" >>"$OUTPUT_FILE"
     echo -ne "+-----------------------------------------------+\n" >>"$OUTPUT_FILE"
     echo -ne "|--------------- git simple diff ---------------|\n" >>"$OUTPUT_FILE"
     echo -ne "+-----------------------------------------------+\n" >>"$OUTPUT_FILE"
