@@ -90,6 +90,7 @@ function _work_check() {
             printf " | $b_name"
             t_name_original=$(git describe --abbrev=7 --dirty --always --tags 2>/dev/null)
             t_name="${t_name_original/-dirty/+}"
+            t_name="${t_name_original/refs\/tags\/tag\//}"
             printf " | $t_name"
             branch_commit=$(git log --pretty=oneline | awk 'NR==1')
             branch_commit_len=${#branch_commit}
