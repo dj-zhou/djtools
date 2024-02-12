@@ -22,6 +22,16 @@ function _work_check_git_source() {
 
 # =============================================================================
 function _work_check() {
+
+    fast_option_provided=false
+    for arg in "$@"; do
+        case $arg in
+        --fast)
+            fast_option_provided=true && break
+            ;;
+        esac
+    done
+
     cur_dir=$PWD
 
     package_width=30
@@ -33,7 +43,7 @@ function _work_check() {
         target_path=$(pwd)
     elif [[ $# = 1 && $1 = "." ]]; then
         target_path=$(realpath .)
-    elif [[ -d $$1 ]]; then
+    elif [[ -d $1 ]]; then
         target_path="$1"
     else
         echo_warn "dj work-check: \"$1\" is not a valid workspace path."
@@ -79,7 +89,9 @@ function _work_check() {
         git_source=$(_work_check_git_source)
         # --------------------------------------------------------
         if [[ $git_source != "----" ]]; then
-            git fetch --quiet
+            if [ "$fast_option_provided" = false ]; then
+                git fetch --quiet
+            fi
             b_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
             b_name="${b_name/ detached / }"
             # if too long, make it shorter
