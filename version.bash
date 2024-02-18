@@ -79,7 +79,7 @@ _version_if_ge_than() { # current version # required version
 
 # =============================================================================
 function _echo_not_installed() {
-    echo -e "$1 maybe not installed correctly!"
+    echo -e "$1 ${YLW}maybe not installed correctly!${NOC}"
 }
 
 # =============================================================================
