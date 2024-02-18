@@ -25,6 +25,9 @@ function _find_version_from_pkgconfig_file() { # file
 # =============================================================================
 # it can only compile x.y.z and xx.yy.zz
 _version_if_ge_than() { # current version #  required version
+    if [[ "$current_ver" = *"maybe not be installed correctly"* ]]; then
+        return "no"
+    fi
     # current_ver=$1
     current_ver=$(echo $1)
     # current_ver=$(echo $1 | grep -o '[^-]*$') # why I have this??
