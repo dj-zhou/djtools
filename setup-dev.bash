@@ -20,7 +20,6 @@ function _dj_setup_cmake() {
     if [ "$system" = "Linux" ]; then
         _show_and_run _install_if_not_installed g++
     fi
-    g++
     new_v=$(_find_package_version cmake)
     v=v$new_v
     _echo_install CMake $v
