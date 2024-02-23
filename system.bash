@@ -109,18 +109,23 @@ function _system_exam_nvidia_driver() {
 
 # =============================================================================
 function _system_exam_process() {
-    echo -e "run ${PRP}ps aux | grep $1${NOC}"
-    ps aux | grep $1
+    if [ $# -eq 0 ]; then
+        echo "usage: system exam process [keyword]"
+        return
+    fi
+    echo -e "run ${INFO}ps aux | grep $1 | grep -v grep${NOC}"
+    ps aux | grep $1 | grep -v grep
 }
 
 # =============================================================================
+# note: the keyword should be the process name
 function _system_exam_threads() {
     if [ $# -eq 0 ]; then
         echo "usage: system exam threads [keyword]"
         return
     fi
-    echo -e "run ${PRP}ps -eLf | grep $1${NOC}"
-    ps -eLf | grep $1
+    echo -e "run ${INFO}ps -eLf | grep $1 | grep -v grep${NOC}"
+    ps -eLf | grep $1 | grep -v grep
 }
 
 # =============================================================================
