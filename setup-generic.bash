@@ -1,6 +1,6 @@
 #!/bin/bash
 
-setup_list="abseil-cpp anaconda ansible arduino-ide boost cli11 cmake computer docker docker-compose  "
+setup_list="abseil-cpp anaconda ansible arduino-ide boost cli11 cmake docker docker-compose  "
 setup_list+="eigen3 esp-idf fast-github flamegraph fmt gadgets git-lfs "
 setup_list+="gitg-gitk glog gnuplot go googletest grpc gtest g++-10 g++-11 htop kdiff3 "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
@@ -11,7 +11,7 @@ setup_list+="sublime yaml-cpp "
 
 if [ $system = 'Linux' ]; then
     setup_list+="adobe-pdf-reader baidu-netdisk can-analyzer can-dev-tools clang-format "
-    setup_list+="clang-llvm cuda cutecom devtools driver dtc device-tree-compilier "
+    setup_list+="clang-llvm computer cuda cutecom devtools driver dtc device-tree-compilier "
     setup_list+="foxit-pdf-reader fsm-pro gcc-arm-stm32 gcc-arm-linux-gnueabi "
     setup_list+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu glfw3 gnome google-repo "
     setup_list+="i219-v mbed network-tools nvidia nvtop qt-5.13.1 qt-5.14.2 saleae-logic "
@@ -225,7 +225,7 @@ function _dj_setup_computer() {
     _press_enter_or_wait_s_continue 5
     packages="ark cmake curl dconf-editor dconf-tools gedit git git-lfs g++ "
     packages+="kazam libgtk2.0-dev libncurses5-dev lsb-core okular scrot "
-    packages+="silversearcher-ag terminator tree vlc vim wmctrl xclip yasm "
+    packages+="silversearcher-ag terminator tree vlc vim wget wmctrl xclip yasm "
     _show_and_run _install_if_not_installed $packages
 
     # -----------------------------------
