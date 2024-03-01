@@ -22,6 +22,16 @@ function _work_check_git_source() {
 
 # =============================================================================
 function _work_check() {
+
+    fast_option_provided=false
+    for arg in "$@"; do
+        case $arg in
+        --fast)
+            fast_option_provided=true && break
+            ;;
+        esac
+    done
+
     cur_dir=$PWD
 
     package_width=30
@@ -33,7 +43,7 @@ function _work_check() {
         target_path=$(pwd)
     elif [[ $# = 1 && $1 = "." ]]; then
         target_path=$(realpath .)
-    elif [[ -d $$1 ]]; then
+    elif [[ -d $1 ]]; then
         target_path="$1"
     else
         echo_warn "dj work-check: \"$1\" is not a valid workspace path."
@@ -79,7 +89,9 @@ function _work_check() {
         git_source=$(_work_check_git_source)
         # --------------------------------------------------------
         if [[ $git_source != "----" ]]; then
-            git fetch --quiet
+            if [ "$fast_option_provided" = false ]; then
+                git fetch --quiet
+            fi
             b_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
             b_name="${b_name/ detached / }"
             # if too long, make it shorter
@@ -90,13 +102,14 @@ function _work_check() {
             printf " | $b_name"
             t_name_original=$(git describe --abbrev=7 --dirty --always --tags 2>/dev/null)
             t_name="${t_name_original/-dirty/+}"
+            t_name="${t_name_original/refs\/tags\/tag\//}"
             printf " | $t_name"
             branch_commit=$(git log --pretty=oneline | awk 'NR==1')
             branch_commit_len=${#branch_commit}
             branch_commit_value=${branch_commit:0:10}"     "
             date_time=$(git log -1 --format=%ai)
             printf " | ${date_time:0:19}"
-            date_time="${date_time:0:19}     "
+            date_time="${date_time:0:19}"
             # --------------------------------------------------------
             commit_str=${branch_commit:41:$branch_commit_len-41}
             # if too long, make it shorter
@@ -158,6 +171,7 @@ function _work_check() {
         echo_info "work-check result is stored in file $OUTPUT_FILE"
         return
     fi
+    echo -ne "\n\n" >>"$OUTPUT_FILE"
     echo -ne "+-----------------------------------------------+\n" >>"$OUTPUT_FILE"
     echo -ne "|--------------- git simple diff ---------------|\n" >>"$OUTPUT_FILE"
     echo -ne "+-----------------------------------------------+\n" >>"$OUTPUT_FILE"

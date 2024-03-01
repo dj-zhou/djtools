@@ -24,24 +24,30 @@ function _find_version_from_pkgconfig_file() { # file
 }
 # =============================================================================
 # it can only compile x.y.z and xx.yy.zz
-_version_if_ge_than() { # current version #  required version
+_version_if_ge_than() { # current version # required version
+
     # current_ver=$1
-    current_ver=$(echo $1)
+    local current_ver="$(echo $1)"
+    if [[ "$current_ver" = *"not installed"* ]]; then
+        echo "no"
+        return
+    fi
+
     # current_ver=$(echo $1 | grep -o '[^-]*$') # why I have this??
-    crr_ver_mjr=$(echo $current_ver | cut -d. -f1)
+    local crr_ver_mjr=$(echo $current_ver | cut -d. -f1)
     # echo "crr_ver_mjr = $crr_ver_mjr"
-    crr_ver_mnr=$(echo $current_ver | cut -d. -f2)
+    local crr_ver_mnr=$(echo $current_ver | cut -d. -f2)
     # echo "crr_ver_mnr = $crr_ver_mnr"
-    crr_ver_rev=$(echo $current_ver | cut -d. -f3)
+    local crr_ver_rev=$(echo $current_ver | cut -d. -f3)
     # echo "crr_ver_rev = $crr_ver_rev"
 
-    require_ver=$(echo $2)
+    local require_ver=$(echo $2)
     # echo "require_ver = $require_ver"
-    req_ver_mjr=$(echo $require_ver | cut -d. -f1)
+    local req_ver_mjr=$(echo $require_ver | cut -d. -f1)
     # echo "req_ver_mjr = $req_ver_mjr"
-    req_ver_mnr=$(echo $require_ver | cut -d. -f2)
+    local req_ver_mnr=$(echo $require_ver | cut -d. -f2)
     # echo "req_ver_mnr = $req_ver_mnr"
-    req_ver_rev=$(echo $require_ver | cut -d. -f3)
+    local req_ver_rev=$(echo $require_ver | cut -d. -f3)
     # echo "req_ver_rev = $req_ver_rev"
 
     if [[ "$crr_ver_mjr" -gt "$req_ver_mjr" ]]; then
@@ -73,7 +79,7 @@ _version_if_ge_than() { # current version #  required version
 
 # =============================================================================
 function _echo_not_installed() {
-    echo -e "$1 ${YLW}maybe not be installed correctly!${NOC}"
+    echo -e "$1 ${YLW}maybe not installed correctly!${NOC}"
 }
 
 # =============================================================================

@@ -1,18 +1,6 @@
 #!/bin/bash
 
 # =============================================================================
-function _system_help() {
-    echo -e 'system help'
-    echo ' exmaple command 1:'
-    echo '   -- enable '
-    echo '   -- disable '
-    echo '   -- check '
-    echo '   -- wallpaper '
-    echo '   -- ubuntu-drivers '
-    echo -e "   -- MORE IS COMMING"
-}
-
-# =============================================================================
 function _system_enable_help() {
     echo " _system_enable_help"
     echo "   -- xxxx "
@@ -27,12 +15,12 @@ function _system_disable_help() {
 }
 
 # =============================================================================
-function _system_check_help() {
-    echo -e "system check <argument>"
-    echo "   -- cpu-memory    : to check CPU and memory usage of a PID"
-    echo "   -- nvidia-driver : to check nvidia driver"
-    echo "   -- temperature   : to check CPU temperature"
-    echo "   -- udev-rules    : to check udev rules"
+function _system_exam_help() {
+    echo -e "system exam [argument]"
+    echo "   -- cpu-memory    : to exam CPU and memory usage of a PID"
+    echo "   -- nvidia-driver : to exam nvidia driver"
+    echo "   -- temperature   : to exam CPU temperature"
+    echo "   -- udev-rules    : to exam udev rules"
     echo -e "   -- MORE IS COMMING"
 }
 
@@ -71,11 +59,11 @@ function _system_disable_apt_dpkg_locks() {
 }
 
 # =============================================================================
-function _system_check_cpu_memory() {
+function _system_exam_cpu_memory() {
     if [ $# = 0 ]; then
-        echo -e "system check cpu-memory"
+        echo -e "system exam cpu-memory"
         echo "    usage (example): "
-        echo -e "   system check cpu-memory \"./bin/main\""
+        echo -e "   system exam cpu-memory \"./bin/main\""
         return
     fi
     cmd=$1
@@ -86,7 +74,7 @@ function _system_check_cpu_memory() {
 }
 
 # =============================================================================
-function _system_check_temperature() {
+function _system_exam_temperature() {
     if [[ "yes" = $(_check_if_package_installed lm-sensors) ]]; then
         sensors
         return
@@ -112,7 +100,7 @@ function _system_check_temperature() {
 }
 
 # =============================================================================
-function _system_check_nvidia_driver() {
+function _system_exam_nvidia_driver() {
     _install_if_not_installed inxi
     inxi -G
 
@@ -120,24 +108,29 @@ function _system_check_nvidia_driver() {
 }
 
 # =============================================================================
-function _system_check_process() {
-    echo -e "run ${PRP}ps aux | grep $1${NOC}"
-    ps aux | grep $1
+function _system_exam_process() {
+    if [ $# -eq 0 ]; then
+        echo "usage: system exam process [keyword]"
+        return
+    fi
+    echo -e "run ${INFO}ps aux | grep $1 | grep -v grep${NOC}"
+    ps aux | grep $1 | grep -v grep
 }
 
 # =============================================================================
-function _system_check_threads() {
+# note: the keyword should be the process name
+function _system_exam_threads() {
     if [ $# -eq 0 ]; then
-        echo "usage: system check threads [keyword]"
+        echo "usage: system exam threads [keyword]"
         return
     fi
-    echo -e "run ${PRP}ps -eLf | grep $1${NOC}"
-    ps -eLf | grep $1
+    echo -e "run ${INFO}ps -eLf | grep $1 | grep -v grep${NOC}"
+    ps -eLf | grep $1 | grep -v grep
 }
 
 # =============================================================================
 function _system_wallpaper_random() {
-    # check if wallpaper_folder is set in .bashrc
+    # exam if wallpaper_folder is set in .bashrc
     wallpaper_folder_is_set=0
     while IFS='' read -r line || [[ -n "$line" ]]; do
         if [[ $line == *"wallpaper_folder="* ]]; then
@@ -174,7 +167,7 @@ function _system_wallpaper_random() {
 function system() {
     # ------------------------------
     if [ $# -eq 0 ]; then
-        _system_help
+        echo "system: need an argument."
         return
     fi
     # ------------------------------
@@ -200,34 +193,34 @@ function system() {
         fi
     fi
     # ------------------------------
-    if [ $1 = 'check' ]; then
+    if [ $1 = 'exam' ]; then
         if [ $# = 1 ]; then
-            _system_check_help
+            _system_exam_help
             return
         fi
         # --------------------------
         if [ $2 = 'cpu-memory' ]; then
-            _system_check_cpu_memory $3 $4 $5
+            _system_exam_cpu_memory $3 $4 $5
             return
         fi
         # --------------------------
         if [ $2 = 'nvidia-driver' ]; then
-            _system_check_nvidia_driver
+            _system_exam_nvidia_driver
             return
         fi
         # --------------------------
         if [ $2 = 'process' ]; then
-            _system_check_process $3 $4 $5
+            _system_exam_process $3 $4 $5
             return
         fi
         # --------------------------
         if [ $2 = 'temperature' ]; then
-            _system_check_temperature
+            _system_exam_temperature
             return
         fi
         # --------------------------
         if [ $2 = 'threads' ]; then
-            _system_check_threads $3 $4 $5
+            _system_exam_threads $3 $4 $5
             return
         fi
     fi
@@ -266,7 +259,7 @@ function _system_linux() {
     local SERVICES=("
         enable
         disable
-        check
+        exam
         wallpaper
         ubuntu-drivers
     ")
@@ -281,10 +274,10 @@ function _system_linux() {
     for i in $disable_list; do
         ACTIONS[$i]=" "
     done
-    check_list="cpu-memory temperature nvidia-driver "
-    check_list+="process threads "
-    ACTIONS[check]+="$check_list "
-    for i in $check_list; do
+    exam_list="cpu-memory temperature nvidia-driver "
+    exam_list+="process threads "
+    ACTIONS[exam]+="$exam_list "
+    for i in $exam_list; do
         ACTIONS[$i]=" "
     done
     ACTIONS[wallpaper]+="random "

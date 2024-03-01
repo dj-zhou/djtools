@@ -20,14 +20,13 @@ function _dj_setup_cmake() {
     if [ "$system" = "Linux" ]; then
         _show_and_run _install_if_not_installed g++
     fi
-    g++
     new_v=$(_find_package_version cmake)
     v=v$new_v
     _echo_install CMake $v
 
     current_v=$(version check cmake)
-    anw=$(_version_if_ge_than $current_v $new_v)
-    if [ "$anw" = "yes" ]; then
+    anw=$(_version_if_ge_than "$current_v" "$new_v")
+    if [[ "$anw" = "yes" ]]; then
         echo "CMake is as new as $current_v, no need to install $new_v."
         return
     fi
