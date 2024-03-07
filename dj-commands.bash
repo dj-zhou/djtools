@@ -1233,7 +1233,7 @@ function _dj_grep_string() {
     fi
     if [ "$1" = "--in-python" ]; then
         echo -e "grep in ${INFO}*.py,*.ipynb${NOC} files"
-        grep "$2" -rIn \
+        grep "$2" -rI \
             --include={"*.py","*.ipynb"} \
             --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
             --exclude={'*.lst','*.pyc'} \
