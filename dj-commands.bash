@@ -1226,6 +1226,15 @@ function _dj_grep_string() {
             .
         return
     fi
+    if [ "$1" = "--in-js" ]; then
+        echo -e "grep in ${INFO}js, jsx${NOC} files"
+        grep "$2" -rI \
+            --include={"*.js","*.jsx"} \
+            --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache","node_modules"} \
+            --exclude={'*.lst','*.pyc'} \
+            .
+        return
+    fi
     if [ "$1" = "--in-meson" ]; then
         echo -e "grep in ${INFO}meson.build${NOC} files"
         _dj_grep_string_in_meson "$2"
@@ -1447,7 +1456,7 @@ function _dj_flame_grapah() {
 # =============================================================================
 function _dj_grep() {
     # ------------------------------
-    if [ $1 = '-package' ]; then
+    if [ $1 = '--package' ]; then
         # ------------------------------
         if [[ $# -ge 2 ]]; then
             shift 1
@@ -1456,7 +1465,7 @@ function _dj_grep() {
         fi
     fi
     # ------------------------------
-    if [ $1 = '-string' ]; then
+    if [ $1 = '--string' ]; then
         # ------------------------------
         if [[ $# -ge 2 ]]; then
             shift 1
@@ -1500,14 +1509,14 @@ function dj() {
     esac
 }
 
-grep_list="-string "
+grep_list="--string "
 if [ $system = 'Linux' ]; then
-    grep_list+="-package "
+    grep_list+="--package "
     # elif [ $system = 'Darwin' ]; then
     # do nothing here
 fi
 
-grep_string_list="--in-bash --in-config --in-meson --in-python --in-ccode "
+grep_string_list="--in-bash --in-config --in-js --in-meson --in-python --in-ccode "
 grep_string_list+="--in-rust --in-yaml --in-yocto-recipe "
 
 # =============================================================================
@@ -1682,7 +1691,7 @@ function _dj_linux() {
         ACTIONS[$i]=" "
     done
 
-    ACTIONS["-string"]="$grep_string_list "
+    ACTIONS["--string"]="$grep_string_list "
     for i in $grep_string_list; do
         ACTIONS[$i]=" "
     done
@@ -1849,8 +1858,8 @@ function _dj_darwin() {
             ;;
         grep)
             case $words[3] in
-            -string)
-                _wanted grep_tl_options expl 'subcommands for grep -string' compadd -a grep_string_options
+            --string)
+                _wanted grep_tl_options expl 'subcommands for grep --string' compadd -a grep_string_options
                 ;;
             esac
             ;;
