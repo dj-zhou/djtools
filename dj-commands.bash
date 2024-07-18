@@ -319,13 +319,8 @@ function _dj_setup_docker() {
 
     # Add the Docker repository to APT sources
     # the install page uses VERSION_CODENAME or UBUNTU_CODENAME, but they are not defined
-    if [[ "${ubuntu_v}" = *'20.04'* ]]; then
-        codename="focal"
-    elif [[ "${ubuntu_v}" = *'22.04'* ]]; then
-        codename="jammy"
-    fi
 
-    _show_and_run echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] $docker_url   "$(. /etc/os-release && echo "$codename")" stable" |
+    _show_and_run echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] $docker_url   "$(. /etc/os-release && echo "$ubuntu_codename")" stable" |
         sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 
     _show_and_run sudo apt-get -y update
@@ -1226,6 +1221,15 @@ function _dj_grep_string() {
             .
         return
     fi
+    if [ "$1" = "--in-js" ]; then
+        echo -e "grep in ${INFO}js, jsx${NOC} files"
+        grep "$2" -rI \
+            --include={"*.js","*.jsx"} \
+            --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache","node_modules"} \
+            --exclude={'*.lst','*.pyc'} \
+            .
+        return
+    fi
     if [ "$1" = "--in-meson" ]; then
         echo -e "grep in ${INFO}meson.build${NOC} files"
         _dj_grep_string_in_meson "$2"
@@ -1233,11 +1237,11 @@ function _dj_grep_string() {
     fi
     if [ "$1" = "--in-python" ]; then
         echo -e "grep in ${INFO}*.py,*.ipynb${NOC} files"
-        grep "$2" -rIn \
+        grep "$2" --color=always -rI \
             --include={"*.py","*.ipynb"} \
             --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
             --exclude={'*.lst','*.pyc'} \
-            .
+            . | awk -F ":" '{print $1 " :" $2}'
         return
     fi
     if [ "$1" = "--in-rust" ]; then # seems not working for *.rs files
@@ -1447,7 +1451,7 @@ function _dj_flame_grapah() {
 # =============================================================================
 function _dj_grep() {
     # ------------------------------
-    if [ $1 = '-package' ]; then
+    if [ $1 = '--package' ]; then
         # ------------------------------
         if [[ $# -ge 2 ]]; then
             shift 1
@@ -1456,7 +1460,7 @@ function _dj_grep() {
         fi
     fi
     # ------------------------------
-    if [ $1 = '-string' ]; then
+    if [ $1 = '--string' ]; then
         # ------------------------------
         if [[ $# -ge 2 ]]; then
             shift 1
@@ -1500,15 +1504,15 @@ function dj() {
     esac
 }
 
-grep_list="-string "
+_grep_list="--string "
 if [ $system = 'Linux' ]; then
-    grep_list+="-package "
+    _grep_list+="--package "
     # elif [ $system = 'Darwin' ]; then
     # do nothing here
 fi
 
-grep_string_list="--in-bash --in-config --in-meson --in-python --in-ccode "
-grep_string_list+="--in-rust --in-yaml --in-yocto-recipe "
+_grep_string_list="--in-bash --in-config --in-js --in-meson --in-python --in-ccode "
+_grep_string_list+="--in-rust --in-yaml --in-yocto-recipe "
 
 # =============================================================================
 function _dj_linux() {
@@ -1677,13 +1681,13 @@ function _dj_linux() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ACTIONS[grep]="$grep_list "
-    for i in $grep_list; do
+    ACTIONS[grep]="$_grep_list "
+    for i in $_grep_list; do
         ACTIONS[$i]=" "
     done
 
-    ACTIONS["-string"]="$grep_string_list "
-    for i in $grep_string_list; do
+    ACTIONS["--string"]="$_grep_string_list "
+    for i in $_grep_string_list; do
         ACTIONS[$i]=" "
     done
 
@@ -1784,6 +1788,7 @@ function _dj_darwin() {
 
     # Array of options for the custom command
     custom_options=(
+        get
         git
         grep
         setup
@@ -1791,12 +1796,14 @@ function _dj_darwin() {
         work-check
     )
     # ------------
+    read -r -A get_options <<<"$get_list"
+    # ------------
     read -r -A git_options <<<"$git_list"
     read -r -A git_search_options <<<"$git_search_list"
     read -r -A git_ssh_account_options <<<"$git_ssh_account_list"
     # ------------
-    read -r -A grep_options <<<"$grep_list"
-    read -r -A grep_string_options <<<"$grep_string_list"
+    read -r -A grep_options <<<"$_grep_list"
+    read -r -A grep_string_options <<<"$_grep_string_list"
     # ------------
     read -r -A setup_options <<<"$setup_list"
     # ------------
@@ -1818,6 +1825,9 @@ function _dj_darwin() {
         ;;
     second)
         case $words[2] in
+        get)
+            _wanted get_sl_options expl 'subcommand for get' compadd -a get_options
+            ;;
         git)
             _wanted git_sl_options expl 'subcommand for git' compadd -a git_options
             ;;
@@ -1849,8 +1859,8 @@ function _dj_darwin() {
             ;;
         grep)
             case $words[3] in
-            -string)
-                _wanted grep_tl_options expl 'subcommands for grep -string' compadd -a grep_string_options
+            --string)
+                _wanted grep_tl_options expl 'subcommands for grep --string' compadd -a grep_string_options
                 ;;
             esac
             ;;

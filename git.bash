@@ -48,7 +48,7 @@ function _dj_git_search_show_result() {
 # =============================================================================
 function _dj_git_search_commit() {
     str="$1"
-    git log --oneline | grep "$str"
+    git log --format="%h %cd %s" --date=format:'%Y-%m-%d %H:%M:%S' | grep "$str"
     echo -e "you can run ${INFO}git show [commit]${NOC} to see the detail of a commit"
 }
 

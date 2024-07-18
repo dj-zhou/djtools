@@ -12,26 +12,24 @@ function _mark-down_help() {
 
 # =============================================================================
 function _mark_down_help_insert_figure() {
-    echo -e "\n method 1: "
+    echo -e "method 1: "
     echo -e '  <img src="./figures/sample-figure.png" width="500px">'
-    echo -e "\n method 2:"
-    echo -e "  ![image description](https://image-link.jpg)\n"
+    echo -e "method 2:"
+    echo -e "  ![image description](https://image-link.jpg)"
 }
 
 # =============================================================================
 function _mark_down_help_insert_table() {
-    echo -e "\n"
     echo '|              |               |          | '
     echo '| :----------: | :-----------: | :------: | '
     echo '|              |               |          | '
-    echo -e "\n"
 }
 
 # =============================================================================
 function _mark_down_help_color_text() {
-    echo -e '\n  <span style="color:blue">this content is blue.</span>'
-    echo -e '  <span style="color:red">this content is red.</span>\n'
-    echo -e '   available colors:\n     blue, red, green, cyan, yellow, purple, white, etc.'
+    echo -e '<span style="color:blue">this content is blue.</span>'
+    echo -e '<span style="color:red">this content is red.</span>\n'
+    echo -e 'available colors:\n     blue, red, green, cyan, yellow, purple, white, etc.'
 }
 
 # =============================================================================
@@ -76,6 +74,8 @@ function mark-down() {
     _popd_quiet
 }
 
+_mark_down_help_list="insert-figure insert-table color-text table-of-content "
+
 # =============================================================================
 function _mark-down_linux() {
     COMPREPLY=()
@@ -89,7 +89,7 @@ function _mark-down_linux() {
     declare -A ACTIONS
 
     # ------------------------------------------------------------------------
-    ACTIONS[help]+="insert-figure insert-table color-text table-of-content "
+    ACTIONS[help]+="$_mark_down_help_list "
     ACTIONS["insert-figure"]=" "
     ACTIONS["insert-table"]=" "
     ACTIONS["color-text"]=" "
@@ -105,8 +105,40 @@ function _mark-down_linux() {
 }
 
 # =============================================================================
+function _mark-down_darwin() {
+    # Getting the current word and previous word in the command-line
+    local curcontext="$curcontext" state line
+    typeset -A opt_args
+
+    # Array of options for the custom command
+    custom_options=(
+        help
+    )
+    # ------------
+    read -r -A help_options <<<"$_mark_down_help_list"
+
+    # Defining states for the completion
+    _arguments -C \
+        '1: :->first' \
+        '2: :->second' && return 0
+
+    case $state in
+    first)
+        _wanted fl_options expl 'main option' compadd -a custom_options
+        ;;
+    second)
+        case $words[2] in
+        help)
+            _wanted help_sl_options expl 'subcommand for help' compadd -a help_options
+            ;;
+        esac
+        ;;
+    esac
+}
+
+# =============================================================================
 if [ $system = 'Linux' ]; then
     complete -F _mark-down_linux mark-down
-# elif [ $system = 'Darwin' ]; then
-#     echo "todo"
+elif [ $system = 'Darwin' ]; then
+    compdef _mark-down_darwin mark-down
 fi

@@ -65,7 +65,7 @@ function _work_check() {
     echo -ne "Computer Hostname: "$hostname"\n" >>"$OUTPUT_FILE"
     echo -ne "Computer Username: "$USER"\n" >>"$OUTPUT_FILE"
     echo -ne "Work Check Time  : "$(date)"\n\n" >>"$OUTPUT_FILE"
-    echo "Dir/Repo | Branch | Tag | Commit Time | Commit Message | Status | Dirty"
+    echo -e "${HGRN}Dir/Repo${NOC} | ${CYN}Branch${NOC} | ${GRN}Tag${NOC} | Commit Time | Commit Message | Status | Dirty"
     $(_write_to_file_width "Commit Time" 20 "$OUTPUT_FILE")
     $(_write_to_file_width "Source" 10 "$OUTPUT_FILE")
     $(_write_to_file_width "Status" $status_width "$OUTPUT_FILE")
@@ -90,7 +90,7 @@ function _work_check() {
         # --------------------------------------------------------
         if [[ $git_source != "----" ]]; then
             if [ "$fast_option_provided" = false ]; then
-                git fetch --quiet
+                git fetch -p --quiet
             fi
             b_name=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
             b_name="${b_name/ detached / }"
@@ -99,11 +99,11 @@ function _work_check() {
             if [ $b_name_len -gt $branch_width ]; then
                 b_name=${b_name:0:$branch_width}
             fi
-            printf " | $b_name"
+            printf " | ${CYN}$b_name${NOC}"
             t_name_original=$(git describe --abbrev=7 --dirty --always --tags 2>/dev/null)
             t_name="${t_name_original/-dirty/+}"
             t_name="${t_name_original/refs\/tags\/tag\//}"
-            printf " | $t_name"
+            printf " | ${GRN}$t_name${NOC}"
             branch_commit=$(git log --pretty=oneline | awk 'NR==1')
             branch_commit_len=${#branch_commit}
             branch_commit_value=${branch_commit:0:10}"     "
@@ -168,7 +168,7 @@ function _work_check() {
     done
     if [[ $has_dirty_repo = "no" ]]; then
         echo -ne "\n\n" >>"$OUTPUT_FILE"
-        echo_info "work-check result is stored in file $OUTPUT_FILE"
+        echo -e "${HWHT}work-check result is stored in file $OUTPUT_FILE${NOC}"
         return
     fi
     echo -ne "\n\n" >>"$OUTPUT_FILE"
@@ -197,7 +197,7 @@ function _work_check() {
     done
 
     echo -ne "\n\n" >>"$OUTPUT_FILE"
-    echo_info "work-check result is stored in file $OUTPUT_FILE"
+    echo -e "${HWHT}work-check result is stored in file $OUTPUT_FILE${NOC}"
 
     cd ${cur_dir}
 }

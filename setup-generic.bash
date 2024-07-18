@@ -1091,16 +1091,22 @@ eom
 
 # =============================================================================
 # https://wiki.crowncloud.net/How_To_Install_Duf_On_Ubuntu_22_04?How_to_Install_Latest_MongoDB_on_Ubuntu_22_04
+# https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
 function _dj_setup_mongodb() {
     uname_a=$(uname -a)
-    if [[ ! "${ubuntu_v}" = *'20.04'* && ! "${ubuntu_v}" = *'22.04'* && ! "${uname_a}" = *'x86_64'* ]]; then
+    if [[ ! "${ubuntu_v}" = *'20.04'* &&
+        ! "${ubuntu_v}" = *'22.04'* &&
+        ! "${uname_a}" = *'x86_64'* ]]; then
         echo_warn "dj setup mongodb: only tested on x86_64 Ubuntu 20.04/22.04, exit!"
         return
     fi
 
     _show_and_run sudo apt-get update -y
     _show_and_run _install_if_not_installed dirmngr gnupg apt-transport-https \
-        ca-certificates software-properties-common libssl1.1
+        ca-certificates software-properties-common
+    if [[ ! "${ubuntu_v}" = *'20.04'* ]]; then
+        _show_and_run _install_if_not_installed libssl1.1
+    fi
     # install libssl1.1 (https://askubuntu.com/a/1403683)
 
     v=$(_find_package_version mongodb)
@@ -1109,20 +1115,25 @@ function _dj_setup_mongodb() {
         sudo gpg -o /usr/share/keyrings/mongodb-server-$v.gpg \
             --dearmor
 
-    if [[ "${ubuntu_v}" = *'20.04'* ]]; then
-        codename="focal"
-    elif [[ "${ubuntu_v}" = *'22.04'* ]]; then
-        codename="jammy"
-    fi
-
-    echo "deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-$v.gpg] https://repo.mongodb.org/apt/ubuntu $codename/mongodb-org/$v multiverse" |
+    # Create a list file for MongoDB
+    echo "deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-$v.gpg] https://repo.mongodb.org/apt/ubuntu $ubuntu_codename/mongodb-org/$v multiverse" |
         sudo tee /etc/apt/sources.list.d/mongodb-org-$v.list
 
+    # Install the MongoDB packages
     _show_and_run sudo apt update -y
     _show_and_run sudo apt install -y mongodb-org
 
+    # Hold package versions
+    _show_and_run echo "mongodb-org hold" | sudo dpkg --set-selections
+    _show_and_run echo "mongodb-org-database hold" | sudo dpkg --set-selections
+    _show_and_run echo "mongodb-org-server hold" | sudo dpkg --set-selections
+    _show_and_run echo "mongodb-mongosh hold" | sudo dpkg --set-selections
+    _show_and_run echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
+    _show_and_run echo "mongodb-org-tools hold" | sudo dpkg --set-selections
+
     # Enable and start MongoDB Deamon program
-    sudo systemctl enable --now mongod
+    _show_and_run sudo systemctl daemon-reload
+    _show_and_run sudo systemctl enable --now mongod
 
     cat <<eom
 
@@ -1142,8 +1153,6 @@ Check if MongoDB is running:
     $ sudo systemctl status mongod
 
 Check if MongoDB is installed:
-    $ mongo --eval 'db.runCommand({ connectionStatus: 1 })'
-    or (for newer version)
     $ mongosh --eval 'db.runCommand({ connectionStatus: 1 })'
 --------------------------------------------
 eom

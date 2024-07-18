@@ -8,6 +8,12 @@ elif [ $system = 'Linux' ]; then
     rc_file="$HOME/.bashrc"
     # add some global variables -- only tested on Ubuntu
     ubuntu_v=$(lsb_release -a)
+    case $ubuntu_v in
+    18.04) ubuntu_codename="bionic" ;;
+    20.04) ubuntu_codename="focal" ;;
+    22.04) ubuntu_codename="jammy" ;;
+    24.04) ubuntu_codename="noble" ;;
+    esac
 fi
 
 # =============================================================================
@@ -44,6 +50,23 @@ function _show() {
 # =============================================================================
 function _show_and_run() {
     _show "$@"
+    "$@"
+}
+
+# =============================================================================
+function _warn() {
+    printf >&2 "${HYLW}run:"
+    local arg
+    for arg in "$@"; do
+        arg="${arg%\'/\'\\\'\'}"
+        printf >&2 " '%s'" "$arg"
+    done
+    printf >&2 "$NOC\n"
+}
+
+# =============================================================================
+function _warn_and_run() {
+    _warn "$@"
     "$@"
 }
 
