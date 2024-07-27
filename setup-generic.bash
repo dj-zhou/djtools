@@ -4,9 +4,9 @@ setup_list="abseil-cpp anaconda ansible arduino-ide boost cli11 cmake docker doc
 setup_list+="eigen3 esp-idf fast-github flamegraph fmt gadgets git-lfs "
 setup_list+="gitg-gitk glog gnuplot go googletest grpc gtest g++-10 g++-11 htop kdiff3 "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
-setup_list+="magic-enum  meson-ninja mongodb nlohmann-json3-dev nodejs opencv-3.4.13 "
-setup_list+="opencv-4.5.5 pangolin perf picocom pip plotjuggler protobuf pycharm "
-setup_list+="python3.10 python3.11 qemu ros2-foxy ros2-humble rpi-pico rust  spdlog "
+setup_list+="magic-enum  meson-ninja mongodb mongodb-compass nlohmann-json3-dev nodejs "
+setup_list+="opencv-3.4.13 opencv-4.5.5 pangolin perf picocom pip plotjuggler protobuf "
+setup_list+="pycharm python3.10 python3.11 qemu ros2-foxy ros2-humble rpi-pico rust spdlog "
 setup_list+="sublime yaml-cpp "
 
 if [ $system = 'Linux' ]; then
@@ -1159,6 +1159,29 @@ eom
 }
 
 # =============================================================================
+function _dj_setup_mongodb_compass() {
+    _show_and_run _pushd_quiet ${PWD}
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    local v=$(_find_package_version mongodb-compass)
+    echo "v=$v"
+    if [ $system = 'Linux' ]; then
+        filename="mongodb-compass_${v}_amd64.deb"
+        echo "filename=$filename"
+        url=https://downloads.mongodb.com/compass/$filename
+        echo "url=$url"
+        # https://downloads.mongodb.com/compass/mongodb-compass_1.43.4_amd64.deb
+        _wget_if_not_exist $filename "3ed32961b284a2520a32be4619e8f80a" $url
+        _show_and_run sudo dpkg -i $filename
+        chmod +x $filename
+
+    else
+        echo "_dj_setup_mongodb_compass: wip for $system."
+    fi
+    _popd_quiet
+
+}
+# =============================================================================
 function _dj_stup_network_tools() {
     echo -e "install ${INFO}nethogs${NOC}, ${INFO}iptraf${NOC}"
     _show_and_run _install_if_not_installed nethogs iptraf
@@ -1702,6 +1725,7 @@ function _dj_setup() {
     "mbed") _dj_setup_mbed ;;
     "meson-ninja") _dj_setup_meson_ninjia ;;
     "mongodb") _dj_setup_mongodb ;;
+    "mongodb-compass") _dj_setup_mongodb_compass ;;
     "network-tools") _dj_stup_network_tools ;;
     "nlohmann-json3-dev") _dj_setup_nlohmann_json3_dev ;;
     "nodejs") _dj_setup_nodejs ;;

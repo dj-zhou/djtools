@@ -52,6 +52,12 @@ eom
 
 # =============================================================================
 function _dj_replace() {
+
+    if [ $# -lt 2 ]; then
+        echo -e "${YLW}dj replace${NOC}: need at least two argument2."
+        echo -e "example: dj replace <original> <new> <path to file>"
+        return
+    fi
     _pushd_quiet ${PWD}
 
     if [ $# = 3 ]; then
