@@ -382,7 +382,7 @@ function _dj_setup_esp_idf() {
     if [[ -z "$which_meson" || -z "$which_ninja" ]]; then
         _show_and_run dj setup meson-ninja
     else
-        echo "meson version: $(meosn --version)"
+        echo "meson version: $(meson --version)"
         echo "ninja version: $(ninja --version)"
     fi
 

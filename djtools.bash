@@ -97,6 +97,7 @@ alias ....="_show_and_run cd ../../.."
 # =============================================================================
 source $djtools_path/block-device.bash
 source $djtools_path/build.bash
+source $djtools_path/clean.bash
 source $djtools_path/djfile.bash
 source $djtools_path/dj-commands.bash
 source $djtools_path/esp32.bash

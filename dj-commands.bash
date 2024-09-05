@@ -1474,12 +1474,12 @@ function _dj_grep() {
 
 # =============================================================================
 function dj() {
-    # ------------------------------
     if [ $# -eq 0 ]; then
         _dj_help
         return
     fi
     case $1 in
+    'clean') shift && _dj_clean "$@" ;;
     'flame-graph') shift && _dj_flame_grapah "$@" ;;
     'format') shift && _dj_format "$@" ;;
     'grep') shift && _dj_grep "$@" ;;
@@ -1520,6 +1520,7 @@ function _dj_linux() {
 
     # All possible first values in command line
     local SERVICES=("
+        clean
         flame-graph
         format
         get
@@ -1597,11 +1598,16 @@ function _dj_linux() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ACTIONS["split"]="$(ls)"
-    # --------------------------------------------------------
-    # --------------------------------------------------------
-    ACTIONS["clone"]="bitbucket github "
+    ACTIONS["clean"]="$clean_list "
+    for i in $clean_list; do
+        ACTIONS["$i"]=" "
+    done
 
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    ACTIONS["split"]="$(ls)"
+
+    # --------------------------------------------------------
     # --------------------------------------------------------
     flame_list="generate clear help "
     ACTIONS["flame-graph"]="$flame_list "
