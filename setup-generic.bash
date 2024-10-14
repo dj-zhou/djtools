@@ -11,7 +11,7 @@ setup_list+="sublime yaml-cpp "
 
 if [ $system = 'Linux' ]; then
     setup_list+="adobe-pdf-reader baidu-netdisk can-analyzer can-dev-tools clang-format "
-    setup_list+="clang-llvm computer cuda cutecom devtools driver dtc device-tree-compilier "
+    setup_list+="clang-llvm computer cuda cursor-ide cutecom devtools driver dtc device-tree-compilier "
     setup_list+="foxit-pdf-reader fsm-pro gcc-arm-stm32 gcc-arm-linux-gnueabi "
     setup_list+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu glfw3 gnome google-repo "
     setup_list+="i219-v mbed network-tools nvidia nvtop qt-5.13.1 qt-5.14.2 saleae-logic "
@@ -1007,7 +1007,7 @@ function _dj_setup_magic_enum() {
 
     gpp_v=$(version check g++)
     anw=$(_version_if_ge_than $gpp_v "12.0.0")
-    if [ $anw="yes" ]; then
+    if [[ "$anw" = 'yes' ]]; then
         echo_warn "g++ > 12.0.0 does not support extended characters"
         ver="0.7.3"
     else
@@ -1678,6 +1678,7 @@ function _dj_setup() {
     "cmake") _dj_setup_cmake ;;
     "computer") _dj_setup_computer ;;
     "cuda") _dj_setup_cuda ;;
+    "cursor-ide") _dj_setup_cursor_ide ;;
     "cutecom") _dj_setup_cutecom ;;
     "devtools") _dj_setup_devtools ;;
     "docker") _dj_setup_docker ;;
