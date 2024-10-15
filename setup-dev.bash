@@ -84,7 +84,7 @@ function _create_cursor_ide_desktop_item() {
 
     _show_and_run sudo chmod +x $folder/$file
 
-    if [ ! -f "$HOME/.local/bin/cursor-x86_64.AppImage" ]; then
+    if [ ! -f "$HOME/.local/bin/cursor" ]; then
         echo -e "${YLW}Cursor is not installed to $HOME/.local/bin/, you need to revise file:${NOC}"
         echo -e "${YLW}$folder/$file accordingly.${NOC}"
     fi
