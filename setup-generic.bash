@@ -1743,7 +1743,7 @@ function _dj_setup() {
     "pycharm") _dj_setup_pycharm ;;
     "python3.10") _dj_setup_python_3_10 ;;
     "python3.11") _dj_setup_python_3_11 ;;
-    "python3.11") _dj_setup_python_3_12 ;;
+    "python3.12") _dj_setup_python_3_12 ;;
     "qemu") shift 1 && _dj_setup_qemu "$@" ;;
     "qt-5.13.1") _dj_setup_qt_5_13_1 ;;
     "qt-5.14.2") _dj_setup_qt_5_14_2 ;;
