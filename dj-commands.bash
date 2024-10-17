@@ -554,6 +554,36 @@ function _dj_setup_python_3_11() {
     _show_and_run _install_if_not_installed python3-pip
 }
 
+
+# =============================================================================
+function _dj_setup_python_3_12() {
+    local anw=$(_check_file_existence deadsnake /etc/apt/sources.list.d)
+    if [ "$anw" = "no" ]; then
+        _show_and_run sudo add-apt-repository ppa:deadsnakes/ppa
+        _show_and_run sudo apt-get -y update
+    fi
+    _show_and_run _install_if_not_installed python3.12
+    _show_and_run _install_if_not_installed python3.11
+
+    # ----------------------
+    echo -e "run update-alternatives:"
+    for i in 3 4 6 7 8 9 10 11 12; do
+        if [ -f /usr/bin/python3.$i ]; then
+            _show_and_run sudo update-alternatives --install \
+                /usr/bin/python3 python3 /usr/bin/python3.$i $i
+        fi
+    done
+
+    # ----------------------
+    _show_and_run sudo update-alternatives --config python3
+
+    # install some related software package
+    _show_and_run _install_if_not_installed python3.11-distutils
+
+    # others ------------
+    _show_and_run _install_if_not_installed python3-pip
+}
+
 # =============================================================================
 function _dj_setup_qemu() {
     _show_and_run _pushd_quiet ${PWD}

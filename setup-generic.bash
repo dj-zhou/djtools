@@ -6,7 +6,7 @@ setup_list+="gitg-gitk glog gnuplot go googletest grpc gtest g++-10 g++-11 htop 
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
 setup_list+="magic-enum  meson-ninja mongodb mongodb-compass nlohmann-json3-dev nodejs "
 setup_list+="opencv-3.4.13 opencv-4.5.5 pangolin perf picocom pip plotjuggler protobuf "
-setup_list+="pycharm python3.10 python3.11 qemu ros2-foxy ros2-humble rpi-pico rust spdlog "
+setup_list+="pycharm python3.10 python3.11 python3.12 qemu ros2-foxy ros2-humble rpi-pico rust spdlog "
 setup_list+="sublime yaml-cpp "
 
 if [ $system = 'Linux' ]; then
@@ -1742,6 +1742,7 @@ function _dj_setup() {
     "pycharm") _dj_setup_pycharm ;;
     "python3.10") _dj_setup_python_3_10 ;;
     "python3.11") _dj_setup_python_3_11 ;;
+    "python3.11") _dj_setup_python_3_12 ;;
     "qemu") shift 1 && _dj_setup_qemu "$@" ;;
     "qt-5.13.1") _dj_setup_qt_5_13_1 ;;
     "qt-5.14.2") _dj_setup_qt_5_14_2 ;;
