@@ -16,6 +16,7 @@ elif [ $system = 'Linux' ]; then
     esac
 fi
 
+echo "ubuntu_v=$ubuntu_v"
 echo "ubuntu_codename=$ubuntu_codename"
 
 # =============================================================================
