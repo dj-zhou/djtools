@@ -16,6 +16,8 @@ elif [ $system = 'Linux' ]; then
     esac
 fi
 
+echo "ubuntu_codename=$ubuntu_codename"
+
 # =============================================================================
 NOC='\033[0m'
 GRY='\033[0;30m'
