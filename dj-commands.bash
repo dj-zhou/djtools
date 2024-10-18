@@ -322,8 +322,7 @@ function _dj_setup_docker() {
 
     _show_and_run echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] $docker_url   "$(. /etc/os-release && echo "$ubuntu_codename")" stable" |
         sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-    echo "ubuntu_codename = $ubuntu_codename"
-    return
+    
     _show_and_run sudo apt-get -y update
 
     # Install
