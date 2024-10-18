@@ -9,10 +9,10 @@ elif [ $system = 'Linux' ]; then
     # add some global variables -- only tested on Ubuntu
     ubuntu_v=$(lsb_release -a)
     case $ubuntu_v in
-    18.04) ubuntu_codename="bionic" ;;
-    20.04) ubuntu_codename="focal" ;;
-    22.04) ubuntu_codename="jammy" ;;
-    24.04) ubuntu_codename="noble" ;;
+    "18.04") ubuntu_codename="bionic" ;;
+    "20.04") ubuntu_codename="focal" ;;
+    "22.04") ubuntu_codename="jammy" ;;
+    "24.04") ubuntu_codename="noble" ;;
     esac
 fi
 
