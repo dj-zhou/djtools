@@ -319,11 +319,11 @@ function _dj_setup_docker() {
 
     # Add the Docker repository to APT sources
     # the install page uses VERSION_CODENAME or UBUNTU_CODENAME, but they are not defined
-    echo "ubuntu_codename = $ubuntu_codename"
-    return
+
     _show_and_run echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] $docker_url   "$(. /etc/os-release && echo "$ubuntu_codename")" stable" |
         sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-
+    echo "ubuntu_codename = $ubuntu_codename"
+    return
     _show_and_run sudo apt-get -y update
 
     # Install
