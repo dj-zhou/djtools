@@ -31,7 +31,6 @@ import shlex
 import subprocess
 import sys
 
-
 # These should never be newer than the main.py version since this needs to be a
 # bit more flexible with older systems.  See that file for more details on the
 # versions we select.
@@ -255,10 +254,11 @@ import shutil
 import stat
 
 if sys.version_info[0] == 3:
-  import urllib.request
   import urllib.error
+  import urllib.request
 else:
   import imp
+
   import urllib2
   urllib = imp.new_module('urllib')
   urllib.request = urllib2

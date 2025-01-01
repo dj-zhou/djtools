@@ -1,5 +1,6 @@
 import os
 import sys
+
 from openai import OpenAI
 
 # add this into ~/.bashrc or ~/.zshrc file

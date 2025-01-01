@@ -52,6 +52,12 @@ eom
 
 # =============================================================================
 function _dj_replace() {
+
+    if [ $# -lt 2 ]; then
+        echo -e "${YLW}dj replace${NOC}: need at least two argument2."
+        echo -e "example: dj replace <original> <new> <path to file>"
+        return
+    fi
     _pushd_quiet ${PWD}
 
     if [ $# = 3 ]; then
@@ -107,7 +113,7 @@ function _dj_format() {
         return
     fi
     if [[ $1 = 'show' ]]; then
-        shift 1
+        # shift 1
         if [[ $2 = 'camel' ]]; then
             shift 1
             _dj_format_clang_format_show_camel "$@"
@@ -116,6 +122,17 @@ function _dj_format() {
         echo "dj format show: need argument."
         return
     fi
+    if [[ $1 = 'python-dir' ]] ; then
+        _show_and_run black .
+        _show_and_run isort --profile=black .
+        return
+    fi
+    if [[ $1 = 'cpp-dir' ]] ; then
+        echo "WIP: apply format for cpp-dir."
+        return
+    fi
+
+    echo "dj format: argument '$1' is not supported."
 
     _popd_quiet
 }

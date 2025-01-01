@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# note: keyremap seems not work in ubuntu 24.04
+
 # =============================================================================
 _keyremap_help() {
     echo -e "keyremap usage:"

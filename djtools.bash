@@ -8,13 +8,17 @@ elif [ $system = 'Linux' ]; then
     rc_file="$HOME/.bashrc"
     # add some global variables -- only tested on Ubuntu
     ubuntu_v=$(lsb_release -a)
-    case $ubuntu_v in
-    18.04) ubuntu_codename="bionic" ;;
-    20.04) ubuntu_codename="focal" ;;
-    22.04) ubuntu_codename="jammy" ;;
-    24.04) ubuntu_codename="noble" ;;
-    esac
+    if [[ "${ubuntu_v}" = *'18.04'* ]]; then
+        ubuntu_codename="bionic"
+    elif [[ "${ubuntu_v}" = *'20.04'* ]]; then
+        ubuntu_codename="focal"
+    elif [[ "${ubuntu_v}" = *'22.04'* ]]; then
+        ubuntu_codename="jammy"
+    elif [[ "${ubuntu_v}" = *'24.04'* ]]; then
+        ubuntu_codename="noble"
+    fi
 fi
+
 
 # =============================================================================
 NOC='\033[0m'
@@ -97,6 +101,7 @@ alias ....="_show_and_run cd ../../.."
 # =============================================================================
 source $djtools_path/block-device.bash
 source $djtools_path/build.bash
+source $djtools_path/clean.bash
 source $djtools_path/djfile.bash
 source $djtools_path/dj-commands.bash
 source $djtools_path/esp32.bash

@@ -4,6 +4,7 @@ arduino 2.0.1
 boost 1.84.0
 cli11 2.1.1 # (no "v" in front!) released Sep. 29th, 2021
 cmake 3.27.8
+cursor-ide 0.41.3
 cutecom v0.50.0 # Aug. 6th, 2018
 docker-compose 2.21.0 # Aug. 30th, 2023
 eigen3 3.4.0 # Aug. 18th, 2021
@@ -24,10 +25,11 @@ lxd 5.17
 nlohmann-json3 v3.11.1 # Aug 1st, 2022
 nodejs 21.1.0 # Oct 23rd, 2023, (includes npm 10.2.0)
 nvm v0.39.1 # Nov 17, 2021
-magic-enum 0.8.2 # Dec. 9th, 2022
+magic-enum 0.9.6 # Jun 29th, 2024
 matplotplusplus c088749434154c230ee7547c6871d65e58876dc6 # latest greatest master on Sep 18th, 2021
 meson 0.61.5 # June. 2nd, 2022, https://github.com/mesonbuild/meson/releases
 mongodb 7.0
+mongodb-compass 1.44.4 # Sept., 24th, 2024
 ninja 1.11.0 # May 15th, 2022, https://github.com/ninja-build/ninja/releases
 pangolin c1d3a6858321b858fd6ab94324460d2c30acb201 # Fri Jan 5 21:55:01 2024
 picocom 3.1   # March 1st, 2018

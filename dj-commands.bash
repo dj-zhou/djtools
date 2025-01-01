@@ -2,6 +2,7 @@
 
 source $djtools_path/clang-format.bash
 source $djtools_path/clone.bash
+source $djtools_path/format.bash
 source $djtools_path/help.bash
 source $djtools_path/get.bash
 source $djtools_path/git.bash
@@ -322,7 +323,7 @@ function _dj_setup_docker() {
 
     _show_and_run echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] $docker_url   "$(. /etc/os-release && echo "$ubuntu_codename")" stable" |
         sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-
+    
     _show_and_run sudo apt-get -y update
 
     # Install
@@ -538,6 +539,36 @@ function _dj_setup_python_3_11() {
     # ----------------------
     echo -e "run update-alternatives:"
     for i in 3 4 6 7 8 9 10 11; do
+        if [ -f /usr/bin/python3.$i ]; then
+            _show_and_run sudo update-alternatives --install \
+                /usr/bin/python3 python3 /usr/bin/python3.$i $i
+        fi
+    done
+
+    # ----------------------
+    _show_and_run sudo update-alternatives --config python3
+
+    # install some related software package
+    _show_and_run _install_if_not_installed python3.11-distutils
+
+    # others ------------
+    _show_and_run _install_if_not_installed python3-pip
+}
+
+
+# =============================================================================
+function _dj_setup_python_3_12() {
+    local anw=$(_check_file_existence deadsnake /etc/apt/sources.list.d)
+    if [ "$anw" = "no" ]; then
+        _show_and_run sudo add-apt-repository ppa:deadsnakes/ppa
+        _show_and_run sudo apt-get -y update
+    fi
+    _show_and_run _install_if_not_installed python3.12
+    _show_and_run _install_if_not_installed python3.11
+
+    # ----------------------
+    echo -e "run update-alternatives:"
+    for i in 3 4 6 7 8 9 10 11 12; do
         if [ -f /usr/bin/python3.$i ]; then
             _show_and_run sudo update-alternatives --install \
                 /usr/bin/python3 python3 /usr/bin/python3.$i $i
@@ -1474,12 +1505,12 @@ function _dj_grep() {
 
 # =============================================================================
 function dj() {
-    # ------------------------------
     if [ $# -eq 0 ]; then
         _dj_help
         return
     fi
     case $1 in
+    'clean') shift && _dj_clean "$@" ;;
     'flame-graph') shift && _dj_flame_grapah "$@" ;;
     'format') shift && _dj_format "$@" ;;
     'grep') shift && _dj_grep "$@" ;;
@@ -1520,6 +1551,7 @@ function _dj_linux() {
 
     # All possible first values in command line
     local SERVICES=("
+        clean
         flame-graph
         format
         get
@@ -1597,11 +1629,16 @@ function _dj_linux() {
 
     # --------------------------------------------------------
     # --------------------------------------------------------
-    ACTIONS["split"]="$(ls)"
-    # --------------------------------------------------------
-    # --------------------------------------------------------
-    ACTIONS["clone"]="bitbucket github "
+    ACTIONS["clean"]="$clean_list "
+    for i in $clean_list; do
+        ACTIONS["$i"]=" "
+    done
 
+    # --------------------------------------------------------
+    # --------------------------------------------------------
+    ACTIONS["split"]="$(ls)"
+
+    # --------------------------------------------------------
     # --------------------------------------------------------
     flame_list="generate clear help "
     ACTIONS["flame-graph"]="$flame_list "
@@ -1609,7 +1646,7 @@ function _dj_linux() {
         ACTIONS["$i"]=" "
     done
     # --------------------------------------------------------
-    format_list="brush show "
+    format_list="brush show python-dir cpp-dir "
     ACTIONS["format"]="$format_list "
     for i in $format_list; do
         ACTIONS["$i"]=" "
@@ -1788,6 +1825,8 @@ function _dj_darwin() {
 
     # Array of options for the custom command
     custom_options=(
+        clean
+        format
         get
         git
         grep
@@ -1795,6 +1834,10 @@ function _dj_darwin() {
         ssh-general
         work-check
     )
+    # ------------
+    read -r -A clean_options <<<"$clean_list"
+    # ------------
+    read -r -A format_options <<<"$format_list"
     # ------------
     read -r -A get_options <<<"$get_list"
     # ------------
@@ -1825,22 +1868,28 @@ function _dj_darwin() {
         ;;
     second)
         case $words[2] in
-        get)
+        "clean")
+            _wanted clean_sl_options expl 'subcommand for clean' compadd -a clean_options
+            ;;
+        "format")
+            _wanted format_sl_options expl 'subcommand for format' compadd -a format_options
+            ;;
+        "get")
             _wanted get_sl_options expl 'subcommand for get' compadd -a get_options
             ;;
-        git)
+        "git")
             _wanted git_sl_options expl 'subcommand for git' compadd -a git_options
             ;;
-        grep)
+        "grep")
             _wanted grep_sl_options expl 'subcommand for grep' compadd -a grep_options
             ;;
-        setup)
+        "setup")
             _wanted setup_sl_options expl 'subcommand for setup' compadd -a setup_options
             ;;
-        ssh-general)
+        "ssh-general")
             _wanted ssh_general_sl_options expl 'subcommand for ssh-general' compadd -a ssh_generals_options
             ;;
-        work-check)
+        "work-check")
             _wanted work_check_sl_options expl 'subcommand for work-check' compadd -a work_check_options
             ;;
         esac

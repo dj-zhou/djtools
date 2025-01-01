@@ -333,11 +333,11 @@ function _wget_if_not_exist() { # $filename $md5sum $url $option
     fi
     need_to_download=1
     if [[ "$md5_checksum" = *"$checksum_passed_in"* ]]; then
-        echo "file exists, md5 checksum matches, no need to download again"
+        echo "file exists, matched the md5 checksum, no need to download again."
         need_to_download=0
     fi
     if [[ "$sha256_checksum" = *"$checksum_passed_in"* ]]; then
-        echo "file exists, sha256 checksum matches, no need to download again"
+        echo "file exists, matched sha256 checksum, no need to download again."
         need_to_download=0
     fi
     # finally, download it if necessary

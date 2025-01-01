@@ -4,20 +4,20 @@ setup_list="abseil-cpp anaconda ansible arduino-ide boost cli11 cmake docker doc
 setup_list+="eigen3 esp-idf fast-github flamegraph fmt gadgets git-lfs "
 setup_list+="gitg-gitk glog gnuplot go googletest grpc gtest g++-10 g++-11 htop kdiff3 "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
-setup_list+="magic-enum  meson-ninja mongodb nlohmann-json3-dev nodejs opencv-3.4.13 "
-setup_list+="opencv-4.5.5 pangolin perf picocom pip plotjuggler protobuf pycharm "
-setup_list+="python3.10 python3.11 qemu ros2-foxy ros2-humble rpi-pico rust  spdlog "
+setup_list+="magic-enum  meson-ninja mongodb mongodb-compass nlohmann-json3-dev nodejs "
+setup_list+="opencv-3.4.13 opencv-4.5.5 pangolin perf picocom pip plotjuggler protobuf "
+setup_list+="pycharm python3.10 python3.11 python3.12 qemu ros2-foxy ros2-humble rpi-pico rust spdlog "
 setup_list+="sublime yaml-cpp "
 
 if [ $system = 'Linux' ]; then
     setup_list+="adobe-pdf-reader baidu-netdisk can-analyzer can-dev-tools clang-format "
-    setup_list+="clang-llvm computer cuda cutecom devtools driver dtc device-tree-compilier "
+    setup_list+="clang-llvm computer cuda cursor-ide cutecom devtools driver dtc device-tree-compilier "
     setup_list+="foxit-pdf-reader fsm-pro gcc-arm-stm32 gcc-arm-linux-gnueabi "
     setup_list+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu glfw3 gnome google-repo "
     setup_list+="i219-v mbed network-tools nvidia nvtop qt-5.13.1 qt-5.14.2 saleae-logic "
     setup_list+="serial-console slack stm32-cube-ide stm32-cube-ide-desktop-item "
     setup_list+="stm32-cube-mx stm32-cube-mx-desktop-item stm32-cube-programmer "
-    setup_list+="stm32-tools texlive thermal-printer typora vscode windows-fonts wireshark wubi "
+    setup_list+="stm32-tools texlive rollo-printer typora vscode windows-fonts wireshark wubi "
     # elif [ $system = 'Darwin' ]; then
     # do nothing at this point
 fi
@@ -382,7 +382,7 @@ function _dj_setup_esp_idf() {
     if [[ -z "$which_meson" || -z "$which_ninja" ]]; then
         _show_and_run dj setup meson-ninja
     else
-        echo "meson version: $(meosn --version)"
+        echo "meson version: $(meson --version)"
         echo "ninja version: $(ninja --version)"
     fi
 
@@ -1005,13 +1005,18 @@ function _dj_setup_magic_enum() {
     _show_and_run cd $soft_dir
     _show_and_run sudo rm -rf magic_enum
 
-    gpp_v=$(version check g++)
-    anw=$(_version_if_ge_than $gpp_v "12.0.0")
-    if [ $anw="yes" ]; then
-        echo_warn "g++ > 12.0.0 does not support extended characters"
-        ver="0.7.3"
-    else
+    if [ $system = 'Darwin' ]; then
         ver=$(_find_package_version magic-enum)
+    else
+        # once it is tested on ubuntu 22.04/24.04, this can be removed
+        gpp_v=$(version check g++)
+        anw=$(_version_if_ge_than $gpp_v "12.0.0")
+        if [[ "$anw" = 'yes' ]]; then
+            echo_warn "g++ > 12.0.0 does not support extended characters"
+            ver="0.7.3"
+        else
+            ver=$(_find_package_version magic-enum)
+        fi
     fi
     _show_and_run git clone https://github.com/Neargye/magic_enum.git
     _show_and_run cd magic_enum
@@ -1158,6 +1163,29 @@ Check if MongoDB is installed:
 eom
 }
 
+# =============================================================================
+function _dj_setup_mongodb_compass() {
+    _show_and_run _pushd_quiet ${PWD}
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+    local v=$(_find_package_version mongodb-compass)
+    echo "v=$v"
+    if [ $system = 'Linux' ]; then
+        filename="mongodb-compass_${v}_amd64.deb"
+        echo "filename=$filename"
+        url=https://downloads.mongodb.com/compass/$filename
+        echo "url=$url"
+        # https://downloads.mongodb.com/compass/mongodb-compass_1.43.4_amd64.deb
+        _wget_if_not_exist $filename "3ed32961b284a2520a32be4619e8f80a" $url
+        _show_and_run sudo dpkg -i $filename
+        chmod +x $filename
+
+    else
+        echo "_dj_setup_mongodb_compass: wip for $system."
+    fi
+    _popd_quiet
+
+}
 # =============================================================================
 function _dj_stup_network_tools() {
     echo -e "install ${INFO}nethogs${NOC}, ${INFO}iptraf${NOC}"
@@ -1541,7 +1569,7 @@ function _dj_setup_texlive() {
 }
 
 # =============================================================================
-function _dj_setup_thermal_printer() {
+function _dj_setup_rollo_printer() {
     _pushd_quiet ${PWD}
 
     _show_and_run mkdir -p $soft_dir
@@ -1555,19 +1583,30 @@ function _dj_setup_thermal_printer() {
     _show_and_run rm -rf rollo
     _show_and_run mkdir rollo
     _show_and_run cd rollo
+
+    uname_a=$(uname -a)
     if [[ "${ubuntu_v}" = *'Raspbian'*'bullseye'* ]]; then
         _show_and_run wget https://www.rollo.com/driver-dl/beta/rollo-driver-raspberrypi-beta.zip
         _show_and_run unzip rollo-driver-raspberrypi-beta.zip
         _show_and_run chmod +x install.run
         _show_and_run sudo ./install.run
-    elif [[ "${ubuntu_v}" = *'Ubuntu'*'22'* ]]; then
+    elif [[ "${ubuntu_v}" = *'Ubuntu'*'22'*  && "${uname_a}" = *'x86_64'* ]]; then
         local f="rollo-driver-ubuntu_x86_64_v1.0.2"
         _show_and_run wget https://rollo-main.b-cdn.net/driver-dl/beta/${f}.tar.gz
         _show_and_run dj unpack tar.gz ${f}.tar.gz
         _show_and_run cd ${f}/${f}/ubuntu_x86_64_v1.0.2
         _show_and_run sudo ./install
+    elif [[ "${ubuntu_v}" = *'Ubuntu'*'24'* && "${uname_a}" = *'x86_64'* ]]; then
+        local f="rollo-cups-driver_1.8.4-1_amd64.deb"
+        _show_and_run wget https://rollo-main.b-cdn.net/driver-dl/linux/${f}
+        _show_and_run sudo dpkg -i ${f}
+        # need to copy rastertolabelbeeprt to /usr/lib/cups/filter/ to finish the setup
+        # this file is only for x86_64
+        # otherwise, `lpstat -p` would have this error:
+        # File "/usr/lib/cups/filter/rastertolabelbeeprt" not available: No such file or directory
+        _show_and_run sudo cp ${djtools_path}/settings/rastertolabelbeeprt /usr/lib/cups/filter/
     else
-        echo_warn "Not tested platform, exit."
+        echo_warn "dj setup rollo-printer: platform is not tested, exit."
         return
     fi
 
@@ -1655,6 +1694,7 @@ function _dj_setup() {
     "cmake") _dj_setup_cmake ;;
     "computer") _dj_setup_computer ;;
     "cuda") _dj_setup_cuda ;;
+    "cursor-ide") _dj_setup_cursor_ide ;;
     "cutecom") _dj_setup_cutecom ;;
     "devtools") _dj_setup_devtools ;;
     "docker") _dj_setup_docker ;;
@@ -1702,6 +1742,7 @@ function _dj_setup() {
     "mbed") _dj_setup_mbed ;;
     "meson-ninja") _dj_setup_meson_ninjia ;;
     "mongodb") _dj_setup_mongodb ;;
+    "mongodb-compass") _dj_setup_mongodb_compass ;;
     "network-tools") _dj_stup_network_tools ;;
     "nlohmann-json3-dev") _dj_setup_nlohmann_json3_dev ;;
     "nodejs") _dj_setup_nodejs ;;
@@ -1718,6 +1759,7 @@ function _dj_setup() {
     "pycharm") _dj_setup_pycharm ;;
     "python3.10") _dj_setup_python_3_10 ;;
     "python3.11") _dj_setup_python_3_11 ;;
+    "python3.12") _dj_setup_python_3_12 ;;
     "qemu") shift 1 && _dj_setup_qemu "$@" ;;
     "qt-5.13.1") _dj_setup_qt_5_13_1 ;;
     "qt-5.14.2") _dj_setup_qt_5_14_2 ;;
@@ -1737,7 +1779,7 @@ function _dj_setup() {
     "stm32-tools") shift 1 && _dj_setup_stm32_tools "$@" ;;
     "sublime") _dj_setup_sublime ;;
     "texlive") _dj_setup_texlive ;;
-    "thermal-printer") _dj_setup_thermal_printer ;;
+    "rollo-printer") _dj_setup_rollo_printer ;;
     "typora") _dj_setup_typora ;;
     "vscode") _dj_setup_vscode ;;
     "windows-fonts") _dj_setup_windows_fonts ;;

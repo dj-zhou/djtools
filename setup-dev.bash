@@ -59,6 +59,58 @@ $ nvcc --version
 eom
 }
 
+# =============================================================================================
+function _create_cursor_ide_desktop_item() {
+    folder="/usr/share/applications"
+
+    # copy the icon file
+    _show_and_run sudo cp $djtools_path/settings/cursor-icon.xpm $folder
+
+    file="cursor-ide.desktop"
+    _show_and_run touch $file
+
+    _show_and_run echo '[Desktop Entry]' >>$file
+    _show_and_run echo 'Encoding=UTF-8' >>$file
+    _show_and_run echo 'Name=Cursor' >>$file
+    _show_and_run echo 'Comment=Cursor IDE' >>$file
+    _show_and_run echo 'Exec=bash -c "cd '$HOME'/.local/bin/ && ./cursor-x86_64.AppImage"' >>$file
+    _show_and_run echo 'Icon='$folder'/cursor-icon.xpm' >>$file
+    _show_and_run echo 'StartupNotify=false' >>$file
+    _show_and_run echo 'Type=Application' >>$file
+    _show_and_run echo 'Categories=Application;Development;' >>$file
+
+    _show_and_run sudo rm -rf $folder/$file
+    _show_and_run sudo mv $file $folder
+
+    _show_and_run sudo chmod +x $folder/$file
+
+    if [ ! -f "$HOME/.local/bin/cursor" ]; then
+        echo -e "${YLW}Cursor is not installed to $HOME/.local/bin/, you need to revise file:${NOC}"
+        echo -e "${YLW}$folder/$file accordingly.${NOC}"
+    fi
+}
+
+# =============================================================================
+function _dj_setup_cursor_ide() {
+    _pushd_quiet "${PWD}"
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    # v=$(_find_package_version cursor-ide)
+    # _echo_install Cursor $v
+    # this seems to get the latest version, so the above is useless
+
+    _show_and_run wget https://downloader.cursor.sh/linux/appImage/x64
+    _show_and_run mv x64 cursor-x86_64.AppImage
+    _show_and_run chmod +x cursor-x86_64.AppImage
+    _show_and_run rm -rf HOME/.local/bin/cursor*.AppImage
+    _show_and_run mv cursor-x86_64.AppImage $HOME/.local/bin/cursor
+
+    _create_cursor_ide_desktop_item
+
+    _popd_quiet
+}
+
 # =============================================================================
 function _dj_setup_cutecom() {
     _pushd_quiet "${PWD}"
