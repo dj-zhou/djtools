@@ -33,6 +33,9 @@ function _dj_python3_venv_numpy_pandas() {
     if [[ $python3_v = *"3.10"* ]]; then
         _show_and_run sudo apt install -y python3.10-venv
     fi
+    if [[ $python3_v = *"3.12"* ]]; then
+        _show_and_run sudo apt install -y python3.12-venv
+    fi
 
     VENV_DIR=".venv"
 

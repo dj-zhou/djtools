@@ -4,6 +4,7 @@ clean_list="--python-dir --git-orig "
 
 function _dj_clean_python_dir() {
     _show_and_run find . -type d -name "__pycache__" -print -exec rm -r {} +
+    _show_and_run find . -type d -name ".pytest_cache" -print -exec rm -r {} +
     _show_and_run find . -type f -name "*.pyc"  -print -delete
     _show_and_run find . -type d -name "*.egg-info"-print -exec rm -r {} +
 }

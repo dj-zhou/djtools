@@ -141,7 +141,11 @@ function _dj_help_screen() {
 -----------------------------------------
 how to use screen:
     start: $ screen /dev/ttyUSB0 115200 [ENTER]
-     exit: press Ctrl+A and then \, and [y]
+     exit: 
+      -- on Ubuntu:
+            press Ctrl + A and then \, and Y
+      -- on Mac OS:
+            press Control + A and then K, and Y
 -----------------------------------------
 eom
 }

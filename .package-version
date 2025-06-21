@@ -23,13 +23,13 @@ libserialport 6f9b03e597ea7200eb616a4e410add3dd1690cb1 # Jun 11, 2021
 libsystemd v248
 lxd 5.17
 nlohmann-json3 v3.11.1 # Aug 1st, 2022
-nodejs 21.1.0 # Oct 23rd, 2023, (includes npm 10.2.0)
+nodejs 23.6.0 # Jan. 27th, 2025, (includes npm 10.xx)
 nvm v0.39.1 # Nov 17, 2021
 magic-enum 0.9.6 # Jun 29th, 2024
 matplotplusplus c088749434154c230ee7547c6871d65e58876dc6 # latest greatest master on Sep 18th, 2021
 meson 0.61.5 # June. 2nd, 2022, https://github.com/mesonbuild/meson/releases
 mongodb 7.0
-mongodb-compass 1.44.4 # Sept., 24th, 2024
+mongodb-compass 1.45.1 # Jan. 22, 2025
 ninja 1.11.0 # May 15th, 2022, https://github.com/ninja-build/ninja/releases
 pangolin c1d3a6858321b858fd6ab94324460d2c30acb201 # Fri Jan 5 21:55:01 2024
 picocom 3.1   # March 1st, 2018

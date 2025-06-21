@@ -122,12 +122,13 @@ function _dj_format() {
         echo "dj format show: need argument."
         return
     fi
-    if [[ $1 = 'python-dir' ]] ; then
-        _show_and_run black .
-        _show_and_run isort --profile=black .
+    if [[ $1 = 'python-dir' ]]; then
+        _show_and_run black . --exclude '/(\.git|\.dev-venv|\.venv|\.vscode|build|dist|__pycache__|.*\.egg-info)/'
+        _show_and_run isort --profile=black . --skip .dev-venv --skip .venv --skip build --skip dist --skip __pycache__
+
         return
     fi
-    if [[ $1 = 'cpp-dir' ]] ; then
+    if [[ $1 = 'cpp-dir' ]]; then
         echo "WIP: apply format for cpp-dir."
         return
     fi

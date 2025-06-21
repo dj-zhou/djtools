@@ -1270,7 +1270,7 @@ function _dj_grep_string() {
         echo -e "grep in ${INFO}*.py,*.ipynb${NOC} files"
         grep "$2" --color=always -rI \
             --include={"*.py","*.ipynb"} \
-            --exclude-dir={".venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
+            --exclude-dir={".venv",".dev-venv","build","subprojects","bin","_b*","builddir",".git",".cache"} \
             --exclude={'*.lst','*.pyc'} \
             . | awk -F ":" '{print $1 " :" $2}'
         return

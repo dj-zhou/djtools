@@ -96,17 +96,19 @@ function _dj_setup_cursor_ide() {
     _show_and_run mkdir -p $soft_dir
     _show_and_run cd $soft_dir
 
-    # v=$(_find_package_version cursor-ide)
-    # _echo_install Cursor $v
-    # this seems to get the latest version, so the above is useless
+    if [ $system = 'Linux' ]; then
+        # this seems to get the latest version, so the above is useless
 
-    _show_and_run wget https://downloader.cursor.sh/linux/appImage/x64
-    _show_and_run mv x64 cursor-x86_64.AppImage
-    _show_and_run chmod +x cursor-x86_64.AppImage
-    _show_and_run rm -rf HOME/.local/bin/cursor*.AppImage
-    _show_and_run mv cursor-x86_64.AppImage $HOME/.local/bin/cursor
+        _show_and_run wget https://downloader.cursor.sh/linux/appImage/x64
+        _show_and_run mv x64 cursor-x86_64.AppImage
+        _show_and_run chmod +x cursor-x86_64.AppImage
+        _show_and_run rm -rf HOME/.local/bin/cursor*.AppImage
+        _show_and_run mv cursor-x86_64.AppImage $HOME/.local/bin/cursor
 
-    _create_cursor_ide_desktop_item
+        _create_cursor_ide_desktop_item
+    elif [ $system = 'Darwin' ]; then
+        echo "open https://www.cursor.com/ and follow the instruction"
+    fi
 
     _popd_quiet
 }

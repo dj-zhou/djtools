@@ -1,7 +1,7 @@
 #!/bin/bash
 
-setup_list="abseil-cpp anaconda ansible arduino-ide boost cli11 cmake docker docker-compose  "
-setup_list+="eigen3 esp-idf fast-github flamegraph fmt gadgets git-lfs "
+setup_list="abseil-cpp anaconda ansible arduino-ide boost cli11 cmake cursor-ide docker "
+setup_list+="docker-compose eigen3 esp-idf fast-github flamegraph fmt gadgets git-lfs "
 setup_list+="gitg-gitk glog gnuplot go googletest grpc gtest g++-10 g++-11 htop kdiff3 "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
 setup_list+="magic-enum  meson-ninja mongodb mongodb-compass nlohmann-json3-dev nodejs "
@@ -11,7 +11,7 @@ setup_list+="sublime yaml-cpp "
 
 if [ $system = 'Linux' ]; then
     setup_list+="adobe-pdf-reader baidu-netdisk can-analyzer can-dev-tools clang-format "
-    setup_list+="clang-llvm computer cuda cursor-ide cutecom devtools driver dtc device-tree-compilier "
+    setup_list+="clang-llvm computer cuda cutecom devtools driver dtc device-tree-compilier "
     setup_list+="foxit-pdf-reader fsm-pro gcc-arm-stm32 gcc-arm-linux-gnueabi "
     setup_list+="gcc-arm-linux-gnueabihf gcc-aarch64-linux-gnu glfw3 gnome google-repo "
     setup_list+="i219-v mbed network-tools nvidia nvtop qt-5.13.1 qt-5.14.2 saleae-logic "
@@ -1250,13 +1250,31 @@ function _dj_setup_nlohmann_json3_dev() {
 }
 
 # =============================================================================
-# use nvm (node version management) to install nodejs
-# https://github.com/nvm-sh/nvm#installing-and-updating
-# https://stackoverflow.com/a/36401038
+# install node.js from source
 function _dj_setup_nodejs() {
 
     if [ $system = 'Linux' ]; then
         _show_and_run _install_if_not_installed git-core curl build-essential openssl libssl-dev
+    elif [ $system = 'Darwin' ]; then
+        _show_and_run _install_if_not_installed curl openssl
+
+        _show_and_run rm -rf ~/.npm
+        _show_and_run rm -rf ~/.node-gyp
+        _show_and_run rm -rf ~/.nvm
+        _show_and_run rm -rf ~/.cache/node-gyp
+        _show_and_run rm -rf ~/.config/nvm
+
+        _show_and_run sudo rm -rf /usr/local/lib/node_modules
+        _show_and_run sudo rm -rf /usr/local/include/node
+        _show_and_run sudo rm -rf /usr/local/bin/node
+        _show_and_run sudo rm -rf /usr/local/share/man/man1/node.1
+        _show_and_run sudo rm -rf /usr/local/lib/dtrace/node.d
+
+        _show_and_run sudo rm -rf /usr/local/bin/node
+        _show_and_run sudo rm -rf /usr/local/bin/npm
+        _show_and_run sudo rm -rf /usr/local/bin/npx
+
+        _show_and_run rm -rf ~/.nvm
     fi
     _show_and_run _pushd_quiet ${PWD}
     _show_and_run mkdir -p $soft_dir
@@ -1269,13 +1287,13 @@ function _dj_setup_nodejs() {
         _show_and_run cd node
     else
         _show_and_run cd node
-        _show_and_run git checkout master
+        _show_and_run git checkout main
         _show_and_run git fetch -p
         _show_and_run git pull
     fi
     _show_and_run git checkout v$v
     _show_and_run ./configure
-    _show_and_run make -j$(nproc)
+    _show_and_run sudo make -j$(nproc)
     _show_and_run sudo make install
 
     _popd_quiet
@@ -1578,6 +1596,7 @@ function _dj_setup_rollo_printer() {
     _show_and_run sudo apt-get update -y
     _show_and_run sudo apt-get upgrade -y
     _show_and_run sudo apt install cups
+    _show_and_run sudo apt install libcups2-dev 
     _show_and_run sudo usermod -a -G lpadmin $USER
 
     _show_and_run rm -rf rollo
@@ -1586,25 +1605,42 @@ function _dj_setup_rollo_printer() {
 
     uname_a=$(uname -a)
     if [[ "${ubuntu_v}" = *'Raspbian'*'bullseye'* ]]; then
-        _show_and_run wget https://www.rollo.com/driver-dl/beta/rollo-driver-raspberrypi-beta.zip
+        # this is only for 32-bit system
+        _show_and_run cp ${djtools_path}/settings/rollo-driver-raspberrypi-beta.zip .
         _show_and_run unzip rollo-driver-raspberrypi-beta.zip
         _show_and_run chmod +x install.run
         _show_and_run sudo ./install.run
-    elif [[ "${ubuntu_v}" = *'Ubuntu'*'22'*  && "${uname_a}" = *'x86_64'* ]]; then
+    elif [[ "${ubuntu_v}" = *'Debian'*'bookworm'* ]]; then
+        # it is better to use the source file
+        # settings/rollo-cups-driver-1.8.4.tar.gz
+        _show_and_run wget https://rollo-main.b-cdn.net/driver-dl/linux/rollo-cups-driver_1.8.4-1_arm64.deb
+        _show_and_run sudo dpkg -i rollo-cups-driver_1.8.4-1_arm64.deb
+        _show_and_run rm rollo-cups-driver_1.8.4-1_arm64.deb
+    elif [[ "${ubuntu_v}" = *'Ubuntu'* && "${uname_a}" = *'x86_64'* ]]; then
         local f="rollo-driver-ubuntu_x86_64_v1.0.2"
-        _show_and_run wget https://rollo-main.b-cdn.net/driver-dl/beta/${f}.tar.gz
-        _show_and_run dj unpack tar.gz ${f}.tar.gz
-        _show_and_run cd ${f}/${f}/ubuntu_x86_64_v1.0.2
-        _show_and_run sudo ./install
-    elif [[ "${ubuntu_v}" = *'Ubuntu'*'24'* && "${uname_a}" = *'x86_64'* ]]; then
-        local f="rollo-cups-driver_1.8.4-1_amd64.deb"
-        _show_and_run wget https://rollo-main.b-cdn.net/driver-dl/linux/${f}
-        _show_and_run sudo dpkg -i ${f}
-        # need to copy rastertolabelbeeprt to /usr/lib/cups/filter/ to finish the setup
-        # this file is only for x86_64
-        # otherwise, `lpstat -p` would have this error:
-        # File "/usr/lib/cups/filter/rastertolabelbeeprt" not available: No such file or directory
-        _show_and_run sudo cp ${djtools_path}/settings/rastertolabelbeeprt /usr/lib/cups/filter/
+        _show_and_run cp ${djtools_path}/settings/rollo-cups-driver-1.8.4.tar.gz .
+        _show_and_run tar -xvf rollo-cups-driver-1.8.4.tar.gz
+        _show_and_run cd rollo-cups-driver-1.8.4
+        _show_and_run ./configure
+        _show_and_run make
+        _show_and_run sudo make install
+        _show_and_run sudo cp rastertorollo /usr/lib/cups/filter # seems already copied during install?
+        _show_and_run sudo ln -s  /usr/lib/cups/filter/rastertorollo /usr/lib/cups/filter/rastertolabelbeeprt # file exists?
+
+    # elif [[ "${ubuntu_v}" = *'Ubuntu'*'24'* && "${uname_a}" = *'x86_64'* ]]; then
+    #     local f="rollo-cups-driver_1.8.4-1_amd64.deb"
+    #     _show_and_run wget https://rollo-main.b-cdn.net/driver-dl/linux/${f}
+    #     _show_and_run sudo dpkg -i ${f}
+    #     # need to copy rastertolabelbeeprt to /usr/lib/cups/filter/ to finish the setup
+    #     # this file is only for x86_64
+    #     # otherwise, `lpstat -p` would have this error:
+    #     # File "/usr/lib/cups/filter/rastertolabelbeeprt" not available: No such file or directory
+    #     # todo: the filter from rollo driver is called rastertrollo or something
+    #     # just need to create a symlink rastertolabelbeeprt to it
+    #     # TODO: check the CUPS version on Ubuntu 24.04
+    #     # not sure if this is related: https://github.com/OpenPrinting/cups-sharing/issues/4
+    #     # seems like cups 3.0 does not need this filter
+    #     _show_and_run sudo cp ${djtools_path}/settings/rastertolabelbeeprt /usr/lib/cups/filter/
     else
         echo_warn "dj setup rollo-printer: platform is not tested, exit."
         return
