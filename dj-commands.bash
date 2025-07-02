@@ -323,7 +323,7 @@ function _dj_setup_docker() {
 
     _show_and_run echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] $docker_url   "$(. /etc/os-release && echo "$ubuntu_codename")" stable" |
         sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
-    
+
     _show_and_run sudo apt-get -y update
 
     # Install
@@ -554,7 +554,6 @@ function _dj_setup_python_3_11() {
     # others ------------
     _show_and_run _install_if_not_installed python3-pip
 }
-
 
 # =============================================================================
 function _dj_setup_python_3_12() {
@@ -1356,8 +1355,9 @@ function _dj_ssh_general_no_password() {
     pos=$(_find_a_char_in_str $user_and_ip "@" 1)
     ip=${user_and_ip:${pos}+1:${#user_and_ip}-${pos}}
 
-    # if ~/.ssh/id_rsa-general.pub does not exist, create one
-    key_file="${HOME}/.ssh/id_rsa-general"
+    # if ~/.ssh/id_rsa.pub does not exist, create one
+    # when ssh to the target, it find the default id_rsa file, not any other names
+    key_file="${HOME}/.ssh/id_rsa"
     if [ ! -f "$key_file" ]; then
         _show_and_run printf "${key_file}\n\n" | _show_and_run ssh-keygen
     fi
