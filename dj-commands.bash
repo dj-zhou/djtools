@@ -193,6 +193,36 @@ function _dj_setup_cli11() {
 }
 
 # =============================================================================
+function _dj_setup_k9s() {
+
+    _show_and_run _pushd_quiet ${PWD}
+    v=$(_find_package_version k9s)
+    if [[ "$v" = *"not be installed"* ]]; then
+        _show_and_run dj setup k9s
+    fi
+    _show_and_run mkdir -p $soft_dir
+    _show_and_run cd $soft_dir
+
+    _show_and_run rm -rf k9s-*
+    file="k9s-v${v}.zip"
+    _show_and_run rm -rf $file
+    _show_and_run wget -O "$file" "https://codeload.github.com/derailed/k9s/zip/refs/tags/v${v}"
+    _show_and_run unzip "$file"
+
+    _show_and_run pushd k9s-${v}/
+    _show_and_run git init
+    _show_and_run git add .
+    _show_and_run git commit -m "local build"
+    COMMIT=$(git rev-parse HEAD)
+    DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    _show_and_run go build -ldflags="-s -w -X github.com/derailed/k9s/cmd.version=0.50.9 -X github.com/derailed/k9s/cmd.commit=$COMMIT -X github.com/derailed/k9s/cmd.date=$DATE" -o k9s .
+
+    _show_and_run sudo mv k9s /usr/local/bin/
+
+    _popd_quiet
+}
+
+# =============================================================================
 function _dj_setup_kdiff3() {
     check_m=$(sysctl -a | grep machdep.cpu.brand_string)
     if [[ "$check_m" = *"Apple M"* ]]; then

@@ -2,7 +2,7 @@
 
 setup_list="abseil-cpp anaconda ansible arduino-ide boost cli11 cmake cursor-ide docker "
 setup_list+="docker-compose eigen3 esp-idf fast-github flamegraph fmt gadgets git-lfs "
-setup_list+="gitg-gitk glog gnuplot go googletest grpc gtest g++-10 g++-11 htop kdiff3 "
+setup_list+="gitg-gitk glog gnuplot go googletest grpc gtest g++-10 g++-11 htop k9s kdiff3 "
 setup_list+="kermit lcm libbpf libcsv-3.0.2 libev libgpiod libiio libserialport libsystemd "
 setup_list+="magic-enum  meson-ninja mongodb mongodb-compass nlohmann-json3-dev nodejs "
 setup_list+="opencv-3.4.13 opencv-4.5.5 pangolin perf picocom pip plotjuggler protobuf "
@@ -1763,6 +1763,7 @@ function _dj_setup() {
     "g++-11") _dj_setup_gpp_11 ;;
     "htop") _dj_setup_htop ;;
     "i219-v") _dj_setup_i219_v $2 ;;
+    "k9s") _dj_setup_k9s ;;
     "kdiff3") _dj_setup_kdiff3 ;;
     "kermit") _dj_setup_kermit ;;
     "lcm") _dj_setup_lcm ;;
