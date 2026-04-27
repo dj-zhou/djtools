@@ -42,11 +42,11 @@ INFO='\033[1;37m'
 
 # =============================================================================
 function _show() {
-    printf >&2 "${INFO}run:"
+    printf >&2 "${GRN}run:"
     local arg
     for arg in "$@"; do
         arg="${arg%\'/\'\\\'\'}"
-        printf >&2 " '%s'" "$arg"
+        printf >&2 " %s" "$arg"
     done
     printf >&2 "$NOC\n"
 }
