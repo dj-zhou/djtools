@@ -23,54 +23,36 @@ function compile_make_build_etc() {
     if [[ $system = "Linux" ]]; then
         [[ -f "make.sh" ]] && options+=("make.sh")
     fi
-    if [[ $system = "Darwin" ]]; then
-        # on Mac OS, I cannot choose the only option
-        if ((${#options[@]} > 0)); then
-            echo "Select a build file to start build:"
-            select file in "${options[@]}"; do
-                if [[ -n "$file" ]]; then
-                    choose="$file"
-                    break
-                else
-                    echo "Invalid selection, try again."
-                fi
-            done
-        else
-            echo "No build files found, exit."
-            return
-        fi
-    elif [[ $system = "Linux" ]]; then
-        if ((${#options[@]} == 1)); then
-            choose="${options[0]}"
-            echo -e "Using $INFO$choose$NOC to build."
-        elif ((${#options[@]} > 0)); then
-            echo "Select a build file to start build:"
-            select file in "${options[@]}"; do
-                if [[ -n "$file" ]]; then
-                    choose="$file"
-                    break
-                else
-                    echo "Invalid selection, try again."
-                fi
-            done
-        else
-            echo "No build files found, exit."
-            return
-        fi
+    if ((${#options[@]} == 1)); then
+        choose="${options[1]:-${options[0]}}"
+        echo -e "Using $INFO$choose$NOC to build."
+    elif ((${#options[@]} > 1)); then
+        echo "Select a build file to start build:"
+        select file in "${options[@]}"; do
+            if [[ -n "$file" ]]; then
+                choose="$file"
+                break
+            else
+                echo "Invalid selection, try again."
+            fi
+        done
+    else
+        echo "No build files found, exit."
+        return
     fi
     # ------------------------------
-    if [ $choose = "Makefile" ]; then
+    if [ "$choose" = "Makefile" ]; then
         _build_makefile "$target"
         return
     fi
     # ------------------------------
     # CMake and Meson are of the same importance
-    if [ $choose = "CMakeLists.txt" ]; then
+    if [ "$choose" = "CMakeLists.txt" ]; then
         _build_cmake "$target"
         return
     fi
-    if [ $choose = "meson.build" ]; then
-        if [ $(_build_main_meson_exists) = 'yes' ]; then
+    if [ "$choose" = "meson.build" ]; then
+        if [ "$(_build_main_meson_exists)" = 'yes' ]; then
             _build_meson_native "$target"
             # this is a hack
             if [ "$target" = "clean" ]; then
@@ -81,7 +63,7 @@ function compile_make_build_etc() {
     fi
 
     # ------------------------------
-    if [ $choose = "make.sh" ]; then
+    if [ "$choose" = "make.sh" ]; then
         echo -e "use customized ${CYN}make.sh${NOC} file"
         chmod +x make.sh
         ./make.sh "$target"
